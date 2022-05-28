@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.library.fluid;
 
 import io.github.fabricators_of_create.porting_lib.mixin.common.accessor.BucketItemAccessor;
-import io.github.fabricators_of_create.porting_lib.transfer.TransferUtilForge;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.transfer.fluid.EmptyFluidHandler;
 import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandler;
 import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandlerItem;
@@ -85,7 +85,7 @@ public class FluidTransferUtil {
         if (!world.isClientSide) {
           BlockEntity te = world.getBlockEntity(pos);
           if (te != null) {
-            TransferUtilForge.getFluidHandler(te, hit)
+            TransferUtil.getFluidHandler(te, hit)
               .ifPresent(handler -> {
                 FluidStack fluidStack = new FluidStack(((BucketItemAccessor)bucket).port_lib$getContent(), FluidAttributes.BUCKET_VOLUME);
                 // must empty the whole bucket
@@ -138,13 +138,13 @@ public class FluidTransferUtil {
       BlockEntity te = world.getBlockEntity(pos);
       if (te != null) {
         // TE must have a capability
-        LazyOptional<IFluidHandler> teCapability = TransferUtilForge.getFluidHandler(te, face);
+        LazyOptional<IFluidHandler> teCapability = TransferUtil.getFluidHandler(te, face);
         if (teCapability.isPresent()) {
           IFluidHandler teHandler = teCapability.orElse(EmptyFluidHandler.INSTANCE);
           ItemStack copy = ItemHandlerHelper.copyStackWithSize(stack, 1);
 
           // if the item has a capability, do a direct transfer
-          LazyOptional<IFluidHandlerItem> itemCapability = TransferUtilForge.getFluidHandlerItem(copy);
+          LazyOptional<IFluidHandlerItem> itemCapability = TransferUtil.getFluidHandlerItem(copy);
           if (itemCapability.isPresent()) {
             if (!world.isClientSide) {
               IFluidHandlerItem itemHandler = itemCapability.resolve().orElseThrow();

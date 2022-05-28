@@ -1,9 +1,9 @@
 package slimeknights.tconstruct.smeltery.block.entity.module;
 
-import io.github.fabricators_of_create.porting_lib.transfer.TransferUtilForge;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandler;
 import io.github.fabricators_of_create.porting_lib.transfer.item.IItemHandler;
-import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelperForge;
+import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import io.github.fabricators_of_create.porting_lib.util.NonNullConsumer;
@@ -13,6 +13,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -48,7 +52,7 @@ public class FuelModule implements ContainerData {
 
   /** Listener to attach to stored capability */
   private final NonNullConsumer<LazyOptional<IFluidHandler>> fluidListener = new WeakConsumerWrapper<>(this, (self, cap) -> self.reset());
-  private final NonNullConsumer<LazyOptional<IItemHandler>> itemListener = new WeakConsumerWrapper<>(this, (self, cap) -> self.reset());
+  private final NonNullConsumer<LazyOptional<Storage<ItemVariant>>> itemListener = new WeakConsumerWrapper<>(this, (self, cap) -> self.reset());
 
   /** Parent TE */
   private final MantleBlockEntity parent;
@@ -60,10 +64,10 @@ public class FuelModule implements ContainerData {
   private MeltingFuel lastRecipe;
   /** Last fluid handler where fluid was extracted */
   @Nullable
-  private LazyOptional<IFluidHandler> fluidHandler;
+  private LazyOptional<Storage<FluidVariant>> fluidHandler;
   /** Last item handler where items were extracted */
   @Nullable
-  private LazyOptional<IItemHandler> itemHandler;
+  private LazyOptional<Storage<ItemVariant>> itemHandler;
   /** Position of the last fluid handler */
   private BlockPos lastPos = NULL_POS;
 
@@ -160,7 +164,11 @@ public class FuelModule implements ContainerData {
       int time = FuelRegistry.INSTANCE.get(stack.getItem()/*, TinkerRecipeTypes.FUEL.get()*/) / 4;
       if (time > 0) {
         if (consume) {
-          ItemStack extracted = handler.extractItem(i, 1, false);
+          ItemStack extracted = ItemStack.EMPTY;
+          try (Transaction t = TransferUtil.getTransaction()) {
+            extracted = handler.extractItem(i, 1, t);
+            t.commit();
+          }
           if (extracted.sameItem(stack)) {
             fuel += time;
             fuelQuality = time;
@@ -170,7 +178,7 @@ public class FuelModule implements ContainerData {
             ItemStack container = new ItemStack(extracted.getItem().getCraftingRemainingItem());
             if (!container.isEmpty()) {
               // if we cannot insert the container back, spit it on the ground
-              ItemStack notInserted = ItemHandlerHelperForge.insertItem(handler, container, false);
+              ItemStack notInserted = ItemHandlerHelper.insertItem(handler, container, false);
               if (!notInserted.isEmpty()) {
                 Level world = getLevel();
                 double x = (world.random.nextFloat() * 0.5F) + 0.25D;
@@ -248,7 +256,7 @@ public class FuelModule implements ContainerData {
     BlockEntity te = getLevel().getBlockEntity(pos);
     if (te != null) {
       // if we find a valid cap, try to consume fuel from it
-      LazyOptional<IFluidHandler> capability = TransferUtilForge.getFluidHandler(te);
+      LazyOptional<IFluidHandler> capability = TransferUtil.getFluidHandler(te);
       Optional<Integer> temperature = capability.map(tryLiquidFuel(consume));
       if (temperature.isPresent()) {
         itemHandler = null;
@@ -258,7 +266,7 @@ public class FuelModule implements ContainerData {
         return temperature.get();
       } else {
         // if we find a valid item cap, consume fuel from that
-        LazyOptional<IItemHandler> itemCap = TransferUtilForge.getItemHandler(te);
+        LazyOptional<Storage<ItemVariant>> itemCap = TransferUtil.getItemStorage(te);
         temperature = itemCap.map(trySolidFuel(consume));
         if (temperature.isPresent()) {
           fluidHandler = null;
@@ -434,12 +442,12 @@ public class FuelModule implements ContainerData {
     if (fluidHandler == null && itemHandler == null) {
       BlockEntity te = getLevel().getBlockEntity(mainTank);
       if (te != null) {
-        LazyOptional<IFluidHandler> fluidCap = TransferUtilForge.getFluidHandler(te);
+        LazyOptional<Storage<FluidVariant>> fluidCap = TransferUtil.getFluidStorage(te);
         if (fluidCap.isPresent()) {
           fluidHandler = fluidCap;
           fluidHandler.addListener(fluidListener);
         } else {
-          LazyOptional<IItemHandler> itemCap = TransferUtilForge.getItemHandler(te);
+          LazyOptional<Storage<ItemVariant>> itemCap = TransferUtil.getItemStorage(te);
           if (itemCap.isPresent()) {
             itemHandler = itemCap;
             itemHandler.addListener(itemListener);
@@ -481,7 +489,7 @@ public class FuelModule implements ContainerData {
           if (!pos.equals(mainTank)) {
             BlockEntity te = world.getBlockEntity(pos);
             if (te != null) {
-              LazyOptional<IFluidHandler> handler = TransferUtilForge.getFluidHandler(te);
+              LazyOptional<IFluidHandler> handler = TransferUtil.getFluidHandler(te);
               if (handler.isPresent()) {
                 handler.addListener(displayListener);
                 tankDisplayHandlers.add(handler);

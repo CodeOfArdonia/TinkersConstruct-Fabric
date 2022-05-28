@@ -4,12 +4,14 @@ import io.github.fabricators_of_create.porting_lib.block.CustomRenderBoundingBox
 import io.github.fabricators_of_create.porting_lib.model.IModelData;
 import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandler;
 import io.github.fabricators_of_create.porting_lib.transfer.item.IItemHandler;
-import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelperForge;
-import io.github.fabricators_of_create.porting_lib.transfer.item.ItemTransferableForge;
+import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
+import io.github.fabricators_of_create.porting_lib.transfer.item.ItemTransferable;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import lombok.Getter;
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -60,7 +62,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public abstract class HeatingStructureBlockEntity extends NameableBlockEntity implements IMasterLogic, ISmelteryTankHandler, ItemTransferableForge, CustomRenderBoundingBoxBlockEntity, RenderAttachmentBlockEntity {
+public abstract class HeatingStructureBlockEntity extends NameableBlockEntity implements IMasterLogic, ISmelteryTankHandler, ItemTransferable, CustomRenderBoundingBoxBlockEntity, RenderAttachmentBlockEntity {
   private static final String TAG_STRUCTURE = "structure";
   private static final String TAG_TANK = "tank";
   private static final String TAG_INVENTORY = "inventory";
@@ -260,15 +262,15 @@ public abstract class HeatingStructureBlockEntity extends NameableBlockEntity im
 
   /* Capability */
 
-//  @Override
+  @Override
   public void invalidateCaps() {
-//    super.invalidateCaps();
+    super.invalidateCaps();
     this.itemCapability.invalidate();
   }
 
   @Nonnull
   @Override
-  public LazyOptional<IItemHandler> getItemHandler(@org.jetbrains.annotations.Nullable Direction direction) {
+  public LazyOptional<Storage<ItemVariant>> getItemStorage(@org.jetbrains.annotations.Nullable Direction direction) {
     return itemCapability.cast();
   }
 
@@ -460,7 +462,7 @@ public abstract class HeatingStructureBlockEntity extends NameableBlockEntity im
    * @param stack  Stack to insert
    */
   private ItemStack insertIntoInventory(ItemStack stack) {
-    return ItemHandlerHelperForge.insertItem(meltingInventory, stack, false);
+    return ItemHandlerHelper.insertItem(meltingInventory, stack, false);
   }
 
 

@@ -1,27 +1,26 @@
 package slimeknights.tconstruct.smeltery.block.entity.component;
 
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
+import io.github.fabricators_of_create.porting_lib.transfer.fluid.EmptyFluidHandler;
 import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTransferableForge;
-import io.github.fabricators_of_create.porting_lib.transfer.item.ItemTransferableForge;
+import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandler;
+import io.github.fabricators_of_create.porting_lib.transfer.item.IItemHandler;
+import io.github.fabricators_of_create.porting_lib.transfer.item.ItemTransferable;
+import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
+import io.github.fabricators_of_create.porting_lib.util.NonNullConsumer;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import io.github.fabricators_of_create.porting_lib.transfer.TransferUtilForge;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTransferable;
-import io.github.fabricators_of_create.porting_lib.transfer.item.ItemTransferable;
-import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
-import io.github.fabricators_of_create.porting_lib.util.NonNullConsumer;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandler;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.EmptyFluidHandler;
-import io.github.fabricators_of_create.porting_lib.transfer.item.IItemHandler;
 import slimeknights.mantle.inventory.EmptyItemHandler;
 import slimeknights.mantle.util.WeakConsumerWrapper;
 import slimeknights.tconstruct.smeltery.TinkerSmeltery;
 import slimeknights.tconstruct.smeltery.block.entity.tank.ISmelteryTankHandler;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
@@ -52,9 +51,9 @@ public abstract class SmelteryInputOutputBlockEntity<T> extends SmelteryComponen
     }
   }
 
-//  @Override
+  @Override
   public void invalidateCaps() {
-//    super.invalidateCaps();
+    super.invalidateCaps();
     clearHandler();
   }
 
@@ -81,7 +80,7 @@ public abstract class SmelteryInputOutputBlockEntity<T> extends SmelteryComponen
    * @return  Capability from parent, or empty if absent
    */
   protected LazyOptional<T> getCapability(BlockEntity parent) {
-    LazyOptional<T> handler = (LazyOptional<T>) TransferUtilForge.getHandler(parent, null, capability); // TODO: PORT this shouldnt need to be casted?
+    LazyOptional<T> handler = (LazyOptional<T>) TransferUtil.getStorage(parent, null, capability); // TODO: PORT this shouldnt need to be casted?
     if (handler.isPresent()) {
       handler.addListener(listener);
 
@@ -151,7 +150,7 @@ public abstract class SmelteryInputOutputBlockEntity<T> extends SmelteryComponen
   }
 
   /** Item implementation of smeltery IO */
-  public static class ChuteBlockEntity extends SmelteryInputOutputBlockEntity<IItemHandler> implements ItemTransferableForge {
+  public static class ChuteBlockEntity extends SmelteryInputOutputBlockEntity<IItemHandler> implements ItemTransferable {
     public ChuteBlockEntity(BlockPos pos, BlockState state) {
       this(TinkerSmeltery.chute.get(), pos, state);
     }
@@ -162,7 +161,7 @@ public abstract class SmelteryInputOutputBlockEntity<T> extends SmelteryComponen
   
     @Nullable
     @Override
-    public LazyOptional<IItemHandler> getItemHandler(@Nullable Direction direction) {
+    public LazyOptional<Storage<ItemVariant>> getItemStorage(@Nullable Direction direction) {
       return getCachedCapability();
     }
   }

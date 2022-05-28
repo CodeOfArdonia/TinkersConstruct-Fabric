@@ -1,8 +1,11 @@
 package slimeknights.tconstruct.tables.block.entity.inventory;
 
-import io.github.fabricators_of_create.porting_lib.transfer.item.ItemStackHandlerForge;
+import io.github.fabricators_of_create.porting_lib.transfer.callbacks.TransactionSuccessCallback;
+import io.github.fabricators_of_create.porting_lib.transfer.item.ItemStackHandler;
 import lombok.Getter;
 import lombok.Setter;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.world.item.ItemStack;
 import slimeknights.mantle.block.entity.MantleBlockEntity;
 
@@ -10,7 +13,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /** Base logic for scaling chest inventories */
-public abstract class ScalingChestItemHandler extends ItemStackHandlerForge implements IChestItemHandler {
+public abstract class ScalingChestItemHandler extends ItemStackHandler implements IChestItemHandler {
   /** Default maximum size */
   protected static final int DEFAULT_MAX = 256;
   /** Current size for display in containers */
@@ -76,21 +79,27 @@ public abstract class ScalingChestItemHandler extends ItemStackHandlerForge impl
 
   @Nonnull
   @Override
-  public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-    ItemStack result = super.insertItem(slot, stack, simulate);
-    if (!simulate) {
-      updateVisualSize(slot, getStackInSlot(slot));
-    }
+  public long insert(ItemVariant resource, long maxAmount, TransactionContext transaction) {
+    long result = super.insert(resource, maxAmount, transaction);
+    TransactionSuccessCallback callback = new TransactionSuccessCallback(transaction);
+    for (int i = 0; i < stacks.length; i++)
+      if (resource.matches(stacks[i])) {
+        int slot = i;
+        callback.addCallback(() -> updateVisualSize(slot, getStackInSlot(slot)));
+      }
     return result;
   }
 
   @Nonnull
   @Override
-  public ItemStack extractItem(int slot, int amount, boolean simulate) {
-    ItemStack result = super.extractItem(slot, amount, simulate);
-    if (!simulate) {
-      updateVisualSize(slot, getStackInSlot(slot));
-    }
+  public long extract(ItemVariant resource, long maxAmount, TransactionContext transaction) {
+    long result = super.extract(resource, maxAmount, transaction);
+    TransactionSuccessCallback callback = new TransactionSuccessCallback(transaction);
+    for (int i = 0; i < stacks.length; i++)
+      if (resource.matches(stacks[i])) {
+        int slot = i;
+        callback.addCallback(() -> updateVisualSize(slot, getStackInSlot(slot)));
+      }
     return result;
   }
 

@@ -87,9 +87,9 @@ public class AlloyerBlockEntity extends NameableBlockEntity implements ITankBloc
     return tankHolder.cast();
   }
 
-  //  @Override
+  @Override
   public void invalidateCaps() {
-//    super.invalidateCaps();
+    super.invalidateCaps();
     this.tankHolder.invalidate();
   }
 

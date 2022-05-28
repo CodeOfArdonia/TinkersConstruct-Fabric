@@ -2,7 +2,7 @@ package slimeknights.tconstruct.tables.menu;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import io.github.fabricators_of_create.porting_lib.transfer.TransferUtilForge;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.transfer.item.IItemHandlerModifiable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
@@ -146,7 +146,7 @@ public class TabbedContainerMenu<TILE extends BlockEntity> extends TriggeringMul
 
       // if we found something, add the side inventory
       if (inventoryTE != null) {
-        int invSlots = TransferUtilForge.getItemHandler(inventoryTE, accessDir).orElse(EmptyItemHandler.INSTANCE).getSlots();
+        int invSlots = TransferUtil.getItemHandler(inventoryTE, accessDir).orElse(EmptyItemHandler.INSTANCE).getSlots();
         int columns = Mth.clamp((invSlots - 1) / 9 + 1, 3, 6);
         this.addSubContainer(new SideInventoryContainer<>(TinkerTables.craftingStationContainer.get(), containerId, inv, inventoryTE, accessDir, -6 - 18 * 6, 8, columns), false);
       }
@@ -172,7 +172,7 @@ public class TabbedContainerMenu<TILE extends BlockEntity> extends TriggeringMul
    * @return True if compatible.
    */
   private static boolean hasItemHandler(BlockEntity tileEntity, @Nullable Direction direction) {
-    return TransferUtilForge.getItemHandler(tileEntity, direction).filter(cap -> cap instanceof IItemHandlerModifiable).isPresent();
+    return TransferUtil.getItemHandler(tileEntity, direction).filter(cap -> cap instanceof IItemHandlerModifiable).isPresent();
   }
 
 

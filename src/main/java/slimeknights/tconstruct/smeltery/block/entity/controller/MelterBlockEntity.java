@@ -5,7 +5,7 @@ import io.github.fabricators_of_create.porting_lib.model.IModelData;
 import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTransferableForge;
 import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandler;
 import io.github.fabricators_of_create.porting_lib.transfer.item.IItemHandler;
-import io.github.fabricators_of_create.porting_lib.transfer.item.ItemTransferableForge;
+import io.github.fabricators_of_create.porting_lib.transfer.item.ItemTransferable;
 import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import lombok.Getter;
 import lombok.Setter;
@@ -42,7 +42,7 @@ import slimeknights.tconstruct.smeltery.menu.MelterContainerMenu;
 import javax.annotation.Nullable;
 import java.util.Collections;
 
-public class MelterBlockEntity extends NameableBlockEntity implements ITankBlockEntity, FluidTransferableForge, ItemTransferableForge, ChunkUnloadListeningBlockEntity, RenderAttachmentBlockEntity {
+public class MelterBlockEntity extends NameableBlockEntity implements ITankBlockEntity, FluidTransferableForge, ItemTransferable, ChunkUnloadListeningBlockEntity, RenderAttachmentBlockEntity {
 
   /** Max capacity for the tank */
   private static final int TANK_CAPACITY = FluidValues.INGOT * 12;
@@ -136,9 +136,9 @@ public class MelterBlockEntity extends NameableBlockEntity implements ITankBlock
     invalidateCaps();
   }
   
-//  @Override
+  @Override
   public void invalidateCaps() {
-//    super.invalidateCaps();
+    super.invalidateCaps();
     this.tankHolder.invalidate();
     this.inventoryHolder.invalidate();
   }

@@ -1,9 +1,11 @@
 package slimeknights.tconstruct.tables.block.entity.chest;
 
 import io.github.fabricators_of_create.porting_lib.transfer.item.IItemHandler;
-import io.github.fabricators_of_create.porting_lib.transfer.item.ItemTransferableForge;
+import io.github.fabricators_of_create.porting_lib.transfer.item.ItemTransferable;
 import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import lombok.Getter;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -23,7 +25,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /** Shared base logic for all Tinkers' chest tile entities */
-public abstract class AbstractChestBlockEntity extends NameableBlockEntity implements ItemTransferableForge {
+public abstract class AbstractChestBlockEntity extends NameableBlockEntity implements ItemTransferable {
   private static final String KEY_ITEMS = "Items";
 
   @Getter
@@ -38,13 +40,13 @@ public abstract class AbstractChestBlockEntity extends NameableBlockEntity imple
 
   @Nonnull
   @Override
-  public LazyOptional<IItemHandler> getItemHandler(@org.jetbrains.annotations.Nullable Direction direction) {
+  public LazyOptional<Storage<ItemVariant>> getItemStorage(@org.jetbrains.annotations.Nullable Direction direction) {
     return capability.cast();
   }
 
-  //  @Override
+  @Override
   public void invalidateCaps() {
-//    super.invalidateCaps();
+    super.invalidateCaps();
     capability.invalidate();
   }
 

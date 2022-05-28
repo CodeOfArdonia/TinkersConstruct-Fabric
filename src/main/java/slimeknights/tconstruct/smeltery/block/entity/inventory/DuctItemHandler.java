@@ -4,7 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import slimeknights.mantle.inventory.SingleItemHandler;
-import io.github.fabricators_of_create.porting_lib.transfer.TransferUtilForge;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.common.network.InventorySlotSyncPacket;
@@ -49,7 +49,7 @@ public class DuctItemHandler extends SingleItemHandler<DuctBlockEntity> {
       }
     }
     // the item must contain fluid (no empty cans or buckets)
-    return TransferUtilForge.getFluidHandlerItem(stack)
+    return TransferUtil.getFluidHandlerItem(stack)
                 .filter(cap -> !cap.getFluidInTank(0).isEmpty())
                 .isPresent();
   }
@@ -63,7 +63,7 @@ public class DuctItemHandler extends SingleItemHandler<DuctBlockEntity> {
     if (stack.isEmpty()) {
       return FluidStack.EMPTY;
     }
-    return TransferUtilForge.getFluidHandlerItem(stack)
+    return TransferUtil.getFluidHandlerItem(stack)
                     .map(handler -> handler.getFluidInTank(0))
                     .orElse(FluidStack.EMPTY);
   }

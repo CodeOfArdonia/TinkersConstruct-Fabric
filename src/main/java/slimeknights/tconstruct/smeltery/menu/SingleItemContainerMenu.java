@@ -1,10 +1,11 @@
 package slimeknights.tconstruct.smeltery.menu;
 
+import io.github.fabricators_of_create.porting_lib.transfer.item.IItemHandler;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import slimeknights.mantle.inventory.SmartItemHandlerSlot;
-import io.github.fabricators_of_create.porting_lib.transfer.TransferUtilForge;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import slimeknights.tconstruct.shared.inventory.TriggeringBaseContainerMenu;
 import slimeknights.tconstruct.smeltery.TinkerSmeltery;
 
@@ -17,8 +18,8 @@ public class SingleItemContainerMenu extends TriggeringBaseContainerMenu<BlockEn
   public SingleItemContainerMenu(int id, @Nullable Inventory inv, @Nullable BlockEntity te) {
     super(TinkerSmeltery.singleItemContainer.get(), id, inv, te);
     if (te != null) {
-      TransferUtilForge.getItemHandler(te)
-        .ifPresent(handler -> this.addSlot(new SmartItemHandlerSlot(handler, 0, 80, 20)));
+      TransferUtil.getItemStorage(te)
+        .ifPresent(handler -> this.addSlot(new SmartItemHandlerSlot((IItemHandler) handler, 0, 80, 20)));
       this.addInventorySlots();
     }
   }

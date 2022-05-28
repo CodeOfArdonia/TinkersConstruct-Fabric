@@ -2,7 +2,7 @@ package slimeknights.tconstruct.smeltery.block.entity.component;
 
 
 import io.github.fabricators_of_create.porting_lib.block.CustomUpdateTagHandlingBlockEntity;
-import io.github.fabricators_of_create.porting_lib.transfer.item.ItemTransferableForge;
+import io.github.fabricators_of_create.porting_lib.transfer.item.ItemTransferable;
 import lombok.Getter;
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -36,7 +36,7 @@ import javax.annotation.Nullable;
 /**
  * Filtered drain tile entity
  */
-public class DuctBlockEntity extends SmelteryFluidIO implements MenuProvider, ItemTransferableForge, CustomUpdateTagHandlingBlockEntity, RenderAttachmentBlockEntity {
+public class DuctBlockEntity extends SmelteryFluidIO implements MenuProvider, ItemTransferable, CustomUpdateTagHandlingBlockEntity, RenderAttachmentBlockEntity {
   private static final String TAG_ITEM = "item";
   private static final Component TITLE = TConstruct.makeTranslation("gui", "duct");
 

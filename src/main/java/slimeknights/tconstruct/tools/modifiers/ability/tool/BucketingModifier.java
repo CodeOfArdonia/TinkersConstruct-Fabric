@@ -29,7 +29,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult.Type;
-import io.github.fabricators_of_create.porting_lib.transfer.TransferUtilForge;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
@@ -93,7 +93,7 @@ public class BucketingModifier extends TankModifier {
       return InteractionResult.PASS;
     }
     Direction face = context.getClickedFace();
-    LazyOptional<IFluidHandler> capability = TransferUtilForge.getFluidHandler(te, face);
+    LazyOptional<IFluidHandler> capability = TransferUtil.getFluidHandler(te, face);
     if (!capability.isPresent()) {
       return InteractionResult.PASS;
     }

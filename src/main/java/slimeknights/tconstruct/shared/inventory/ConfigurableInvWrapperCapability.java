@@ -1,37 +1,39 @@
 package slimeknights.tconstruct.shared.inventory;
 
+import io.github.fabricators_of_create.porting_lib.transfer.WrappedStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.world.Container;
-import net.minecraft.world.item.ItemStack;
-import io.github.fabricators_of_create.porting_lib.transfer.item.InvWrapper;
 
 import javax.annotation.Nonnull;
 
-public class ConfigurableInvWrapperCapability extends InvWrapper {
+public class ConfigurableInvWrapperCapability extends WrappedStorage<ItemVariant> {
 
   private final boolean canInsert;
   private final boolean canExtract;
 
   public ConfigurableInvWrapperCapability(Container inv, boolean canInsert, boolean canExtract) {
-    super(inv);
+    super(InventoryStorage.of(inv, null));
     this.canInsert = canInsert;
     this.canExtract = canExtract;
   }
 
   @Nonnull
   @Override
-  public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
+  public long insert(ItemVariant resource, long maxAmount, TransactionContext transaction) {
     if (!this.canInsert) {
-      return stack;
+      return 0;
     }
-    return super.insertItem(slot, stack, simulate);
+    return super.insert(resource, maxAmount, transaction);
   }
 
   @Nonnull
   @Override
-  public ItemStack extractItem(int slot, int amount, boolean simulate) {
+  public long extract(ItemVariant resource, long maxAmount, TransactionContext transaction) {
     if (!this.canExtract) {
-      return ItemStack.EMPTY;
+      return 0;
     }
-    return super.extractItem(slot, amount, simulate);
+    return super.extract(resource, maxAmount, transaction);
   }
 }

@@ -3,11 +3,11 @@ package slimeknights.tconstruct.smeltery.block.entity;
 import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTransferableForge;
 import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandler;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
-import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelperForge;
-import io.github.fabricators_of_create.porting_lib.transfer.item.wrapper.SidedInvWrapper;
+import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import lombok.Getter;
+import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -113,7 +113,7 @@ public abstract class CastingBlockEntity extends TableBlockEntity implements Wor
     super(beType, pos, state, NAME, 2, 1);
     this.requireCast = state.getBlock() instanceof AbstractCastingBlock casting && casting.isRequireCast();
     this.emptyCastTag = emptyCastTag;
-    this.itemHandler = new SidedInvWrapper(this, Direction.DOWN);
+    this.itemHandler = InventoryStorage.of(this, Direction.DOWN);
     this.castingType = castingType;
     this.moldingType = moldingType;
     this.castingInventory = new CastingContainerWrapper(this);
@@ -174,7 +174,7 @@ public abstract class CastingBlockEntity extends TableBlockEntity implements Wor
         recipe = findMoldingRecipe();
         if (recipe != null) {
           setItem(INPUT, ItemStack.EMPTY);
-          ItemHandlerHelperForge.giveItemToPlayer(player, recipe.assemble(moldingInventory), player.getInventory().selected);
+          ItemHandlerHelper.giveItemToPlayer(player, recipe.assemble(moldingInventory), player.getInventory().selected);
           return;
         }
       }
@@ -199,7 +199,7 @@ public abstract class CastingBlockEntity extends TableBlockEntity implements Wor
       // can have ItemStacks with stacksize > 1 as output
       // we therefore spill the whole contents on extraction.
       ItemStack stack = getItem(slot);
-      ItemHandlerHelperForge.giveItemToPlayer(player, stack, player.getInventory().selected);
+      ItemHandlerHelper.giveItemToPlayer(player, stack, player.getInventory().selected);
       setItem(slot, ItemStack.EMPTY);
 
       // send a block update for the comparator, needs to be done after the stack is removed

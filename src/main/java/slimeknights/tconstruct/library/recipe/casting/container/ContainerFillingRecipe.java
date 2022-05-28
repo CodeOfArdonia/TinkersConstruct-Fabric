@@ -12,7 +12,7 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
-import io.github.fabricators_of_create.porting_lib.transfer.TransferUtilForge;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import slimeknights.mantle.recipe.IMultiRecipe;
 import slimeknights.tconstruct.library.recipe.TinkerRecipeTypes;
@@ -43,7 +43,7 @@ public abstract class ContainerFillingRecipe implements ICastingRecipe, IMultiRe
   @Override
   public long getFluidAmount(ICastingContainer inv) {
     Fluid fluid = inv.getFluid();
-    return TransferUtilForge.getFluidHandlerItem(inv.getStack())
+    return TransferUtil.getFluidHandlerItem(inv.getStack())
               .map(handler -> handler.fill(new FluidStack(fluid, this.fluidAmount), true))
               .orElse(0L);
   }
@@ -68,7 +68,7 @@ public abstract class ContainerFillingRecipe implements ICastingRecipe, IMultiRe
     ItemStack stack = inv.getStack();
     Fluid fluid = inv.getFluid();
     return stack.getItem() == this.container.asItem()
-           && TransferUtilForge.getFluidHandlerItem(stack)
+           && TransferUtil.getFluidHandlerItem(stack)
                    .filter(handler -> handler.fill(new FluidStack(fluid, this.fluidAmount), true) > 0)
                    .isPresent();
   }
@@ -83,7 +83,7 @@ public abstract class ContainerFillingRecipe implements ICastingRecipe, IMultiRe
   @Override
   public ItemStack assemble(ICastingContainer inv) {
     ItemStack stack = inv.getStack().copy();
-    return TransferUtilForge.getFluidHandlerItem(stack).map(handler -> {
+    return TransferUtil.getFluidHandlerItem(stack).map(handler -> {
       handler.fill(new FluidStack(inv.getFluid(), this.fluidAmount, inv.getFluidTag()), false);
       return handler.getContainer();
     }).orElse(stack);
@@ -102,7 +102,7 @@ public abstract class ContainerFillingRecipe implements ICastingRecipe, IMultiRe
                                              .map(fluid -> {
                                                FluidStack fluidStack = new FluidStack(fluid, fluidAmount);
                                                ItemStack stack = new ItemStack(container);
-                                               stack = TransferUtilForge.getFluidHandlerItem(stack).map(handler -> {
+                                               stack = TransferUtil.getFluidHandlerItem(stack).map(handler -> {
                                                  handler.fill(fluidStack, false);
                                                  return handler.getContainer();
                                                }).orElse(stack);

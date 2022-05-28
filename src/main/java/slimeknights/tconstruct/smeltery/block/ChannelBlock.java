@@ -28,7 +28,7 @@ import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import io.github.fabricators_of_create.porting_lib.transfer.TransferUtilForge;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import slimeknights.mantle.util.BlockEntityHelper;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.utils.Util;
@@ -162,7 +162,7 @@ public class ChannelBlock extends Block implements EntityBlock {
 	 */
 	private static boolean isFluidHandler(LevelAccessor world, Direction side, BlockPos pos) {
 		BlockEntity te = world.getBlockEntity(pos);
-		return te != null && TransferUtilForge.getFluidHandler(te, side).isPresent();
+		return te != null && TransferUtil.getFluidHandler(te, side).isPresent();
 	}
 
 	/**

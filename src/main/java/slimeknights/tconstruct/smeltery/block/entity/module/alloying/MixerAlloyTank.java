@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.smeltery.block.entity.module.alloying;
 
-import io.github.fabricators_of_create.porting_lib.transfer.TransferUtilForge;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.transfer.fluid.EmptyFluidHandler;
 import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandler;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
@@ -142,7 +142,7 @@ public class MixerAlloyTank implements IMutableAlloyTank {
             BlockEntity te = world.getBlockEntity(target);
             if (te != null) {
               // if we found a tank, increment the number of tanks
-              LazyOptional<IFluidHandler> capability = TransferUtilForge.getFluidHandler(te, direction.getOpposite());
+              LazyOptional<IFluidHandler> capability = TransferUtil.getFluidHandler(te, direction.getOpposite());
               if (capability.isPresent()) {
                 // attach a listener so we know when the side invalidates
                 capability.addListener(listeners.computeIfAbsent(direction, dir -> new WeakConsumerWrapper<>(this, (self, handler) -> {

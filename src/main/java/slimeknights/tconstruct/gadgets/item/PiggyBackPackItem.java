@@ -3,8 +3,9 @@ package slimeknights.tconstruct.gadgets.item;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.vertex.PoseStack;
-import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelperForge;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.util.EffectRenderer;
+import net.fabricmc.fabric.api.transfer.v1.item.PlayerInventoryStorage;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
 import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket;
@@ -57,7 +58,7 @@ public class PiggyBackPackItem extends TooltipItem {
     if (this.pickupEntity(playerIn, target)) {
       // unequip old armor
       if (chestArmor.getItem() != this) {
-        ItemHandlerHelperForge.giveItemToPlayer(playerIn, chestArmor);
+        TransferUtil.insertItem(PlayerInventoryStorage.of(playerIn), chestArmor);
         chestArmor = ItemStack.EMPTY;
       }
 

@@ -98,11 +98,11 @@ public class TankBlockEntity extends SmelteryComponentBlockEntity implements ITa
     return holder.cast();
   }
 
-//  @Override
-//  public void invalidateCaps() {
-//    super.invalidateCaps();
-//    holder.invalidate();
-//  }
+  @Override
+  public void invalidateCaps() {
+    super.invalidateCaps();
+    holder.invalidate();
+  }
 
   @Nonnull
   @Override

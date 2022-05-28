@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.tables.block.entity.chest;
 
-import io.github.fabricators_of_create.porting_lib.transfer.item.ItemStackHandlerForge;
+import io.github.fabricators_of_create.porting_lib.transfer.item.ItemStackHandler;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -67,7 +67,7 @@ public class TinkersChestBlockEntity extends AbstractChestBlockEntity {
   }
 
   /** Item handler for tinkers chests */
-  public static class TinkersChestItemHandler extends ItemStackHandlerForge implements IChestItemHandler {
+  public static class TinkersChestItemHandler extends ItemStackHandler implements IChestItemHandler {
     @Setter @Nullable
     private MantleBlockEntity parent;
     public TinkersChestItemHandler() {

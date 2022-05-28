@@ -1,7 +1,6 @@
 package slimeknights.tconstruct.tables.block;
 
 import io.github.fabricators_of_create.porting_lib.transfer.item.IItemHandlerModifiable;
-import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelperForge;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
