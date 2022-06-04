@@ -96,6 +96,7 @@ public class FluidTagProvider extends FabricTagProvider.FluidTagProvider {
         .addTag(TinkerFluids.skySlime.getLocalTag())
         .addTag(TinkerFluids.enderSlime.getLocalTag());
 
+    this.tag(TinkerTags.Fluids.POTION).add(TinkerFluids.potion.get());
 
     // tooltips //
     this.tag(TinkerTags.Fluids.GLASS_TOOLTIPS).addTag(TinkerFluids.moltenGlass.getLocalTag()).addTag(TinkerFluids.liquidSoul.getLocalTag()).addTag(TinkerFluids.moltenObsidian.getLocalTag());
@@ -120,10 +121,10 @@ public class FluidTagProvider extends FabricTagProvider.FluidTagProvider {
         // mekanism alloys
         TinkerFluids.moltenRefinedGlowstone.getForgeTag()).addTag(TinkerFluids.moltenRefinedObsidian.getForgeTag());
 
-    this.tag(TinkerTags.Fluids.LARGE_GEM_TOOLTIPS).addTag(TinkerFluids.moltenEmerald.getLocalTag()).addTag(TinkerFluids.moltenDiamond.getLocalTag());
-    this.tag(TinkerTags.Fluids.SMALL_GEM_TOOLTIPS).addTag(TinkerFluids.moltenQuartz.getLocalTag()).addTag(TinkerFluids.moltenAmethyst.getLocalTag());
-    this.tag(TinkerTags.Fluids.SOUP_TOOLTIPS).addTag(TinkerFluids.beetrootSoup.getLocalTag()).addTag(TinkerFluids.mushroomStew.getLocalTag()).addTag(TinkerFluids.rabbitStew.getLocalTag());
-    this.tag(TinkerTags.Fluids.BOTTLE_TOOLTIPS).add(Fluids.WATER, Fluids.FLOWING_WATER).addTag(TinkerFluids.honey.getLocalTag());
+    this.tag(TinkerTags.Fluids.LARGE_GEM_TOOLTIPS).addTags(TinkerFluids.moltenEmerald.getLocalTag(), TinkerFluids.moltenDiamond.getLocalTag());
+    this.tag(TinkerTags.Fluids.SMALL_GEM_TOOLTIPS).addTags(TinkerFluids.moltenQuartz.getLocalTag(), TinkerFluids.moltenAmethyst.getLocalTag());
+    this.tag(TinkerTags.Fluids.SOUP_TOOLTIPS).addTags(TinkerFluids.beetrootSoup.getLocalTag(), TinkerFluids.mushroomStew.getLocalTag(), TinkerFluids.rabbitStew.getLocalTag());
+    this.tag(TinkerTags.Fluids.WATER_TOOLTIPS).add(Fluids.WATER, Fluids.FLOWING_WATER); // the water tag contains too many non-water things
 
     // spilling tags - reduces the number of recipes generated //
     this.tag(TinkerTags.Fluids.CLAY_SPILLING)

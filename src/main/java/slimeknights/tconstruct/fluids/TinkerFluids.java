@@ -1,14 +1,37 @@
 package slimeknights.tconstruct.fluids;
 
-import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
-import io.github.tropheusj.milk.Milk;
+import net.minecraft.core.cauldron.CauldronInteraction;
+import net.minecraft.data.DataGenerator;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.material.Material;
+import net.minecraftforge.common.ForgeMod;
+import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fluids.FluidAttributes;
+import net.minecraftforge.fluids.ForgeFlowingFluid;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
+import net.minecraftforge.registries.RegistryObject;
+import slimeknights.mantle.registration.ItemProperties;
 import slimeknights.mantle.registration.ModelFluidAttributes;
 import slimeknights.mantle.registration.object.FluidObject;
-import slimeknights.mantle.util.SimpleFlowableFluid;
+import slimeknights.mantle.registration.object.ItemObject;
+import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.common.TinkerModule;
+import slimeknights.tconstruct.common.TinkerTags;
+import slimeknights.tconstruct.fluids.fluids.PotionFluidAttributes;
 import slimeknights.tconstruct.fluids.fluids.SlimeFluid;
+import slimeknights.tconstruct.fluids.fluids.UnplaceableFluid;
+import slimeknights.tconstruct.fluids.item.BottleItem;
+import slimeknights.tconstruct.fluids.item.PotionBucketItem;
+import slimeknights.tconstruct.fluids.util.BottleBrewingRecipe;
+import slimeknights.tconstruct.fluids.util.EmptyBottleIntoEmpty;
+import slimeknights.tconstruct.fluids.util.EmptyBottleIntoWater;
+import slimeknights.tconstruct.fluids.util.FillBottle;
 import slimeknights.tconstruct.shared.block.SlimeType;
 
 import java.util.EnumMap;
@@ -46,6 +69,12 @@ public final class TinkerFluids extends TinkerModule {
   public static FluidObject<SimpleFlowableFluid> beetrootSoup = FLUIDS.register("beetroot_soup", coolBuilder().temperature(400), Material.WATER, 0);
   public static FluidObject<SimpleFlowableFluid> mushroomStew = FLUIDS.register("mushroom_stew", coolBuilder().temperature(400), Material.WATER, 0);
   public static FluidObject<SimpleFlowableFluid> rabbitStew   = FLUIDS.register("rabbit_stew",   coolBuilder().temperature(400), Material.WATER, 0);
+
+  // potion
+  public static final ItemObject<PotionBucketItem> potionBucket = ITEMS.register("potion_bucket", () -> new PotionBucketItem(TinkerFluids.potion, ItemProperties.BUCKET_PROPS));
+  public static final RegistryObject<UnplaceableFluid> potion = FLUIDS.registerFluid("potion", () -> new UnplaceableFluid(potionBucket, PotionFluidAttributes.builder(TConstruct.getResource("block/fluid/potion/")).sound(SoundEvents.BUCKET_FILL, SoundEvents.BUCKET_EMPTY).density(1100).viscosity(1100).temperature(315)));
+  public static final ItemObject<Item> splashBottle = ITEMS.register("splash_bottle", () -> new BottleItem(Items.SPLASH_POTION, GENERAL_PROPS));
+  public static final ItemObject<Item> lingeringBottle = ITEMS.register("lingering_bottle", () -> new BottleItem(Items.LINGERING_POTION, GENERAL_PROPS));
 
   // base molten fluids
   public static final FluidObject<SimpleFlowableFluid> searedStone   = FLUIDS.register("seared_stone",   hotBuilder().temperature( 900), Material.LAVA,  6);
@@ -123,5 +152,26 @@ public final class TinkerFluids extends TinkerModule {
   /** Creates a builder for a hot fluid */
   private static FluidAttributes.Builder hotBuilder() {
     return ModelFluidAttributes.builder().density(2000).viscosity(10000).temperature(1000).sound(SoundEvents.BUCKET_FILL_LAVA, SoundEvents.BUCKET_EMPTY_LAVA);
+  }
+
+  @SubscribeEvent
+  void gatherData(final GatherDataEvent event) {
+    if (event.includeClient()) {
+      DataGenerator datagenerator = event.getGenerator();
+      datagenerator.addProvider(new FluidTooltipProvider(datagenerator));
+    }
+  }
+
+  @SubscribeEvent
+  void commonSetup(final FMLCommonSetupEvent event) {
+    CauldronInteraction.WATER.put(splashBottle.get(), new FillBottle(Items.SPLASH_POTION));
+    CauldronInteraction.WATER.put(lingeringBottle.get(), new FillBottle(Items.LINGERING_POTION));
+    CauldronInteraction.WATER.put(Items.SPLASH_POTION,    new EmptyBottleIntoWater(splashBottle,    CauldronInteraction.WATER.get(Items.SPLASH_POTION)));
+    CauldronInteraction.WATER.put(Items.LINGERING_POTION, new EmptyBottleIntoWater(lingeringBottle, CauldronInteraction.WATER.get(Items.LINGERING_POTION)));
+    CauldronInteraction.EMPTY.put(Items.SPLASH_POTION,    new EmptyBottleIntoEmpty(splashBottle,    CauldronInteraction.EMPTY.get(Items.SPLASH_POTION)));
+    CauldronInteraction.EMPTY.put(Items.LINGERING_POTION, new EmptyBottleIntoEmpty(lingeringBottle, CauldronInteraction.EMPTY.get(Items.LINGERING_POTION)));
+    // brew bottles into each other, bit weird but feels better than shapeless
+    BrewingRecipeRegistry.addRecipe(new BottleBrewingRecipe(Ingredient.of(Items.GLASS_BOTTLE), Items.POTION, Items.SPLASH_POTION, new ItemStack(splashBottle)));
+    BrewingRecipeRegistry.addRecipe(new BottleBrewingRecipe(Ingredient.of(TinkerTags.Items.SPLASH_BOTTLE), Items.SPLASH_POTION, Items.LINGERING_POTION, new ItemStack(lingeringBottle)));
   }
 }

@@ -145,6 +145,9 @@ public class ItemTagProvider extends FabricTagProvider.ItemTagProvider {
                  TinkerMaterials.manyullyn.getIngotTag()).addTag(TinkerMaterials.hepatizon.getIngotTag());
 
     this.copy(TinkerTags.Blocks.COPPER_PLATFORMS, TinkerTags.Items.COPPER_PLATFORMS);
+
+    this.tag(TinkerTags.Items.SPLASH_BOTTLE).add(TinkerFluids.splashBottle.get());
+    this.tag(TinkerTags.Items.LINGERING_BOTTLE).add(TinkerFluids.lingeringBottle.get());
   }
 
   private void addWorld() {

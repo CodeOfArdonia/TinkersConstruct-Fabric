@@ -24,16 +24,19 @@
 //import net.minecraft.resources.ResourceLocation;
 //import net.minecraft.tags.TagKey;
 //import net.minecraft.world.Container;
+//import net.minecraft.world.effect.MobEffectInstance;
 //import net.minecraft.world.inventory.AbstractContainerMenu;
 //import net.minecraft.world.item.Item;
 //import net.minecraft.world.item.ItemStack;
+//import net.minecraft.world.item.alchemy.Potion;
+//import net.minecraft.world.item.alchemy.PotionUtils;
 //import net.minecraft.world.item.crafting.Recipe;
 //import net.minecraft.world.item.crafting.RecipeManager;
 //import net.minecraft.world.item.crafting.RecipeType;
 //import net.minecraft.world.level.ItemLike;
 //import net.minecraft.world.level.material.Fluid;
 //import net.minecraftforge.fluids.FluidAttributes;
-//import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+//import net.minecraftforge.fluids.FluidStack;
 //import net.minecraftforge.fml.ModList;
 //import net.minecraftforge.registries.ForgeRegistries;
 //import net.minecraftforge.registries.tags.ITag;
@@ -261,6 +264,19 @@
 //    registry.registerSubtypeInterpreter(TinkerTables.tinkerStation.asItem(), tables);
 //    registry.registerSubtypeInterpreter(TinkerTables.tinkersAnvil.asItem(), tables);
 //    registry.registerSubtypeInterpreter(TinkerTables.scorchedAnvil.asItem(), tables);
+//    registry.registerSubtypeInterpreter(TinkerFluids.potionBucket.asItem(), (stack, context) -> {
+//      if (!stack.hasTag()) {
+//        return IIngredientSubtypeInterpreter.NONE;
+//      }
+//      Potion potionType = PotionUtils.getPotion(stack);
+//      String potionTypeString = potionType.getName("");
+//      StringBuilder stringBuilder = new StringBuilder(potionTypeString);
+//      List<MobEffectInstance> effects = PotionUtils.getMobEffects(stack);
+//      for (MobEffectInstance effect : effects) {
+//        stringBuilder.append(";").append(effect);
+//      }
+//      return stringBuilder.toString();
+//    });
 //
 //    IIngredientSubtypeInterpreter<ItemStack> toolPartInterpreter = (stack, context) -> {
 //      MaterialVariantId materialId = IMaterialItem.getMaterialFromStack(stack);

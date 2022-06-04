@@ -2,10 +2,16 @@ package slimeknights.tconstruct.fluids;
 
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.world.item.alchemy.PotionUtils;
 import slimeknights.mantle.registration.object.FluidObject;
 import slimeknights.tconstruct.common.ClientEventBase;
+import slimeknights.tconstruct.library.fluid.FluidTooltipHandler;
 
 public class FluidClientEvents extends ClientEventBase {
+  @SubscribeEvent
+  static void addResourceListeners(RegisterClientReloadListenersEvent event) {
+    FluidTooltipHandler.init(event);
+  }
 
   public static void clientSetup() {
     setTranslucent(TinkerFluids.honey);
@@ -22,6 +28,11 @@ public class FluidClientEvents extends ClientEventBase {
     setTranslucent(TinkerFluids.liquidSoul);
     setTranslucent(TinkerFluids.moltenSoulsteel);
     setTranslucent(TinkerFluids.moltenAmethyst);
+  }
+
+  @SubscribeEvent
+  static void itemColors(final ColorHandlerEvent.Item event) {
+    event.getItemColors().register((stack, index) -> index > 0 ? -1 : PotionUtils.getColor(stack), TinkerFluids.potionBucket.asItem());
   }
 
   private static void setTranslucent(FluidObject<?> fluid) {

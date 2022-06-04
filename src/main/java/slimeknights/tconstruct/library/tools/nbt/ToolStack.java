@@ -137,7 +137,9 @@ public class ToolStack implements IToolStackView {
     if (nbt == null) {
       nbt = new CompoundTag();
       if (!copyNbt) {
-        stack.setTag(nbt);
+        // bypass the setter as vanilla insists on setting damage values there, along with verifying the tag
+        // both are things we will do later, doing so now causes us to recursively call this method (though not infinite)
+        stack.tag = nbt;
       }
     } else if (copyNbt) {
       nbt = nbt.copy();
@@ -459,6 +461,16 @@ public class ToolStack implements IToolStackView {
   }
 
   /**
+   * Updates the upgrades list on the tool
+   * @param modifiers  New upgrades
+   */
+  public void setUpgrades(ModifierNBT modifiers) {
+    this.upgrades = modifiers;
+    nbt.put(TAG_UPGRADES, modifiers.serializeToNBT());
+    rebuildStats();
+  }
+
+  /**
    * Adds a single modifier to this tool
    * @param modifier  Modifier to add
    * @param level     Level to add
@@ -467,10 +479,7 @@ public class ToolStack implements IToolStackView {
     if (level <= 0) {
       throw new IllegalArgumentException("Invalid level, must be above 0");
     }
-    ModifierNBT newModifiers = getUpgrades().withModifier(modifier, level);
-    this.upgrades = newModifiers;
-    nbt.put(TAG_UPGRADES, newModifiers.serializeToNBT());
-    rebuildStats();
+    setUpgrades(getUpgrades().withModifier(modifier, level));
   }
 
   /**
@@ -742,7 +751,8 @@ public class ToolStack implements IToolStackView {
     }
 
     // resolve all material redirects
-    if (tag.contains(ToolStack.TAG_MATERIALS, Tag.TAG_LIST)) {
+    boolean hasMaterials = tag.contains(ToolStack.TAG_MATERIALS, Tag.TAG_LIST);
+    if (hasMaterials) {
       MaterialIdNBT stored = MaterialIdNBT.readFromNBT(tag.getList(ToolStack.TAG_MATERIALS, Tag.TAG_STRING));
       MaterialIdNBT resolved = stored.resolveRedirects();
       if (resolved != stored) {
@@ -752,6 +762,8 @@ public class ToolStack implements IToolStackView {
     // rebuild stats
     ToolStack tool = ToolStack.from(item, definition, tag);
     tool.ensureSlotsBuilt();
-    tool.rebuildStats();
+    if (hasMaterials || !definition.isMultipart()) {
+      tool.rebuildStats();
+    }
   }
 }

@@ -272,30 +272,30 @@ public final class TinkerWorld extends TinkerModule {
    * Entities
    */
   // our own copy of the slime to make spawning a bit easier
-  public static final RegistryObject<EntityType<EarthSlimeEntity>> earthSlimeEntity = ENTITIES.registerFabric("earth_slime", () ->
-    FabricEntityTypeBuilder.create(MobCategory.MONSTER, EarthSlimeEntity::new)
-                      .forceTrackedVelocityUpdates(true)
-                      .trackRangeChunks(10)
-                      .dimensions(EntityDimensions.fixed(2.04F, 2.04F))
-                      /*.entityFactory((spawnEntity, world) -> TinkerWorld.earthSlimeEntity.get().create(world))*/);
-  public static final RegistryObject<EntityType<SkySlimeEntity>> skySlimeEntity = ENTITIES.registerWithEggFabric("sky_slime", () ->
-    FabricEntityTypeBuilder.create(MobCategory.MONSTER, SkySlimeEntity::new)
-                      .forceTrackedVelocityUpdates(true)
-                      .trackRangeChunks(20)
-                      .dimensions(EntityDimensions.fixed(2.04F, 2.04F))
-                     /* .entityFactory((spawnEntity, world) -> TinkerWorld.skySlimeEntity.get().create(world))*/, 0x47eff5, 0xacfff4);
-  public static final RegistryObject<EntityType<EnderSlimeEntity>> enderSlimeEntity = ENTITIES.registerWithEggFabric("ender_slime", () ->
-    FabricEntityTypeBuilder.create(MobCategory.MONSTER, EnderSlimeEntity::new)
-                      .forceTrackedVelocityUpdates(true)
-                      .trackRangeChunks(32)
-                      .dimensions(EntityDimensions.fixed(2.04F, 2.04F))
-                      /*.entityFactory((spawnEntity, world) -> TinkerWorld.enderSlimeEntity.get().create(world))*/, 0x6300B0, 0xD37CFF);
-  public static final RegistryObject<EntityType<TerracubeEntity>> terracubeEntity = ENTITIES.registerWithEggFabric("terracube", () ->
-    FabricEntityTypeBuilder.create(MobCategory.MONSTER, TerracubeEntity::new)
-                      .forceTrackedVelocityUpdates(true)
-                      .trackRangeChunks(8)
-                      .dimensions(EntityDimensions.fixed(2.04F, 2.04F))
-                      /*.entityFactory((spawnEntity, world) -> TinkerWorld.terracubeEntity.get().create(world))*/, 0xAFB9D6, 0xA1A7B1);
+  public static final RegistryObject<EntityType<EarthSlimeEntity>> earthSlimeEntity = ENTITIES.registerWithEgg("earth_slime", () ->
+    EntityType.Builder.of(EarthSlimeEntity::new, MobCategory.MONSTER)
+                      .setShouldReceiveVelocityUpdates(true)
+                      .setTrackingRange(10)
+                      .sized(2.04F, 2.04F)
+                      .setCustomClientFactory((spawnEntity, world) -> TinkerWorld.earthSlimeEntity.get().create(world)), 0x51a03e, 0x7ebf6e);
+  public static final RegistryObject<EntityType<SkySlimeEntity>> skySlimeEntity = ENTITIES.registerWithEgg("sky_slime", () ->
+    EntityType.Builder.of(SkySlimeEntity::new, MobCategory.MONSTER)
+                      .setShouldReceiveVelocityUpdates(true)
+                      .setTrackingRange(20)
+                      .sized(2.04F, 2.04F)
+                      .setCustomClientFactory((spawnEntity, world) -> TinkerWorld.skySlimeEntity.get().create(world)), 0x47eff5, 0xacfff4);
+  public static final RegistryObject<EntityType<EnderSlimeEntity>> enderSlimeEntity = ENTITIES.registerWithEgg("ender_slime", () ->
+    EntityType.Builder.of(EnderSlimeEntity::new, MobCategory.MONSTER)
+                      .setShouldReceiveVelocityUpdates(true)
+                      .setTrackingRange(32)
+                      .sized(2.04F, 2.04F)
+                      .setCustomClientFactory((spawnEntity, world) -> TinkerWorld.enderSlimeEntity.get().create(world)), 0x6300B0, 0xD37CFF);
+  public static final RegistryObject<EntityType<TerracubeEntity>> terracubeEntity = ENTITIES.registerWithEgg("terracube", () ->
+    EntityType.Builder.of(TerracubeEntity::new, MobCategory.MONSTER)
+                      .setShouldReceiveVelocityUpdates(true)
+                      .setTrackingRange(8)
+                      .sized(2.04F, 2.04F)
+                      .setCustomClientFactory((spawnEntity, world) -> TinkerWorld.terracubeEntity.get().create(world)), 0xAFB9D6, 0xA1A7B1);
 
   /*
    * Particles

@@ -330,6 +330,10 @@ public class TinkerTags {
     /** Tag so mods like thermal know our scyhtes can harvest */
     public static final TagKey<Item> SCYTHES = forgeTag("tools/scythe");
 
+    /** Tag for others adding empty potion bottles */
+    public static final TagKey<Item> SPLASH_BOTTLE = forgeTag("bottles/splash");
+    public static final TagKey<Item> LINGERING_BOTTLE = forgeTag("bottles/lingering");
+
     /** Makes a tag in the tinkers domain */
     private static TagKey<Item> tag(String name) {
       return TagKey.create(Registry.ITEM_REGISTRY, TConstruct.getResource(name));
@@ -356,10 +360,10 @@ public class TinkerTags {
     public static final TagKey<Fluid> SMALL_GEM_TOOLTIPS = tag("tooltips/gem_small");
     /** Causes the fluid to be formatted like glass in tooltips */
     public static final TagKey<Fluid> GLASS_TOOLTIPS = tag("tooltips/glass");
-    /** Causes the fluid to be formatted with 4 bottles per bucket, closest value to water bottles */
-    public static final TagKey<Fluid> BOTTLE_TOOLTIPS = tag("tooltips/bottle");
     /** Causes the fluid to be formatted like soup in tooltips, with bowls. Similar to slime, but no blocks */
     public static final TagKey<Fluid> SOUP_TOOLTIPS = tag("tooltips/soup");
+    /** Causes the fluid to be formatted like water, with bottles and buckets */
+    public static final TagKey<Fluid> WATER_TOOLTIPS = tag("tooltips/water");
 
     // spilling tags - used to reduce the number of spilling recipes
     public static final TagKey<Fluid> CLAY_SPILLING = tag("spilling/clay");
@@ -367,6 +371,8 @@ public class TinkerTags {
     public static final TagKey<Fluid> CHEAP_METAL_SPILLING = tag("spilling/metal/cheap");
     public static final TagKey<Fluid> AVERAGE_METAL_SPILLING = tag("spilling/metal/average");
     public static final TagKey<Fluid> EXPENSIVE_METAL_SPILLING = tag("spilling/metal/expensive");
+
+    public static final TagKey<Fluid> POTION = forgeTag("potion");
 
     private static TagKey<Fluid> tag(String name) {
       return TagKey.create(Registry.FLUID_REGISTRY, TConstruct.getResource(name));
@@ -394,7 +400,8 @@ public class TinkerTags {
     public static final TagKey<EntityType<?>> KILLAGERS = tag("killagers");
     /** Mobs that rarely spawn, boosts drop rate of severing */
     public static final TagKey<EntityType<?>> RARE_MOBS = tag("rare_mobs");
-
+    /** Mobs that get the 4x protection boost due to only 1 armor piece */
+    public static final TagKey<EntityType<?>> SMALL_ARMOR = forgeTag("small_armor");
 
     private static TagKey<EntityType<?>> tag(String name) {
       return TagKey.create(Registry.ENTITY_TYPE_REGISTRY, TConstruct.getResource(name));

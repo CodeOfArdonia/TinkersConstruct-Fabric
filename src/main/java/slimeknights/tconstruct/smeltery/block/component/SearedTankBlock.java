@@ -48,7 +48,7 @@ public class SearedTankBlock extends SearedBlock implements ITankBlock, EntityBl
   @Override
   @Nullable
   public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
-    return new TankBlockEntity(pPos, pState);
+    return new TankBlockEntity(pPos, pState, this);
   }
 
   @Deprecated
