@@ -106,7 +106,7 @@ dependencies {
 
     // dependencies
     modImplementation("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
-    modImplementation("io.github.fabricators_of_create:Porting-Lib:${project.port_lib_version}+${project.minecraft_version}-forgetransfer.${project.port_lib_hash}")
+    modImplementation("io.github.fabricators_of_create:Porting-Lib:${project.port_lib_version}+${project.minecraft_version}-dev.${project.port_lib_hash}")
     modImplementation(include("slimeknights.mantle:Mantle:${minecraft_version}-${mantle_version}"))
     modImplementation(include("io.github.tropheusj:milk-lib:0.3.2"))
 
