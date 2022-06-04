@@ -1,14 +1,16 @@
 package slimeknights.tconstruct.library.recipe.melting;
 
 import com.google.gson.JsonObject;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandler;
 import slimeknights.tconstruct.smeltery.TinkerSmeltery;
 
 import java.util.List;
@@ -30,13 +32,13 @@ public class DamageableMeltingRecipe extends MeltingRecipe {
 
   /** Scales a fluid stack based on the damage */
   private static FluidStack scaleOutput(FluidStack fluid, int damage, int maxDamage, int unitSize) {
-    int amount = fluid.getAmount() * (maxDamage - damage) / maxDamage;
+    long amount = fluid.getAmount() * (maxDamage - damage) / maxDamage;
     // mimimum output is one unit
     if (amount <= unitSize) {
       amount = Math.max(unitSize, 1);
     } else if (unitSize > 1) {
       // round down to the nearest unit
-      int remainder = amount % unitSize;
+      long remainder = amount % unitSize;
       if (remainder > 0) {
         amount -= remainder;
       }
@@ -57,7 +59,7 @@ public class DamageableMeltingRecipe extends MeltingRecipe {
   }
 
   @Override
-  public void handleByproducts(IMeltingContainer inv, IFluidHandler handler) {
+  public void handleByproducts(IMeltingContainer inv, Storage<FluidVariant> handler) {
     ItemStack input = inv.getStack();
     int maxDamage = input.getMaxDamage();
     if (maxDamage <= 0) {
@@ -67,7 +69,7 @@ public class DamageableMeltingRecipe extends MeltingRecipe {
       int itemDamage = input.getDamageValue();
       for (int i = 0; i < byproducts.size(); i++) {
         FluidStack fluidStack = byproducts.get(i);
-        handler.fill(scaleOutput(fluidStack, itemDamage, maxDamage, i < byproductSizes.length ? byproductSizes[i] : unitSize), false);
+        TransferUtil.insertFluid(handler, scaleOutput(fluidStack, itemDamage, maxDamage, i < byproductSizes.length ? byproductSizes[i] : unitSize));
       }
     }
   }

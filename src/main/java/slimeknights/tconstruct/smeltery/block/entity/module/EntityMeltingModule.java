@@ -1,7 +1,11 @@
 package slimeknights.tconstruct.smeltery.block.entity.module;
 
 import io.github.fabricators_of_create.porting_lib.mixin.common.accessor.DamageSourceAccessor;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import lombok.RequiredArgsConstructor;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -12,8 +16,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandler;
 import slimeknights.mantle.block.entity.MantleBlockEntity;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.common.TinkerTags.EntityTypes;
@@ -39,7 +41,7 @@ public class EntityMeltingModule {
   public static final DamageSource SMELTERY_MAGIC = DamageSourceAccessor.port_lib$init(TConstruct.prefix("smeltery_magic")).setMagic();
 
   private final MantleBlockEntity parent;
-  private final IFluidHandler tank;
+  private final Storage<FluidVariant> tank;
   /** Supplier that returns true if the tank has space */
   private final BooleanSupplier canMeltEntities;
   /** Function that tries to insert an item into the inventory */
@@ -149,7 +151,7 @@ public class EntityMeltingModule {
           // if the entity is successfully damaged, fill the tank with fluid
           if (entity.hurt(entity.fireImmune() ? SMELTERY_MAGIC : SMELTERY_DAMAGE, damage)) {
             // its fine if we don't fill it all, leftover fluid is just lost
-            tank.fill(fluid, false);
+            TransferUtil.insertFluid(tank, fluid);
             melted = true;
           }
         }

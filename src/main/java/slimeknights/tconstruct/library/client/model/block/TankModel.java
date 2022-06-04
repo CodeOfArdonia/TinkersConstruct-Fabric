@@ -13,7 +13,7 @@ import io.github.fabricators_of_create.porting_lib.model.IModelData;
 import io.github.fabricators_of_create.porting_lib.model.IModelGeometry;
 import io.github.fabricators_of_create.porting_lib.model.IModelLoader;
 import io.github.fabricators_of_create.porting_lib.render.TransformTypeDependentItemBakedModel;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTankForge;
+import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTank;
 import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import lombok.AllArgsConstructor;
@@ -112,7 +112,7 @@ public class TankModel implements IModelGeometry<TankModel> {
         return model;
       }
       // determine fluid
-      FluidTankForge tank = TankItem.getFluidTank(stack);
+      FluidTank tank = TankItem.getFluidTank(stack);
       if (tank.isEmpty()) {
         return model;
       }
@@ -253,7 +253,7 @@ public class TankModel implements IModelGeometry<TankModel> {
     public void emitBlockQuads(BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<Random> randomSupplier, RenderContext context) {
       if(blockView instanceof RenderAttachedBlockView renderAttachedBlockView && renderAttachedBlockView.getBlockEntityRenderAttachment(pos) instanceof IModelData data) {
         if ((original.forceModelFluid || Config.CLIENT.tankFluidModel.get()) && data.hasProperty(ModelProperties.FLUID_TANK)) {
-          FluidTankForge tank = data.getData(ModelProperties.FLUID_TANK);
+          FluidTank tank = data.getData(ModelProperties.FLUID_TANK);
           if (tank != null && !tank.getFluid().isEmpty()) {
             ((FabricBakedModel)getCachedModel(tank.getFluid(), tank.getCapacity())).emitBlockQuads(blockView, state, pos, randomSupplier, context);
             return;

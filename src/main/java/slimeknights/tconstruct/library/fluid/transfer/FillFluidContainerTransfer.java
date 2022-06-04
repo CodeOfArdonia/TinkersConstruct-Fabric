@@ -6,8 +6,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandler;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import lombok.RequiredArgsConstructor;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -51,16 +54,19 @@ public class FillFluidContainerTransfer implements IFluidContainerTransfer {
 
   @Nullable
   @Override
-  public TransferResult transfer(ItemStack stack, FluidStack fluid, IFluidHandler handler) {
+  public TransferResult transfer(ItemStack stack, FluidStack fluid, Storage<FluidVariant> handler) {
     long amount = this.fluid.getAmount(fluid.getFluid());
     FluidStack toDrain = new FluidStack(fluid, amount);
-    FluidStack simulated = handler.drain(toDrain.copy(), true);
-    if (simulated.getAmount() == amount) {
-      FluidStack actual = handler.drain(toDrain.copy(), false);
-      if (actual.getAmount() != amount) {
-        TConstruct.LOG.error("Wrong amount drained from {}, expected {}, filled {}", stack.getItem().getRegistryName(), fluid.getAmount(), actual.getAmount());
+    try (Transaction t = TransferUtil.getTransaction()) {
+      long simulated = handler.simulateExtract(toDrain.copy().getType(), toDrain.copy().getAmount(), t);
+      if (simulated == amount) {
+        long actual = TransferUtil.extractFluid(handler, toDrain.copy());
+        t.commit();
+        if (actual != amount) {
+          TConstruct.LOG.error("Wrong amount drained from {}, expected {}, filled {}", stack.getItem().getRegistryName(), fluid.getAmount(), actual);
+        }
+        return new TransferResult(getFilled(toDrain), toDrain, true);
       }
-      return new TransferResult(getFilled(toDrain), toDrain, true);
     }
     return null;
   }

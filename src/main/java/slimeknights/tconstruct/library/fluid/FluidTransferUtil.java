@@ -2,15 +2,14 @@ package slimeknights.tconstruct.library.fluid;
 
 import io.github.fabricators_of_create.porting_lib.mixin.common.accessor.BucketItemAccessor;
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.EmptyFluidHandler;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandler;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandlerItem;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
 import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -45,7 +44,7 @@ public class FluidTransferUtil {
    * @param maxFill  Maximum to transfer
    * @return  True if transfer succeeded
    */
-  public static FluidStack tryTransfer(IFluidHandler input, IFluidHandler output, int maxFill) {
+  public static FluidStack tryTransfer(Storage<FluidVariant> input, Storage<FluidVariant> output, int maxFill) {
     // first, figure out how much we can drain
     FluidStack simulated = input.drain(maxFill, true);
     if (!simulated.isEmpty()) {
@@ -140,7 +139,7 @@ public class FluidTransferUtil {
         // TE must have a capability
         LazyOptional<IFluidHandler> teCapability = TransferUtil.getFluidHandler(te, face);
         if (teCapability.isPresent()) {
-          IFluidHandler teHandler = teCapability.orElse(EmptyFluidHandler.INSTANCE);
+          Storage<FluidVariant> teHandler = teCapability.orElse(EmptyFluidHandler.INSTANCE);
           ItemStack copy = ItemHandlerHelper.copyStackWithSize(stack, 1);
 
           // if the item has a capability, do a direct transfer
@@ -171,7 +170,7 @@ public class FluidTransferUtil {
           if (FluidContainerTransferManager.INSTANCE.mayHaveTransfer(stack)) {
             // only actually transfer on the serverside, client just has items
             if (!world.isClientSide) {
-              FluidStack currentFluid = teHandler.drain(Integer.MAX_VALUE, true);
+              FluidStack currentFluid = teHandler.simulateExtract(Long.MAX_VALUE, true);
               IFluidContainerTransfer transfer = FluidContainerTransferManager.INSTANCE.getTransfer(stack, currentFluid);
               if (transfer != null) {
                 TransferResult result = transfer.transfer(stack, currentFluid, teHandler);

@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.smeltery.block.entity.inventory;
 
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTankForge;
+import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTank;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
@@ -14,9 +14,9 @@ import java.util.Optional;
  * Fluid tank wrapper that weakly references a tank from a neighbor
  */
 public class MelterFuelWrapper implements IFluidContainer {
-  private final WeakReference<FluidTankForge> tank;
+  private final WeakReference<FluidTank> tank;
 
-  public MelterFuelWrapper(FluidTankForge tank) {
+  public MelterFuelWrapper(FluidTank tank) {
     this.tank = new WeakReference<>(tank);
   }
 
@@ -31,7 +31,7 @@ public class MelterFuelWrapper implements IFluidContainer {
   @Override
   public Fluid getFluid() {
     return Optional.ofNullable(tank.get())
-                   .map(FluidTankForge::getFluid)
+                   .map(FluidTank::getFluid)
                    .map(FluidStack::getFluid)
                    .orElse(Fluids.EMPTY);
   }
@@ -44,7 +44,7 @@ public class MelterFuelWrapper implements IFluidContainer {
    */
   public FluidStack getFluidStack() {
     return Optional.ofNullable(tank.get())
-                   .map(FluidTankForge::getFluid)
+                   .map(FluidTank::getFluid)
                    .orElse(FluidStack.EMPTY);
   }
 
@@ -54,7 +54,7 @@ public class MelterFuelWrapper implements IFluidContainer {
    */
   public long getCapacity() {
     return Optional.ofNullable(tank.get())
-                   .map(FluidTankForge::getCapacity)
+                   .map(FluidTank::getCapacity)
                    .orElse(0L);
   }
 
@@ -64,7 +64,7 @@ public class MelterFuelWrapper implements IFluidContainer {
    * @return  Ticks of fuel units
    */
   public long consumeFuel(MeltingFuel fuel) {
-    FluidTankForge tank = this.tank.get();
+    FluidTank tank = this.tank.get();
     if (tank != null) {
       long amount = fuel.getAmount(this);
       if (amount > 0) {

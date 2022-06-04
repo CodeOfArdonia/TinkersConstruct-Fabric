@@ -6,8 +6,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandler;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import lombok.RequiredArgsConstructor;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
@@ -50,16 +53,19 @@ public class EmptyFluidContainerTransfer implements IFluidContainerTransfer {
   }
 
   @Override
-  public TransferResult transfer(ItemStack stack, FluidStack fluid, IFluidHandler handler) {
+  public TransferResult transfer(ItemStack stack, FluidStack fluid, Storage<FluidVariant> handler) {
     FluidStack contained = getFluid(stack);
-    int simulated = handler.fill(contained.copy(), FluidAction.SIMULATE);
-    if (simulated == this.fluid.getAmount()) {
-      long actual = handler.fill(contained.copy(), false);
-      if (actual > 0) {
-        if (actual != this.fluid.getAmount()) {
-          TConstruct.LOG.error("Wrong amount filled from {}, expected {}, filled {}", stack.getItem().getRegistryName(), this.fluid.getAmount(), actual);
+    try (Transaction t = TransferUtil.getTransaction()) {
+      long simulated = handler.simulateInsert(contained.copy().getType(), contained.copy().getAmount(), t);
+      if (simulated == this.fluid.getAmount()) {
+        long actual = TransferUtil.insertFluid(handler, contained.copy());
+        t.commit();
+        if (actual > 0) {
+          if (actual != this.fluid.getAmount()) {
+            TConstruct.LOG.error("Wrong amount filled from {}, expected {}, filled {}", stack.getItem().getRegistryName(), this.fluid.getAmount(), actual);
+          }
+          return new TransferResult(filled.get().copy(), contained, false);
         }
-        return new TransferResult(filled.get().copy(), contained, false);
       }
     }
     return null;

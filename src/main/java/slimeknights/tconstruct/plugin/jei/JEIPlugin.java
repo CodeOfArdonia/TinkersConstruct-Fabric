@@ -36,7 +36,7 @@
 //import net.minecraft.world.level.ItemLike;
 //import net.minecraft.world.level.material.Fluid;
 //import net.minecraftforge.fluids.FluidAttributes;
-//import net.minecraftforge.fluids.FluidStack;
+//import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 //import net.minecraftforge.fml.ModList;
 //import net.minecraftforge.registries.ForgeRegistries;
 //import net.minecraftforge.registries.tags.ITag;

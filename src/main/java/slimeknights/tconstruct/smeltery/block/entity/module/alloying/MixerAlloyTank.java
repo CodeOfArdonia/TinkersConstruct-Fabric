@@ -1,14 +1,14 @@
 package slimeknights.tconstruct.smeltery.block.entity.module.alloying;
 
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.EmptyFluidHandler;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandler;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import io.github.fabricators_of_create.porting_lib.util.NonNullConsumer;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -31,7 +31,7 @@ public class MixerAlloyTank implements IMutableAlloyTank {
   /** Handler parent */
   private final MantleBlockEntity parent;
   /** Tank for outputs */
-  private final IFluidHandler outputTank;
+  private final Storage<FluidVariant> outputTank;
 
   /** Current temperature. Provided as a getter and setter as there are a few contexts with different source for temperature */
   @Getter
@@ -40,12 +40,12 @@ public class MixerAlloyTank implements IMutableAlloyTank {
 
   // side tank cache
   /** Cache of tanks for each of the sides */
-  private final Map<Direction,LazyOptional<IFluidHandler>> inputs = new EnumMap<>(Direction.class);
+  private final Map<Direction,LazyOptional<Storage<FluidVariant>>> inputs = new EnumMap<>(Direction.class);
   /** Map of invalidation listeners for each side */
-  private final Map<Direction,NonNullConsumer<LazyOptional<IFluidHandler>>> listeners = new EnumMap<>(Direction.class);
+  private final Map<Direction,NonNullConsumer<LazyOptional<Storage<FluidVariant>>>> listeners = new EnumMap<>(Direction.class);
   /** Map of tank index to tank on the side */
   @Nullable
-  private IFluidHandler[] indexedList = null;
+  private Storage<FluidVariant>[] indexedList = null;
 
   // state
   /** If true, tanks are marked for refresh later */
@@ -60,15 +60,15 @@ public class MixerAlloyTank implements IMutableAlloyTank {
   }
 
   /** Gets the map of index to direction */
-  private IFluidHandler[] indexTanks() {
+  private Storage<FluidVariant>[] indexTanks() {
     // convert map into indexed list of fluid handlers, will be cleared next time a side updates
     if (indexedList == null) {
-      indexedList = new IFluidHandler[currentTanks];
+      indexedList = new Storage<FluidVariant>[currentTanks];
       if (currentTanks > 0) {
         int nextTank = 0;
         for (Direction direction : Direction.values()) {
           if (direction != Direction.DOWN) {
-            LazyOptional<IFluidHandler> handler = inputs.getOrDefault(direction, LazyOptional.empty());
+            LazyOptional<Storage<FluidVariant>> handler = inputs.getOrDefault(direction, LazyOptional.empty());
             if (handler.isPresent()) {
               indexedList[nextTank] = handler.orElse(EmptyFluidHandler.INSTANCE);
               nextTank++;
@@ -81,7 +81,7 @@ public class MixerAlloyTank implements IMutableAlloyTank {
   }
 
   /** Gets the fluid handler for the given tank index */
-  public IFluidHandler getFluidHandler(int tank) {
+  public Storage<FluidVariant> getFluidHandler(int tank) {
     checkTanks();
     // invalid index, nothing
     if (tank >= currentTanks || tank < 0) {

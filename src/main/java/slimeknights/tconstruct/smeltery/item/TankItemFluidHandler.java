@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.smeltery.item;
 
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTankForge;
+import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTank;
 import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandlerItem;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
@@ -21,12 +21,12 @@ public class TankItemFluidHandler implements IFluidHandlerItem {
   private final ItemStack container;
 
   /** Gets the tank on the stack */
-  private FluidTankForge getTank() {
+  private FluidTank getTank() {
     return TankItem.getFluidTank(container);
   }
 
   /** Updates the container from the given tank */
-  private void updateContainer(FluidTankForge tank) {
+  private void updateContainer(FluidTank tank) {
     TankItem.setTank(container, tank);
   }
 
@@ -58,7 +58,7 @@ public class TankItemFluidHandler implements IFluidHandlerItem {
 
   @Override
   public long fill(FluidStack resource, boolean sim) {
-    FluidTankForge tank = getTank();
+    FluidTank tank = getTank();
     long didFill = tank.fill(resource, sim);
     if (didFill > 0 && !sim) {
       updateContainer(tank);
@@ -69,7 +69,7 @@ public class TankItemFluidHandler implements IFluidHandlerItem {
   @Nonnull
   @Override
   public FluidStack drain(FluidStack resource, boolean sim) {
-    FluidTankForge tank = getTank();
+    FluidTank tank = getTank();
     FluidStack didDrain = tank.drain(resource, sim);
     if (!didDrain.isEmpty() && !sim) {
       updateContainer(tank);
@@ -80,7 +80,7 @@ public class TankItemFluidHandler implements IFluidHandlerItem {
   @Nonnull
   @Override
   public FluidStack drain(long maxDrain, boolean sim) {
-    FluidTankForge tank = getTank();
+    FluidTank tank = getTank();
     FluidStack didDrain = tank.drain(maxDrain, sim);
     if (!didDrain.isEmpty() && !sim) {
       updateContainer(tank);

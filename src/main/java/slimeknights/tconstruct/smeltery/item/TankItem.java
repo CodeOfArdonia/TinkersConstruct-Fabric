@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.smeltery.item;
 
 import io.github.fabricators_of_create.porting_lib.item.CustomMaxCountItem;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTankForge;
+import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTank;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
@@ -61,7 +61,7 @@ public class TankItem extends BlockTooltipItem implements CustomMaxCountItem {
   @Override
   public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
     if (stack.hasTag()) {
-      FluidTankForge tank = getFluidTank(stack);
+      FluidTank tank = getFluidTank(stack);
       if (tank.getFluidAmount() > 0) {
         tooltip.add(new TranslatableComponent(KEY_FLUID, tank.getFluid().getDisplayName()).withStyle(ChatFormatting.GRAY));
         long amount = tank.getFluidAmount();
@@ -109,7 +109,7 @@ public class TankItem extends BlockTooltipItem implements CustomMaxCountItem {
    * @param tank   Tank instance
    * @return  Stack with tank
    */
-  public static ItemStack setTank(ItemStack stack, FluidTankForge tank) {
+  public static ItemStack setTank(ItemStack stack, FluidTank tank) {
     if (tank.isEmpty()) {
       CompoundTag nbt = stack.getTag();
       if (nbt != null) {
@@ -129,8 +129,8 @@ public class TankItem extends BlockTooltipItem implements CustomMaxCountItem {
    * @param stack  Tank stack
    * @return  Tank stored in the stack
    */
-  public static FluidTankForge getFluidTank(ItemStack stack) {
-    FluidTankForge tank = new FluidTankForge(TankBlockEntity.getCapacity(stack.getItem()));
+  public static FluidTank getFluidTank(ItemStack stack) {
+    FluidTank tank = new FluidTank(TankBlockEntity.getCapacity(stack.getItem()));
     if (stack.hasTag()) {
       assert stack.getTag() != null;
       tank.readFromNBT(stack.getTag().getCompound(NBTTags.TANK));

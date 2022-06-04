@@ -1,8 +1,6 @@
 package slimeknights.tconstruct.smeltery.block.entity.module;
 
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandler;
-import io.github.fabricators_of_create.porting_lib.transfer.item.IItemHandler;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
@@ -51,7 +49,7 @@ public class FuelModule implements ContainerData {
   public static final int SOLID_TEMPERATURE = 800;
 
   /** Listener to attach to stored capability */
-  private final NonNullConsumer<LazyOptional<IFluidHandler>> fluidListener = new WeakConsumerWrapper<>(this, (self, cap) -> self.reset());
+  private final NonNullConsumer<LazyOptional<Storage<FluidVariant>>> fluidListener = new WeakConsumerWrapper<>(this, (self, cap) -> self.reset());
   private final NonNullConsumer<LazyOptional<Storage<ItemVariant>>> itemListener = new WeakConsumerWrapper<>(this, (self, cap) -> self.reset());
 
   /** Parent TE */
@@ -73,9 +71,9 @@ public class FuelModule implements ContainerData {
 
 
   /** Client fuel display */
-  private List<LazyOptional<IFluidHandler>> tankDisplayHandlers;
+  private List<LazyOptional<Storage<FluidVariant>>> tankDisplayHandlers;
   /** Listener to attach to display capabilities */
-  private final NonNullConsumer<LazyOptional<IFluidHandler>> displayListener = new WeakConsumerWrapper<>(this, (self, cap) -> {
+  private final NonNullConsumer<LazyOptional<Storage<FluidVariant>>> displayListener = new WeakConsumerWrapper<>(this, (self, cap) -> {
     if (self.tankDisplayHandlers != null) {
       self.tankDisplayHandlers.remove(cap);
     }
@@ -148,17 +146,17 @@ public class FuelModule implements ContainerData {
   /* Fuel updating */
 
   /* Cache of objects, since they are otherwise created possibly several times */
-  private final NonNullFunction<IItemHandler,Integer> trySolidFuelConsume = handler -> trySolidFuel(handler, true);
-  private final NonNullFunction<IItemHandler,Integer> trySolidFuelNoConsume = handler -> trySolidFuel(handler, false);
-  private final NonNullFunction<IFluidHandler,Integer> tryLiquidFuelConsume = handler -> tryLiquidFuel(handler, true);
-  private final NonNullFunction<IFluidHandler,Integer> tryLiquidFuelNoConsume = handler -> tryLiquidFuel(handler, false);
+  private final NonNullFunction<Storage<ItemVariant>,Integer> trySolidFuelConsume = handler -> trySolidFuel(handler, true);
+  private final NonNullFunction<Storage<ItemVariant>,Integer> trySolidFuelNoConsume = handler -> trySolidFuel(handler, false);
+  private final NonNullFunction<Storage<FluidVariant>,Integer> tryLiquidFuelConsume = handler -> tryLiquidFuel(handler, true);
+  private final NonNullFunction<Storage<FluidVariant>,Integer> tryLiquidFuelNoConsume = handler -> tryLiquidFuel(handler, false);
 
   /**
    * Tries to consume fuel from the given fluid handler
    * @param handler  Handler to consume fuel from
    * @return   Temperature of the consumed fuel, 0 if none found
    */
-  private int trySolidFuel(IItemHandler handler, boolean consume) {
+  private int trySolidFuel(Storage<ItemVariant> handler, boolean consume) {
     for (int i = 0; i < handler.getSlots(); i++) {
       ItemStack stack = handler.getStackInSlot(i);
       int time = FuelRegistry.INSTANCE.get(stack.getItem()/*, TinkerRecipeTypes.FUEL.get()*/) / 4;
@@ -205,7 +203,7 @@ public class FuelModule implements ContainerData {
    * @param consume  If true, fuel is consumed
    * @return Mapper function for solid fuel
    */
-  private NonNullFunction<IItemHandler,Integer> trySolidFuel(boolean consume) {
+  private NonNullFunction<Storage<ItemVariant>,Integer> trySolidFuel(boolean consume) {
     return consume ? trySolidFuelConsume : trySolidFuelNoConsume;
   }
 
@@ -214,7 +212,7 @@ public class FuelModule implements ContainerData {
    * @param handler  Handler to consume fuel from
    * @return   Temperature of the consumed fuel, 0 if none found
    */
-  private int tryLiquidFuel(IFluidHandler handler, boolean consume) {
+  private int tryLiquidFuel(Storage<FluidVariant> handler, boolean consume) {
     FluidStack fluid = handler.getFluidInTank(0);
     MeltingFuel recipe = findRecipe(fluid.getFluid());
     if (recipe != null) {
@@ -243,7 +241,7 @@ public class FuelModule implements ContainerData {
    * @param consume  If true, fuel is consumed
    * @return Mapper function for liquid fuel
    */
-  private NonNullFunction<IFluidHandler,Integer> tryLiquidFuel(boolean consume) {
+  private NonNullFunction<Storage<FluidVariant>,Integer> tryLiquidFuel(boolean consume) {
     return consume ? tryLiquidFuelConsume : tryLiquidFuelNoConsume;
   }
 

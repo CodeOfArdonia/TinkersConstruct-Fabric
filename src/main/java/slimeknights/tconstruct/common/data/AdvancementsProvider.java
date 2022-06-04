@@ -2,7 +2,7 @@ package slimeknights.tconstruct.common.data;
 
 import com.google.common.collect.Sets;
 import com.google.gson.JsonObject;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTankForge;
+import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTank;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.minecraft.advancements.Advancement;
@@ -370,10 +370,8 @@ public class AdvancementsProvider extends GenericDataProvider {
   }
 
   /** Gets a tank filled with the given fluid */
-  private static FluidTankForge getTankWith(Fluid fluid, long capacity) {
-    FluidTankForge tank = new FluidTankForge(capacity);
-    tank.fill(new FluidStack(fluid, capacity), false);
-    return tank;
+  private static FluidTank getTankWith(Fluid fluid, long capacity) {
+    return new FluidTank(new FluidStack(fluid, capacity), capacity);
   }
 
   /**

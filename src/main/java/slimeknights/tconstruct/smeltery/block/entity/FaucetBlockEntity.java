@@ -1,6 +1,8 @@
 package slimeknights.tconstruct.smeltery.block.entity;
 
 import lombok.Getter;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -80,7 +82,7 @@ public class FaucetBlockEntity extends MantleBlockEntity implements CustomRender
    * @param side  Side to check
    * @return  Fluid handler
    */
-  private LazyOptional<IFluidHandler> findFluidHandler(Direction side) {
+  private LazyOptional<Storage<FluidVariant>> findFluidHandler(Direction side) {
     assert level != null;
     BlockEntity te = level.getBlockEntity(worldPosition.relative(side));
     if (te != null) {
