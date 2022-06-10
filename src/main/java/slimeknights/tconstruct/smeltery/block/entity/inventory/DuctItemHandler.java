@@ -1,5 +1,10 @@
 package slimeknights.tconstruct.smeltery.block.entity.inventory;
 
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -40,18 +45,16 @@ public class DuctItemHandler extends SingleItemHandler<DuctBlockEntity> {
   }
 
   @Override
-  protected boolean isItemValid(ItemStack stack) {
+  protected boolean canInsert(ItemVariant item) {
     // the item or its container must be in the tag
-    if (!stack.is(TinkerTags.Items.DUCT_CONTAINERS)) {
-      ItemStack container = new ItemStack(stack.getItem().getCraftingRemainingItem());
+    if (!item.getItem().builtInRegistryHolder().is(TinkerTags.Items.DUCT_CONTAINERS)) {
+      ItemStack container = new ItemStack(item.getItem().getCraftingRemainingItem());
       if (container.isEmpty() || !container.is(TinkerTags.Items.DUCT_CONTAINERS)) {
         return false;
       }
     }
     // the item must contain fluid (no empty cans or buckets)
-    return TransferUtil.getFluidHandlerItem(stack)
-                .filter(cap -> !cap.getFluidInTank(0).isEmpty())
-                .isPresent();
+    return ContainerItemContext.withInitial(item, 1).find(FluidStorage.ITEM) != null;
   }
 
   /**
@@ -63,8 +66,7 @@ public class DuctItemHandler extends SingleItemHandler<DuctBlockEntity> {
     if (stack.isEmpty()) {
       return FluidStack.EMPTY;
     }
-    return TransferUtil.getFluidHandlerItem(stack)
-                    .map(handler -> handler.getFluidInTank(0))
-                    .orElse(FluidStack.EMPTY);
+    Storage<FluidVariant> storage = ContainerItemContext.withInitial(stack).find(FluidStorage.ITEM);
+    return storage != null ? TransferUtil.firstCopyOrEmpty(storage) : FluidStack.EMPTY;
   }
 }

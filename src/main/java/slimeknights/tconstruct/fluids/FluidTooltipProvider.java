@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.fluids;
 
+import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
 import net.minecraft.data.DataGenerator;
-import net.minecraftforge.fluids.FluidAttributes;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.library.client.data.AbstractFluidTooltipProvider;

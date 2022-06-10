@@ -1,13 +1,15 @@
 package slimeknights.tconstruct.smeltery.block.entity.module;
 
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandler;
-import io.github.fabricators_of_create.porting_lib.transfer.item.IItemHandlerModifiable;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
 import slimeknights.mantle.block.entity.MantleBlockEntity;
 import slimeknights.tconstruct.library.recipe.melting.IMeltingContainer.IOreRate;
@@ -20,7 +22,7 @@ import java.util.function.Consumer;
 /**
  * Inventory composite made of a set of melting module inventories
  */
-public class MeltingModuleInventory implements IItemHandlerModifiable {
+public class MeltingModuleInventory implements Storage<ItemVariant> {
   private static final String TAG_SLOT = "slot";
   private static final String TAG_ITEMS = "items";
   private static final String TAG_SIZE = "size";
@@ -28,7 +30,7 @@ public class MeltingModuleInventory implements IItemHandlerModifiable {
   /** Parent tile entity */
   private final MantleBlockEntity parent;
   /** Fluid handler for outputs */
-  protected final IFluidHandler fluidHandler;
+  protected final Storage<FluidVariant> fluidHandler;
   /** Array of modules containing each slot */
   private MeltingModule[] modules;
   /** If true, module cannot be resized */
@@ -43,7 +45,7 @@ public class MeltingModuleInventory implements IItemHandlerModifiable {
    * @param oreRate        Ore rate
    * @param size           Size
    */
-  public MeltingModuleInventory(MantleBlockEntity parent, IFluidHandler fluidHandler, IOreRate oreRate, int size) {
+  public MeltingModuleInventory(MantleBlockEntity parent, Storage<FluidVariant> fluidHandler, IOreRate oreRate, int size) {
     this.parent = parent;
     this.fluidHandler = fluidHandler;
     this.modules = new MeltingModule[size];
@@ -57,16 +59,11 @@ public class MeltingModuleInventory implements IItemHandlerModifiable {
    * @param fluidHandler   Tank for output
    * @param oreRate        Ore rate
    */
-  public MeltingModuleInventory(MantleBlockEntity parent, IFluidHandler fluidHandler, IOreRate oreRate) {
+  public MeltingModuleInventory(MantleBlockEntity parent, Storage<FluidVariant> fluidHandler, IOreRate oreRate) {
     this(parent, fluidHandler, oreRate, 0);
   }
 
   /* Properties */
-
-  @Override
-  public int getSlots() {
-    return modules.length;
-  }
 
   /**
    * Checks if the given slot index is valid
@@ -80,11 +77,6 @@ public class MeltingModuleInventory implements IItemHandlerModifiable {
   @Override
   public int getSlotLimit(int slot) {
     return 1;
-  }
-
-  @Override
-  public boolean isItemValid(int slot, ItemStack stack) {
-    return true;
   }
 
   /** Returns true if a slot is defined in the array */
@@ -170,7 +162,6 @@ public class MeltingModuleInventory implements IItemHandlerModifiable {
   /* Item handling */
 
   @Nonnull
-  @Override
   public ItemStack getStackInSlot(int slot) {
     if (validSlot(slot)) {
       // don't create the slot, just reading
@@ -181,7 +172,6 @@ public class MeltingModuleInventory implements IItemHandlerModifiable {
     return ItemStack.EMPTY;
   }
 
-  @Override
   public void setStackInSlot(int slot, ItemStack stack) {
     // actually set the stack
     if (validSlot(slot)) {
@@ -197,6 +187,20 @@ public class MeltingModuleInventory implements IItemHandlerModifiable {
         getModule(slot).setStack(stack);
       }
     }
+  }
+
+  @Override
+  public long insert(ItemVariant resource, long maxAmount, TransactionContext transaction) {
+    // if the slot is empty, we can insert. Ignores stack sizes at this time, assuming always 1
+    for (MeltingModule module : modules) {
+      if (module == null) continue;
+      boolean canInsert = module.getStack().isEmpty();
+      if (canInsert) {
+        module.setStack(resource.toStack()); // FIXME does not respect transactions
+        return 1;
+      }
+    }
+    return 0;
   }
 
   @Nonnull

@@ -1,10 +1,10 @@
 package slimeknights.tconstruct.fluids.util;
 
+import me.shedaniel.rei.plugin.common.displays.brewing.BrewingRecipe;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraftforge.common.brewing.BrewingRecipe;
 
 /** Recipe for transforming a bottle, depending on a vanilla brewing recipe to get the ingredient */
 public class BottleBrewingRecipe extends BrewingRecipe {

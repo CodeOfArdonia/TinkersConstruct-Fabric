@@ -8,6 +8,9 @@ import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import lombok.Getter;
 import lombok.Setter;
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -55,8 +58,6 @@ public class MelterBlockEntity extends NameableBlockEntity implements ITankBlock
   /** Internal fluid tank output */
   @Getter
   protected final FluidTankAnimated tank = new FluidTankAnimated(TANK_CAPACITY, this);
-  /** Capability holder for the tank */
-  private final LazyOptional<IFluidHandler> tankHolder = LazyOptional.of(() -> tank);
   /** Tank data for the model */
   @Getter
   private final IModelData modelData = new SinglePropertyData<>(ModelProperties.FLUID_TANK, tank);
@@ -71,8 +72,6 @@ public class MelterBlockEntity extends NameableBlockEntity implements ITankBlock
   /** Handles all the melting needs */
   @Getter
   private final MeltingModuleInventory meltingInventory = new MeltingModuleInventory(this, tank, Config.COMMON.melterOreRate, 3);
-  /** Capability holder for the tank */
-  private final LazyOptional<IItemHandler> inventoryHolder = LazyOptional.of(() -> meltingInventory);
 
   /** Fuel handling logic */
   @Getter
@@ -110,19 +109,20 @@ public class MelterBlockEntity extends NameableBlockEntity implements ITankBlock
 //    }
 //    return super.getCapability(capability, facing);
 //  }
-  
+
+
   @Nullable
   @Override
-  public LazyOptional<IFluidHandler> getFluidHandler(@Nullable Direction direction) {
-    return tankHolder;
+  public Storage<FluidVariant> getFluidStorage(@Nullable Direction face) {
+    return this.tank;
   }
-  
+
   @Nullable
   @Override
-  public LazyOptional<IItemHandler> getItemHandler(@Nullable Direction direction) {
-    return inventoryHolder;
+  public Storage<ItemVariant> getItemStorage(@Nullable Direction face) {
+    return meltingInventory;
   }
-  
+
   @Override
   public void setRemoved() {
     super.setRemoved();

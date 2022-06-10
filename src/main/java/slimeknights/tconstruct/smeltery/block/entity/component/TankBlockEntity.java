@@ -19,6 +19,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
 import slimeknights.mantle.client.model.data.SinglePropertyData;
 import slimeknights.tconstruct.library.client.model.ModelProperties;
 import slimeknights.tconstruct.library.fluid.FluidTankAnimated;
@@ -29,7 +30,6 @@ import slimeknights.tconstruct.smeltery.block.entity.ITankBlockEntity;
 import slimeknights.tconstruct.smeltery.item.TankItem;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 public class TankBlockEntity extends SmelteryComponentBlockEntity implements ITankBlockEntity, FluidTransferable, RenderAttachmentBlockEntity {
   /** Max capacity for the tank */
@@ -62,8 +62,6 @@ public class TankBlockEntity extends SmelteryComponentBlockEntity implements ITa
   /** Internal fluid tank instance */
   @Getter
   protected final FluidTankAnimated tank;
-  /** Capability holder for the tank */
-  private final LazyOptional<Storage<FluidVariant>> holder;
   /** Tank data for the model */
   private final IModelData modelData;
   /** Last comparator strength to reduce block updates */
@@ -86,7 +84,6 @@ public class TankBlockEntity extends SmelteryComponentBlockEntity implements ITa
   protected TankBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, ITankBlock block) {
     super(type, pos, state);
     tank = new FluidTankAnimated(block.getCapacity(), this);
-    holder = LazyOptional.of(() -> tank);
     modelData = new SinglePropertyData<>(ModelProperties.FLUID_TANK, tank);
   }
 
@@ -95,16 +92,10 @@ public class TankBlockEntity extends SmelteryComponentBlockEntity implements ITa
    * Tank methods
    */
 
+  @Nullable
   @Override
-  @Nonnull
-  public LazyOptional<IFluidHandler> getFluidHandler(@Nullable Direction direction) {
-    return holder.cast();
-  }
-
-  @Override
-  public void invalidateCaps() {
-    super.invalidateCaps();
-    holder.invalidate();
+  public Storage<FluidVariant> getFluidStorage(@Nullable Direction face) {
+    return tank;
   }
 
   @Nonnull

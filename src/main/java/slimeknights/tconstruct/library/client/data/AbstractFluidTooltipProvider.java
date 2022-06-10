@@ -103,18 +103,18 @@ public abstract class AbstractFluidTooltipProvider extends GenericDataProvider {
     private final ImmutableList.Builder<FluidUnit> units = ImmutableList.builder();
 
     /** Adds a unit with a full translation key */
-    public FluidUnitListBuilder addUnitRaw(String key, int amount) {
+    public FluidUnitListBuilder addUnitRaw(String key, long amount) {
       units.add(new FluidUnit(key, amount));
       return this;
     }
 
     /** Adds a unit local to the current mod */
-    public FluidUnitListBuilder addTinkerUnit(String key, int amount) {
+    public FluidUnitListBuilder addTinkerUnit(String key, long amount) {
       return addUnitRaw(TConstruct.makeTranslationKey("gui", "fluid." + key), amount);
     }
 
     /** Adds a unit local to the current mod */
-    public FluidUnitListBuilder addUnit(String key, int amount) {
+    public FluidUnitListBuilder addUnit(String key, long amount) {
       return addUnitRaw(Util.makeTranslationKey("gui", id("fluid." + key)), amount);
     }
 
