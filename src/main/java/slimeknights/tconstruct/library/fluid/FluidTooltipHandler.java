@@ -12,8 +12,11 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.google.gson.JsonSyntaxException;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Registry;
@@ -21,14 +24,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
-import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import net.minecraftforge.fml.ModList;
 import slimeknights.mantle.recipe.ingredient.FluidIngredient;
 import slimeknights.mantle.util.JsonHelper;
 import slimeknights.mantle.util.RegistryHelper;
@@ -51,7 +52,7 @@ import java.util.function.BiConsumer;
 
 /** Handles fluid units displaying in tooltips */
 @Log4j2
-public class FluidTooltipHandler extends SimpleJsonResourceReloadListener {
+public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implements IdentifiableResourceReloadListener {
   public static final Component HOLD_SHIFT = new TranslatableComponent(TConstruct.makeTranslationKey("gui", "fluid.hold_shift")).withStyle(ChatFormatting.GRAY);
   /** Folder for saving the logic */
   public static final String FOLDER = "tinkering/fluid_tooltips";
@@ -90,10 +91,9 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener {
 
   /**
    * Initializes this manager, registering it with the resource manager
-   * @param manager  Manager
    */
-  public static void init(RegisterClientReloadListenersEvent manager) {
-    manager.registerReloadListener(INSTANCE);
+  public static void init() {
+    ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(INSTANCE);
   }
 
   private FluidTooltipHandler() {
@@ -236,10 +236,10 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener {
    * @param tooltip    Tooltip to append information
    * @return  True if the amount is not in buckets
    */
-  public static boolean appendMaterialNoShift(Fluid fluid, int original, List<Component> tooltip) {
+  public static boolean appendMaterialNoShift(Fluid fluid, long original, List<Component> tooltip) {
     // if holding shift, skip specific units
     if (SafeClientAccess.getTooltipKey() != TooltipKey.SHIFT) {
-      int amount = original;
+      long amount = original;
       amount = INSTANCE.getUnitList(fluid).getText(tooltip, amount);
       MILLIBUCKET.getText(tooltip, amount);
       return INSTANCE.listCache.get(fluid) != INSTANCE.fallback;
@@ -265,7 +265,7 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener {
    * Adds information to the tooltip based on ingot units
    * @param amount   Fluid amount
    * @param tooltip  Tooltip to append information
-   * @deprecated use {@link #appendNamedList(ResourceLocation, int, List)}
+   * @deprecated use {@link #appendNamedList(ResourceLocation, long, List)}
    */
   @Deprecated
   public static void appendIngots(long amount, List<Component> tooltip) {
@@ -279,7 +279,7 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener {
    * @param amount   Fluid amount
    * @param tooltip  Tooltip to append information
    */
-  public static void appendNamedList(ResourceLocation id, int amount, List<Component> tooltip) {
+  public static void appendNamedList(ResourceLocation id, long amount, List<Component> tooltip) {
     amount = INSTANCE.getUnitList(id).getText(tooltip, amount);
     appendBuckets(amount, tooltip);
   }
@@ -294,12 +294,17 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener {
     MILLIBUCKET.getText(tooltip, amount);
   }
 
+  @Override
+  public ResourceLocation getFabricId() {
+    return TConstruct.getResource("fluid_tooltip_handler");
+  }
+
   /** Single entry for text options */
   @SuppressWarnings("ClassCanBeRecord") // needed in GSON
   @RequiredArgsConstructor
   public static class FluidUnit {
     private final String key;
-    private final int needed;
+    private final long needed;
 
     /**
      * Gets the display text for this fluid entry
@@ -328,7 +333,7 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener {
     }
 
     /** Applies the text of all child units */
-    public int getText(List<Component> tooltip, int amount) {
+    public long getText(List<Component> tooltip, long amount) {
       if (units != null) {
         for (FluidUnit unit : units) {
           amount = unit.getText(tooltip, amount);

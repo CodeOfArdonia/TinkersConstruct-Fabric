@@ -5,6 +5,9 @@ import io.github.fabricators_of_create.porting_lib.block.CustomUpdateTagHandling
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemTransferable;
 import lombok.Getter;
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -18,8 +21,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import slimeknights.mantle.client.model.data.SinglePropertyData;
 import io.github.fabricators_of_create.porting_lib.model.IModelData;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandler;
-import io.github.fabricators_of_create.porting_lib.transfer.item.IItemHandler;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemTransferable;
 import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import slimeknights.tconstruct.TConstruct;
@@ -42,7 +43,6 @@ public class DuctBlockEntity extends SmelteryFluidIO implements MenuProvider, It
 
   @Getter
   private final DuctItemHandler itemHandler = new DuctItemHandler(this);
-  private final LazyOptional<IItemHandler> itemCapability = LazyOptional.of(() -> itemHandler);
   @Getter
   private final IModelData modelData = new SinglePropertyData<>(IDisplayFluidListener.PROPERTY);
 
@@ -73,19 +73,13 @@ public class DuctBlockEntity extends SmelteryFluidIO implements MenuProvider, It
 
   @Nonnull
   @Override
-  public LazyOptional<IItemHandler> getItemHandler(@org.jetbrains.annotations.Nullable Direction direction) {
-    return itemCapability.cast();
+  public Storage<ItemVariant> getItemStorage(@org.jetbrains.annotations.Nullable Direction direction) {
+    return itemHandler;
   }
 
   @Override
-  public void invalidateCaps() {
-    super.invalidateCaps();
-    itemCapability.invalidate();
-  }
-
-  @Override
-  protected LazyOptional<IFluidHandler> makeWrapper(LazyOptional<IFluidHandler> capability) {
-    return LazyOptional.of(() -> new DuctTankWrapper(capability.orElse(emptyInstance), itemHandler));
+  protected Storage<FluidVariant> makeWrapper(Storage<FluidVariant> capability) {
+    return new DuctTankWrapper(capability, itemHandler);
   }
 
   /** Updates the fluid in model data */

@@ -15,7 +15,7 @@ public class PlagueModifier extends NoLevelsModifier {
     if (isDirectDamage && !source.isProjectile()) {
       // copy all negative effects to target
       for (MobEffectInstance effect : context.getEntity().getActiveEffects()) {
-        if (!effect.getEffect().isBeneficial() && !((MobEffectInstanceExtensions)effect).getCurativeItems().isEmpty()) {
+        if (!effect.getEffect().isBeneficial() && !effect.getCurativeItems().isEmpty()) {
           target.addEffect(new MobEffectInstance(effect));
         }
       }

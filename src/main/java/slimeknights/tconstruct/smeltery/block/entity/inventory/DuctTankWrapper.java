@@ -1,31 +1,18 @@
 package slimeknights.tconstruct.smeltery.block.entity.inventory;
 
+import io.github.fabricators_of_create.porting_lib.transfer.WrappedStorage;
 import lombok.AllArgsConstructor;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandler;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 
 @AllArgsConstructor
-public class DuctTankWrapper implements IFluidHandler {
+public class DuctTankWrapper extends WrappedStorage<FluidVariant> {
   private final IFluidHandler parent;
   private final DuctItemHandler itemHandler;
 
 
   /* Properties */
-
-  @Override
-  public int getTanks() {
-    return parent.getTanks();
-  }
-
-  @Override
-  public FluidStack getFluidInTank(int tank) {
-    return parent.getFluidInTank(tank);
-  }
-
-  @Override
-  public long getTankCapacity(int tank) {
-    return parent.getTankCapacity(tank);
-  }
 
   @Override
   public boolean isFluidValid(int tank, FluidStack stack) {

@@ -3,6 +3,7 @@ package slimeknights.tconstruct.fluids;
 import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
 import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import io.github.fabricators_of_create.porting_lib.util.SimpleFlowableFluid;
+import io.github.tropheusj.milk.Milk;
 import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.sounds.SoundEvents;

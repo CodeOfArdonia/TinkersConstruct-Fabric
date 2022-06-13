@@ -1,6 +1,5 @@
 package slimeknights.tconstruct.smeltery.menu;
 
-import io.github.fabricators_of_create.porting_lib.transfer.item.IItemHandler;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.entity.BlockEntity;

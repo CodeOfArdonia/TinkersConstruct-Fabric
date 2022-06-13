@@ -3,7 +3,6 @@ package slimeknights.tconstruct.smeltery.block.entity.component;
 import io.github.fabricators_of_create.porting_lib.model.IModelData;
 import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTransferable;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import lombok.Getter;
 import lombok.Setter;
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
@@ -62,8 +61,6 @@ public class TankBlockEntity extends SmelteryComponentBlockEntity implements ITa
   /** Internal fluid tank instance */
   @Getter
   protected final FluidTankAnimated tank;
-  /** Capability holder for the tank */
-  private final LazyOptional<Storage<FluidVariant>> holder;
   /** Tank data for the model */
   private final IModelData modelData;
   /** Last comparator strength to reduce block updates */
@@ -86,7 +83,6 @@ public class TankBlockEntity extends SmelteryComponentBlockEntity implements ITa
   protected TankBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, ITankBlock block) {
     super(type, pos, state);
     tank = new FluidTankAnimated(block.getCapacity(), this);
-    holder = LazyOptional.of(() -> tank);
     modelData = new SinglePropertyData<>(ModelProperties.FLUID_TANK, tank);
   }
 
@@ -97,14 +93,13 @@ public class TankBlockEntity extends SmelteryComponentBlockEntity implements ITa
 
   @Override
   @Nonnull
-  public LazyOptional<IFluidHandler> getFluidHandler(@Nullable Direction direction) {
-    return holder.cast();
+  public Storage<FluidVariant> getFluidStorage(@Nullable Direction direction) {
+    return tank;
   }
 
   @Override
   public void invalidateCaps() {
     super.invalidateCaps();
-    holder.invalidate();
   }
 
   @Nonnull

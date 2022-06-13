@@ -3,6 +3,9 @@ package slimeknights.tconstruct.smeltery.block.entity.tank;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -17,7 +20,7 @@ import javax.annotation.Nonnull;
 import java.util.Objects;
 
 @RequiredArgsConstructor
-public class CastingFluidHandler implements IFluidHandler {
+public class CastingFluidHandler implements Storage<FluidVariant> {
   private final CastingBlockEntity tile;
   @Getter @Setter
   private FluidStack fluid = FluidStack.EMPTY;
@@ -51,7 +54,8 @@ public class CastingFluidHandler implements IFluidHandler {
   }
 
   @Override
-  public long fill(FluidStack resource, boolean sim) {
+  public long insert(FluidVariant variant, long maxAmount, TransactionContext transaction) {
+    FluidStack resource = new FluidStack(variant, maxAmount);
     if (resource.isEmpty() || !isFluidValid(resource)) {
       return 0;
     }

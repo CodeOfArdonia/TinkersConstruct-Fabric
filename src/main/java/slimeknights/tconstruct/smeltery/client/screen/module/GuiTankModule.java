@@ -2,6 +2,8 @@ package slimeknights.tconstruct.smeltery.client.screen.module;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import lombok.Getter;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -23,12 +25,12 @@ import java.util.function.BiConsumer;
 public class GuiTankModule {
   private static final int TANK_INDEX = 0;
   private final AbstractContainerScreen<?> screen;
-  private final IFluidHandler tank;
+  private final Storage<FluidVariant> tank;
   @Getter
   private final int x, y, width, height;
   private final BiConsumer<Integer,List<Component>> formatter;
 
-  public GuiTankModule(AbstractContainerScreen<?> screen, IFluidHandler tank, int x, int y, int width, int height, ResourceLocation tooltipId) {
+  public GuiTankModule(AbstractContainerScreen<?> screen, Storage<FluidVariant> tank, int x, int y, int width, int height, ResourceLocation tooltipId) {
     this.screen = screen;
     this.tank = tank;
     this.x = x;

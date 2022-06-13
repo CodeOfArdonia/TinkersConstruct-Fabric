@@ -1,8 +1,6 @@
 package slimeknights.tconstruct.tools.data;
 
 import io.github.fabricators_of_create.porting_lib.crafting.CompoundIngredient;
-import io.github.fabricators_of_create.porting_lib.crafting.DifferenceIngredient;
-import io.github.fabricators_of_create.porting_lib.crafting.IntersectionIngredient;
 import me.alphamode.forgetags.Tags;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.resource.conditions.v1.DefaultResourceConditions;

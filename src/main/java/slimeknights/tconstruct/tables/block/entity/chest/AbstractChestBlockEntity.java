@@ -1,8 +1,6 @@
 package slimeknights.tconstruct.tables.block.entity.chest;
 
-import io.github.fabricators_of_create.porting_lib.transfer.item.IItemHandler;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemTransferable;
-import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import lombok.Getter;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -30,24 +28,16 @@ public abstract class AbstractChestBlockEntity extends NameableBlockEntity imple
 
   @Getter
   private final IChestItemHandler itemHandler;
-  private final LazyOptional<IItemHandler> capability;
   protected AbstractChestBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, Component name, IChestItemHandler itemHandler) {
     super(type, pos, state, name);
     itemHandler.setParent(this);
     this.itemHandler = itemHandler;
-    this.capability = LazyOptional.of(() -> itemHandler);
   }
 
   @Nonnull
   @Override
-  public LazyOptional<Storage<ItemVariant>> getItemStorage(@org.jetbrains.annotations.Nullable Direction direction) {
-    return capability.cast();
-  }
-
-  @Override
-  public void invalidateCaps() {
-    super.invalidateCaps();
-    capability.invalidate();
+  public Storage<ItemVariant> getItemStorage(@org.jetbrains.annotations.Nullable Direction direction) {
+    return itemHandler;
   }
 
   @Nullable
