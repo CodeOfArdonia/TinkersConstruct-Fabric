@@ -18,6 +18,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
 import slimeknights.mantle.client.model.data.SinglePropertyData;
 import slimeknights.tconstruct.library.client.model.ModelProperties;
 import slimeknights.tconstruct.library.fluid.FluidTankAnimated;
@@ -28,7 +29,6 @@ import slimeknights.tconstruct.smeltery.block.entity.ITankBlockEntity;
 import slimeknights.tconstruct.smeltery.item.TankItem;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 public class TankBlockEntity extends SmelteryComponentBlockEntity implements ITankBlockEntity, FluidTransferable, RenderAttachmentBlockEntity {
   /** Max capacity for the tank */
@@ -91,15 +91,10 @@ public class TankBlockEntity extends SmelteryComponentBlockEntity implements ITa
    * Tank methods
    */
 
+  @Nullable
   @Override
-  @Nonnull
-  public Storage<FluidVariant> getFluidStorage(@Nullable Direction direction) {
+  public Storage<FluidVariant> getFluidStorage(@Nullable Direction face) {
     return tank;
-  }
-
-  @Override
-  public void invalidateCaps() {
-    super.invalidateCaps();
   }
 
   @Nonnull

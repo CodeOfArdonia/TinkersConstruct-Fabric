@@ -1,11 +1,15 @@
 package slimeknights.tconstruct.library.tools.capability;
 
+import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTank;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandlerItem;
 import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
@@ -21,18 +25,13 @@ import java.util.function.Supplier;
  * Logic to make a tool a fluid handler
  */
 @RequiredArgsConstructor
-public class ToolFluidCapability implements IFluidHandlerItem {
+public class ToolFluidCapability implements SingleSlotStorage<FluidVariant> {
   /** Boolean key to set in volatile mod data to enable the fluid capability */
   public static final ResourceLocation TOTAL_TANKS = TConstruct.getResource("total_tanks");
 
   @Getter
   private final ItemStack container;
   private final Supplier<? extends IToolStackView> tool;
-
-  @Override
-  public int getTanks() {
-    return tool.get().getVolatileData().getInt(TOTAL_TANKS);
-  }
 
   /**
    * Runs a fluid handler function for a tank index
@@ -58,25 +57,10 @@ public class ToolFluidCapability implements IFluidHandlerItem {
     return defaultValue;
   }
 
-  @Nonnull
   @Override
-  public FluidStack getFluidInTank(int tank) {
-    return runForTank(tank, FluidStack.EMPTY, IFluidModifier::getFluidInTank);
-  }
-
-  @Override
-  public long getTankCapacity(int tank) {
-    return runForTank(tank, 0L, IFluidModifier::getTankCapacity);
-  }
-
-  @Override
-  public boolean isFluidValid(int tank, FluidStack stack) {
-    return runForTank(tank, false, (module, tool, level, tank1) -> module.isFluidValid(tool, level, tank1, stack));
-  }
-
-  @Override
-  public long fill(FluidStack resource, boolean sim) {
-    int totalFilled = 0;
+  public long insert(FluidVariant insertedVariant, long maxAmount, TransactionContext transaction) {
+    long totalFilled = 0;
+    FluidStack resource = new FluidStack(insertedVariant, maxAmount);
     IToolStackView tool = this.tool.get();
     for (ModifierEntry entry : tool.getModifierList()) {
       IFluidModifier fluidModifier = entry.getModifier().getModule(IFluidModifier.class);

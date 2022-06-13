@@ -109,7 +109,7 @@ public abstract class AbstractFluidTooltipProvider extends GenericDataProvider {
     }
 
     /** Adds a unit local to the current mod */
-    public FluidUnitListBuilder addTinkerUnit(String key, int amount) {
+    public FluidUnitListBuilder addTinkerUnit(String key, long amount) {
       return addUnitRaw(TConstruct.makeTranslationKey("gui", "fluid." + key), amount);
     }
 

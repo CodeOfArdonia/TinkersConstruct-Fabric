@@ -3,14 +3,13 @@ package slimeknights.tconstruct.smeltery.block.entity.module;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandler;
-import io.github.fabricators_of_create.porting_lib.transfer.item.IItemHandlerModifiable;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
 import slimeknights.mantle.block.entity.MantleBlockEntity;
 import slimeknights.tconstruct.library.recipe.melting.IMeltingContainer.IOreRate;
@@ -66,11 +65,6 @@ public class MeltingModuleInventory implements Storage<ItemVariant> {
 
   /* Properties */
 
-  @Override
-  public int getSlots() {
-    return modules.length;
-  }
-
   /**
    * Checks if the given slot index is valid
    * @param slot  Slot index to check
@@ -83,11 +77,6 @@ public class MeltingModuleInventory implements Storage<ItemVariant> {
   @Override
   public int getSlotLimit(int slot) {
     return 1;
-  }
-
-  @Override
-  public boolean isItemValid(int slot, ItemStack stack) {
-    return true;
   }
 
   /** Returns true if a slot is defined in the array */
@@ -173,7 +162,6 @@ public class MeltingModuleInventory implements Storage<ItemVariant> {
   /* Item handling */
 
   @Nonnull
-  @Override
   public ItemStack getStackInSlot(int slot) {
     if (validSlot(slot)) {
       // don't create the slot, just reading
@@ -184,7 +172,6 @@ public class MeltingModuleInventory implements Storage<ItemVariant> {
     return ItemStack.EMPTY;
   }
 
-  @Override
   public void setStackInSlot(int slot, ItemStack stack) {
     // actually set the stack
     if (validSlot(slot)) {
@@ -200,6 +187,20 @@ public class MeltingModuleInventory implements Storage<ItemVariant> {
         getModule(slot).setStack(stack);
       }
     }
+  }
+
+  @Override
+  public long insert(ItemVariant resource, long maxAmount, TransactionContext transaction) {
+    // if the slot is empty, we can insert. Ignores stack sizes at this time, assuming always 1
+    for (MeltingModule module : modules) {
+      if (module == null) continue;
+      boolean canInsert = module.getStack().isEmpty();
+      if (canInsert) {
+        module.setStack(resource.toStack()); // FIXME does not respect transactions
+        return 1;
+      }
+    }
+    return 0;
   }
 
   @Nonnull
