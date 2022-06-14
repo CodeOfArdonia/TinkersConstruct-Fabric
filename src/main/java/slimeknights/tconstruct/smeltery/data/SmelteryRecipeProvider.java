@@ -1,8 +1,6 @@
 package slimeknights.tconstruct.smeltery.data;
 
 import io.github.fabricators_of_create.porting_lib.crafting.CompoundIngredient;
-import io.github.fabricators_of_create.porting_lib.crafting.DifferenceIngredient;
-import io.github.fabricators_of_create.porting_lib.crafting.IntersectionIngredient;
 import io.github.fabricators_of_create.porting_lib.crafting.NBTIngredient;
 import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;

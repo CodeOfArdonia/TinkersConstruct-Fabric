@@ -1,6 +1,5 @@
 package slimeknights.tconstruct.smeltery.data;
 
-import io.github.fabricators_of_create.porting_lib.crafting.PartialNBTIngredient;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.tags.FluidTags;
@@ -12,7 +11,6 @@ import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
-import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import slimeknights.mantle.recipe.helper.ItemOutput;
 import slimeknights.mantle.recipe.ingredient.FluidIngredient;
 import slimeknights.tconstruct.TConstruct;
