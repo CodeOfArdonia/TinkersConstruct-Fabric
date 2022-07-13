@@ -83,7 +83,7 @@ public class TankModifier extends Modifier {
     if (level > 0 && isOwner(tool)) {
       FluidStack fluidStack = getFluid(tool);
       if (!fluidStack.isEmpty()) {
-        int capacity = getCapacity(tool);
+        long capacity = getCapacity(tool);
         if (fluidStack.getAmount() > capacity) {
           fluidStack.setAmount(capacity);
           setFluid(tool, fluidStack);
@@ -144,8 +144,8 @@ public class TankModifier extends Modifier {
   }
 
   /** Gets the capacity of the tank */
-  public int getCapacity(IToolStackView tool) {
-    return tool.getVolatileData().getInt(getCapacityKey());
+  public long getCapacity(IToolStackView tool) {
+    return tool.getVolatileData().getLong(getCapacityKey());
   }
 
   /** Adds the given capacity into volatile NBT */
@@ -164,7 +164,7 @@ public class TankModifier extends Modifier {
 
   /** Sets the fluid in the tank */
   public FluidStack setFluid(IToolStackView tool, FluidStack fluid) {
-    int capacity = getCapacity(tool);
+    long capacity = getCapacity(tool);
     if (fluid.getAmount() > capacity) {
       fluid.setAmount(capacity);
     }
@@ -181,7 +181,7 @@ public class TankModifier extends Modifier {
    * @return  Fluid after filling, or empty if nothing changed
    */
   public FluidStack fill(IToolStackView tool, FluidStack current, FluidStack resource, long amount) {
-    int capacity = getCapacity(tool);
+    long capacity = getCapacity(tool);
     if (current.isEmpty()) {
       // cap fluid at capacity, store in tool
       resource.setAmount(Math.min(amount, capacity));

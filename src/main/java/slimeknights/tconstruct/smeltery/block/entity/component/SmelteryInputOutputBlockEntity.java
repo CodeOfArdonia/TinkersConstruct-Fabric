@@ -1,13 +1,8 @@
 package slimeknights.tconstruct.smeltery.block.entity.component;
 
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.EmptyFluidHandler;
 import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTransferable;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandler;
-import io.github.fabricators_of_create.porting_lib.transfer.item.IItemHandler;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemTransferable;
-import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
-import io.github.fabricators_of_create.porting_lib.util.NonNullConsumer;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -17,8 +12,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import slimeknights.mantle.inventory.EmptyItemHandler;
-import slimeknights.mantle.util.WeakConsumerWrapper;
 import slimeknights.tconstruct.smeltery.TinkerSmeltery;
 import slimeknights.tconstruct.smeltery.block.entity.tank.ISmelteryTankHandler;
 
@@ -33,29 +26,11 @@ public abstract class SmelteryInputOutputBlockEntity<T> extends SmelteryComponen
   private final Class<T> capability;
   /** Empty capability for in case the valid capability becomes invalid without invalidating */
   protected final Storage<T> emptyInstance;
-  /** Listener to attach to consumed capabilities */
-  protected final NonNullConsumer<LazyOptional<T>> listener = new WeakConsumerWrapper<>(this, (te, cap) -> te.clearHandler());
-  @Nullable
-  private LazyOptional<T> capabilityHolder = null;
 
   protected SmelteryInputOutputBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, Class<T> capability, Storage<T> emptyInstance) {
     super(type, pos, state);
     this.capability = capability;
     this.emptyInstance = emptyInstance;
-  }
-
-  /** Clears all cached capabilities */
-  private void clearHandler() {
-    if (capabilityHolder != null) {
-      capabilityHolder.invalidate();
-      capabilityHolder = null;
-    }
-  }
-
-  @Override
-  public void invalidateCaps() {
-    super.invalidateCaps();
-    clearHandler();
   }
 
   @Override
@@ -65,7 +40,6 @@ public abstract class SmelteryInputOutputBlockEntity<T> extends SmelteryComponen
     // if we have a new master, invalidate handlers
     boolean masterChanged = false;
     if (!Objects.equals(getMasterPos(), master)) {
-      clearHandler();
       masterChanged = true;
     }
     super.setMaster(master, block);
@@ -80,34 +54,24 @@ public abstract class SmelteryInputOutputBlockEntity<T> extends SmelteryComponen
    * @param parent  Parent tile entity
    * @return  Capability from parent, or empty if absent
    */
-  protected LazyOptional<T> getCapability(BlockEntity parent) {
-    LazyOptional<T> handler = (LazyOptional<T>) TransferUtil.getStorage(parent, null, capability); // TODO: PORT this shouldnt need to be casted?
-    if (handler.isPresent()) {
-      handler.addListener(listener);
-
-      return LazyOptional.of(() -> handler.orElse(emptyInstance));
-    }
-    return LazyOptional.empty();
+  protected Storage<T> getCapability(BlockEntity parent) {
+    return TransferUtil.getStorage(parent, null, capability);
   }
 
   /**
    * Fetches the capability handlers if missing
    */
-  protected LazyOptional<T> getCachedCapability() {
-    if (capabilityHolder == null) {
-      if (validateMaster()) {
-        BlockPos master = getMasterPos();
-        if (master != null && this.level != null) {
-          BlockEntity te = level.getBlockEntity(master);
-          if (te != null) {
-            capabilityHolder = getCapability(te);
-            return capabilityHolder;
-          }
+  protected Storage<T> getCachedCapability() {
+    if (validateMaster()) {
+      BlockPos master = getMasterPos();
+      if (master != null && this.level != null) {
+        BlockEntity te = level.getBlockEntity(master);
+        if (te != null) {
+          return getCapability(te);
         }
       }
-      capabilityHolder = LazyOptional.empty();
     }
-    return capabilityHolder;
+    return null;
   }
   
 //  @Nonnull
@@ -120,9 +84,9 @@ public abstract class SmelteryInputOutputBlockEntity<T> extends SmelteryComponen
 //  }
 
   /** Fluid implementation of smeltery IO */
-  public static abstract class SmelteryFluidIO extends SmelteryInputOutputBlockEntity<IFluidHandler> implements FluidTransferable {
+  public static abstract class SmelteryFluidIO extends SmelteryInputOutputBlockEntity<FluidVariant> implements FluidTransferable {
     protected SmelteryFluidIO(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-      super(type, pos, state, IFluidHandler.class, EmptyFluidHandler.INSTANCE);
+      super(type, pos, state, FluidVariant.class, Storage.empty());
     }
 
     /** Wraps the given capability */
@@ -133,38 +97,37 @@ public abstract class SmelteryInputOutputBlockEntity<T> extends SmelteryComponen
     }
 
     @Override
-    protected LazyOptional<IFluidHandler> getCapability(BlockEntity parent) {
+    protected Storage<FluidVariant> getCapability(BlockEntity parent) {
       // fluid capability is not exposed directly in the smeltery
       if (parent instanceof ISmelteryTankHandler) {
-        LazyOptional<IFluidHandler> capability = ((ISmelteryTankHandler) parent).getFluidCapability();
-        if (capability.isPresent()) {
-          capability.addListener(listener);
+        Storage<FluidVariant> capability = ((ISmelteryTankHandler) parent).getTank();
+        if (capability != null) {
           return makeWrapper(capability);
         }
       }
-      return LazyOptional.empty();
+      return null;
     }
   
     @Nullable
     @Override
-    public LazyOptional<IFluidHandler> getFluidHandler(@Nullable Direction direction) {
+    public Storage<FluidVariant> getFluidStorage(@Nullable Direction direction) {
       return getCachedCapability();
     }
   }
 
   /** Item implementation of smeltery IO */
-  public static class ChuteBlockEntity extends SmelteryInputOutputBlockEntity<IItemHandler> implements ItemTransferable {
+  public static class ChuteBlockEntity extends SmelteryInputOutputBlockEntity<ItemVariant> implements ItemTransferable {
     public ChuteBlockEntity(BlockPos pos, BlockState state) {
       this(TinkerSmeltery.chute.get(), pos, state);
     }
 
     protected ChuteBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-      super(type, pos, state, IItemHandler.class, EmptyItemHandler.INSTANCE);
+      super(type, pos, state, ItemVariant.class, Storage.empty());
     }
   
     @Nullable
     @Override
-    public LazyOptional<Storage<ItemVariant>> getItemStorage(@Nullable Direction direction) {
+    public Storage<ItemVariant> getItemStorage(@Nullable Direction direction) {
       return getCachedCapability();
     }
   }

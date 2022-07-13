@@ -1,6 +1,5 @@
 package slimeknights.tconstruct.library.tools.nbt;
 
-import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.entity.PlayerComponent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -48,6 +47,15 @@ public interface INamespacedNBTView extends PlayerComponent<INamespacedNBTView> 
    */
   default int getInt(ResourceLocation name) {
     return get(name, CompoundTag::getInt);
+  }
+
+  /**
+   * Reads an long from the mod data
+   * @param name  Name
+   * @return  Long value
+   */
+  default long getLong(ResourceLocation name) {
+    return get(name, CompoundTag::getLong);
   }
 
   /**

@@ -1,49 +1,35 @@
 package slimeknights.tconstruct.smeltery.block.entity.inventory;
 
 import io.github.fabricators_of_create.porting_lib.transfer.WrappedStorage;
-import lombok.AllArgsConstructor;
-import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandler;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
-@AllArgsConstructor
 public class DuctTankWrapper extends WrappedStorage<FluidVariant> {
-  private final IFluidHandler parent;
   private final DuctItemHandler itemHandler;
 
-
-  /* Properties */
-
-  @Override
-  public boolean isFluidValid(int tank, FluidStack stack) {
-    return itemHandler.getFluid().isFluidEqual(stack);
+  public DuctTankWrapper(Storage<FluidVariant> wrapped, DuctItemHandler itemHandler) {
+    super(wrapped);
+    this.itemHandler = itemHandler;
   }
 
+  /* Properties */
 
   /* Interactions */
 
   @Override
-  public long fill(FluidStack resource, boolean sim) {
-    if (resource.isEmpty() || !itemHandler.getFluid().isFluidEqual(resource)) {
+  public long insert(FluidVariant resource, long maxAmount, TransactionContext transaction) {
+    if (resource.isBlank() || !itemHandler.getFluid().isFluidEqual(resource)) {
       return 0;
     }
-    return parent.fill(resource, sim);
+    return super.insert(resource, maxAmount, transaction);
   }
 
   @Override
-  public FluidStack drain(long maxDrain, boolean sim) {
-    FluidStack fluid = itemHandler.getFluid();
-    if (fluid.isEmpty()) {
-      return FluidStack.EMPTY;
+  public long extract(FluidVariant resource, long maxAmount, TransactionContext transaction) {
+    if (resource.isBlank() || !itemHandler.getFluid().isFluidEqual(resource)) {
+      return 0;
     }
-    return parent.drain(new FluidStack(fluid, maxDrain), sim);
-  }
-
-  @Override
-  public FluidStack drain(FluidStack resource, boolean sim) {
-    if (resource.isEmpty() || !itemHandler.getFluid().isFluidEqual(resource)) {
-      return FluidStack.EMPTY;
-    }
-    return parent.drain(resource, sim);
+    return super.extract(resource, maxAmount, transaction);
   }
 }

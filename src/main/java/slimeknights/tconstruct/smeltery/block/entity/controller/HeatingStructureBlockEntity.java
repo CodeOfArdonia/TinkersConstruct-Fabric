@@ -90,9 +90,6 @@ public abstract class HeatingStructureBlockEntity extends NameableBlockEntity im
   /** Tank instance for this smeltery */
   @Getter
   protected final SmelteryTank<HeatingStructureBlockEntity> tank = new SmelteryTank<>(this);
-  /** Capability to pass to drains for fluid handling */
-  @Getter
-  private LazyOptional<Storage<FluidVariant>> fluidCapability = LazyOptional.empty();
 
   /** Inventory handling melting items */
   @Getter

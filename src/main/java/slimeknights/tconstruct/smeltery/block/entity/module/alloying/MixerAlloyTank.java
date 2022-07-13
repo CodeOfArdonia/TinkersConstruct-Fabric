@@ -1,5 +1,6 @@
 package slimeknights.tconstruct.smeltery.block.entity.module.alloying;
 
+import com.google.common.collect.Iterators;
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -63,14 +65,14 @@ public class MixerAlloyTank implements IMutableAlloyTank {
   private Storage<FluidVariant>[] indexTanks() {
     // convert map into indexed list of fluid handlers, will be cleared next time a side updates
     if (indexedList == null) {
-      indexedList = new Storage<FluidVariant>[currentTanks];
+      indexedList = new Storage[currentTanks];
       if (currentTanks > 0) {
         int nextTank = 0;
         for (Direction direction : Direction.values()) {
           if (direction != Direction.DOWN) {
             LazyOptional<Storage<FluidVariant>> handler = inputs.getOrDefault(direction, LazyOptional.empty());
             if (handler.isPresent()) {
-              indexedList[nextTank] = handler.orElse(EmptyFluidHandler.INSTANCE);
+              indexedList[nextTank] = handler.orElse(Storage.empty());
               nextTank++;
             }
           }
@@ -85,7 +87,7 @@ public class MixerAlloyTank implements IMutableAlloyTank {
     checkTanks();
     // invalid index, nothing
     if (tank >= currentTanks || tank < 0) {
-      return EmptyFluidHandler.INSTANCE;
+      return Storage.empty();
     }
     return indexTanks()[tank];
   }
@@ -98,7 +100,9 @@ public class MixerAlloyTank implements IMutableAlloyTank {
       return FluidStack.EMPTY;
     }
     // get the first fluid from the proper tank, we do not support multiple fluids on a side
-    return indexTanks()[tank].getFluidInTank(0);
+    try (Transaction t = TransferUtil.getTransaction()) {
+      return Iterators.get(indexTanks()[tank].iterator(t)).getFluidInTank(0);
+    }
   }
 
   @Override

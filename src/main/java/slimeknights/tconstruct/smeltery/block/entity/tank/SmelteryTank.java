@@ -2,6 +2,8 @@ package slimeknights.tconstruct.smeltery.block.entity.tank;
 
 import com.google.common.collect.Lists;
 import lombok.Getter;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -20,7 +22,7 @@ import java.util.ListIterator;
 /**
  * Fluid handler implementation for the smeltery
  */
-public class SmelteryTank<T extends MantleBlockEntity & ISmelteryTankHandler> implements IFluidHandler {
+public class SmelteryTank<T extends MantleBlockEntity & ISmelteryTankHandler> implements Storage<FluidVariant> {
   private final T parent;
   /** Fluids actually contained in the tank */
   @Getter

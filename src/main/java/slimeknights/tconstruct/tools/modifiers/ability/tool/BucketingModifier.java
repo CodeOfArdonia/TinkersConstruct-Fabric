@@ -1,6 +1,8 @@
 package slimeknights.tconstruct.tools.modifiers.ability.tool;
 
 import io.github.fabricators_of_create.porting_lib.extensions.FluidExtensions;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.mixin.transfer.BucketItemAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -33,7 +35,6 @@ import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandler;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.modifiers.impl.TankModifier;
 import slimeknights.tconstruct.library.tools.capability.TinkerDataKeys;
@@ -93,8 +94,8 @@ public class BucketingModifier extends TankModifier {
       return InteractionResult.PASS;
     }
     Direction face = context.getClickedFace();
-    LazyOptional<IFluidHandler> capability = TransferUtil.getFluidHandler(te, face);
-    if (!capability.isPresent()) {
+    Storage<FluidVariant> capability = TransferUtil.getFluidStorage(te, face);
+    if (capability == null) {
       return InteractionResult.PASS;
     }
 
@@ -102,40 +103,38 @@ public class BucketingModifier extends TankModifier {
     if (!world.isClientSide) {
       Player player = context.getPlayer();
       boolean sneaking = player != null && player.isShiftKeyDown();
-      capability.ifPresent(cap -> {
-        FluidStack fluidStack = getFluid(tool);
-        // sneaking fills, not sneak drains
-        SoundEvent sound = null;
-        if (sneaking) {
-          // must have something to fill
-          if (!fluidStack.isEmpty()) {
-            long added = cap.fill(fluidStack, false);
-            if (added > 0) {
-              sound = fluidStack.getFluid().getAttributes().getEmptySound(fluidStack);
-              fluidStack.shrink(added);
-              setFluid(tool, fluidStack);
-            }
-          }
-          // if nothing currently, will drain whatever
-        } else if (fluidStack.isEmpty()) {
-          FluidStack drained = cap.drain(getCapacity(tool), false);
-          if (!drained.isEmpty()) {
-            setFluid(tool, drained);
-            sound = drained.getFluid().getAttributes().getFillSound(drained);
-          }
-        } else {
-          // filter drained to be the same as the current fluid
-          FluidStack drained = cap.drain(new FluidStack(fluidStack, getCapacity(tool) - fluidStack.getAmount()), false);
-          if (!drained.isEmpty() && drained.isFluidEqual(fluidStack)) {
-            fluidStack.grow(drained.getAmount());
+      FluidStack fluidStack = getFluid(tool);
+      // sneaking fills, not sneak drains
+      SoundEvent sound = null;
+      if (sneaking) {
+        // must have something to fill
+        if (!fluidStack.isEmpty()) {
+          long added = TransferUtil.insertFluid(capability, fluidStack);
+          if (added > 0) {
+            sound = fluidStack.getFluid().getAttributes().getEmptySound(fluidStack);
+            fluidStack.shrink(added);
             setFluid(tool, fluidStack);
-            sound = drained.getFluid().getAttributes().getFillSound(drained);
           }
         }
-        if (sound != null) {
-          world.playSound(null, target, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
+        // if nothing currently, will drain whatever
+      } else if (fluidStack.isEmpty()) {
+        FluidStack drained = cap.drain(getCapacity(tool), false);
+        if (!drained.isEmpty()) {
+          setFluid(tool, drained);
+          sound = drained.getFluid().getAttributes().getFillSound(drained);
         }
-      });
+      } else {
+        // filter drained to be the same as the current fluid
+        FluidStack drained = cap.drain(new FluidStack(fluidStack, getCapacity(tool) - fluidStack.getAmount()), false);
+        if (!drained.isEmpty() && drained.isFluidEqual(fluidStack)) {
+          fluidStack.grow(drained.getAmount());
+          setFluid(tool, fluidStack);
+          sound = drained.getFluid().getAttributes().getFillSound(drained);
+        }
+      }
+      if (sound != null) {
+        world.playSound(null, target, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
+      }
     }
     return InteractionResult.sidedSuccess(world.isClientSide);
   }

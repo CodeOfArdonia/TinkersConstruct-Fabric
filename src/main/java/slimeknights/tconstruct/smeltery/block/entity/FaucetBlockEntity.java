@@ -3,6 +3,7 @@ package slimeknights.tconstruct.smeltery.block.entity;
 import lombok.Getter;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -19,8 +20,6 @@ import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import io.github.fabricators_of_create.porting_lib.util.NonNullConsumer;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandler;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.EmptyFluidHandler;
 import slimeknights.mantle.block.entity.MantleBlockEntity;
 import slimeknights.mantle.util.WeakConsumerWrapper;
 import slimeknights.tconstruct.common.network.TinkerNetwork;
@@ -32,7 +31,7 @@ import static slimeknights.tconstruct.smeltery.block.FaucetBlock.FACING;
 
 public class FaucetBlockEntity extends MantleBlockEntity implements CustomRenderBoundingBoxBlockEntity {
   /** amount of MB to extract from the input at a time */
-  public static final int PACKET_SIZE = FluidValues.INGOT;
+  public static final long PACKET_SIZE = FluidValues.INGOT;
   /** Transfer rate of the faucet */
   public static final int MB_PER_TICK = 10;
 
@@ -57,13 +56,13 @@ public class FaucetBlockEntity extends MantleBlockEntity implements CustomRender
   private boolean lastRedstoneState = false;
 
   /** Fluid handler of the input to the faucet */
-  private LazyOptional<IFluidHandler> inputHandler;
+  private Storage<FluidVariant> inputHandler;
   /** Fluid handler of the output from the faucet */
-  private LazyOptional<IFluidHandler> outputHandler;
+  private Storage<FluidVariant> outputHandler;
   /** Listener for when the input handler is invalidated */
-  private final NonNullConsumer<LazyOptional<IFluidHandler>> inputListener = new WeakConsumerWrapper<>(this, (self, handler) -> self.inputHandler = null);
+  private final NonNullConsumer<Storage<FluidVariant>> inputListener = new WeakConsumerWrapper<>(this, (self, handler) -> self.inputHandler = null);
   /** Listener for when the output handler is invalidated */
-  private final NonNullConsumer<LazyOptional<IFluidHandler>> outputListener = new WeakConsumerWrapper<>(this, (self, handler) -> self.outputHandler = null);
+  private final NonNullConsumer<Storage<FluidVariant>> outputListener = new WeakConsumerWrapper<>(this, (self, handler) -> self.outputHandler = null);
 
   public FaucetBlockEntity(BlockPos pos, BlockState state) {
     this(TinkerSmeltery.faucet.get(), pos, state);
@@ -82,23 +81,21 @@ public class FaucetBlockEntity extends MantleBlockEntity implements CustomRender
    * @param side  Side to check
    * @return  Fluid handler
    */
-  private LazyOptional<Storage<FluidVariant>> findFluidHandler(Direction side) {
+  private Storage<FluidVariant> findFluidHandler(Direction side) {
     assert level != null;
     BlockEntity te = level.getBlockEntity(worldPosition.relative(side));
     if (te != null) {
-      LazyOptional<IFluidHandler> handler = TransferUtil.getFluidHandler(te, side.getOpposite());
-      if (handler.isPresent()) {
-        return handler;
-      }
+      Storage<FluidVariant> handler = TransferUtil.getFluidStorage(te, side.getOpposite());
+      return handler;
     }
-    return LazyOptional.empty();
+    return null;
   }
 
   /**
    * Gets the input fluid handler
    * @return  Input fluid handler
    */
-  private LazyOptional<IFluidHandler> getInputHandler() {
+  private Storage<FluidVariant> getInputHandler() {
     if (inputHandler == null) {
       inputHandler = findFluidHandler(getBlockState().getValue(FACING).getOpposite());
       if (inputHandler.isPresent()) {
@@ -112,13 +109,13 @@ public class FaucetBlockEntity extends MantleBlockEntity implements CustomRender
    * Gets the output fluid handler
    * @return  Output fluid handler
    */
-  private LazyOptional<IFluidHandler> getOutputHandler() {
-    if (outputHandler == null) {
-      outputHandler = findFluidHandler(Direction.DOWN);
-      if (outputHandler.isPresent()) {
-        outputHandler.addListener(outputListener);
-      }
-    }
+  private Storage<FluidVariant> getOutputHandler() {
+//    if (outputHandler == null) { TODO: PORT (required?)
+//      outputHandler = findFluidHandler(Direction.DOWN);
+//      if (outputHandler.isPresent()) {
+//        outputHandler.addListener(outputListener);
+//      }
+//    }
     return outputHandler;
   }
 
@@ -223,31 +220,31 @@ public class FaucetBlockEntity extends MantleBlockEntity implements CustomRender
    */
   private boolean doTransfer(boolean execute) {
     // still got content left
-    LazyOptional<IFluidHandler> inputOptional = getInputHandler();
-    LazyOptional<IFluidHandler> outputOptional = getOutputHandler();
-    if (inputOptional.isPresent() && outputOptional.isPresent()) {
+    Storage<FluidVariant> input = getInputHandler();
+    Storage<FluidVariant> output = getOutputHandler();
+    if (input != null && output != null) {
       // can we drain?
-      IFluidHandler input = inputOptional.orElse(EmptyFluidHandler.INSTANCE);
-      FluidStack drained = input.drain(PACKET_SIZE, true);
-      if (!drained.isEmpty() && !((FluidExtensions)drained.getFluid()).getAttributes().isGaseous(drained)) {
-        // can we fill
-        IFluidHandler output = outputOptional.orElse(EmptyFluidHandler.INSTANCE);
-        long filled = output.fill(drained, true);
-        if (filled > 0) {
-          // fill if requested
-          if (execute) {
-            // drain the liquid and transfer it, buffer the amount for delay
-            this.drained = input.drain(filled, false);
+      try (Transaction t = TransferUtil.getTransaction()) {
+        FluidStack drained = TransferUtil.simulateExtractAnyFluid(input, PACKET_SIZE);
+        if (!drained.isEmpty() && !drained.getFluid().getAttributes().isGaseous(drained)) {
+          // can we fill
+          long filled = output.fill(drained, true);
+          if (filled > 0) {
+            // fill if requested
+            if (execute) {
+              // drain the liquid and transfer it, buffer the amount for delay
+              this.drained = TransferUtil.extractAnyFluid(input, filled);
 
-            // sync to clients if we have changes
-            if (faucetState == FaucetState.OFF || !renderFluid.isFluidEqual(drained)) {
-              syncToClient(this.drained, true);
+              // sync to clients if we have changes
+              if (faucetState == FaucetState.OFF || !renderFluid.isFluidEqual(drained)) {
+                syncToClient(this.drained, true);
+              }
+              faucetState = FaucetState.POURING;
+              // pour after initial packet, in case we end up resetting later
+              pour();
             }
-            faucetState = FaucetState.POURING;
-            // pour after initial packet, in case we end up resetting later
-            pour();
+            return true;
           }
-          return true;
         }
       }
 
@@ -277,14 +274,13 @@ public class FaucetBlockEntity extends MantleBlockEntity implements CustomRender
     }
 
     // ensure we have an output
-    LazyOptional<IFluidHandler> outputOptional = getOutputHandler();
-    if (outputOptional.isPresent()) {
+    Storage<FluidVariant> output = getOutputHandler();
+    if (output != null) {
       FluidStack fillStack = drained.copy();
       fillStack.setAmount(Math.min(drained.getAmount(), MB_PER_TICK));
 
       // can we fill?
-      IFluidHandler output = outputOptional.orElse(EmptyFluidHandler.INSTANCE);
-      long filled = output.fill(fillStack, true);
+      long filled = TransferUtil.insertFluid(output.fill(fillStack, true));
       if (filled > 0) {
         // update client if they do not think we have fluid
         if (!renderFluid.isFluidEqual(drained)) {

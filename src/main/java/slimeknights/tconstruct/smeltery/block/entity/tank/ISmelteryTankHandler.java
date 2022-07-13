@@ -1,9 +1,6 @@
 package slimeknights.tconstruct.smeltery.block.entity.tank;
 
-import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 
 import java.util.List;
 
@@ -19,12 +16,6 @@ public interface ISmelteryTankHandler {
    * @return  Tank instance
    */
   SmelteryTank<?> getTank();
-
-  /**
-   * Gets the fluid capability for this smeltery. Provided here as the smeltery itself does not expose this
-   * @return  Fluid capability
-   */
-  LazyOptional<Storage<FluidVariant>> getFluidCapability();
 
   /**
    * Called when the tank adds or removes a fluid to notify listeners

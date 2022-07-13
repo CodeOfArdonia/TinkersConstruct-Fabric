@@ -2,9 +2,7 @@ package slimeknights.tconstruct.smeltery.block.entity;
 
 import io.github.fabricators_of_create.porting_lib.block.CustomRenderBoundingBoxBlockEntity;
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.EmptyFluidHandler;
 import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTransferable;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandler;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import io.github.fabricators_of_create.porting_lib.util.NonNullConsumer;
@@ -51,14 +49,14 @@ public class ChannelBlockEntity extends MantleBlockEntity implements IFluidPacke
 		}
 	});
 	/** Tanks for inserting on each side */
-	private final Map<Direction,LazyOptional<IFluidHandler>> sideHandlers = new EnumMap<>(Direction.class);
+	private final Map<Direction,Storage<FluidVariant>> sideHandlers = new EnumMap<>(Direction.class);
 	/** Tanks for alerting neighbors the given side is present */
-	private final Map<Direction,LazyOptional<IFluidHandler>> emptySideHandler = new EnumMap<>(Direction.class);
+	private final Map<Direction,Storage<FluidVariant>> emptySideHandler = new EnumMap<>(Direction.class);
 
 	/** Cache of tanks on all neighboring sides */
-	private final Map<Direction,LazyOptional<IFluidHandler>> neighborTanks = new EnumMap<>(Direction.class);
+	private final Map<Direction,Storage<FluidVariant>> neighborTanks = new EnumMap<>(Direction.class);
 	/** Consumers to attach to each of the neighbors */
-	private final Map<Direction, NonNullConsumer<LazyOptional<IFluidHandler>>> neighborConsumers = new EnumMap<>(Direction.class);
+	private final Map<Direction, NonNullConsumer<Storage<FluidVariant>>> neighborConsumers = new EnumMap<>(Direction.class);
 
   /** Ticker instance for this TE, serverside only */
   public static final BlockEntityTicker<ChannelBlockEntity> SERVER_TICKER = (level, pos, state, self) -> self.tick(state);
@@ -124,7 +122,7 @@ public class ChannelBlockEntity extends MantleBlockEntity implements IFluidPacke
 	 * @param side  Side of the neighbor to fetch
 	 * @return  Fluid handler, or empty
 	 */
-	private LazyOptional<IFluidHandler> getNeighborHandlerUncached(Direction side) {
+	private Storage<FluidVariant> getNeighborHandlerUncached(Direction side) {
 		assert level != null;
 		// must have a TE with a fluid handler
 		BlockEntity te = level.getBlockEntity(worldPosition.relative(side));
@@ -143,7 +141,7 @@ public class ChannelBlockEntity extends MantleBlockEntity implements IFluidPacke
 	 * @param side  Side of the neighbor to fetch
 	 * @return  Fluid handler, or empty
 	 */
-	protected LazyOptional<IFluidHandler> getNeighborHandler(Direction side) {
+	protected Storage<FluidVariant> getNeighborHandler(Direction side) {
 		return neighborTanks.computeIfAbsent(side, this::getNeighborHandlerUncached);
 	}
 
@@ -172,17 +170,17 @@ public class ChannelBlockEntity extends MantleBlockEntity implements IFluidPacke
 			if (connection != ChannelConnection.OUT) {
 				neighborTanks.remove(Direction.DOWN);
 				// remove the empty handler, mostly so the neighbor knows to update
-				LazyOptional<IFluidHandler> handler = emptySideHandler.remove(side);
-				if (handler != null) {
-					handler.invalidate();
-				}
+//        Storage<FluidVariant> handler = emptySideHandler.remove(side); TODO: PORT (not needed?)
+//				if (handler != null) {
+//					handler.invalidate();
+//				}
 			}
 			// remove the side handler, if we changed from out or from in the handler is no longer correct
 			if (connection != ChannelConnection.IN) {
-				LazyOptional<IFluidHandler> handler = sideHandlers.remove(side);
-				if (handler != null) {
-					handler.invalidate();
-				}
+//				LazyOptional<IFluidHandler> handler = sideHandlers.remove(side);
+//				if (handler != null) {
+//					handler.invalidate();
+//				}
 			}
 		}
 	}

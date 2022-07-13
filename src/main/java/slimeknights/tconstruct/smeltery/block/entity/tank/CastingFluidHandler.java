@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
@@ -13,14 +14,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandler;
 import slimeknights.tconstruct.smeltery.block.entity.CastingBlockEntity;
 
 import javax.annotation.Nonnull;
 import java.util.Objects;
 
 @RequiredArgsConstructor
-public class CastingFluidHandler implements Storage<FluidVariant> {
+public class CastingFluidHandler implements Storage<FluidVariant>, StorageView<FluidVariant> {
   private final CastingBlockEntity tile;
   @Getter @Setter
   private FluidStack fluid = FluidStack.EMPTY;
@@ -39,6 +39,7 @@ public class CastingFluidHandler implements Storage<FluidVariant> {
   }
 
   /** Gets the current capacity of this fluid handler */
+  @Override
   public long getCapacity() {
     if (capacity == 0) {
       return fluid.getAmount();
@@ -145,30 +146,6 @@ public class CastingFluidHandler implements Storage<FluidVariant> {
   }
 
   /* Required */
-
-  @Nonnull
-  @Override
-  public FluidStack getFluidInTank(int tank) {
-    if (tank == 0) {
-      return fluid;
-    }
-    return FluidStack.EMPTY;
-  }
-
-  @Override
-  public int getTanks() {
-    return 1;
-  }
-
-  @Override
-  public long getTankCapacity(int tank) {
-    return getCapacity();
-  }
-
-  @Override
-  public boolean isFluidValid(int tank, FluidStack stack) {
-    return tank == 0 && isFluidValid(stack);
-  }
 
   /* Tag */
   private static final String TAG_FLUID = "fluid";
