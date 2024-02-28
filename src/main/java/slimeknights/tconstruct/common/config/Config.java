@@ -1,14 +1,19 @@
 package slimeknights.tconstruct.common.config;
 
 import com.google.common.collect.ImmutableList;
-import io.github.fabricators_of_create.porting_lib.config.ConfigRegistry;
-import io.github.fabricators_of_create.porting_lib.config.ConfigType;
-import io.github.fabricators_of_create.porting_lib.config.ModConfigSpec;
-import io.github.fabricators_of_create.porting_lib.config.ModConfigSpec.BooleanValue;
-import io.github.fabricators_of_create.porting_lib.config.ModConfigSpec.ConfigValue;
-import io.github.fabricators_of_create.porting_lib.config.ModConfigSpec.DoubleValue;
-import io.github.fabricators_of_create.porting_lib.config.ModConfigSpec.EnumValue;
-import io.github.fabricators_of_create.porting_lib.config.ModConfigSpec.IntValue;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
+import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
+import net.minecraftforge.common.ForgeConfigSpec.DoubleValue;
+import net.minecraftforge.common.ForgeConfigSpec.EnumValue;
+import net.minecraftforge.common.ForgeConfigSpec.IntValue;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.commons.lang3.tuple.Pair;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.recipe.melting.IMeltingContainer.IOreRate;
@@ -27,7 +32,7 @@ public class Config {
   public static class Common {
 
     public final BooleanValue shouldSpawnWithTinkersBook;
-    public final List<ConfigurableAction> damageSourceTweaks;
+    public final List<ConfigurableAction> toolTweaks;
 
     // recipes
     public final BooleanValue addGravelToFlintRecipe;
@@ -79,17 +84,21 @@ public class Config {
         .worldRestart()
         .define("shouldSpawnWithTinkersBook", true);
 
-      builder.comment("Tweaks to vanilla damage sources to better work with armor").push("damageTweaks");
       ImmutableList.Builder<ConfigurableAction> actions = ImmutableList.builder();
-//      actions.add(new ConfigurableAction(builder, "wither", true, "Makes withering damage count as magic", DamageSource.WITHER::setMagic)); TODO: PORT?
+      actions.add(new ConfigurableAction(builder, "extendFireProtectionSlots", true,
+                                         "If true, extends the applicable slots for the fire protection enchantment to work better with shields. Will not impact gameplay with the vanilla enchantment.\nIf false, fire protection on a shield will not reduce fire tick time.",
+                                         () -> Enchantments.FIRE_PROTECTION.slots = EquipmentSlot.values()));
+
+//      builder.comment("Tweaks to vanilla damage sources to better work with armor").push("damageTweaks");
+//      actions.add(new ConfigurableAction(builder, "wither", true, "Makes withering damage count as magic", DamageSource.WITHER::setMagic));
 //      actions.add(new ConfigurableAction(builder, "dragon_breath", true, "Makes dragons breath count as magic", DamageSource.DRAGON_BREATH::setMagic));
 //      actions.add(new ConfigurableAction(builder, "falling_block", false, "Makes falling blocks count as projectile", () -> {
 //        DamageSource.FALLING_BLOCK.setProjectile();
 //        DamageSource.ANVIL.setProjectile();
 //        DamageSource.FALLING_STALACTITE.setProjectile();
 //      }));
-//      actions.add(new ConfigurableAction(builder, "lightning", true, "Makes lightning count as fire damage", ((DamageSourceAccessor)DamageSource.LIGHTNING_BOLT)::port_lib$setFireDamage));
-      damageSourceTweaks = actions.build();
+//      actions.add(new ConfigurableAction(builder, "lightning", true, "Makes lightning count as fire damage", DamageSource.LIGHTNING_BOLT::setIsFire));
+      toolTweaks = actions.build();
 
       this.repairKitAmount = builder
         .comment("Amount of durability restored by a repair kit in terms of ingots. Does not affect the cost to create the kit, that is controlled by JSON.")
@@ -274,7 +283,7 @@ public class Config {
   public static class Client {
     //public final ForgeConfigSpec.BooleanValue temperatureInCelsius;
     public final ModConfigSpec.BooleanValue tankFluidModel;
-    public final ModConfigSpec.BooleanValue extraToolTips;
+    public final ModConfigSpec.BooleanValue extraToolTips; // TODO: do we even need this config option? who would turn it off?
     public final ModConfigSpec.BooleanValue logMissingMaterialTextures;
     public final ModConfigSpec.BooleanValue logMissingModifierTextures;
     public final ModConfigSpec.BooleanValue showModifiersInJEI;

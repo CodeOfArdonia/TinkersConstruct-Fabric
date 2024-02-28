@@ -12,10 +12,13 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import slimeknights.tconstruct.library.modifiers.modules.armor.ReplaceBlockWalkerModule;
 import slimeknights.tconstruct.library.tools.context.EquipmentContext;
 import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 import slimeknights.tconstruct.tools.TinkerModifiers;
 
+/** @deprecated use {@link ReplaceBlockWalkerModule} and {@link slimeknights.tconstruct.library.modifiers.modules.armor.BlockDamageSourceModule} */
+@Deprecated
 public class FrostWalkerModifier extends AbstractWalkerModifier {
   @Override
   protected float getRadius(IToolStackView tool, int level) {

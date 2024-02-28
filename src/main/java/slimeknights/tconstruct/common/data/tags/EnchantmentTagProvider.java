@@ -44,7 +44,7 @@ public class EnchantmentTagProvider extends FabricTagProvider.EnchantmentTagProv
     modifierTag(ModifierIds.luck, "ensorcellation:hunter");
     modifierTag(TinkerModifiers.multishot.getId(), "cyclic:multishot", "ensorcellation:volley");
     modifierTag(ModifierIds.reach, "cyclic:reach", "ensorcellation:reach");
-    modifierTag(TinkerModifiers.tilling.getId(), "ensorcellation:tilling");
+    modifierTag(ModifierIds.tilling, "ensorcellation:tilling");
     modifierTag(TinkerModifiers.reflecting.getId(), "parry:rebound");
   }
 

@@ -165,10 +165,10 @@ public class MaterialIngredient extends Ingredient {
       return List.of(ingredient.getItems());
     }
 
-    @Override
-    public boolean requiresTesting() {
-      return true;
-    }
+  @Override
+  public boolean requiresTesting() {
+    return material == WILDCARD;
+  }
 
     @Override
     public CustomIngredientSerializer<FabricMaterialIngredient> getSerializer() {

@@ -1,45 +1,42 @@
 {
   "type": "tconstruct:modifier",
-  "allow_crystal": false,
   "inputs": [
     {
-      "tag": "c:rose_gold_ingots"
+      "tag": "forge:ingots/rose_gold"
     },
     {
       "item": "minecraft:rabbit_foot"
     },
     {
-      "tag": "c:rose_gold_ingots"
+      "tag": "forge:ingots/rose_gold"
     },
     {
-      "tag": "c:diamonds"
+      "tag": "forge:gems/diamond"
     },
     {
       "item": "minecraft:name_tag"
     }
   ],
-  "max_level": 3,
+  "tools": [
+    {
+      "tag": "tconstruct:modifiable/melee"
+    },
+    {
+      "tag": "tconstruct:modifiable/harvest"
+    },
+    {
+      "tag": "tconstruct:modifiable/ranged/bows"
+    }
+  ],
   "requirements": {
-    "error": "recipe.tconstruct.modifier.luck.level_3",
+    "name": "tconstruct:luck",
     "level": 2,
-    "name": "tconstruct:luck"
+    "error": "recipe.tconstruct.modifier.luck.level_3"
   },
+  "allow_crystal": false,
   "result": {
-    "level": 1,
-    "name": "tconstruct:luck"
+    "name": "tconstruct:luck",
+    "level": 1
   },
-  "tools": {
-    "fabric:type": "fabric:any",
-    "ingredients": [
-      {
-        "tag": "tconstruct:modifiable/melee"
-      },
-      {
-        "tag": "tconstruct:modifiable/harvest"
-      },
-      {
-        "tag": "tconstruct:modifiable/ranged"
-      }
-    ]
-  }
+  "max_level": 3
 }

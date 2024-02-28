@@ -84,4 +84,50 @@ public class TinkerClient implements ClientModInitializer {
     graphics.flushIfUnmanaged();
     return l;
   }
+
+  @SubscribeEvent
+  static void renderBlockOverlay(RenderBlockOverlayEvent event) {
+    BlockState state = event.getBlockState();
+    if (state.is(TinkerTags.Blocks.TRANSPARENT_OVERLAY)) {
+      Minecraft minecraft = Minecraft.getInstance();
+      assert minecraft.level != null;
+      assert minecraft.player != null;
+      BlockPos pos = event.getBlockPos();
+      float width = minecraft.player.getBbWidth() * 0.8F;
+      // check collision of the block again, for non-full blocks
+      if (Shapes.joinIsNotEmpty(state.getShape(minecraft.level, pos).move(pos.getX(), pos.getY(), pos.getZ()), Shapes.create(AABB.ofSize(minecraft.player.getEyePosition(), width, 1.0E-6D, width)), BooleanOp.AND)) {
+        // this is for the most part a clone of the vanilla logic from ScreenEffectRenderer with some changes mentioned below
+
+        TextureAtlasSprite texture = minecraft.getBlockRenderer().getBlockModelShaper().getTexture(state, minecraft.level, pos);
+        RenderSystem.setShaderTexture(0, texture.atlas().location());
+        // changed: shader using pos tex
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        BufferBuilder bufferbuilder = Tesselator.getInstance().getBuilder();
+
+        // change: handle brightness based on renderWater, and enable blend
+        float brightness = minecraft.player.getBrightness();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShaderColor(brightness, brightness, brightness, 1.0f);
+
+        // draw the quad
+        float u0 = texture.getU0();
+        float u1 = texture.getU1();
+        float v0 = texture.getV0();
+        float v1 = texture.getV1();
+        Matrix4f matrix4f = event.getPoseStack().last().pose();
+        bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+        // change: dropped color, see above
+        bufferbuilder.vertex(matrix4f, -1, -1, -0.5f).uv(u1, v1).endVertex();
+        bufferbuilder.vertex(matrix4f, 1, -1, -0.5f).uv(u0, v1).endVertex();
+        bufferbuilder.vertex(matrix4f, 1, 1, -0.5f).uv(u0, v0).endVertex();
+        bufferbuilder.vertex(matrix4f, -1, 1, -0.5f).uv(u1, v0).endVertex();
+        bufferbuilder.end();
+        BufferUploader.end(bufferbuilder);
+        // changed: disable blend
+        RenderSystem.disableBlend();
+      }
+      event.setCanceled(true);
+    }
+  }
 }

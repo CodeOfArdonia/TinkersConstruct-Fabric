@@ -80,6 +80,7 @@ public class BlockLootTableProvider extends ModdedBlockLootSubProvider {
     this.registerBuildingLootTables(TinkerCommons.blazewood);
     this.registerBuildingLootTables(TinkerCommons.lavawood);
     this.registerFenceBuildingLootTables(TinkerMaterials.nahuatl);
+    this.dropSelf(TinkerCommons.cheeseBlock.get());
 
     this.dropSelf(TinkerModifiers.silkyJewelBlock.get());
     this.dropSelf(TinkerCommons.goldBars.get());
@@ -222,7 +223,10 @@ public class BlockLootTableProvider extends ModdedBlockLootSubProvider {
     this.dropSelf(TinkerSmeltery.searedTriangleBricks.get());
     this.dropSelf(TinkerSmeltery.searedLadder.get());
     this.dropSelf(TinkerSmeltery.searedGlass.get());
+    this.dropSelf(TinkerSmeltery.searedSoulGlass.get());
+    this.dropSelf(TinkerSmeltery.searedTintedGlass.get());
     this.dropSelf(TinkerSmeltery.searedGlassPane.get());
+    this.dropSelf(TinkerSmeltery.searedSoulGlassPane.get());
     this.dropTable(TinkerSmeltery.searedDrain.get());
     this.dropTable(TinkerSmeltery.searedChute.get());
     this.dropTable(TinkerSmeltery.searedDuct.get());
@@ -256,7 +260,10 @@ public class BlockLootTableProvider extends ModdedBlockLootSubProvider {
     this.registerBuildingLootTables(TinkerSmeltery.scorchedRoad);
     this.dropSelf(TinkerSmeltery.scorchedLadder.get());
     this.dropSelf(TinkerSmeltery.scorchedGlass.get());
+    this.dropSelf(TinkerSmeltery.scorchedSoulGlass.get());
+    this.dropSelf(TinkerSmeltery.scorchedTintedGlass.get());
     this.dropSelf(TinkerSmeltery.scorchedGlassPane.get());
+    this.dropSelf(TinkerSmeltery.scorchedSoulGlassPane.get());
     this.dropTable(TinkerSmeltery.scorchedDrain.get());
     this.dropTable(TinkerSmeltery.scorchedChute.get());
     this.dropTable(TinkerSmeltery.scorchedDuct.get());

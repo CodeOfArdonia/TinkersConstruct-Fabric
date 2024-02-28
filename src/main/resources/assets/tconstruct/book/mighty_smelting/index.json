@@ -36,7 +36,6 @@
   },
   {
     "name": "tools",
-    "data": "sections/tools.json",
     "icon": {
       "item": {
         "type": "forge:nbt",
@@ -53,6 +52,23 @@
           ]
         }
       }
+    },
+    "extraData": {
+      "tconstruct:load_tools": { "tag": "tconstruct:modifiable/broad", "path": "tools" }
+    }
+  },
+  {
+    "name": "armor",
+    "icon": {
+      "item": "minecraft:diamond_chestplate"
+    },
+    "condition": {
+      "type": "tconstruct:tag_not_empty",
+      "registry": "minecraft:item",
+      "tag": "tconstruct:modifiable/book_armor/mighty_smelting"
+    },
+    "extraData": {
+      "tconstruct:load_tools": { "tag": "tconstruct:modifiable/book_armor/mighty_smelting", "path": "armor", "sort": false }
     }
   },
   {

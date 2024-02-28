@@ -31,11 +31,9 @@ public class SkySlimeSlingItem extends BaseSlimeSlingItem {
   /** Called when the player stops using an Item (stops holding the right mouse button). */
   @Override
   public void releaseUsing(ItemStack stack, Level worldIn, LivingEntity entityLiving, int timeLeft) {
-    if (!(entityLiving instanceof Player)) {
+    if (!(entityLiving instanceof Player player)) {
       return;
     }
-
-    Player player = (Player) entityLiving;
 
     // don't allow free flight when using an elytra, should use fireworks
     if (player.isFallFlying()) {
@@ -43,7 +41,7 @@ public class SkySlimeSlingItem extends BaseSlimeSlingItem {
     }
 
     player.causeFoodExhaustion(0.2F);
-    player.setSprinting(true);
+    //player.setSprinting(true);
 
     float f = getForce(stack, timeLeft);
     float speed = f / 3F;
@@ -53,7 +51,6 @@ public class SkySlimeSlingItem extends BaseSlimeSlingItem {
       (1 + look.y) * speed / 2f,
       (look.z * speed));
 
-    onSuccess(player, stack);
     SlimeBounceHandler.addBounceHandler(player);
     if (!worldIn.isClientSide) {
       player.getCooldowns().addCooldown(stack.getItem(), 3);

@@ -20,12 +20,11 @@ public class EarthSlimeSlingItem extends BaseSlimeSlingItem {
   /** Called when the player stops using an Item (stops holding the right mouse button). */
   @Override
   public void releaseUsing(ItemStack stack, Level worldIn, LivingEntity entityLiving, int timeLeft) {
-    if (!entityLiving.onGround() || !(entityLiving instanceof Player)) {
+    if (!entityLiving.onGround() || !(entityLiving instanceof Player player)) {
       return;
     }
 
     // check if player was targeting a block
-    Player player = (Player) entityLiving;
     BlockHitResult mop = getPlayerPOVHitResult(worldIn, player, ClipContext.Fluid.NONE);
     if (mop.getType() == HitResult.Type.BLOCK) {
       // we fling the inverted player look vector

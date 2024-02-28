@@ -7,10 +7,10 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot.Type;
 import slimeknights.mantle.data.GenericLoaderRegistry.IGenericLoader;
-import slimeknights.tconstruct.library.json.serializer.GenericRegistryEntrySerializer;
+import slimeknights.mantle.data.loader.RegistryEntryLoader;
 import slimeknights.tconstruct.library.modifiers.Modifier;
 import slimeknights.tconstruct.library.modifiers.impl.NoLevelsModifier;
-import slimeknights.tconstruct.library.modifiers.modules.MobDisguiseModule;
+import slimeknights.tconstruct.library.modifiers.modules.armor.MobDisguiseModule;
 import slimeknights.tconstruct.library.tools.capability.TinkerDataCapability.TinkerDataKey;
 import slimeknights.tconstruct.library.tools.context.EquipmentChangeContext;
 import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
@@ -20,7 +20,7 @@ import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 @RequiredArgsConstructor
 public class MobDisguiseModifier extends NoLevelsModifier {
   /** Loader instance */
-  public static final IGenericLoader<MobDisguiseModifier> LOADER = new GenericRegistryEntrySerializer<>("entity", BuiltInRegistries.ENTITY_TYPE, MobDisguiseModifier::new, m -> m.type);
+  public static final IGenericLoader<MobDisguiseModifier> LOADER = new RegistryEntryLoader<>("entity", BuiltInRegistries.ENTITY_TYPE, MobDisguiseModifier::new, m -> m.type);
   /** @deprecated use {@link MobDisguiseModule#DISGUISES} */
   @Deprecated
   public static final TinkerDataKey<Multiset<EntityType<?>>> DISGUISES = MobDisguiseModule.DISGUISES;

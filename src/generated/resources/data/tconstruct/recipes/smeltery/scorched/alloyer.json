@@ -1,25 +1,26 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
-  "key": {
-    "B": {
-      "item": "tconstruct:scorched_brick"
-    },
-    "G": [
-      {
-        "item": "tconstruct:scorched_ingot_gauge"
-      },
-      {
-        "item": "tconstruct:scorched_fuel_gauge"
-      }
-    ]
-  },
   "pattern": [
     "BGB",
     "BBB"
   ],
+  "key": {
+    "G": {
+      "type": "tconstruct:no_container",
+      "match": [
+        {
+          "item": "tconstruct:scorched_ingot_gauge"
+        },
+        {
+          "item": "tconstruct:scorched_fuel_gauge"
+        }
+      ]
+    },
+    "B": {
+      "item": "tconstruct:scorched_brick"
+    }
+  },
   "result": {
     "item": "tconstruct:scorched_alloyer"
-  },
-  "show_notification": true
+  }
 }

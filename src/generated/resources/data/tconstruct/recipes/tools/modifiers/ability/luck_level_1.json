@@ -1,9 +1,8 @@
 {
   "type": "tconstruct:modifier",
-  "allow_crystal": false,
   "inputs": [
     {
-      "tag": "c:copper_ingots"
+      "tag": "forge:ingots/copper"
     },
     {
       "ingredient": [
@@ -16,35 +15,33 @@
       ]
     },
     {
-      "tag": "c:copper_ingots"
+      "tag": "forge:ingots/copper"
     },
     {
-      "tag": "c:lapis_blocks"
+      "tag": "forge:storage_blocks/lapis"
     },
     {
-      "tag": "c:lapis_blocks"
+      "tag": "forge:storage_blocks/lapis"
     }
   ],
-  "max_level": 1,
-  "result": {
-    "level": 1,
-    "name": "tconstruct:luck"
-  },
+  "tools": [
+    {
+      "tag": "tconstruct:modifiable/melee"
+    },
+    {
+      "tag": "tconstruct:modifiable/harvest"
+    },
+    {
+      "tag": "tconstruct:modifiable/ranged/bows"
+    }
+  ],
   "slots": {
     "abilities": 1
   },
-  "tools": {
-    "fabric:type": "fabric:any",
-    "ingredients": [
-      {
-        "tag": "tconstruct:modifiable/melee"
-      },
-      {
-        "tag": "tconstruct:modifiable/harvest"
-      },
-      {
-        "tag": "tconstruct:modifiable/ranged"
-      }
-    ]
-  }
+  "allow_crystal": false,
+  "result": {
+    "name": "tconstruct:luck",
+    "level": 1
+  },
+  "max_level": 1
 }

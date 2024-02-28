@@ -2,12 +2,9 @@ package slimeknights.tconstruct.library.modifiers;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
-import net.minecraft.ResourceLocationException;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
+import slimeknights.tconstruct.library.utils.IdParser;
 
 import javax.annotation.Nullable;
 
@@ -15,6 +12,7 @@ import javax.annotation.Nullable;
  * This is just a copy of ResourceLocation for type safety.
  */
 public class ModifierId extends ResourceLocation {
+  public static final IdParser<ModifierId> PARSER = new IdParser<>(ModifierId::new, "Modifier");
 
   public ModifierId(String resourceName) {
     super(resourceName);
@@ -35,11 +33,7 @@ public class ModifierId extends ResourceLocation {
    */
   @Nullable
   public static ModifierId tryParse(String string) {
-    try {
-      return new ModifierId(string);
-    } catch (ResourceLocationException resourcelocationexception) {
-      return null;
-    }
+    return PARSER.tryParse(string);
   }
 
   /**
@@ -64,12 +58,7 @@ public class ModifierId extends ResourceLocation {
    * @return  Resource location parsed
    */
   public static ModifierId getFromJson(JsonObject json, String key) {
-    String text = GsonHelper.getAsString(json, key);
-    ModifierId location = tryParse(text);
-    if (location == null) {
-      throw new JsonSyntaxException("Expected " + key + " to be a Modifier ID, was '" + text + "'");
-    }
-    return location;
+    return PARSER.getFromJson(json, key);
   }
 
   /**
@@ -79,12 +68,7 @@ public class ModifierId extends ResourceLocation {
    * @return  Resource location parsed
    */
   public static ModifierId convertFromJson(JsonElement json, String key) {
-    String text = GsonHelper.convertToString(json, key);
-    ModifierId location = tryParse(text);
-    if (location == null) {
-      throw new JsonSyntaxException("Expected " + key + " to be a Modifier ID, was '" + text + "'");
-    }
-    return location;
+    return PARSER.convertFromJson(json, key);
   }
 
   /** Writes an ID to the packet buffer */

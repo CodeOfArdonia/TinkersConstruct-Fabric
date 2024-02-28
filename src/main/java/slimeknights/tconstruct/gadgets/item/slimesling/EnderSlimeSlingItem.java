@@ -7,6 +7,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.Vec3;
 import slimeknights.tconstruct.common.Sounds;
 import slimeknights.tconstruct.library.events.teleport.SlimeslingTeleportEvent;
 import slimeknights.tconstruct.shared.block.SlimeType;
@@ -20,11 +21,10 @@ public class EnderSlimeSlingItem extends BaseSlimeSlingItem {
   /** Called when the player stops using an Item (stops holding the right mouse button). */
   @Override
   public void releaseUsing(ItemStack stack, Level worldIn, LivingEntity entityLiving, int timeLeft) {
-    if (worldIn.isClientSide || !(entityLiving instanceof ServerPlayer)) {
+    if (worldIn.isClientSide || !(entityLiving instanceof ServerPlayer player)) {
       return;
     }
 
-    ServerPlayer player = (ServerPlayer) entityLiving;
     float f = getForce(stack, timeLeft);
 
     Vec3 look = player.getLookAngle();

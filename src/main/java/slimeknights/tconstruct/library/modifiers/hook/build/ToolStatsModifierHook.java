@@ -3,6 +3,7 @@ package slimeknights.tconstruct.library.modifiers.hook.build;
 import io.github.fabricators_of_create.porting_lib.entity.events.PlayerEvents;
 import net.minecraft.core.Direction;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
+import slimeknights.tconstruct.library.modifiers.hook.behavior.AttributesModifierHook;
 import slimeknights.tconstruct.library.tools.context.ToolRebuildContext;
 import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 import slimeknights.tconstruct.library.tools.stat.ModifierStatsBuilder;

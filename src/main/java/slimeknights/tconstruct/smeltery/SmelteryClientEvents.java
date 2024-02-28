@@ -58,6 +58,7 @@ public class SmelteryClientEvents extends ClientEventBase {
   static void clientSetup() {
     // render layers
     RenderType cutout = RenderType.cutout();
+    RenderType translucent = RenderType.translucent();
     // seared
     // casting
     BlockRenderLayerMap.INSTANCE.putBlock(TinkerSmeltery.searedFaucet.get(), cutout);
@@ -71,9 +72,12 @@ public class SmelteryClientEvents extends ClientEventBase {
     BlockRenderLayerMap.INSTANCE.putBlock(TinkerSmeltery.searedDrain.get(), cutout);
     BlockRenderLayerMap.INSTANCE.putBlock(TinkerSmeltery.searedDuct.get(), cutout);
     TinkerSmeltery.searedTank.forEach(tank -> BlockRenderLayerMap.INSTANCE.putBlock(tank, cutout));
-    BlockRenderLayerMap.INSTANCE.putBlock(TinkerSmeltery.searedLantern.get(), cutout);
-    BlockRenderLayerMap.INSTANCE.putBlock(TinkerSmeltery.searedGlass.get(), cutout);
-    BlockRenderLayerMap.INSTANCE.putBlock(TinkerSmeltery.searedGlassPane.get(), cutout);
+    IBlockRenderLayerMap.INSTANCE.putBlock(TinkerSmeltery.searedLantern.get(), cutout);
+    IBlockRenderLayerMap.INSTANCE.putBlock(TinkerSmeltery.searedGlass.get(), cutout);
+    IBlockRenderLayerMap.INSTANCE.putBlock(TinkerSmeltery.searedSoulGlass.get(), translucent);
+    IBlockRenderLayerMap.INSTANCE.putBlock(TinkerSmeltery.searedTintedGlass.get(), translucent);
+    IBlockRenderLayerMap.INSTANCE.putBlock(TinkerSmeltery.searedGlassPane.get(), cutout);
+    IBlockRenderLayerMap.INSTANCE.putBlock(TinkerSmeltery.searedSoulGlassPane.get(), translucent);
     // scorched
     // casting
     BlockRenderLayerMap.INSTANCE.putBlock(TinkerSmeltery.scorchedFaucet.get(), cutout);
@@ -82,12 +86,15 @@ public class SmelteryClientEvents extends ClientEventBase {
     // controller
     BlockRenderLayerMap.INSTANCE.putBlock(TinkerSmeltery.scorchedAlloyer.get(), cutout);
     // peripherals
-    BlockRenderLayerMap.INSTANCE.putBlock(TinkerSmeltery.scorchedDrain.get(), cutout);
-    BlockRenderLayerMap.INSTANCE.putBlock(TinkerSmeltery.scorchedDuct.get(), cutout);
+    ItemBlockRenderTypes.setRenderLayer(TinkerSmeltery.scorchedDrain.get(), cutout);
+    ItemBlockRenderTypes.setRenderLayer(TinkerSmeltery.scorchedDuct.get(), cutout);
     TinkerSmeltery.scorchedTank.forEach(tank -> BlockRenderLayerMap.INSTANCE.putBlock(tank, cutout));
     BlockRenderLayerMap.INSTANCE.putBlock(TinkerSmeltery.scorchedLantern.get(), cutout);
     BlockRenderLayerMap.INSTANCE.putBlock(TinkerSmeltery.scorchedGlass.get(), cutout);
+    BlockRenderLayerMap.INSTANCE.putBlock(TinkerSmeltery.scorchedSoulGlass.get(), translucent);
+    BlockRenderLayerMap.INSTANCE.putBlock(TinkerSmeltery.scorchedTintedGlass.get(), translucent);
     BlockRenderLayerMap.INSTANCE.putBlock(TinkerSmeltery.scorchedGlassPane.get(), cutout);
+    BlockRenderLayerMap.INSTANCE.putBlock(TinkerSmeltery.scorchedSoulGlassPane.get(), translucent);
 
     // screens
     ScreenRegistry.register(TinkerSmeltery.melterContainer.get(), MelterScreen::new);

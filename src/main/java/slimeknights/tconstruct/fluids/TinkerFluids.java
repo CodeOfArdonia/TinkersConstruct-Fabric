@@ -23,8 +23,18 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DispenserBlock;
-import net.minecraft.world.level.material.MapColor;
-import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.level.material.Material;
+import net.minecraftforge.common.ForgeMod;
+import net.minecraftforge.common.brewing.BrewingRecipe;
+import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fluids.FluidAttributes;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.ForgeFlowingFluid;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
+import net.minecraftforge.registries.DataSerializerEntry;
+import net.minecraftforge.registries.RegistryObject;
 import slimeknights.mantle.fluid.UnplaceableFluid;
 import slimeknights.mantle.fluid.attributes.FluidAttributes;
 import slimeknights.mantle.registration.ItemProperties;
@@ -49,6 +59,7 @@ import slimeknights.tconstruct.fluids.util.EmptyBottleIntoWater;
 import slimeknights.tconstruct.fluids.util.FillBottle;
 import slimeknights.tconstruct.library.recipe.FluidValues;
 import slimeknights.tconstruct.shared.block.SlimeType;
+import slimeknights.tconstruct.tools.network.FluidDataSerializer;
 import slimeknights.tconstruct.world.TinkerWorld;
 
 import java.util.EnumMap;
@@ -73,6 +84,7 @@ public final class TinkerFluids extends TinkerModule {
                                  .build()).stacksTo(1).craftRemainder(Items.GLASS_BOTTLE),
     () -> new FluidStack(venom.get(), FluidValues.BOTTLE))
   );
+  public static final RegistryObject<UnplaceableFluid> powderedSnow = FLUIDS.registerFluid("powdered_snow", () -> new UnplaceableFluid(Items.POWDER_SNOW_BUCKET.delegate, FluidAttributes.builder(TConstruct.getResource("block/fluid/powdered_snow/still"), TConstruct.getResource("block/fluid/powdered_snow/flowing")).sound(SoundEvents.BUCKET_FILL, SoundEvents.BUCKET_EMPTY).temperature(270)));
 
   // slime -  note second name parameter is forge tag name
   public static final FluidObject<SimpleFlowableFluid> earthSlime = FLUIDS.register("earth_slime", "slime",  coolBuilder().density(1400).viscosity(1400).temperature(350), properties -> properties.mapColor(MapColor.WATER).replaceable().pushReaction(PushReaction.DESTROY).liquid(), SlimeFluid.Source::new, SlimeFluid.Flowing::new, 0);
@@ -205,6 +217,9 @@ public final class TinkerFluids extends TinkerModule {
   public static final FluidObject<SimpleFlowableFluid> moltenRefinedGlowstone = FLUIDS.register("molten_refined_glowstone", hotBuilder().temperature(1125), properties -> properties.mapColor(MapColor.FIRE).replaceable().pushReaction(PushReaction.DESTROY).liquid(), 15);
   public static final FluidObject<SimpleFlowableFluid> moltenRefinedObsidian  = FLUIDS.register("molten_refined_obsidian",  hotBuilder().temperature(1775), properties -> properties.mapColor(MapColor.FIRE).replaceable().pushReaction(PushReaction.DESTROY).liquid(),  7);
 
+  // fluid data serializer
+  public static final FluidDataSerializer FLUID_DATA_SERIALIZER = new FluidDataSerializer();
+  public static final RegistryObject<DataSerializerEntry> FLUID_DATA_SERIALIZER_REGISTRY = DATA_SERIALIZERS.register("fluid", () -> new DataSerializerEntry(FLUID_DATA_SERIALIZER));
 
   /** Creates a builder for a cool fluid with textures */
   private static FluidAttributes.Builder coolBuilder() {

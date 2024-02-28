@@ -17,6 +17,9 @@ public enum ArmorSlotType implements StringRepresentable {
   CHESTPLATE(ArmorItem.Type.CHESTPLATE),
   HELMET(ArmorItem.Type.HELMET);
 
+  /** Armor slots in order from helmet to boots, {@link #values()} will go from boots to helmet. */
+  public static final ArmorSlotType[] TOP_DOWN = { HELMET, CHESTPLATE, LEGGINGS, BOOTS };
+
   private final ArmorItem.Type armorType;
   private final String serializedName = toString().toLowerCase(Locale.ROOT);
   private final int index = ordinal();

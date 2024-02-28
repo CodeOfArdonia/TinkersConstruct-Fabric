@@ -11,22 +11,22 @@ import slimeknights.tconstruct.library.modifiers.hook.ArmorWalkModifierHook;
 import slimeknights.tconstruct.library.modifiers.hook.BlockTransformModifierHook;
 import slimeknights.tconstruct.library.modifiers.hook.BowAmmoModifierHook;
 import slimeknights.tconstruct.library.modifiers.hook.ConditionalStatModifierHook;
-import slimeknights.tconstruct.library.modifiers.hook.DisplayNameModifierHook;
-import slimeknights.tconstruct.library.modifiers.hook.EffectiveLevelModifierHook;
 import slimeknights.tconstruct.library.modifiers.hook.ElytraFlightModifierHook;
-import slimeknights.tconstruct.library.modifiers.hook.EquipmentChangeModifierHook;
 import slimeknights.tconstruct.library.modifiers.hook.HarvestEnchantmentsModifierHook;
 import slimeknights.tconstruct.library.modifiers.hook.KeybindInteractModifierHook;
 import slimeknights.tconstruct.library.modifiers.hook.LootingModifierHook;
 import slimeknights.tconstruct.library.modifiers.hook.PlantHarvestModifierHook;
 import slimeknights.tconstruct.library.modifiers.hook.ProjectileHitModifierHook;
 import slimeknights.tconstruct.library.modifiers.hook.ProjectileLaunchModifierHook;
-import slimeknights.tconstruct.library.modifiers.hook.RepairFactorModifierHook;
 import slimeknights.tconstruct.library.modifiers.hook.ShearsModifierHook;
-import slimeknights.tconstruct.library.modifiers.hook.ToolActionModifierHook;
-import slimeknights.tconstruct.library.modifiers.hook.TooltipModifierHook;
-import slimeknights.tconstruct.library.modifiers.hook.build.AttributesModifierHook;
+import slimeknights.tconstruct.library.modifiers.hook.armor.EquipmentChangeModifierHook;
+import slimeknights.tconstruct.library.modifiers.hook.behavior.AttributesModifierHook;
+import slimeknights.tconstruct.library.modifiers.hook.behavior.EffectiveLevelModifierHook;
+import slimeknights.tconstruct.library.modifiers.hook.behavior.RepairFactorModifierHook;
+import slimeknights.tconstruct.library.modifiers.hook.behavior.ToolActionModifierHook;
+import slimeknights.tconstruct.library.modifiers.hook.behavior.ToolDamageModifierHook;
 import slimeknights.tconstruct.library.modifiers.hook.build.ModifierRemovalHook;
+import slimeknights.tconstruct.library.modifiers.hook.build.ModifierTraitHook;
 import slimeknights.tconstruct.library.modifiers.hook.build.RawDataModifierHook;
 import slimeknights.tconstruct.library.modifiers.hook.build.ToolStatsModifierHook;
 import slimeknights.tconstruct.library.modifiers.hook.build.ValidateModifierHook;
@@ -36,10 +36,15 @@ import slimeknights.tconstruct.library.modifiers.hook.combat.DamageDealtModifier
 import slimeknights.tconstruct.library.modifiers.hook.combat.DamageTakenModifierHook;
 import slimeknights.tconstruct.library.modifiers.hook.combat.MeleeDamageModifierHook;
 import slimeknights.tconstruct.library.modifiers.hook.combat.MeleeHitModifierHook;
+import slimeknights.tconstruct.library.modifiers.hook.combat.ModifyDamageModifierHook;
 import slimeknights.tconstruct.library.modifiers.hook.combat.ProtectionModifierHook;
+import slimeknights.tconstruct.library.modifiers.hook.display.DisplayNameModifierHook;
+import slimeknights.tconstruct.library.modifiers.hook.display.DurabilityDisplayModifierHook;
+import slimeknights.tconstruct.library.modifiers.hook.display.TooltipModifierHook;
 import slimeknights.tconstruct.library.modifiers.hook.interaction.BlockInteractionModifierHook;
 import slimeknights.tconstruct.library.modifiers.hook.interaction.EntityInteractionModifierHook;
 import slimeknights.tconstruct.library.modifiers.hook.interaction.GeneralInteractionModifierHook;
+import slimeknights.tconstruct.library.modifiers.hook.interaction.InventoryTickModifierHook;
 import slimeknights.tconstruct.library.modifiers.hook.mining.BlockBreakModifierHook;
 import slimeknights.tconstruct.library.modifiers.hook.mining.BreakSpeedModifierHook;
 import slimeknights.tconstruct.library.modifiers.hook.mining.FinishHarvestModifierHook;
@@ -74,10 +79,6 @@ public class TinkerHooks {
   /** Generic hook for stats conditioned on the entity holding the tool */
   public static final ModifierHook<ConditionalStatModifierHook> CONDITIONAL_STAT = register("conditional_stat", ConditionalStatModifierHook.class, ConditionalStatModifierHook.ALL_MERGER, ConditionalStatModifierHook.EMPTY);
 
-  /** Hook for modifiers adding additional information to the tooltip */
-  public static final ModifierHook<TooltipModifierHook> TOOLTIP = register("tooltip", TooltipModifierHook.class, TooltipModifierHook.AllMerger::new, (tool, modifier, player, tooltip, tooltipKey, tooltipFlag)
-    -> modifier.getModifier().addInformation(tool, modifier.getLevel(), player, tooltip, tooltipKey, tooltipFlag));
-
   /** Hook for modifiers checking if they can perform a tool action */
   public static final ModifierHook<ToolActionModifierHook> TOOL_ACTION = register("tool_action", ToolActionModifierHook.class, ToolActionModifierHook.AnyMerger::new, (tool, modifier, toolAction)
     -> modifier.getModifier().canPerformAction(tool, modifier.getLevel(), toolAction));
@@ -103,6 +104,13 @@ public class TinkerHooks {
   /** Hook for modifying the repair amount for tools */
   public static final ModifierHook<RepairFactorModifierHook> REPAIR_FACTOR = register("repair_factor", RepairFactorModifierHook.class, RepairFactorModifierHook.ComposeMerger::new, (tool, entry, factor) -> entry.getModifier().getRepairFactor(tool, entry.getLevel(), factor));
 
+  /** Hook for modifying the damage amount for tools */
+  public static final ModifierHook<ToolDamageModifierHook> TOOL_DAMAGE = register("tool_damage", ToolDamageModifierHook.class, ToolDamageModifierHook.Merger::new, (tool, modifier, amount, holder) -> modifier.getModifier().onDamageTool(tool, modifier.getLevel(), amount, holder));
+
+  /** Hook running while the tool is in the inventory */
+  public static final ModifierHook<InventoryTickModifierHook> INVENTORY_TICK = register("inventory_tick", InventoryTickModifierHook.class, InventoryTickModifierHook.AllMerger::new,
+    (tool, modifier, world, holder, itemSlot, isSelected, isCorrectSlot, stack) -> modifier.getModifier().onInventoryTick(tool, modifier.getLevel(), world, holder, itemSlot, isSelected, isCorrectSlot, stack));
+
 
   /* Composable only  */
 
@@ -111,6 +119,37 @@ public class TinkerHooks {
 
   /** Hook for supporting modifiers to change the modifier display name */
   public static final ModifierHook<DisplayNameModifierHook> DISPLAY_NAME = register("display_name", DisplayNameModifierHook.class, DisplayNameModifierHook.ComposeMerger::new, (tool, modifier, level, name) -> name);
+
+
+  /* Display */
+
+  /** Hook for modifiers adding additional information to the tooltip */
+  public static final ModifierHook<TooltipModifierHook> TOOLTIP = register("tooltip", TooltipModifierHook.class, TooltipModifierHook.AllMerger::new, (tool, modifier, player, tooltip, tooltipKey, tooltipFlag)
+    -> modifier.getModifier().addInformation(tool, modifier.getLevel(), player, tooltip, tooltipKey, tooltipFlag));
+
+  /** Hook for changing the itemstack durability bar */
+  public static final ModifierHook<DurabilityDisplayModifierHook> DURABILITY_DISPLAY = register("durability_display", DurabilityDisplayModifierHook.class, DurabilityDisplayModifierHook.FirstMerger::new, new DurabilityDisplayModifierHook() {
+    @Nullable
+    @Override
+    public Boolean showDurabilityBar(IToolStackView tool, ModifierEntry modifier) {
+      return modifier.getModifier().showDurabilityBar(tool, modifier.getLevel());
+    }
+
+    @Override
+    public int getDurabilityWidth(IToolStackView tool, ModifierEntry modifier) {
+      double damagePercent = modifier.getModifier().getDamagePercentage(tool, modifier.getLevel());
+      if (Double.isNaN(damagePercent)) {
+        return 0;
+      }
+      // using 12.75 to increase the amount of the bar that shows as nearly full, see full comment on DurabilityDisplayModifierHook#getWidthFor
+      return (int)(1 + 12.75 * (1 - damagePercent));
+    }
+
+    @Override
+    public int getDurabilityRGB(IToolStackView tool, ModifierEntry modifier) {
+      return modifier.getModifier().getDurabilityRGB(tool, modifier.getLevel());
+    }
+  });
 
 
   /* Tool Building */
@@ -159,6 +198,8 @@ public class TinkerHooks {
     return null;
   });
 
+  /** Hook for a modifier to add other modifiers to the builder */
+  public static final ModifierHook<ModifierTraitHook> MODIFIER_TRAITS = register("modifier_traits", ModifierTraitHook.class, ModifierTraitHook.AllMerger::new, (context, modifier, builder, firstEncounter) -> {});
 
   /* Combat */
 
@@ -187,17 +228,30 @@ public class TinkerHooks {
     }
   });
 
-  /** Hook called when taking damage wearing this armor to reduce the damage */
+  /** Hook called when taking damage wearing this armor to reduce the damage, runs after {@link #MODIFY_HURT} and before {@link #MODIFY_DAMAGE} */
   public static final ModifierHook<ProtectionModifierHook> PROTECTION = register("protection", ProtectionModifierHook.class, ProtectionModifierHook.AllMerger::new, (tool, modifier, context, slotType, source, modifierValue)
     -> modifier.getModifier().getProtectionModifier(tool, modifier.getLevel(), context, slotType, source, modifierValue));
 
   /** Hook called when taking damage wearing this armor to cancel the damage */
   public static final ModifierHook<DamageBlockModifierHook> DAMAGE_BLOCK = register("damage_block", DamageBlockModifierHook.class, DamageBlockModifierHook.AnyMerger::new, (tool, modifier, context, slotType, source, amount)
     -> modifier.getModifier().isSourceBlocked(tool, modifier.getLevel(), context, slotType, source, amount));
-
-  /** Hook called when taking damage to apply secondary effects such as counterattack or healing */
+  /**
+   * Hook called when taking damage to apply secondary effects such as counterattack or healing. Runs after {@link #DAMAGE_BLOCK} but before vanilla effects that cancel damage.
+   * TODO 1.19: rename hook to {@code ON_ATTACKED} to better represent the appropriate event and the fact that damage is still pending.
+   */
   public static final ModifierHook<DamageTakenModifierHook> DAMAGE_TAKEN = register("damage_taken", DamageTakenModifierHook.class, DamageTakenModifierHook.AllMerger::new, (tool, modifier, context, slotType, source, amount, isDirectDamage)
     -> modifier.getModifier().onAttacked(tool, modifier.getLevel(), context, slotType, source, amount, isDirectDamage));
+
+  /** Hook allowing modifying damage taken or responding when damage is taken. Runs after {@link #DAMAGE_TAKEN} and any vanilla effects that cancel damage, but before armor reduction and {@link #PROTECTION}.  */
+  public static final ModifierHook<ModifyDamageModifierHook> MODIFY_HURT;
+  /** Hook allowing modifying damage taken or responding when damage is taken. Runs after {@link #PROTECTION}, armor damage reduction, and absorption.  */
+  public static final ModifierHook<ModifyDamageModifierHook> MODIFY_DAMAGE;
+  static {
+    Function<Collection<ModifyDamageModifierHook>,ModifyDamageModifierHook> merger = ModifyDamageModifierHook.AllMerger::new;
+    ModifyDamageModifierHook fallback = (tool, modifier, context, slotType, source, amount, isDirectDamage) -> amount;
+    MODIFY_HURT = register("modify_hurt", ModifyDamageModifierHook.class, merger, fallback);
+    MODIFY_DAMAGE = register("modify_damage", ModifyDamageModifierHook.class, merger, fallback);
+  }
 
   /** Hook called when dealing damage while wearing this equipment */
   public static final ModifierHook<DamageDealtModifierHook> DAMAGE_DEALT = register("damage_dealt", DamageDealtModifierHook.class, DamageDealtModifierHook.AllMerger::new, (tool, modifier, context, slotType, target, source, amount, isDirectDamage)

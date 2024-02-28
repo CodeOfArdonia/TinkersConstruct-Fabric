@@ -345,7 +345,7 @@ public final class TinkerWorld extends TinkerModule {
   public static void bootstrap(BootstapContext<PlacedFeature> bootstapContext) {
     HolderGetter<ConfiguredFeature<?, ?>> lookup = bootstapContext.lookup(Registries.CONFIGURED_FEATURE);
     PlacementUtils.register(bootstapContext, placedSmallCobaltOreKey, lookup.getOrThrow(smallCobaltOreKey), CountPlacement.of(5), InSquarePlacement.spread(), PlacementUtils.RANGE_8_8, BiomeFilter.biome());
-    PlacementUtils.register(bootstapContext, placedLargeCobaltOreKey, lookup.getOrThrow(largeCobaltOreKey), CountPlacement.of(3), InSquarePlacement.spread(), HeightRangePlacement.triangle(VerticalAnchor.absolute(8), VerticalAnchor.absolute(32)), BiomeFilter.biome());
+    PlacementUtils.register(bootstapContext, placedLargeCobaltOreKey, lookup.getOrThrow(largeCobaltOreKey), configuredLargeCobaltOre, CountPlacement.of(3), InSquarePlacement.spread(), HeightRangePlacement.triangle(VerticalAnchor.absolute(8), VerticalAnchor.absolute(32)), BiomeFilter.biome());
 
     placedGeode(bootstapContext, placedEarthGeodeKey, lookup.getOrThrow(configuredEarthGeodeKey), RarityFilter.onAverageOnceEvery(128), HeightRangePlacement.uniform(VerticalAnchor.aboveBottom(6), VerticalAnchor.aboveBottom(54)));
     placedGeode(bootstapContext, placedSkyGeodeKey, lookup.getOrThrow(configuredSkyGeodeKey), RarityFilter.onAverageOnceEvery(64), HeightRangePlacement.uniform(VerticalAnchor.absolute(16), VerticalAnchor.absolute(54)));

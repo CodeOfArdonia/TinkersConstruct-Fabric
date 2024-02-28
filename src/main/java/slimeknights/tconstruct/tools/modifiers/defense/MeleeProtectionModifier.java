@@ -3,7 +3,6 @@ package slimeknights.tconstruct.tools.modifiers.defense;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -11,8 +10,10 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.TooltipFlag;
+import slimeknights.mantle.data.predicate.damage.DamageSourcePredicate;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.modifiers.data.ModifierMaxLevel;
+import slimeknights.tconstruct.library.modifiers.modules.armor.ProtectionModule;
 import slimeknights.tconstruct.library.tools.capability.TinkerDataCapability.TinkerDataKey;
 import slimeknights.tconstruct.library.tools.context.EquipmentChangeContext;
 import slimeknights.tconstruct.library.tools.context.EquipmentContext;
@@ -29,22 +30,6 @@ public class MeleeProtectionModifier extends AbstractProtectionModifier<Modifier
 
   public MeleeProtectionModifier() {
     super(KEY);
-  }
-
-  /** Checks if the damage source is blocked by this modifier */
-  private static boolean doesApply(DamageSource source) {
-    if (source.is(DamageTypeTags.BYPASSES_EFFECTS) || source.is(DamageTypeTags.IS_PROJECTILE) || source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
-      return false;
-    }
-    // if its caused by an entity, require it to simply not be thorns
-    // meets most normal melee attacks, like zombies, but also means a melee fire or melee magic attack will work
-    if (source.getEntity() != null) {
-      return !source.is(DamageTypes.THORNS);
-    } else {
-      // for non-entity damage, require it to not be any other type
-      // blocks dall damage, falling blocks, cactus, but not starving, drowning, freezing
-      return !source.is(DamageTypeTags.BYPASSES_ARMOR) && !source.is(DamageTypeTags.IS_FIRE) && !source.is(DamageTypes.MAGIC) && !source.is(DamageTypeTags.IS_EXPLOSION);
-    }
   }
 
   @Override
@@ -75,15 +60,15 @@ public class MeleeProtectionModifier extends AbstractProtectionModifier<Modifier
 
   @Override
   public float getProtectionModifier(IToolStackView tool, int level, EquipmentContext context, EquipmentSlot slotType, DamageSource source, float modifierValue) {
-    if (doesApply(source)) {
-      modifierValue += getScaledLevel(tool, level) * 2.5;
+    if (DamageSourcePredicate.CAN_PROTECT.matches(source) && DamageSourcePredicate.MELEE.matches(source)) {
+      modifierValue += getEffectiveLevel(tool, level) * 2.5;
     }
     return modifierValue;
   }
 
   @Override
   public void addInformation(IToolStackView tool, int level, @Nullable Player player, List<Component> tooltip, TooltipKey tooltipKey, TooltipFlag tooltipFlag) {
-    AbstractProtectionModifier.addResistanceTooltip(this, tool, level, 2.5f, tooltip);
+    ProtectionModule.addResistanceTooltip(tool, this, getEffectiveLevel(tool, level) * 2.5f, player, tooltip);
   }
 
   @Override

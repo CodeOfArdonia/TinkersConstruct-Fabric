@@ -12,6 +12,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.TooltipFlag;
 import slimeknights.tconstruct.library.modifiers.impl.IncrementalModifier;
+import slimeknights.tconstruct.library.modifiers.modules.armor.ProtectionModule;
 import slimeknights.tconstruct.library.tools.context.EquipmentContext;
 import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 import slimeknights.tconstruct.library.utils.TooltipKey;
@@ -21,6 +22,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 
+/** @deprecated use {@link ProtectionModule} and {@link slimeknights.tconstruct.library.modifiers.modules.behavior.AttributeModule} */
+@Deprecated
 public class TurtleShellModifier extends IncrementalModifier {
   private static final UUID[] UUIDS = {
     UUID.fromString("62a1c224-50e5-11ec-bf63-0242ac130002"),
@@ -40,7 +43,7 @@ public class TurtleShellModifier extends IncrementalModifier {
       LivingEntity entity = context.getEntity();
       // helmet/chest boost if eyes in water, legs/boots boost if feet in water
       if ((slotType == EquipmentSlot.HEAD || slotType == EquipmentSlot.CHEST) ? entity.wasEyeInWater : entity.isInWater()) {
-        modifierValue += getScaledLevel(tool, level) * 2.5f;
+        modifierValue += getEffectiveLevel(tool, level) * 2.5f;
       }
     }
     return modifierValue;
@@ -48,6 +51,6 @@ public class TurtleShellModifier extends IncrementalModifier {
 
   @Override
   public void addInformation(IToolStackView tool, int level, @Nullable Player player, List<Component> tooltip, TooltipKey tooltipKey, TooltipFlag tooltipFlag) {
-    AbstractProtectionModifier.addResistanceTooltip(this, tool, level, 2.5f, tooltip);
+    ProtectionModule.addResistanceTooltip(tool, this, getEffectiveLevel(tool, level) * 2.5f, player, tooltip);
   }
 }

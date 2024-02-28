@@ -75,7 +75,7 @@ public final class TinkerGadgets extends TinkerModule {
    */
   public static final ItemObject<PiggyBackPackItem> piggyBackpack = ITEMS_DEFFERED.register("piggy_backpack", () -> new PiggyBackPackItem(new Properties().stacksTo(16)));
   public static final EnumObject<FrameType,FancyItemFrameItem> itemFrame = ITEMS_DEFFERED.registerEnum(FrameType.values(), "item_frame", (type) -> new FancyItemFrameItem(GADGET_PROPS, (world, pos, dir) -> new FancyItemFrameEntity(world, pos, dir, type)));
-  // slime tools
+  // slings - TODO: remove in 1.19, replaced by slimestaffs & flinging/springing/bonking/warping
   private static final Item.Properties SLING_PROPS = new Item.Properties().stacksTo(1).durability(250);
   public static final EnumObject<SlimeType, BaseSlimeSlingItem> slimeSling = new EnumObject.Builder<SlimeType, BaseSlimeSlingItem>(SlimeType.class)
     .put(SlimeType.EARTH, ITEMS_DEFFERED.register("earth_slime_sling", () -> new EarthSlimeSlingItem(SLING_PROPS)))

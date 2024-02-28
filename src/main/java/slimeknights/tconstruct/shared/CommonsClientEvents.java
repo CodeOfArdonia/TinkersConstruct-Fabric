@@ -51,6 +51,7 @@ public class CommonsClientEvents extends ClientEventBase {
     BlockRenderLayerMap.INSTANCE.putBlock(TinkerMaterials.soulsteel.get(), RenderType.translucent());
     BlockRenderLayerMap.INSTANCE.putBlock(TinkerMaterials.slimesteel.get(), RenderType.translucent());
     RenderType cutout = RenderType.cutout();
+    BlockRenderLayerMap.INSTANCE.putBlock(TinkerCommons.cheeseBlock.get(), cutout);
     BlockRenderLayerMap.INSTANCE.putBlock(TinkerCommons.goldBars.get(), cutout);
     BlockRenderLayerMap.INSTANCE.putBlock(TinkerCommons.goldPlatform.get(), cutout);
     BlockRenderLayerMap.INSTANCE.putBlock(TinkerCommons.ironPlatform.get(), cutout);

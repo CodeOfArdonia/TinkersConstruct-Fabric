@@ -1,20 +1,25 @@
 {
   "type": "tconstruct:incremental_modifier",
-  "allow_crystal": true,
-  "amount_per_item": 1,
   "input": {
     "item": "tconstruct:ichor_slime_crystal"
   },
-  "max_level": 5,
+  "amount_per_item": 1,
   "needed_per_level": 72,
-  "result": {
-    "level": 1,
-    "name": "tconstruct:power"
-  },
+  "tools": [
+    {
+      "tag": "tconstruct:modifiable/ranged/longbows"
+    },
+    {
+      "tag": "tconstruct:modifiable/staffs"
+    }
+  ],
   "slots": {
     "upgrades": 1
   },
-  "tools": {
-    "tag": "tconstruct:modifiable/ranged/longbows"
-  }
+  "allow_crystal": true,
+  "result": {
+    "name": "tconstruct:power",
+    "level": 1
+  },
+  "max_level": 5
 }

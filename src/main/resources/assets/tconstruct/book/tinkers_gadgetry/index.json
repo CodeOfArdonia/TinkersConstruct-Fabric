@@ -29,16 +29,23 @@
   },
   {
     "name": "staffs",
-    "data": "sections/staffs.json",
     "icon": {
       "item": "tconstruct:sky_staff"
-    }
+    },
+    "extraData": { "tconstruct:load_tools": { "tag": "tconstruct:modifiable/special", "path": "staffs", "sort": false }}
   },
   {
     "name": "armor",
-    "data": "sections/armor.json",
     "icon": {
       "item": "tconstruct:slime_boots"
+    },
+    "condition": {
+      "type": "tconstruct:tag_not_empty",
+      "registry": "minecraft:item",
+      "tag": "tconstruct:modifiable/book_armor/tinkers_gadgetry"
+    },
+    "extraData": {
+      "tconstruct:load_tools": { "tag": "tconstruct:modifiable/book_armor/tinkers_gadgetry", "path": "armor", "sort": false }
     }
   },
   {

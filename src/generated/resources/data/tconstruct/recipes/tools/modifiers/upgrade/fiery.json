@@ -1,28 +1,31 @@
 {
   "type": "tconstruct:incremental_modifier",
-  "allow_crystal": true,
-  "amount_per_item": 1,
   "input": {
     "item": "minecraft:blaze_powder"
   },
-  "max_level": 5,
+  "amount_per_item": 1,
   "needed_per_level": 25,
-  "result": {
-    "level": 1,
-    "name": "tconstruct:fiery"
-  },
+  "tools": [
+    {
+      "tag": "tconstruct:modifiable/melee_or_unarmed"
+    },
+    {
+      "tag": "tconstruct:modifiable/ranged/bows"
+    },
+    {
+      "tag": "tconstruct:modifiable/armor/worn"
+    },
+    {
+      "tag": "tconstruct:modifiable/shields"
+    }
+  ],
   "slots": {
     "upgrades": 1
   },
-  "tools": {
-    "fabric:type": "fabric:any",
-    "ingredients": [
-      {
-        "tag": "tconstruct:modifiable/melee_or_unarmed"
-      },
-      {
-        "tag": "tconstruct:modifiable/ranged/bows"
-      }
-    ]
-  }
+  "allow_crystal": true,
+  "result": {
+    "name": "tconstruct:fiery",
+    "level": 1
+  },
+  "max_level": 5
 }

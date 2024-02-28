@@ -1,5 +1,6 @@
 package slimeknights.tconstruct.library.client.book;
 
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import slimeknights.mantle.client.book.BookLoader;
 import slimeknights.mantle.client.book.data.BookData;
@@ -11,8 +12,11 @@ import slimeknights.tconstruct.library.client.book.content.ContentMaterialSkull;
 import slimeknights.tconstruct.library.client.book.content.ContentModifier;
 import slimeknights.tconstruct.library.client.book.content.ContentTool;
 import slimeknights.tconstruct.library.client.book.content.RangedMaterialContent;
+import slimeknights.tconstruct.library.client.book.content.TooltipShowcaseContent;
 import slimeknights.tconstruct.library.client.book.sectiontransformer.ModifierSectionTransformer;
+import slimeknights.tconstruct.library.client.book.sectiontransformer.ModifierTagInjectorTransformer;
 import slimeknights.tconstruct.library.client.book.sectiontransformer.ToolSectionTransformer;
+import slimeknights.tconstruct.library.client.book.sectiontransformer.ToolTagInjectorTransformer;
 import slimeknights.tconstruct.library.client.book.sectiontransformer.materials.SkullMaterialSectionTransformer;
 import slimeknights.tconstruct.library.client.book.sectiontransformer.materials.TierRangeMaterialSectionTransformer;
 import slimeknights.tconstruct.library.client.book.sectiontransformer.materials.TieredMaterialSectionTransformer;
@@ -39,33 +43,41 @@ public class TinkerBook extends BookData {
   public static final BookData TINKERS_GADGETRY  = BookLoader.registerBook(TINKERS_GADGETRY_ID,  false, false);
   public static final BookData FANTASTIC_FOUNDRY = BookLoader.registerBook(FANTASTIC_FOUNDRY_ID, false, false);
   public static final BookData ENCYCLOPEDIA      = BookLoader.registerBook(ENCYCLOPEDIA_ID,      false, false);
+  private static final BookData[] ALL_BOOKS = {MATERIALS_AND_YOU, PUNY_SMELTING, MIGHTY_SMELTING, TINKERS_GADGETRY, FANTASTIC_FOUNDRY, ENCYCLOPEDIA};
 
   /**
    * Initializes the books
    */
   public static void initBook() {
+    BookLoader.registerGsonTypeAdapter(Component.class, new Component.Serializer());
+
     // register page types
     BookLoader.registerPageType(ContentMaterial.ID, ContentMaterial.class);
     BookLoader.registerPageType(ContentTool.ID,     ContentTool.class);
     BookLoader.registerPageType(ContentModifier.ID, ContentModifier.class);
+    BookLoader.registerPageType(TooltipShowcaseContent.ID, TooltipShowcaseContent.class);
 
     TierRangeMaterialSectionTransformer.registerMaterialType(TConstruct.getResource("melee_harvest"), ContentMaterial::new, HeadMaterialStats.ID, HandleMaterialStats.ID, ExtraMaterialStats.ID);
     TierRangeMaterialSectionTransformer.registerMaterialType(TConstruct.getResource("ranged"), RangedMaterialContent::new, LimbMaterialStats.ID, GripMaterialStats.ID, BowstringMaterialStats.ID);
     TierRangeMaterialSectionTransformer.registerMaterialType(TConstruct.getResource("skull"), ContentMaterialSkull::new, SkullStats.ID);
 
-    // tool transformers
+    // add transformers that load modifiers from tags
     ToolSectionTransformer armorTransformer = new ToolSectionTransformer("armor");
+    for (BookData book : ALL_BOOKS) {
+      book.addTransformer(ToolTagInjectorTransformer.INSTANCE);
+      book.addTransformer(ModifierTagInjectorTransformer.INSTANCE);
+      book.addTransformer(armorTransformer);
+    }
+
+    // tool transformers
+    // TODO: migrate to using extraData instead of hardcoded names
     MATERIALS_AND_YOU.addTransformer(ToolSectionTransformer.INSTANCE);
-    MATERIALS_AND_YOU.addTransformer(armorTransformer);
     MIGHTY_SMELTING.addTransformer(ToolSectionTransformer.INSTANCE);
-    FANTASTIC_FOUNDRY.addTransformer(armorTransformer);
-    TINKERS_GADGETRY.addTransformer(armorTransformer);
     TINKERS_GADGETRY.addTransformer(new ToolSectionTransformer("staffs"));
-    ENCYCLOPEDIA.addTransformer(new ToolSectionTransformer("tools"));
-    ENCYCLOPEDIA.addTransformer(armorTransformer);
+    ENCYCLOPEDIA.addTransformer(ToolSectionTransformer.INSTANCE);
 
     // material tier transformers
-    // TODO 1.19: remove old materail section transformers
+    // TODO 1.19: remove old material section transformers
     MATERIALS_AND_YOU.addTransformer(new TieredMaterialSectionTransformer("tier_one_materials", 1, false));
     PUNY_SMELTING.addTransformer(new TieredMaterialSectionTransformer("tier_two_materials", 2, false));
     MIGHTY_SMELTING.addTransformer(new TieredMaterialSectionTransformer("tier_three_materials", 3, false));
@@ -110,9 +122,9 @@ public class TinkerBook extends BookData {
   private static void addStandardData(BookData book, ResourceLocation id) {
     book.addRepository(new FileRepository(new ResourceLocation(id.getNamespace(), "book/" + id.getPath())));
     book.addTransformer(BookTransformer.indexTranformer());
+    book.addTransformer(TierRangeMaterialSectionTransformer.INSTANCE);
     // padding needs to be last to ensure page counts are right
     book.addTransformer(BookTransformer.paddingTransformer());
-    book.addTransformer(TierRangeMaterialSectionTransformer.INSTANCE);
   }
 
   /**

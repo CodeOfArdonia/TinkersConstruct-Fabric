@@ -43,6 +43,7 @@ import slimeknights.tconstruct.library.tools.capability.TinkerDataCapability.Tin
 import slimeknights.tconstruct.library.tools.definition.ToolDefinitionLoader;
 import slimeknights.tconstruct.library.tools.layout.StationSlotLayoutLoader;
 import slimeknights.tconstruct.library.utils.Util;
+import slimeknights.tconstruct.plugin.DietPlugin;
 import slimeknights.tconstruct.shared.TinkerCommons;
 import slimeknights.tconstruct.shared.TinkerMaterials;
 import slimeknights.tconstruct.smeltery.TinkerSmeltery;
@@ -122,6 +123,9 @@ public class TConstruct implements ModInitializer {
 //    if (modList.isLoaded("jsonthings")) {
 //      JsonThingsPlugin.onConstruct();
 //    }
+    if (modList.isLoaded("diet")) {
+      DietPlugin.onConstruct();
+    }
 
     commonSetup();
     FabricEvents.init();

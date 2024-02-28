@@ -4,16 +4,15 @@ import lombok.RequiredArgsConstructor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import slimeknights.tconstruct.common.TinkerTags;
+import net.minecraft.world.entity.player.Player;
 import slimeknights.tconstruct.library.modifiers.Modifier;
 import slimeknights.tconstruct.library.modifiers.data.ModifierMaxLevel;
 import slimeknights.tconstruct.library.modifiers.impl.IncrementalModifier;
+import slimeknights.tconstruct.library.modifiers.modules.armor.ProtectionModule;
 import slimeknights.tconstruct.library.tools.capability.TinkerDataCapability.TinkerDataKey;
 import slimeknights.tconstruct.library.tools.context.EquipmentChangeContext;
 import slimeknights.tconstruct.library.tools.helper.ModifierUtil;
 import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
-import slimeknights.tconstruct.library.utils.Util;
-import slimeknights.tconstruct.tools.TinkerModifiers;
 
 import java.util.List;
 
@@ -82,20 +81,9 @@ public abstract class AbstractProtectionModifier<T extends ModifierMaxLevel> ext
     }
   }
 
-  /**
-   * Adds the resistance type tooltip to the armor
-   * @param modifier    Modifier instance
-   * @param tool        Tool getting the tooltip
-   * @param level       Modifier level
-   * @param multiplier  Amount per level
-   * @param tooltip     Tooltip to show
-   */
+  /** @deprecated use {@link ProtectionModule#addResistanceTooltip(IToolStackView, Modifier, float, Player, List)} */
+  @Deprecated
   public static void addResistanceTooltip(Modifier modifier, IToolStackView tool, int level, float multiplier, List<Component> tooltip) {
-    if (tool.hasTag(TinkerTags.Items.ARMOR)) {
-      float cap = Math.min(0.95f, 0.8f + tool.getModifierLevel(TinkerModifiers.boundless.getId()) * 0.1f);
-      tooltip.add(modifier.applyStyle(Component.literal(Util.PERCENT_BOOST_FORMAT.format(Math.min(modifier.getEffectiveLevel(tool, level) * multiplier / 25f, cap)))
-                                        .append(" ")
-                                        .append(Component.translatable(modifier.getTranslationKey() + ".resistance"))));
-    }
+    ProtectionModule.addResistanceTooltip(tool, modifier, modifier.getEffectiveLevel(tool, level) * multiplier, null, tooltip);
   }
 }

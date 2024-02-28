@@ -12,6 +12,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
 import slimeknights.mantle.util.JsonHelper;
+import slimeknights.tconstruct.library.modifiers.modules.behavior.AttributeModule;
 import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 
 import java.util.List;
@@ -20,10 +21,8 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 
-/**
- * Represents an attribute in a modifier
- * TODO 1.19: merge into {@link slimeknights.tconstruct.library.modifiers.modules.AttributeModule}
- */
+/** @deprecated use {@link AttributeModule} */
+@Deprecated
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ModifierAttribute {
   private final String name;
@@ -131,8 +130,9 @@ public class ModifierAttribute {
     return new ModifierAttribute(name, attribute, operation, amount, slotUUIDs);
   }
 
-  /** Gets the UUID from a name */
+  /** @deprecated use {@link AttributeModule#getUUID(String, EquipmentSlot)} */
+  @Deprecated
   public static UUID getUUID(String name, EquipmentSlot slot) {
-    return UUID.nameUUIDFromBytes((name + "." + slot.getName()).getBytes());
+    return AttributeModule.getUUID(name, slot);
   }
 }

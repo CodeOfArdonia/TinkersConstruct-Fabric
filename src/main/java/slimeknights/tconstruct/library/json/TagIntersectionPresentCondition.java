@@ -18,7 +18,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-/** Condition requiring that items exist in the intersection of all required item tags */
+/**
+ * Condition requiring that items exist in the intersection of all required item tags.
+ * TODO 1.19: move to {@code slimeknights.tconsturct.library.json.condition}
+ */
 public class TagIntersectionPresentCondition<T> implements ConditionJsonProvider {
   public static final ResourceLocation NAME = TConstruct.getResource("tag_intersection_present");
 

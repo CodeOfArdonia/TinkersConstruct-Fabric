@@ -28,7 +28,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
 
-/** Modifier that has an inventory */
+/**
+ * Modifier that has an inventory
+ * TODO: migrate to a modifier module
+ */
 @RequiredArgsConstructor
 public class InventoryModifier extends Modifier implements InventoryModifierHook {
   /** Mod Data NBT mapper to get a compound list */

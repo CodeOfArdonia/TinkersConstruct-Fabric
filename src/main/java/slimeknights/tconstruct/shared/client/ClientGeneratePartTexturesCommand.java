@@ -1,6 +1,8 @@
 package slimeknights.tconstruct.shared.client;
 
 import com.google.common.collect.ImmutableList;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.mojang.blaze3d.platform.NativeImage;
@@ -20,6 +22,7 @@ import slimeknights.mantle.util.JsonHelper;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.client.data.material.AbstractMaterialSpriteProvider.MaterialSpriteInfo;
 import slimeknights.tconstruct.library.client.data.material.AbstractPartSpriteProvider.PartSpriteInfo;
+import slimeknights.tconstruct.library.client.data.material.GeneratorPartTextureJsonGenerator.StatOverride;
 import slimeknights.tconstruct.library.client.data.material.MaterialPartTextureGenerator;
 import slimeknights.tconstruct.library.client.data.util.AbstractSpriteReader;
 import slimeknights.tconstruct.library.client.data.util.ResourceManagerSpriteReader;
@@ -42,9 +45,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
@@ -74,8 +80,8 @@ public class ClientGeneratePartTexturesCommand {
     Player player = Minecraft.getInstance().player;
 
     // get the list of sprites
-    List<PartSpriteInfo> partSprites = loadPartSprites(manager);
-    if (partSprites.isEmpty()) {
+    GeneratorConfiguration generatorConfig = loadGeneratorConfig(manager);
+    if (generatorConfig.sprites.isEmpty()) {
       if (player != null) {
         player.displayClientMessage(NO_PARTS, false);
       }
@@ -123,8 +129,8 @@ public class ClientGeneratePartTexturesCommand {
 
     // at this point in time we have all our materials, time to generate our sprites
     for (MaterialSpriteInfo material : materialSprites) {
-      for (PartSpriteInfo part : partSprites) {
-        if (material.supportStatType(part.getStatType())) {
+      for (PartSpriteInfo part : generatorConfig.sprites) {
+        if (material.supportStatType(part.getStatType()) || generatorConfig.statOverrides.hasOverride(part.getStatType(), material.getTexture())) {
           MaterialPartTextureGenerator.generateSprite(spriteReader, material, part, shouldGenerate, saver);
         }
       }
@@ -174,9 +180,14 @@ public class ClientGeneratePartTexturesCommand {
     }
   }
 
+  /** Record holding config from the generator JSON file */
+  private record GeneratorConfiguration(List<PartSpriteInfo> sprites, StatOverride statOverrides) {}
+
   /** Loads all part sprites file */
-  private static List<PartSpriteInfo> loadPartSprites(ResourceManager manager) {
+  private static GeneratorConfiguration loadGeneratorConfig(ResourceManager manager) {
     ImmutableList.Builder<PartSpriteInfo> builder = ImmutableList.builder();
+    StatOverride.Builder stats = new StatOverride.Builder();
+    Map<MaterialStatsId,Set<ResourceLocation>> statOverrides = new HashMap<>();
 
     // each namespace loads separately
     for (String namespace : manager.getNamespaces()) {
@@ -196,6 +207,20 @@ public class ClientGeneratePartTexturesCommand {
               return new PartSpriteInfo(path, statId);
             });
             builder.addAll(parts);
+              if (object.has("overrides")) {
+                for (Entry<String,JsonElement> entry : GsonHelper.getAsJsonObject(object, "overrides").entrySet()) {
+                  String key = entry.getKey();
+                  MaterialStatsId statId = MaterialStatsId.PARSER.tryParse(key);
+                  if (statId == null) {
+                    TConstruct.LOG.error("Invalid stat ID " + key);
+                  } else {
+                    JsonArray array = GsonHelper.convertToJsonArray(entry.getValue(), key);
+                    for (int i = 0; i < array.size(); i++) {
+                      stats.addVariant(statId, MaterialVariantId.parse(GsonHelper.convertToString(array.get(i), key + '[' + i + ']')));
+                    }
+                  }
+                }
+              }
 
             // if we find replace, don't process lower files from this namespace
             if (GsonHelper.getAsBoolean(object, "replace", false)) {
@@ -207,7 +232,7 @@ public class ClientGeneratePartTexturesCommand {
         }
       }
     }
-    return builder.build();
+    return new GeneratorConfiguration(builder.build(), stats.build());
   }
 
   /**

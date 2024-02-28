@@ -50,6 +50,7 @@ public abstract class TinkerModule {
   protected static final FluidDeferredRegister FLUIDS = new FluidDeferredRegister(TConstruct.MOD_ID);
   protected static final SynchronizedDeferredRegister<MobEffect> MOB_EFFECTS = SynchronizedDeferredRegister.create(Registries.MOB_EFFECT, TConstruct.MOD_ID);
   protected static final SynchronizedDeferredRegister<ParticleType<?>> PARTICLE_TYPES = SynchronizedDeferredRegister.create(Registries.PARTICLE_TYPE, TConstruct.MOD_ID);
+  protected static final SynchronizedDeferredRegister<DataSerializerEntry> DATA_SERIALIZERS = SynchronizedDeferredRegister.create(Keys.DATA_SERIALIZERS, TConstruct.MOD_ID);
   // gameplay instances
   protected static final BlockEntityTypeDeferredRegister BLOCK_ENTITIES = new BlockEntityTypeDeferredRegister(TConstruct.MOD_ID);
   protected static final EntityTypeDeferredRegister ENTITIES = new EntityTypeDeferredRegister(TConstruct.MOD_ID);
@@ -80,6 +81,7 @@ public abstract class TinkerModule {
     FLUIDS.register();
     MOB_EFFECTS.register();
     PARTICLE_TYPES.register();
+    DATA_SERIALIZERS.register(bus);
     // gameplay instance
     BLOCK_ENTITIES.register();
     ENTITIES.register();

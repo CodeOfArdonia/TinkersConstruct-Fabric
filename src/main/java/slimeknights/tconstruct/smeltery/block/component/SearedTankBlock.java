@@ -19,6 +19,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import slimeknights.mantle.fluid.FluidTransferHelper;
@@ -36,9 +37,20 @@ import java.util.Locale;
 public class SearedTankBlock extends SearedBlock implements ITankBlock, EntityBlock, BlockPickInteractionAware, LightEmissiveBlock {
   @Getter
   private final long capacity;
-  public SearedTankBlock(Properties properties, long capacity) {
+  private final PushReaction pushReaction;
+  public SearedTankBlock(Properties properties, long capacity, PushReaction pushReaction) {
     super(properties);
     this.capacity = capacity;
+    this.pushReaction = pushReaction;
+  }
+
+  public SearedTankBlock(Properties properties, int capacity) {
+    this(properties, capacity, PushReaction.BLOCK);
+  }
+
+  @Override
+  public PushReaction getPistonPushReaction(BlockState pState) {
+    return pushReaction;
   }
 
   @Deprecated

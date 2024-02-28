@@ -44,6 +44,11 @@ public class TankItem extends BlockTooltipItem implements CustomMaxCountItem {
   }
 
   @Override
+  public boolean hasContainerItem(ItemStack stack) {
+    return isFilled(stack);
+  }
+
+  @Override
   public ItemStack getRecipeRemainder(ItemStack stack) {
     return isFilled(stack) ? new ItemStack(this) : ItemStack.EMPTY;
   }

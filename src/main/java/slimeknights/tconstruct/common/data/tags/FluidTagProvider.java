@@ -101,6 +101,7 @@ public class FluidTagProvider extends FabricTagProvider.FluidTagProvider {
         .addTag(TinkerFluids.enderSlime.getLocalTag());
 
     this.getOrCreateTagBuilder(TinkerTags.Fluids.POTION).add(TinkerFluids.potion.get());
+    this.tag(TinkerTags.Fluids.POWDERED_SNOW).add(TinkerFluids.powderedSnow.get());
 
     // tooltips //
     this.tag(TinkerTags.Fluids.GLASS_TOOLTIPS).addTag(TinkerFluids.moltenGlass.getLocalTag()).addTag(TinkerFluids.liquidSoul.getLocalTag()).addTag(TinkerFluids.moltenObsidian.getLocalTag());

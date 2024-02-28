@@ -1,25 +1,26 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
-  "key": {
-    "B": {
-      "item": "tconstruct:seared_brick"
-    },
-    "G": [
-      {
-        "item": "tconstruct:seared_fuel_gauge"
-      },
-      {
-        "item": "tconstruct:seared_ingot_gauge"
-      }
-    ]
-  },
   "pattern": [
     "BGB",
     "BBB"
   ],
+  "key": {
+    "G": {
+      "type": "tconstruct:no_container",
+      "match": [
+        {
+          "item": "tconstruct:seared_fuel_gauge"
+        },
+        {
+          "item": "tconstruct:seared_ingot_gauge"
+        }
+      ]
+    },
+    "B": {
+      "item": "tconstruct:seared_brick"
+    }
+  },
   "result": {
     "item": "tconstruct:seared_melter"
-  },
-  "show_notification": true
+  }
 }

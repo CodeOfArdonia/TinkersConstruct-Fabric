@@ -25,6 +25,11 @@ import slimeknights.mantle.data.GenericLoaderRegistry.IGenericLoader;
 import slimeknights.mantle.util.JsonHelper;
 import slimeknights.tconstruct.library.modifiers.Modifier;
 import slimeknights.tconstruct.library.modifiers.impl.IncrementalModifier;
+import slimeknights.tconstruct.library.modifiers.modules.behavior.AttributeModule;
+import slimeknights.tconstruct.library.modifiers.modules.behavior.ToolActionsModule;
+import slimeknights.tconstruct.library.modifiers.modules.build.SetStatModule;
+import slimeknights.tconstruct.library.modifiers.modules.build.StatBoostModule;
+import slimeknights.tconstruct.library.modifiers.modules.build.VolatileFlagModule;
 import slimeknights.tconstruct.library.modifiers.util.ModifierAttribute;
 import slimeknights.tconstruct.library.modifiers.util.ModifierLevelDisplay;
 import slimeknights.tconstruct.library.modifiers.util.ModifierStatBoost;
@@ -46,8 +51,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
-/** @deprecated use one or more of {@link slimeknights.tconstruct.library.modifiers.modules.ToolStatModule}, {@link slimeknights.tconstruct.library.modifiers.modules.AttributeModule},
- * {@link slimeknights.tconstruct.library.modifiers.modules.VolatileFlagModule}, or {@link slimeknights.tconstruct.library.modifiers.modules.ToolActionsModule} */
+/** @deprecated use one or more of {@link StatBoostModule}, {@link SetStatModule}, {@link AttributeModule}, {@link VolatileFlagModule}, or {@link ToolActionsModule} */
 @Deprecated
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class StatBoostModifier extends IncrementalModifier {

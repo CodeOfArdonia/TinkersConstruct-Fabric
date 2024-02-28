@@ -1,22 +1,19 @@
 {
   "type": "tconstruct:melting",
-  "byproducts": [
-    {
-      "amount": 81000,
-      "fluid": "tconstruct:molten_glass"
-    }
-  ],
   "ingredient": {
-    "fabric:type": "fabric:nbt",
-    "base": {
-      "item": "tconstruct:seared_fuel_tank"
-    },
-    "strict": true
+    "item": "tconstruct:seared_fuel_tank",
+    "type": "tconstruct:no_container"
   },
   "result": {
-    "amount": 162000,
-    "fluid": "tconstruct:seared_stone"
+    "fluid": "tconstruct:seared_stone",
+    "amount": 2000
   },
   "temperature": 600,
-  "time": 160
+  "time": 160,
+  "byproducts": [
+    {
+      "fluid": "tconstruct:molten_glass",
+      "amount": 1000
+    }
+  ]
 }

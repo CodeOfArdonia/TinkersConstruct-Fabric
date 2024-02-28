@@ -9,11 +9,14 @@ ranged_materials.subtext=これらの素材を鋳造して弓のような遠距�
 
 further_reading=参考文献
 
+armor=旅行者の装備
+armor.subtext=旅行者の装備は改良作業台でクラフトします！これらの防具の防御力は高くはありませんが、防具をアップグレードする機会はまだたくさんあります。ああ、どんな素敵なものを作りますか？
+
 upgrades=アップグレード
 upgrades.subtext=道具はアップグレードで強化できますが、各道具に適用できるのは有限個のみです。
 upgrades.group_general=一般
 upgrades.group_harvest=収穫
-upgrades.group_weapon=近接
+upgrades.group_melee=近接
 upgrades.group_damage=攻撃力上昇
 upgrades.group_armor=防具
 

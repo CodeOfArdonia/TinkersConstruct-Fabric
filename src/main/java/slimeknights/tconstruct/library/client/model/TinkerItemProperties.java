@@ -10,7 +10,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.UseAnim;
 import slimeknights.tconstruct.TConstruct;
-import slimeknights.tconstruct.library.tools.capability.TinkerDataCapability;
 import slimeknights.tconstruct.library.tools.helper.ModifierUtil;
 import slimeknights.tconstruct.library.tools.item.ModifiableLauncherItem;
 import slimeknights.tconstruct.library.tools.nbt.ToolStack;
@@ -18,24 +17,13 @@ import slimeknights.tconstruct.tools.item.ModifiableCrossbowItem;
 
 /** Properties for tinker tools */
 public class TinkerItemProperties {
-  /** ID for the pull property */
+  /** @deprecated use {@link #CHARGE_ID} */
+  @Deprecated
   private static final ResourceLocation PULL_ID = new ResourceLocation("pull");
-  /** Property for bow pull amount */
-  private static final ItemPropertyFunction PULL = (stack, level, holder, seed) -> {
-    if (holder == null || holder.getUseItem() != stack) {
-      return 0.0F;
-    }
-    float drawSpeed = TinkerDataCapability.CAPABILITY.maybeGet(holder).map(data -> data.get(ModifiableLauncherItem.DRAWSPEED)).orElse(1/20f);
-    return (float)(stack.getUseDuration() - holder.getUseItemRemainingTicks()) * drawSpeed;
-  };
 
-  /** ID for the pulling property */
+  /** @deprecated use {@link #CHARGING_ID} */
+  @Deprecated
   private static final ResourceLocation PULLING_ID = new ResourceLocation("pulling");
-  /**
-   * Boolean indicating the bow is pulling
-   * TODO: ditch in favor of charging?
-   */
-  private static final ItemPropertyFunction PULLING = (stack, level, holder, seed) -> holder != null && holder.isUsingItem() && holder.getUseItem() == stack ? 1.0F : 0.0F;
 
   /** ID for ammo property */
   private static final ResourceLocation AMMO_ID = TConstruct.getResource("ammo");
@@ -76,13 +64,17 @@ public class TinkerItemProperties {
     if (holder == null || holder.getUseItem() != stack) {
       return 0.0F;
     }
-    return (float)(stack.getUseDuration() - holder.getUseItemRemainingTicks()) / ModifierUtil.getPersistentInt(stack, ModifiableLauncherItem.KEY_DRAWTIME, 20);
+    int drawtime = ModifierUtil.getPersistentInt(stack, ModifiableLauncherItem.KEY_DRAWTIME, -1);
+    return drawtime == -1 ? 0 : (float)(stack.getUseDuration() - holder.getUseItemRemainingTicks()) / drawtime;
   };
 
-  /** Registers properties for a bow */
+  /**
+   * Registers properties for a bow
+   * TODO 1.19: switch IDs to charging IDs
+   */
   public static void registerBowProperties(Item item) {
-    ItemProperties.PROPERTIES.computeIfAbsent(item, itemx -> Maps.newHashMap()).put(PULL_ID, PULL);
-    ItemProperties.PROPERTIES.computeIfAbsent(item, itemx -> Maps.newHashMap()).put(PULLING_ID, PULLING);
+    ItemProperties.PROPERTIES.computeIfAbsent(item, itemx -> Maps.newHashMap()).put(PULL_ID, CHARGE);
+    ItemProperties.PROPERTIES.computeIfAbsent(item, itemx -> Maps.newHashMap()).put(PULLING_ID, CHARGING);
   }
 
   /** Registers properties for a bow */

@@ -1,20 +1,31 @@
 {
   "type": "tconstruct:modifier",
-  "allow_crystal": true,
   "inputs": [
     {
       "item": "minecraft:powder_snow_bucket"
     }
   ],
-  "max_level": 2,
-  "result": {
-    "level": 1,
-    "name": "tconstruct:freezing"
-  },
+  "tools": [
+    {
+      "tag": "tconstruct:modifiable/melee_or_unarmed"
+    },
+    {
+      "tag": "tconstruct:modifiable/ranged/bows"
+    },
+    {
+      "tag": "tconstruct:modifiable/armor/worn"
+    },
+    {
+      "tag": "tconstruct:modifiable/shields"
+    }
+  ],
   "slots": {
     "upgrades": 1
   },
-  "tools": {
-    "tag": "tconstruct:modifiable/ranged/bows"
-  }
+  "allow_crystal": true,
+  "result": {
+    "name": "tconstruct:freezing",
+    "level": 1
+  },
+  "max_level": 3
 }

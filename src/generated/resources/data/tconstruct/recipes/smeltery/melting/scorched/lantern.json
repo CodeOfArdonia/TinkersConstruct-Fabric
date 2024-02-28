@@ -1,26 +1,23 @@
 {
   "type": "tconstruct:melting",
-  "byproducts": [
-    {
-      "amount": 2025,
-      "fluid": "tconstruct:molten_quartz"
-    },
-    {
-      "amount": 3000,
-      "fluid": "tconstruct:molten_iron"
-    }
-  ],
   "ingredient": {
-    "fabric:type": "fabric:nbt",
-    "base": {
-      "item": "tconstruct:scorched_lantern"
-    },
-    "strict": true
+    "item": "tconstruct:scorched_lantern",
+    "type": "tconstruct:no_container"
   },
   "result": {
-    "amount": 40500,
-    "fluid": "tconstruct:scorched_stone"
+    "fluid": "tconstruct:scorched_stone",
+    "amount": 500
   },
   "temperature": 500,
-  "time": 50
+  "time": 50,
+  "byproducts": [
+    {
+      "fluid": "tconstruct:molten_quartz",
+      "amount": 25
+    },
+    {
+      "fluid": "tconstruct:molten_iron",
+      "amount": 30
+    }
+  ]
 }
