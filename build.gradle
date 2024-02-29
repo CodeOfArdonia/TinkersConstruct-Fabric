@@ -161,6 +161,8 @@ dependencies {
         exclude(group: "net.fabricmc.fabric-api")
     }
 
+    modCompileOnly("curse.maven:diet-443570:4813902")
+
     // Sodium
 //    modImplementation "maven.modrinth:sodium:mc1.20.1-0.5.2"
 //    modImplementation("maven.modrinth:indium:1.0.25+mc1.20.1")

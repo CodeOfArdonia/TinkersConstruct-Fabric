@@ -1,9 +1,9 @@
 package slimeknights.tconstruct.tools.modifiers.ability.fluid;
 
-import com.mojang.math.Quaternion;
-import com.mojang.math.Vector3f;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import lombok.Getter;
 import lombok.Setter;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -20,8 +20,6 @@ import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.fluids.FluidAttributes;
-import net.minecraftforge.fluids.FluidStack;
 import slimeknights.tconstruct.fluids.TinkerFluids;
 import slimeknights.tconstruct.library.modifiers.Modifier;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
@@ -54,7 +52,7 @@ public class SpittingModifier extends Modifier implements GeneralInteractionModi
   @Override
   protected void registerHooks(Builder builder) {
     builder.addHook(this, TinkerHooks.CHARGEABLE_INTERACT);
-    tank = new TankModule(FluidAttributes.BUCKET_VOLUME, true);
+    tank = new TankModule(FluidConstants.BUCKET, true);
     builder.addModule(tank);
   }
 
@@ -72,7 +70,7 @@ public class SpittingModifier extends Modifier implements GeneralInteractionModi
   public InteractionResult onToolUse(IToolStackView tool, ModifierEntry modifier, Player player, InteractionHand hand, InteractionSource source) {
     if (!tool.isBroken() && source == InteractionSource.RIGHT_CLICK) {
       FluidStack fluid = tank.getFluid(tool);
-      if (fluid.getAmount() >= (1 + 2 * (modifier.getLevel() - 1)) && SpillingFluidManager.INSTANCE.contains(fluid.getFluid())) {
+      if (fluid.getAmount() >= (1 + 2L * (modifier.getLevel() - 1)) && SpillingFluidManager.INSTANCE.contains(fluid.getFluid())) {
         ModifierUtil.startUsingItemWithDrawtime(tool, modifier.getId(), player, hand, 1.5f);
         return InteractionResult.SUCCESS;
       }
@@ -88,7 +86,7 @@ public class SpittingModifier extends Modifier implements GeneralInteractionModi
   @Override
   public boolean onStoppedUsing(IToolStackView tool, ModifierEntry modifier, LivingEntity entity, int timeLeft) {
     ScopeModifier.stopScoping(entity);
-    if (!entity.level.isClientSide) {
+    if (!entity.level().isClientSide) {
       int chargeTime = getUseDuration(tool, modifier) - timeLeft;
       if (chargeTime > 0) {
         // find the fluid to spit
@@ -104,7 +102,7 @@ public class SpittingModifier extends Modifier implements GeneralInteractionModi
             int level = modifier.getLevel();
             // amount is the amount per projectile, total cost is amount times level (every other shot is free)
             // if its 0, that means we have only a couple mb left
-            int amount = Math.min(fluid.getAmount(), (int)(recipe.getAmount(fluid) * power) * level) / level;
+            long amount = Math.min(fluid.getAmount(), (int)(recipe.getAmount(fluid) * power) * level) / level;
             if (amount > 0) {
               // other stats now that we know we are shooting
               // velocity determines how far it goes, does not impact damage unlike bows
@@ -116,7 +114,7 @@ public class SpittingModifier extends Modifier implements GeneralInteractionModi
               float startAngle = ModifiableLauncherItem.getAngleStart(shots);
               int primaryIndex = shots / 2;
               for (int shotIndex = 0; shotIndex < shots; shotIndex++) {
-                FluidSpitEntity spit = new FluidSpitEntity(entity.level, entity, new FluidStack(fluid, amount), (int)Math.ceil(power));
+                FluidSpitEntity spit = new FluidSpitEntity(entity.level(), entity, new FluidStack(fluid, amount), (int)Math.ceil(power));
 
                 // setup projectile target
                 Vector3f targetVector = new Vector3f(entity.getViewVector(1.0f));
@@ -125,7 +123,7 @@ public class SpittingModifier extends Modifier implements GeneralInteractionModi
                 spit.shoot(targetVector.x(), targetVector.y(), targetVector.z(), velocity, inaccuracy);
 
                 // store all modifiers on the spit
-                spit.getCapability(EntityModifierCapability.CAPABILITY).ifPresent(cap -> cap.setModifiers(tool.getModifiers()));
+                EntityModifierCapability.CAPABILITY.maybeGet(spit).ifPresent(cap -> cap.setModifiers(tool.getModifiers()));
 
                 // fetch the persistent data for the arrow as modifiers may want to store data
                 NamespacedNBT arrowData = PersistentDataCapability.getOrWarn(spit);
@@ -135,8 +133,8 @@ public class SpittingModifier extends Modifier implements GeneralInteractionModi
                 }
 
                 // finally, fire the projectile
-                entity.level.addFreshEntity(spit);
-                entity.level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.LLAMA_SPIT, SoundSource.PLAYERS, 1.0F, 1.0F / (entity.level.getRandom().nextFloat() * 0.4F + 1.2F) + charge * 0.5F + (angle / 10f));
+                entity.level().addFreshEntity(spit);
+                entity.level().playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.LLAMA_SPIT, SoundSource.PLAYERS, 1.0F, 1.0F / (entity.level().getRandom().nextFloat() * 0.4F + 1.2F) + charge * 0.5F + (angle / 10f));
 
               }
 
@@ -185,7 +183,7 @@ public class SpittingModifier extends Modifier implements GeneralInteractionModi
     @Override
     protected void onHitEntity(EntityHitResult result) {
       FluidStack fluid = getFluid();
-      if (!level.isClientSide && !fluid.isEmpty() && getOwner() instanceof LivingEntity living) {
+      if (!level().isClientSide && !fluid.isEmpty() && getOwner() instanceof LivingEntity living) {
         SpillingFluid recipe = SpillingFluidManager.INSTANCE.find(fluid.getFluid());
         Entity target = result.getEntity();
         if (recipe.hasEffects()) {

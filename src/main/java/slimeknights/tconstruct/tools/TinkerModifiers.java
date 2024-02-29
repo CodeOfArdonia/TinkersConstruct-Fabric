@@ -1,6 +1,7 @@
 package slimeknights.tconstruct.tools;
 
 import com.mojang.serialization.Codec;
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import io.github.fabricators_of_create.porting_lib.tool.ToolAction;
 import io.github.fabricators_of_create.porting_lib.tool.ToolActions;
 import io.github.fabricators_of_create.porting_lib.util.RegistryObject;

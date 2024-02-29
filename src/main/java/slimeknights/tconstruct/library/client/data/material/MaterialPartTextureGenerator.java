@@ -44,10 +44,10 @@ public class MaterialPartTextureGenerator extends GenericTextureGenerator {
   private final StatOverride overrides;
 
   public MaterialPartTextureGenerator(FabricDataOutput output, ExistingFileHelper existingFileHelper, AbstractPartSpriteProvider spriteProvider, AbstractMaterialSpriteProvider... materialProviders) {
-    this(generator, existingFileHelper, spriteProvider, StatOverride.EMPTY, materialProviders);
+    this(output, existingFileHelper, spriteProvider, StatOverride.EMPTY, materialProviders);
   }
 
-  public MaterialPartTextureGenerator(DataGenerator generator, ExistingFileHelper existingFileHelper, AbstractPartSpriteProvider spriteProvider, StatOverride overrides, AbstractMaterialSpriteProvider... materialProviders) {
+  public MaterialPartTextureGenerator(FabricDataOutput output, ExistingFileHelper existingFileHelper, AbstractPartSpriteProvider spriteProvider, StatOverride overrides, AbstractMaterialSpriteProvider... materialProviders) {
     super(output, FOLDER);
     this.spriteReader = new DataGenSpriteReader(existingFileHelper, FOLDER);
     this.existingFileHelper = existingFileHelper;

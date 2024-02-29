@@ -2,7 +2,6 @@ package slimeknights.tconstruct.library.modifiers.hook.combat;
 
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraftforge.common.util.LazyOptional;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.library.tools.capability.TinkerDataCapability;
 import slimeknights.tconstruct.library.tools.capability.TinkerDataKeys;
@@ -10,6 +9,7 @@ import slimeknights.tconstruct.library.tools.context.EquipmentContext;
 import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 
 import java.util.Collection;
+import java.util.Optional;
 
 /**
  * Hook for increasing or decreasing protection from a given damage source.
@@ -35,8 +35,8 @@ public interface ProtectionModifierHook {
   float getProtectionModifier(IToolStackView tool, ModifierEntry modifier, EquipmentContext context, EquipmentSlot slotType, DamageSource source, float modifierValue);
 
   /** Gets the maximum protection amount on the given entity */
-  static float getProtectionCap(LazyOptional<TinkerDataCapability.Holder> capability) {
-    return Math.min(20 + capability.resolve().map(data -> data.get(TinkerDataKeys.PROTECTION_CAP)).orElse(0f), 25 * 0.95f);
+  static float getProtectionCap(Optional<TinkerDataCapability.Holder> capability) {
+    return Math.min(20 + capability.map(data -> data.get(TinkerDataKeys.PROTECTION_CAP)).orElse(0f), 25 * 0.95f);
   }
 
   /** Merger that combines all values */

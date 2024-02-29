@@ -31,11 +31,11 @@ public class TankCapacityModule implements ModifierModule, VolatileDataModifierH
   /** Volatile NBT integer indicating the tank's max capacity */
   private final ResourceLocation capacityKey;
   /** Max capacity added by this module */
-  private final int capacity;
+  private final long capacity;
   /** If true, capacity scales with level */
   private final boolean scaleCapacity;
 
-  public TankCapacityModule(int capacity, boolean scaleCapacity) {
+  public TankCapacityModule(long capacity, boolean scaleCapacity) {
     this(DEFAULT_CAPACITY_KEY, capacity, scaleCapacity);
   }
 
@@ -47,7 +47,7 @@ public class TankCapacityModule implements ModifierModule, VolatileDataModifierH
   @Override
   public void addVolatileData(ToolRebuildContext context, ModifierEntry modifier, ModDataNBT volatileData) {
     ResourceLocation key = getCapacityKey();
-    volatileData.putInt(key, capacity * modifier.getLevel() + volatileData.getInt(key));
+    volatileData.putLong(key, capacity * modifier.getLevel() + volatileData.getInt(key));
   }
 
   @Override
@@ -63,7 +63,7 @@ public class TankCapacityModule implements ModifierModule, VolatileDataModifierH
   public static final IGenericLoader<TankCapacityModule> LOADER = new IGenericLoader<>() {
     @Override
     public TankCapacityModule deserialize(JsonObject json) {
-      int capacity = GsonHelper.getAsInt(json, "capacity");
+      long capacity = GsonHelper.getAsLong(json, "capacity");
       boolean scaleCapacity = GsonHelper.getAsBoolean(json, "scale_capacity");
       ResourceLocation capacityKey = JsonHelper.getResourceLocation(json, "capacity_key", DEFAULT_CAPACITY_KEY);
       return new TankCapacityModule(capacityKey, capacity, scaleCapacity);
@@ -81,7 +81,7 @@ public class TankCapacityModule implements ModifierModule, VolatileDataModifierH
     @Override
     public TankCapacityModule fromNetwork(FriendlyByteBuf buffer) {
       ResourceLocation capacityKey = buffer.readResourceLocation();
-      int capacity = buffer.readVarInt();
+      long capacity = buffer.readLong();
       boolean scaleCapacity = buffer.readBoolean();
       return new TankCapacityModule(capacityKey, capacity, scaleCapacity);
     }
@@ -89,7 +89,7 @@ public class TankCapacityModule implements ModifierModule, VolatileDataModifierH
     @Override
     public void toNetwork(TankCapacityModule object, FriendlyByteBuf buffer) {
       buffer.writeResourceLocation(object.capacityKey);
-      buffer.writeVarInt(object.capacity);
+      buffer.writeLong(object.capacity);
       buffer.writeBoolean(object.scaleCapacity);
     }
   };

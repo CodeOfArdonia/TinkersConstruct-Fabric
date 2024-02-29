@@ -18,11 +18,14 @@ import slimeknights.tconstruct.library.materials.definition.MaterialVariantId;
 import slimeknights.tconstruct.library.materials.stats.MaterialStatsId;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 /** Generates the file that tells the part generator command which parts are needed for your tools */
 public class GeneratorPartTextureJsonGenerator extends GenericDataProvider {
@@ -39,10 +42,10 @@ public class GeneratorPartTextureJsonGenerator extends GenericDataProvider {
   private final StatOverride overrides;
 
   public GeneratorPartTextureJsonGenerator(FabricDataOutput output, String modId, AbstractPartSpriteProvider spriteProvider) {
-    this(generator, modId, spriteProvider, StatOverride.EMPTY);
+    this(output, modId, spriteProvider, StatOverride.EMPTY);
   }
 
-  public GeneratorPartTextureJsonGenerator(DataGenerator generator, String modId, AbstractPartSpriteProvider spriteProvider, StatOverride overrides) {
+  public GeneratorPartTextureJsonGenerator(FabricDataOutput output, String modId, AbstractPartSpriteProvider spriteProvider, StatOverride overrides) {
     super(output, PackType.CLIENT_RESOURCES, "tinkering", GSON);
     this.modId = modId;
     this.spriteProvider = spriteProvider;

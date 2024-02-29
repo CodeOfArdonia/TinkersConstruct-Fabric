@@ -2,14 +2,15 @@ package slimeknights.tconstruct.library.client.book.content;
 
 import com.google.common.collect.Lists;
 import com.google.gson.annotations.SerializedName;
+import io.github.fabricators_of_create.porting_lib.util.ForgeI18n;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.ForgeI18n;
 import slimeknights.mantle.client.book.data.BookData;
 import slimeknights.mantle.client.book.data.content.PageContent;
 import slimeknights.mantle.client.book.data.element.ImageData;
@@ -109,7 +110,7 @@ public class ContentModifier extends PageContent {
       return null;
     }
     if (this.toolFilterTag == null) {
-      this.toolFilterTag = TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation(toolFilter));
+      this.toolFilterTag = TagKey.create(Registries.ITEM, new ResourceLocation(toolFilter));
     }
     return this.toolFilterTag;
   }

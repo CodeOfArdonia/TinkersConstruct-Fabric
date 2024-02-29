@@ -11,7 +11,7 @@ public record EntityLightVariable(LightLayer lightLayer) implements EntityVariab
 
   @Override
   public float getValue(LivingEntity entity) {
-    return entity.level.getBrightness(lightLayer, entity.blockPosition());
+    return entity.level().getBrightness(lightLayer, entity.blockPosition());
   }
 
   @Override

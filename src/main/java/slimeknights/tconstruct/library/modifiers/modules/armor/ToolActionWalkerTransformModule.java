@@ -1,11 +1,13 @@
 package slimeknights.tconstruct.library.modifiers.modules.armor;
 
 import com.google.gson.JsonObject;
+import io.github.fabricators_of_create.porting_lib.tool.ToolAction;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -17,9 +19,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
-import net.minecraftforge.common.ToolAction;
-import net.minecraftforge.registries.ForgeRegistries;
 import slimeknights.mantle.data.GenericLoaderRegistry.IGenericLoader;
 import slimeknights.mantle.util.JsonHelper;
 import slimeknights.tconstruct.library.json.LevelingValue;
@@ -72,7 +71,7 @@ public record ToolActionWalkerTransformModule(ToolAction action, SoundEvent soun
 
   @Override
   public MutableUseOnContext getContext(IToolStackView tool, ModifierEntry modifier, LivingEntity living, BlockPos prevPos, BlockPos newPos) {
-    return new MutableUseOnContext(living.getLevel(), living instanceof Player p ? p : null, InteractionHand.MAIN_HAND, living.getItemBySlot(EquipmentSlot.FEET), Util.createTraceResult(newPos, Direction.UP, false));
+    return new MutableUseOnContext(living.level(), living instanceof Player p ? p : null, InteractionHand.MAIN_HAND, living.getItemBySlot(EquipmentSlot.FEET), Util.createTraceResult(newPos, Direction.UP, false));
   }
 
   @Override
@@ -103,7 +102,7 @@ public record ToolActionWalkerTransformModule(ToolAction action, SoundEvent soun
     public ToolActionWalkerTransformModule deserialize(JsonObject json) {
       return new ToolActionWalkerTransformModule(
         ToolAction.get(GsonHelper.getAsString(json, "tool_action")),
-        JsonHelper.getAsEntry(ForgeRegistries.SOUND_EVENTS, json, "sound"),
+        JsonHelper.getAsEntry(BuiltInRegistries.SOUND_EVENT, json, "sound"),
         LevelingValue.deserialize(GsonHelper.getAsJsonObject(json, "radius")),
         ModifierModuleCondition.deserializeFrom(json)
       );
@@ -113,7 +112,7 @@ public record ToolActionWalkerTransformModule(ToolAction action, SoundEvent soun
     public void serialize(ToolActionWalkerTransformModule object, JsonObject json) {
       object.condition.serializeInto(json);
       json.addProperty("tool_action", object.action.name());
-      json.addProperty("sound", Objects.requireNonNull(object.sound.getRegistryName()).toString());
+      json.addProperty("sound", Objects.requireNonNull(BuiltInRegistries.SOUND_EVENT.getKey(object.sound)).toString());
       json.add("radius", object.radius.serialize(new JsonObject()));
     }
 
@@ -121,7 +120,7 @@ public record ToolActionWalkerTransformModule(ToolAction action, SoundEvent soun
     public ToolActionWalkerTransformModule fromNetwork(FriendlyByteBuf buffer) {
       return new ToolActionWalkerTransformModule(
         ToolAction.get(buffer.readUtf(Short.MAX_VALUE)),
-        buffer.readRegistryIdUnsafe(ForgeRegistries.SOUND_EVENTS),
+        BuiltInRegistries.SOUND_EVENT.byId(buffer.readVarInt()),
         LevelingValue.fromNetwork(buffer),
         ModifierModuleCondition.fromNetwork(buffer)
       );
@@ -130,7 +129,7 @@ public record ToolActionWalkerTransformModule(ToolAction action, SoundEvent soun
     @Override
     public void toNetwork(ToolActionWalkerTransformModule object, FriendlyByteBuf buffer) {
       buffer.writeUtf(object.action.name());
-      buffer.writeRegistryIdUnsafe(ForgeRegistries.SOUND_EVENTS, object.sound);
+      buffer.writeVarInt(BuiltInRegistries.SOUND_EVENT.getId(object.sound));
       object.radius.toNetwork(buffer);
       object.condition.toNetwork(buffer);
     }

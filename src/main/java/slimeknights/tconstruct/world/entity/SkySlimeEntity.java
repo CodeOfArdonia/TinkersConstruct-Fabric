@@ -3,6 +3,7 @@ package slimeknights.tconstruct.world.entity;
 import io.github.fabricators_of_create.porting_lib.entity.events.LivingEntityEvents;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
@@ -26,7 +27,6 @@ import slimeknights.tconstruct.tools.item.ArmorSlotType;
 import slimeknights.tconstruct.world.TinkerWorld;
 
 import java.util.List;
-import java.util.Random;
 
 public class SkySlimeEntity extends ArmoredSlimeEntity {
   private double bounceAmount = 0f;
@@ -80,7 +80,7 @@ public class SkySlimeEntity extends ArmoredSlimeEntity {
   }
 
   @Override
-  protected void populateDefaultEquipmentSlots(RandomSource randomSource, DifficultyInstance difficulty) {
+  protected void populateDefaultEquipmentSlots(RandomSource random, DifficultyInstance difficulty) {
     // sky slime spawns with tinkers armor, high chance of travelers, low chance of plate
     // vanilla logic but simplified down to just helmets
     float multiplier = difficulty.getSpecialMultiplier();
@@ -125,7 +125,7 @@ public class SkySlimeEntity extends ArmoredSlimeEntity {
   }
 
   /** Gets a random defense modifier from the tag */
-  private static ModifierId randomModifier(Random random, TagKey<Modifier> tag) {
+  private static ModifierId randomModifier(RandomSource random, TagKey<Modifier> tag) {
     List<Modifier> options = ModifierManager.getTagValues(tag);
     return options.get(random.nextInt(options.size())).getId();
   }

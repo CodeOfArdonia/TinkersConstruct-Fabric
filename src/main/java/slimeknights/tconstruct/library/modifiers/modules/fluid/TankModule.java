@@ -1,18 +1,16 @@
 package slimeknights.tconstruct.library.modifiers.modules.fluid;
 
 import com.google.gson.JsonObject;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import lombok.Getter;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import slimeknights.mantle.client.TooltipKey;
 import slimeknights.mantle.data.GenericLoaderRegistry.IGenericLoader;
 import slimeknights.mantle.util.JsonHelper;
@@ -57,13 +55,13 @@ public class TankModule extends TankCapacityModule implements FluidModifierHook,
   @Getter
   private final ResourceLocation fluidKey;
 
-  public TankModule(ResourceLocation capacityKey, int capacity, boolean scaleCapacity, ResourceLocation fluidKey, ResourceLocation ownerKey) {
+  public TankModule(ResourceLocation capacityKey, long capacity, boolean scaleCapacity, ResourceLocation fluidKey, ResourceLocation ownerKey) {
     super(capacityKey, capacity, scaleCapacity);
     this.ownerKey = ownerKey;
     this.fluidKey = fluidKey;
   }
 
-  public TankModule(int capacity, boolean scaleCapacity) {
+  public TankModule(long capacity, boolean scaleCapacity) {
     this(DEFAULT_CAPACITY_KEY, capacity, scaleCapacity, DEFAULT_FLUID_KEY, DEFAULT_OWNER_KEY);
   }
 
@@ -72,9 +70,9 @@ public class TankModule extends TankCapacityModule implements FluidModifierHook,
     if (isOwner(tool, modifier.getId())) {
       FluidStack current = getFluid(tool);
       if (!current.isEmpty()) {
-        tooltip.add(new TranslatableComponent(FILLED_KEY, current.getAmount(), current.getDisplayName()));
+        tooltip.add(Component.translatable(FILLED_KEY, current.getAmount(), current.getDisplayName()));
       }
-      tooltip.add(new TranslatableComponent(CAPACITY_KEY, getCapacity(tool)));
+      tooltip.add(Component.translatable(CAPACITY_KEY, getCapacity(tool)));
     }
   }
 
@@ -96,7 +94,7 @@ public class TankModule extends TankCapacityModule implements FluidModifierHook,
   }
 
   @Override
-  public int getTankCapacity(IToolStackView tool, ModifierEntry modifier, int tank) {
+  public long getTankCapacity(IToolStackView tool, ModifierEntry modifier, int tank) {
     return isOwner(tool, modifier.getId()) ? getCapacity(tool) : 0;
   }
 

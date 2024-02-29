@@ -1,5 +1,7 @@
 package slimeknights.tconstruct.tools.modifiers.ability.armor;
 
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -7,8 +9,6 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.EquipmentSlot.Type;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.fluids.FluidAttributes;
-import net.minecraftforge.fluids.FluidStack;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.library.modifiers.impl.TankModifier;
 import slimeknights.tconstruct.library.modifiers.spilling.SpillingFluid;
@@ -24,13 +24,13 @@ import javax.annotation.Nullable;
 /** Modifier to handle spilling recipes onto self when attacked */
 public abstract class UseFluidOnHitModifier extends TankModifier {
   public UseFluidOnHitModifier() {
-    super(FluidAttributes.BUCKET_VOLUME);
+    super(FluidConstants.BUCKET);
   }
 
   /** Spawns particles at the given entity */
   public static void spawnParticles(Entity target, FluidStack fluid) {
-    if (target.level instanceof ServerLevel) {
-      ((ServerLevel)target.level).sendParticles(new FluidParticleData(TinkerCommons.fluidParticle.get(), fluid), target.getX(), target.getY(0.5), target.getZ(), 10, 0.1, 0.2, 0.1, 0.2);
+    if (target.level() instanceof ServerLevel) {
+      ((ServerLevel)target.level()).sendParticles(new FluidParticleData(TinkerCommons.fluidParticle.get(), fluid), target.getX(), target.getY(0.5), target.getZ(), 10, 0.1, 0.2, 0.1, 0.2);
     }
   }
 

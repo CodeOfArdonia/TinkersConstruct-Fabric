@@ -3,13 +3,13 @@ package slimeknights.tconstruct.library.modifiers.modules.behavior;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
-import net.minecraftforge.registries.ForgeRegistries;
 import slimeknights.mantle.data.GenericLoaderRegistry.IGenericLoader;
 import slimeknights.mantle.util.JsonHelper;
 import slimeknights.tconstruct.library.json.LevelingValue;
@@ -77,7 +77,7 @@ public record AttributeModule(String unique, Attribute attribute, Operation oper
     public AttributeModule deserialize(JsonObject json) {
       String unique = GsonHelper.getAsString(json, "unique");
       return new AttributeModule(unique,
-        JsonHelper.getAsEntry(ForgeRegistries.ATTRIBUTES, json, "attribute"),
+        JsonHelper.getAsEntry(BuiltInRegistries.ATTRIBUTE, json, "attribute"),
         JsonHelper.getAsEnum(json, "operation", Operation.class),
         LevelingValue.deserialize(json),
         slotsToUUIDs(unique, JsonHelper.parseList(json, "slots", SLOT_PARSER)),
@@ -89,7 +89,7 @@ public record AttributeModule(String unique, Attribute attribute, Operation oper
     public void serialize(AttributeModule object, JsonObject json) {
       object.condition.serializeInto(json);
       json.addProperty("unique", object.unique);
-      json.addProperty("attribute", Objects.requireNonNull(object.attribute.getRegistryName()).toString());
+      json.addProperty("attribute", Objects.requireNonNull(BuiltInRegistries.ATTRIBUTE.getKey(object.attribute)).toString());
       json.addProperty("operation", object.operation.name().toLowerCase(Locale.ROOT));
       object.amount.serialize(json);
       JsonArray array = new JsonArray();
@@ -112,7 +112,7 @@ public record AttributeModule(String unique, Attribute attribute, Operation oper
         }
       }
       return new AttributeModule(name,
-        buffer.readRegistryIdUnsafe(ForgeRegistries.ATTRIBUTES),
+        BuiltInRegistries.ATTRIBUTE.byId(buffer.readVarInt()),
         buffer.readEnum(Operation.class),
         LevelingValue.fromNetwork(buffer),
         slotUUIDs,
@@ -130,7 +130,7 @@ public record AttributeModule(String unique, Attribute attribute, Operation oper
         }
       }
       buffer.writeByte(packed);
-      buffer.writeRegistryIdUnsafe(ForgeRegistries.ATTRIBUTES, object.attribute);
+      buffer.writeVarInt(BuiltInRegistries.ATTRIBUTE.getId(object.attribute));
       buffer.writeEnum(object.operation);
       object.amount.toNetwork(buffer);
       object.condition.toNetwork(buffer);

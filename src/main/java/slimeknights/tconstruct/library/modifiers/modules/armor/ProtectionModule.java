@@ -5,10 +5,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -16,7 +15,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraftforge.registries.ForgeRegistries;
 import slimeknights.mantle.client.TooltipKey;
 import slimeknights.mantle.data.GenericLoaderRegistry.IGenericLoader;
 import slimeknights.mantle.data.predicate.IJsonPredicate;
@@ -78,13 +76,13 @@ public record ProtectionModule(IJsonPredicate<DamageSource> source, IJsonPredica
   public static void addResistanceTooltip(IToolStackView tool, Modifier modifier, float amount, @Nullable Player player, List<Component> tooltip) {
     float cap;
     if (player != null) {
-      cap = ProtectionModifierHook.getProtectionCap(player.getCapability(TinkerDataCapability.CAPABILITY));
+      cap = ProtectionModifierHook.getProtectionCap(TinkerDataCapability.CAPABILITY.maybeGet(player));
     } else {
       cap = Math.min(20f + tool.getModifierLevel(TinkerModifiers.boundless.getId()) * 2.5f, 20 * 0.95f);
     }
     tooltip.add(modifier.applyStyle(
-      new TextComponent(Util.PERCENT_BOOST_FORMAT.format(Math.min(amount, cap) / 25f))
-        .append(" ").append(new TranslatableComponent(modifier.getTranslationKey() + ".resistance"))));
+      Component.literal(Util.PERCENT_BOOST_FORMAT.format(Math.min(amount, cap) / 25f))
+        .append(" ").append(Component.translatable(modifier.getTranslationKey() + ".resistance"))));
   }
 
   @Override
@@ -104,7 +102,7 @@ public record ProtectionModule(IJsonPredicate<DamageSource> source, IJsonPredica
     public ProtectionModule deserialize(JsonObject json) {
       Enchantment enchantment = null;
       if (json.has("subtract_enchantment")) {
-        enchantment = JsonHelper.getAsEntry(ForgeRegistries.ENCHANTMENTS, json, "subtract_enchantment");
+        enchantment = JsonHelper.getAsEntry(BuiltInRegistries.ENCHANTMENT, json, "subtract_enchantment");
       }
       return new ProtectionModule(
         DamageSourcePredicate.LOADER.getAndDeserialize(json, "damage_source"),
@@ -119,7 +117,7 @@ public record ProtectionModule(IJsonPredicate<DamageSource> source, IJsonPredica
       json.add("wearing_entity", LivingEntityPredicate.LOADER.serialize(object.entity));
       object.amount.serialize(json);
       if (object.subtract != null) {
-        json.addProperty("subtract_enchantment", Objects.requireNonNull(object.subtract.getRegistryName()).toString());
+        json.addProperty("subtract_enchantment", Objects.requireNonNull(BuiltInRegistries.ENCHANTMENT.getKey(object.subtract)).toString());
       }
     }
 
@@ -127,7 +125,7 @@ public record ProtectionModule(IJsonPredicate<DamageSource> source, IJsonPredica
     public ProtectionModule fromNetwork(FriendlyByteBuf buffer) {
       Enchantment enchantment = null;
       if (buffer.readBoolean()) {
-        enchantment = buffer.readRegistryIdUnsafe(ForgeRegistries.ENCHANTMENTS);
+        enchantment = BuiltInRegistries.ENCHANTMENT.byId(buffer.readVarInt());
       }
       return new ProtectionModule(
         DamageSourcePredicate.LOADER.fromNetwork(buffer), LivingEntityPredicate.LOADER.fromNetwork(buffer),
@@ -138,7 +136,7 @@ public record ProtectionModule(IJsonPredicate<DamageSource> source, IJsonPredica
     public void toNetwork(ProtectionModule object, FriendlyByteBuf buffer) {
       if (object.subtract != null) {
         buffer.writeBoolean(true);
-        buffer.writeRegistryIdUnsafe(ForgeRegistries.ENCHANTMENTS, object.subtract);
+        buffer.writeVarInt(BuiltInRegistries.ENCHANTMENT.getId(object.subtract));
       } else {
         buffer.writeBoolean(false);
       }

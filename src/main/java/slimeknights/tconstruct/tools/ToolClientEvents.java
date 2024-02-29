@@ -17,6 +17,7 @@ import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.client.player.Input;
 import net.minecraft.client.renderer.entity.ItemEntityRenderer;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -112,7 +113,7 @@ public class ToolClientEvents extends ClientEventBase {
   static void registerRenderers() {
     EntityRendererRegistry.register(TinkerTools.indestructibleItem.get(), ItemEntityRenderer::new);
     EntityRendererRegistry.register(TinkerTools.crystalshotEntity.get(), CrystalshotRenderer::new);
-    event.registerEntityRenderer(TinkerModifiers.fluidSpitEntity.get(), FluidSpitRenderer::new);
+    EntityRendererRegistry.register(TinkerModifiers.fluidSpitEntity.get(), FluidSpitRenderer::new);
   }
 
   public static void clientSetupEvent() {
@@ -166,7 +167,7 @@ public class ToolClientEvents extends ClientEventBase {
   }
 
   static void registerParticleFactories() {
-    ParticleEngine.SpriteParticleRegistration<SimpleParticleType> factory = AttackParticle.Factory::new;
+    ParticleFactoryRegistry.PendingParticleFactory<SimpleParticleType> factory = AttackParticle.Factory::new;
     ParticleFactoryRegistry.getInstance().register(TinkerTools.hammerAttackParticle.get(), factory);
     ParticleFactoryRegistry.getInstance().register(TinkerTools.axeAttackParticle.get(), factory);
     ParticleFactoryRegistry.getInstance().register(TinkerTools.bonkAttackParticle.get(), factory);

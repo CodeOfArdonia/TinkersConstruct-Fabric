@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -12,7 +13,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraftforge.registries.ForgeRegistries;
 import slimeknights.mantle.data.GenericLoaderRegistry.IGenericLoader;
 import slimeknights.mantle.util.JsonHelper;
 import slimeknights.tconstruct.library.modifiers.Modifier;
@@ -81,7 +81,7 @@ public interface EnchantmentModule extends ModifierModule {
     @Override
     public EnchantmentModule deserialize(JsonObject json) {
       return constructor.apply(
-        JsonHelper.getAsEntry(ForgeRegistries.ENCHANTMENTS, json, "name"),
+        JsonHelper.getAsEntry(BuiltInRegistries.ENCHANTMENT, json, "name"),
         JsonUtils.getIntMin(json, "level", 1),
         ModifierModuleCondition.deserializeFrom(json));
     }
@@ -89,21 +89,21 @@ public interface EnchantmentModule extends ModifierModule {
     @Override
     public void serialize(EnchantmentModule object, JsonObject json) {
       object.condition().serializeInto(json);
-      json.addProperty("name", Objects.requireNonNull(object.enchantment().getRegistryName()).toString());
+      json.addProperty("name", Objects.requireNonNull(BuiltInRegistries.ENCHANTMENT.getKey(object.enchantment())).toString());
       json.addProperty("level", object.level());
     }
 
     @Override
     public EnchantmentModule fromNetwork(FriendlyByteBuf buffer) {
       return constructor.apply(
-        buffer.readRegistryIdUnsafe(ForgeRegistries.ENCHANTMENTS),
+        BuiltInRegistries.ENCHANTMENT.byId(buffer.readVarInt()),
         buffer.readVarInt(),
         ModifierModuleCondition.fromNetwork(buffer));
     }
 
     @Override
     public void toNetwork(EnchantmentModule object, FriendlyByteBuf buffer) {
-      buffer.writeRegistryIdUnsafe(ForgeRegistries.ENCHANTMENTS, object.enchantment());
+      buffer.writeVarInt(BuiltInRegistries.ENCHANTMENT.getId(object.enchantment()));
       buffer.writeVarInt(object.level());
       object.condition().toNetwork(buffer);
     }
@@ -144,7 +144,7 @@ public interface EnchantmentModule extends ModifierModule {
    * @param enchantment   Enchantment to remove
    */
   private static void removeEnchantment(ListTag list, Enchantment enchantment) {
-    String id = Objects.requireNonNull(enchantment.getRegistryName()).toString();
+    String id = Objects.requireNonNull(BuiltInRegistries.ENCHANTMENT.getKey(enchantment)).toString();
     Iterator<Tag> iterator = list.iterator();
     while (iterator.hasNext()) {
       Tag iteratorTag = iterator.next();
@@ -172,7 +172,7 @@ public interface EnchantmentModule extends ModifierModule {
       tag.put(ModifierUtil.TAG_ENCHANTMENTS, enchantments);
     }
     // add the enchantment
-    enchantments.add(EnchantmentHelper.storeEnchantment(enchantment.getRegistryName(), level));
+    enchantments.add(EnchantmentHelper.storeEnchantment(BuiltInRegistries.ENCHANTMENT.getKey(enchantment), level));
   }
 
   /**
