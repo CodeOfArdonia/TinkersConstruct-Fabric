@@ -1,6 +1,11 @@
 package slimeknights.tconstruct.fluids;
 
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
+import net.minecraft.world.item.Items;
+import slimeknights.tconstruct.fluids.util.ConstantFluidContainerWrapper;
 
 /**
  * Event subscriber for modifier events
@@ -8,21 +13,16 @@ import net.fabricmc.fabric.api.registry.FuelRegistry;
  */
 @SuppressWarnings("unused")
 public class FluidEvents {
+  public static void init() {
+    onFurnaceFuel();
+    FluidStorage.ITEM.registerForItems((itemStack, context) -> new ConstantFluidContainerWrapper(new FluidStack(TinkerFluids.powderedSnow.get(), FluidConstants.BUCKET), Items.BUCKET.getDefaultInstance(), context), Items.POWDER_SNOW_BUCKET);
+  }
+
   public static void onFurnaceFuel() {
 //    if (event.getItemStack().getItem() == TinkerFluids.blazingBlood.asItem()) {
 //      // 150% efficiency compared to lava bucket, compare to casting blaze rods, which cast into 120%
 //      event.setBurnTime(30000);
 //    }
     FuelRegistry.INSTANCE.add(TinkerFluids.blazingBlood.asItem(), 30000);
-  }
-
-  @SubscribeEvent
-  static void attachCapabilities(AttachCapabilitiesEvent<ItemStack> event) {
-    ItemStack stack = event.getObject();
-    if (event.getObject().is(Items.POWDER_SNOW_BUCKET)) {
-      event.addCapability(
-        TConstruct.getResource("powdered_snow"),
-        new ConstantFluidContainerWrapper(new FluidStack(TinkerFluids.powderedSnow.get(), FluidAttributes.BUCKET_VOLUME), Items.BUCKET.getDefaultInstance()));
-    }
   }
 }

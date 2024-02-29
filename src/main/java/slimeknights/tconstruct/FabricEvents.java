@@ -13,7 +13,7 @@ import slimeknights.tconstruct.tools.logic.ToolEvents;
 
 public class FabricEvents {
   public static void init() {
-    FluidEvents.onFurnaceFuel();
+    FluidEvents.init();
     ToolEvents.init();
     CommonsEvents.init();
     AchievementEvents.init();

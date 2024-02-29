@@ -1,5 +1,6 @@
 package slimeknights.tconstruct.tools.item;
 
+import io.github.fabricators_of_create.porting_lib.tool.ToolActions;
 import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.nbt.CompoundTag;
@@ -28,7 +29,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.ToolActions;
+import net.minecraft.world.phys.Vec3;
+import org.joml.Quaternionf;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.library.modifiers.TinkerHooks;

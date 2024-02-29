@@ -23,18 +23,8 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DispenserBlock;
-import net.minecraft.world.level.material.Material;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.common.brewing.BrewingRecipe;
-import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fluids.FluidAttributes;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.ForgeFlowingFluid;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
-import net.minecraftforge.registries.DataSerializerEntry;
-import net.minecraftforge.registries.RegistryObject;
+import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
 import slimeknights.mantle.fluid.UnplaceableFluid;
 import slimeknights.mantle.fluid.attributes.FluidAttributes;
 import slimeknights.mantle.registration.ItemProperties;
@@ -84,7 +74,7 @@ public final class TinkerFluids extends TinkerModule {
                                  .build()).stacksTo(1).craftRemainder(Items.GLASS_BOTTLE),
     () -> new FluidStack(venom.get(), FluidValues.BOTTLE))
   );
-  public static final RegistryObject<UnplaceableFluid> powderedSnow = FLUIDS.registerFluid("powdered_snow", () -> new UnplaceableFluid(Items.POWDER_SNOW_BUCKET.delegate, FluidAttributes.builder(TConstruct.getResource("block/fluid/powdered_snow/still"), TConstruct.getResource("block/fluid/powdered_snow/flowing")).sound(SoundEvents.BUCKET_FILL, SoundEvents.BUCKET_EMPTY).temperature(270)));
+  public static final RegistryObject<UnplaceableFluid> powderedSnow = FLUIDS.registerFluid("powdered_snow", () -> new UnplaceableFluid(() -> Items.POWDER_SNOW_BUCKET, FluidAttributes.builder(TConstruct.getResource("block/fluid/powdered_snow/still"), TConstruct.getResource("block/fluid/powdered_snow/flowing")).sound(SoundEvents.BUCKET_FILL, SoundEvents.BUCKET_EMPTY).temperature(270)));
 
   // slime -  note second name parameter is forge tag name
   public static final FluidObject<SimpleFlowableFluid> earthSlime = FLUIDS.register("earth_slime", "slime",  coolBuilder().density(1400).viscosity(1400).temperature(350), properties -> properties.mapColor(MapColor.WATER).replaceable().pushReaction(PushReaction.DESTROY).liquid(), SlimeFluid.Source::new, SlimeFluid.Flowing::new, 0);

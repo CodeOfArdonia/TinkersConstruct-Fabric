@@ -14,7 +14,7 @@ import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import org.apache.logging.log4j.Logger;
@@ -365,11 +365,9 @@ public final class TinkerSmeltery extends TinkerModule {
 
   public TinkerSmeltery() {
     registerSerializers();
-    event.enqueueWork(() -> {
-      Consumer<Block> dispenserBehavior = block -> DispenserBlock.registerBehavior(block.asItem(), PlaceBlockDispenserBehavior.INSTANCE);
-      searedTank.forEach(dispenserBehavior);
-      scorchedTank.forEach(dispenserBehavior);
-    });
+    Consumer<Block> dispenserBehavior = block -> DispenserBlock.registerBehavior(block.asItem(), PlaceBlockDispenserBehavior.INSTANCE);
+    searedTank.forEach(dispenserBehavior);
+    scorchedTank.forEach(dispenserBehavior);
   }
 
   void registerSerializers() {

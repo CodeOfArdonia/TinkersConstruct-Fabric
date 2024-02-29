@@ -83,8 +83,7 @@ public class ToolEvents {
   public static void init() {
     PlayerEvents.BREAK_SPEED.register(ToolEvents::onBreakSpeed);
     ToolHarvestEvent.EVENT.register(ToolEvents::onHarvest);
-    LivingEntityEvents.HURT.register(ToolEvents::enderDragonDamage);
-    LivingEntityEvents.HURT.register(ToolEvents::livingAttack);
+    LivingEntityEvents.ATTACK.register(ToolEvents::livingAttack);
     LivingEntityEvents.HURT.register(ToolEvents::livingHurt);
     LivingEntityEvents.TICK.register(ToolEvents::livingWalk);
     LivingVisibilityEvent.VISIBILITY.register(ToolEvents::livingVisibility);
@@ -189,16 +188,15 @@ public class ToolEvents {
   }
 
   @SubscribeEvent(priority = EventPriority.LOW)
-  static void livingAttack(LivingAttackEvent event) {
-    LivingEntity entity = event.getEntityLiving();
+  static boolean livingAttack(LivingEntity entity, DamageSource source, float amount) {
     // client side always returns false, so this should be fine?
     if (entity.level().isClientSide() || entity.isDeadOrDying()) {
-      return amount;
+      return false;
     }
     // I cannot think of a reason to run when invulnerable
 //    DamageSource source = event.getSource();
     if (entity.isInvulnerableTo(source)) {
-      return amount;
+      return false;
     }
 
     // a lot of counterattack hooks want to detect direct attacks, so save time by calculating once
@@ -215,7 +213,7 @@ public class ToolEvents {
           if (toolStack != null && !toolStack.isBroken()) {
             for (ModifierEntry entry : toolStack.getModifierList()) {
               if (entry.getHook(TinkerHooks.DAMAGE_BLOCK).isDamageBlocked(toolStack, entry, context, slotType, source, amount)) {
-                return 0;
+                return true;
               }
             }
           }
@@ -241,7 +239,7 @@ public class ToolEvents {
         }
       }
     }
-    return amount;
+    return false;
   }
 
   /**
@@ -272,8 +270,7 @@ public class ToolEvents {
       originalDamage = ModifyDamageModifierHook.modifyDamageTaken(TinkerHooks.MODIFY_HURT, context, source, originalDamage, DamageTakenModifierHook.isDirectDamage(source));
       event.setAmount(originalDamage);
       if (originalDamage <= 0) {
-        event.setCanceled(true);
-        return;
+        return 0;
       }
 
       // remaining logic is reducing damage like vanilla protection

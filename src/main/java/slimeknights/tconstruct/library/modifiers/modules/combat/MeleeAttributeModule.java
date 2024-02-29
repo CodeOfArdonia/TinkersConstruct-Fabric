@@ -1,6 +1,7 @@
 package slimeknights.tconstruct.library.modifiers.modules.combat;
 
 import com.google.gson.JsonObject;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.LivingEntity;
@@ -8,7 +9,6 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
-import net.minecraftforge.registries.ForgeRegistries;
 import slimeknights.mantle.data.GenericLoaderRegistry.IGenericLoader;
 import slimeknights.mantle.util.JsonHelper;
 import slimeknights.tconstruct.library.json.LevelingValue;
@@ -92,7 +92,7 @@ public record MeleeAttributeModule(String unique, Attribute attribute, UUID uuid
     public MeleeAttributeModule deserialize(JsonObject json) {
       return new MeleeAttributeModule(
         GsonHelper.getAsString(json, "unique"),
-        JsonHelper.getAsEntry(ForgeRegistries.ATTRIBUTES, json, "attribute"),
+        JsonHelper.getAsEntry(BuiltInRegistries.ATTRIBUTE, json, "attribute"),
         JsonHelper.getAsEnum(json, "operation", Operation.class),
         LevelingValue.deserialize(json),
         ModifierModuleCondition.deserializeFrom(json)
@@ -103,7 +103,7 @@ public record MeleeAttributeModule(String unique, Attribute attribute, UUID uuid
     public void serialize(MeleeAttributeModule object, JsonObject json) {
       object.condition.serializeInto(json);
       json.addProperty("unique", object.unique);
-      json.addProperty("attribute", Objects.requireNonNull(object.attribute.getRegistryName()).toString());
+      json.addProperty("attribute", Objects.requireNonNull(BuiltInRegistries.ATTRIBUTE.getKey(object.attribute)).toString());
       json.addProperty("operation", object.operation.name().toLowerCase(Locale.ROOT));
       object.amount.serialize(json);
     }
@@ -112,7 +112,7 @@ public record MeleeAttributeModule(String unique, Attribute attribute, UUID uuid
     public MeleeAttributeModule fromNetwork(FriendlyByteBuf buffer) {
       return new MeleeAttributeModule(
         buffer.readUtf(Short.MAX_VALUE),
-        buffer.readRegistryIdUnsafe(ForgeRegistries.ATTRIBUTES),
+        BuiltInRegistries.ATTRIBUTE.byId(buffer.readVarInt()),
         buffer.readEnum(Operation.class),
         LevelingValue.fromNetwork(buffer),
         ModifierModuleCondition.fromNetwork(buffer)
@@ -122,7 +122,7 @@ public record MeleeAttributeModule(String unique, Attribute attribute, UUID uuid
     @Override
     public void toNetwork(MeleeAttributeModule object, FriendlyByteBuf buffer) {
       buffer.writeUtf(object.unique);
-      buffer.writeRegistryIdUnsafe(ForgeRegistries.ATTRIBUTES, object.attribute);
+      buffer.writeVarInt(BuiltInRegistries.ATTRIBUTE.getId(object.attribute));
       buffer.writeEnum(object.operation);
       object.amount.toNetwork(buffer);
       object.condition.toNetwork(buffer);

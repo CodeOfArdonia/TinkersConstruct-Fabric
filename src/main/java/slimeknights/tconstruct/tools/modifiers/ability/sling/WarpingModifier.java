@@ -53,13 +53,13 @@ public class WarpingModifier extends SlingModifier {
         // get furthest teleportable block
         if (furthestPos != null) {
           SlingModifierTeleportEvent event = new SlingModifierTeleportEvent(player, furthestPos.getX() + 0.5f, furthestPos.getY(), furthestPos.getZ() + 0.5f, tool, modifier);
-          MinecraftForge.EVENT_BUS.post(event);
+          event.sendEvent();
           if (!event.isCanceled()) {
             player.teleportTo(event.getTargetX(), event.getTargetY(), event.getTargetZ());
 
             // particle effect from EnderPearlEntity
             for (int i = 0; i < 32; ++i) {
-              entity.level().addParticle(ParticleTypes.PORTAL, player.getX(), player.getY() + entity.level().random.nextDouble() * 2.0D, player.getZ(), entity.level().random.nextGaussian(), 0.0D, entity.level.random.nextGaussian());
+              entity.level().addParticle(ParticleTypes.PORTAL, player.getX(), player.getY() + entity.level().random.nextDouble() * 2.0D, player.getZ(), entity.level().random.nextGaussian(), 0.0D, entity.level().random.nextGaussian());
             }
             entity.level().playSound(null, player.getX(), player.getY(), player.getZ(), Sounds.SLIME_SLING_TELEPORT.getSound(), player.getSoundSource(), 1f, 1f);
             player.causeFoodExhaustion(0.2F);
