@@ -254,7 +254,7 @@ public final class TinkerWorld extends TinkerModule {
   public static final ResourceKey<PlacedFeature> placedEarthGeodeKey = placed("earth_geode");
   // sky
   public static final GeodeItemObject skyGeode   = BLOCKS.registerGeode("sky_slime_crystal",   MapColor.COLOR_BLUE,        Sounds.SKY_CRYSTAL,   Sounds.SKY_CRYSTAL_CHIME.getSound(),   Sounds.SKY_CRYSTAL_CLUSTER,    0, WORLD_PROPS);
-  public static final ResourceKey<ConfiguredFeature<?,?>> configuredSkyGeodeKey = configured("sky_geode");;
+  public static final ResourceKey<ConfiguredFeature<?,?>> configuredSkyGeodeKey = configured("sky_geode");
   public static final ResourceKey<PlacedFeature> placedSkyGeodeKey = placed("sky_geode");
   // ichor
   public static final GeodeItemObject ichorGeode = BLOCKS.registerGeode("ichor_slime_crystal", MapColor.COLOR_ORANGE,      Sounds.ICHOR_CRYSTAL, Sounds.ICHOR_CRYSTAL_CHIME.getSound(), Sounds.ICHOR_CRYSTAL_CLUSTER, 10, WORLD_PROPS);
@@ -466,9 +466,6 @@ public final class TinkerWorld extends TinkerModule {
   /** Creates a skull block for the given head type */
   private static SkullBlock makeHead(TinkerHeadType type) {
     BlockBehaviour.Properties props = BlockBehaviour.Properties.of().pushReaction(PushReaction.DESTROY).strength(1.0F);
-    if (type == TinkerHeadType.PIGLIN_BRUTE || type == TinkerHeadType.ZOMBIFIED_PIGLIN) {
-      return new SkullBlock(SkullBlock.Types.PIGLIN, props);
-    }
     return new SkullBlock(type, props);
   }
 
