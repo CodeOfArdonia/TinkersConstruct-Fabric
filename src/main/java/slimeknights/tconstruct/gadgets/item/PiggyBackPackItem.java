@@ -46,17 +46,20 @@ public class PiggyBackPackItem extends TooltipItem {
     // is the chest slot empty?
     ItemStack chestArmor = playerIn.getItemBySlot(EquipmentSlot.CHEST);
 
-    // need enough space to exchange the chest armor
-    if (chestArmor.getItem() != this && playerIn.getInventory().getFreeSlot() == -1) {
-      // not enough inventory space
-      return InteractionResult.PASS;
+    if(chestArmor != ItemStack.EMPTY) {
+      // need enough space to exchange the chest armor
+      if (chestArmor.getItem() != this && playerIn.getInventory().getFreeSlot() == -1) {
+        // not enough inventory space
+        return InteractionResult.PASS;
+      }
     }
 
     // try carrying the entity
     if (this.pickupEntity(playerIn, target)) {
       // unequip old armor
       if (chestArmor.getItem() != this) {
-        ItemHandlerHelper.giveItemToPlayer(playerIn, chestArmor);
+        int piggyBackpackSlot = playerIn.getInventory().findSlotMatchingItem(stack);
+        playerIn.getInventory().add(piggyBackpackSlot, chestArmor);
         chestArmor = ItemStack.EMPTY;
       }
 
