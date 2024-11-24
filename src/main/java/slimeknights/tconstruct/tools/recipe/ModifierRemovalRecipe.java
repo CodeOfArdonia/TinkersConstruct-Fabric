@@ -47,7 +47,6 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -71,13 +70,17 @@ public class ModifierRemovalRecipe extends AbstractWorktableRecipe {
     this.entryPredicate = mod -> modifierPredicate.matches(mod.getId());
   }
 
-  /** @deprecated use {#link #ModifierRemovalRecipe(ResourceLocation, SizedIngredient, List, List, IJsonPredicate} */
+  /**
+   * @deprecated use {#link #ModifierRemovalRecipe(ResourceLocation, SizedIngredient, List, List, IJsonPredicate}
+   */
   @Deprecated
   public ModifierRemovalRecipe(ResourceLocation id, List<SizedIngredient> inputs, List<ItemStack> leftovers, IJsonPredicate<ModifierId> modifierPredicate) {
     this(id, SizedIngredient.fromTag(TinkerTags.Items.MODIFIABLE), inputs, leftovers, modifierPredicate);
   }
 
-  /** @deprecated use {@link #ModifierRemovalRecipe(ResourceLocation, SizedIngredient, List, List, IJsonPredicate)} */
+  /**
+   * @deprecated use {@link #ModifierRemovalRecipe(ResourceLocation, SizedIngredient, List, List, IJsonPredicate)}
+   */
   @Deprecated
   public ModifierRemovalRecipe(ResourceLocation id, List<SizedIngredient> inputs, List<ItemStack> leftovers) {
     this(id, inputs, leftovers, ModifierPredicate.ALWAYS);
@@ -96,7 +99,9 @@ public class ModifierRemovalRecipe extends AbstractWorktableRecipe {
     return ModifierRecipe.checkMatch(inv, inputs);
   }
 
-  /** Filters the given modifier list */
+  /**
+   * Filters the given modifier list
+   */
   protected List<ModifierEntry> filter(@Nullable IToolStackView tool, List<ModifierEntry> modifiers) {
     if (modifierPredicate != ModifierPredicate.ALWAYS) {
       return modifiers.stream().filter(entryPredicate).toList();
@@ -194,7 +199,9 @@ public class ModifierRemovalRecipe extends AbstractWorktableRecipe {
 
   /* JEI */
 
-  /** Gets a list of tools to display */
+  /**
+   * Gets a list of tools to display
+   */
   @Override
   public List<ItemStack> getInputTools() {
     if (tools == null) {
@@ -209,9 +216,12 @@ public class ModifierRemovalRecipe extends AbstractWorktableRecipe {
     return tools;
   }
 
-  /** @deprecated use {@link Factory} */
+  /**
+   * @deprecated use {@link Factory}
+   */
   @FunctionalInterface
   public interface ModifierRemovalRecipeFactory extends Factory {
+
     ModifierRemovalRecipe create(ResourceLocation id, List<SizedIngredient> inputs, List<ItemStack> leftovers, IJsonPredicate<ModifierId> modifierPredicate);
 
     @Override
@@ -220,20 +230,26 @@ public class ModifierRemovalRecipe extends AbstractWorktableRecipe {
     }
   }
 
-  /** Factory interface for modifier removal recipes */
+  /**
+   * Factory interface for modifier removal recipes
+   */
   @FunctionalInterface
   public interface Factory {
+
     ModifierRemovalRecipe create(ResourceLocation id, SizedIngredient toolRequirement, List<SizedIngredient> inputs, List<ItemStack> leftovers, IJsonPredicate<ModifierId> modifierPredicate);
   }
 
   @RequiredArgsConstructor
   public static class Serializer extends LoggingRecipeSerializer<ModifierRemovalRecipe> {
+
     private final Factory factory;
 
-    /** @deprecated use {@link #Serializer(Factory)} */
+    /**
+     * @deprecated use {@link #Serializer(Factory)}
+     */
     @Deprecated
     public Serializer(ModifierRemovalRecipeFactory factory) {
-      this((Factory)factory);
+      this((Factory) factory);
     }
 
     @Override
@@ -291,34 +307,44 @@ public class ModifierRemovalRecipe extends AbstractWorktableRecipe {
 
   @RequiredArgsConstructor(staticName = "removal")
   public static class Builder extends AbstractSizedIngredientRecipeBuilder<Builder> {
+
     private final RecipeSerializer<? extends ModifierRemovalRecipe> serializer;
     private final List<ItemStack> leftovers = new ArrayList<>();
     private SizedIngredient tools = SizedIngredient.EMPTY;
-    @Setter @Accessors(fluent = true)
+    @Setter
+    @Accessors(fluent = true)
     private IJsonPredicate<ModifierId> modifierPredicate = ModifierPredicate.ALWAYS;
 
     public static Builder removal() {
       return removal(TinkerModifiers.removeModifierSerializer.get());
     }
 
-    /** Sets the tool requirement for this recipe */
+    /**
+     * Sets the tool requirement for this recipe
+     */
     public Builder setTools(SizedIngredient ingredient) {
       this.tools = ingredient;
       return this;
     }
 
-    /** Sets the tool requirement for this recipe */
+    /**
+     * Sets the tool requirement for this recipe
+     */
     public Builder setTools(Ingredient ingredient) {
       return setTools(SizedIngredient.of(ingredient));
     }
 
-    /** Adds a leftover stack to the recipe */
+    /**
+     * Adds a leftover stack to the recipe
+     */
     public Builder addLeftover(ItemStack stack) {
       leftovers.add(stack);
       return this;
     }
 
-    /** Adds a leftover stack to the recipe */
+    /**
+     * Adds a leftover stack to the recipe
+     */
     public Builder addLeftover(ItemLike item) {
       return addLeftover(new ItemStack(item));
     }
@@ -338,6 +364,7 @@ public class ModifierRemovalRecipe extends AbstractWorktableRecipe {
     }
 
     private class Finished extends SizedFinishedRecipe {
+
       public Finished(ResourceLocation ID, @Nullable ResourceLocation advancementID) {
         super(ID, advancementID);
       }

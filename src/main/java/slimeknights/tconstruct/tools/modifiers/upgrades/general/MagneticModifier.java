@@ -28,12 +28,15 @@ import slimeknights.tconstruct.tools.TinkerModifiers;
 import java.util.List;
 
 public class MagneticModifier extends TotalArmorLevelModifier implements PlantHarvestModifierHook, ShearsModifierHook {
-  /** Player modifier data key for haste */
+
+  /**
+   * Player modifier data key for haste
+   */
   private static final TinkerDataKey<Integer> MAGNET = TConstruct.createKey("magnet");
 
   public MagneticModifier() {
     super(MAGNET);
-    LivingEntityEvents.TICK.register(MagneticModifier::onLivingTick);
+    LivingEntityEvents.LivingTickEvent.TICK.register(MagneticModifier::onLivingTick);
   }
 
   @Override
@@ -75,8 +78,11 @@ public class MagneticModifier extends TotalArmorLevelModifier implements PlantHa
 
   // armor
 
-  /** Called to perform the magnet for armor */
-  private static void onLivingTick(LivingEntity entity) {
+  /**
+   * Called to perform the magnet for armor
+   */
+  private static void onLivingTick(LivingEntityEvents.LivingTickEvent event) {
+    LivingEntity entity = event.getEntity();
     // TOOD: this will run on any held armor that is also melee/harvest, is that a problem?
     if (!entity.isSpectator() && (entity.tickCount & 1) == 0) {
       int level = ModifierUtil.getTotalModifierLevel(entity, MAGNET);
@@ -86,7 +92,9 @@ public class MagneticModifier extends TotalArmorLevelModifier implements PlantHa
     }
   }
 
-  /** Performs the magnetic effect */
+  /**
+   * Performs the magnetic effect
+   */
   public static <T extends Entity> void applyVelocity(LivingEntity entity, int amplifier, Class<T> targetClass, int minRange, float speed, int maxPush) {
     // super magnetic - inspired by botanias code
     double x = entity.getX();
@@ -103,9 +111,9 @@ public class MagneticModifier extends TotalArmorLevelModifier implements PlantHa
       }
       // calculate direction: item -> player
       Vec3 vec = entity.position()
-                       .subtract(target.getX(), target.getY(), target.getZ())
-                       .normalize()
-                       .scale(speed * (amplifier + 1));
+        .subtract(target.getX(), target.getY(), target.getZ())
+        .normalize()
+        .scale(speed * (amplifier + 1));
       if (!target.isNoGravity()) {
         vec = vec.add(0, 0.04f, 0);
       }
@@ -120,7 +128,9 @@ public class MagneticModifier extends TotalArmorLevelModifier implements PlantHa
     }
   }
 
-  /** Performs the magnetic effect */
+  /**
+   * Performs the magnetic effect
+   */
   public static void applyMagnet(LivingEntity entity, int amplifier) {
     applyVelocity(entity, amplifier, ItemEntity.class, 3, 0.05f, 100);
   }

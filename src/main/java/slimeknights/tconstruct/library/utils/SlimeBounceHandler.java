@@ -13,20 +13,27 @@ import slimeknights.tconstruct.common.Sounds;
 import javax.annotation.Nullable;
 import java.util.IdentityHashMap;
 
-/** Logic for entities bouncing */
+/**
+ * Logic for entities bouncing
+ */
 public class SlimeBounceHandler {
+
   private SlimeBounceHandler() {}
+
   private static final IdentityHashMap<Entity, BounceInfo> BOUNCING_ENTITIES = new IdentityHashMap<>();
 
-  /** Registers event handlers */
+  /**
+   * Registers event handlers
+   */
   public static void init() {
-    LivingEntityEvents.TICK.register(SlimeBounceHandler::onLivingTick);
+    LivingEntityEvents.LivingTickEvent.TICK.register(SlimeBounceHandler::onLivingTick);
     ServerLifecycleEvents.SERVER_STOPPING.register(SlimeBounceHandler::serverStopping);
   }
 
   /**
    * Preserves entity air momentum
-   * @param entity  Entity to bounce
+   *
+   * @param entity Entity to bounce
    */
   public static void addBounceHandler(LivingEntity entity) {
     addBounceHandler(entity, null);
@@ -34,8 +41,9 @@ public class SlimeBounceHandler {
 
   /**
    * Causes the entity to bounce, needed because the fall event will reset motion afterwards
-   * @param entity  Entity to bounce
-   * @param bounce  Bounce amount
+   *
+   * @param entity Entity to bounce
+   * @param bounce Bounce amount
    */
   public static void addBounceHandler(LivingEntity entity, @Nullable Vec3 bounce) {
     // no fake players PlayerTick event
@@ -57,8 +65,11 @@ public class SlimeBounceHandler {
     }
   }
 
-  /** Called on living tick to preserve momentum and bounce */
-  private static void onLivingTick(LivingEntity entity) {
+  /**
+   * Called on living tick to preserve momentum and bounce
+   */
+  private static void onLivingTick(LivingEntityEvents.LivingTickEvent event) {
+    LivingEntity entity = event.getEntity();
     BounceInfo info = BOUNCING_ENTITIES.get(entity);
 
     // if we have info for this entity, time to work
@@ -127,27 +138,46 @@ public class SlimeBounceHandler {
     }
   }
 
-  /** Called on server shutdown to prevent memory leaks */
+  /**
+   * Called on server shutdown to prevent memory leaks
+   */
   private static void serverStopping(MinecraftServer server) {
     BOUNCING_ENTITIES.clear();
   }
 
-  /** Data class to keep track of bouncing info for an entity */
+  /**
+   * Data class to keep track of bouncing info for an entity
+   */
   private static class BounceInfo {
-    /** Velocity the entity should have, unused if null */
+
+    /**
+     * Velocity the entity should have, unused if null
+     */
     @Nullable
     private Vec3 bounce;
-    /** Time to update the entities velocity */
+    /**
+     * Time to update the entities velocity
+     */
     private int bounceTick;
-    /** Tick to stop entity magnitude changes */
+    /**
+     * Tick to stop entity magnitude changes
+     */
     private int stopMagTick;
-    /** Magnitude of the X/Z motion last tick */
+    /**
+     * Magnitude of the X/Z motion last tick
+     */
     private double lastMagSq;
-    /** If true, the entity was in air last tick */
+    /**
+     * If true, the entity was in air last tick
+     */
     private boolean wasInAir = false;
-    /** Time when motion should stop */
+    /**
+     * Time when motion should stop
+     */
     private int endHandler = 0;
-    /** Last angle of motion, used for sound effects */
+    /**
+     * Last angle of motion, used for sound effects
+     */
     private double lastAngle;
 
     public BounceInfo(LivingEntity entity, @Nullable Vec3 bounce) {

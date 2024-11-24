@@ -1,12 +1,11 @@
 package slimeknights.tconstruct.tools.modifiers.defense;
 
-import io.github.fabricators_of_create.porting_lib.entity.events.LivingEntityEvents;
+import io.github.fabricators_of_create.porting_lib.entity.events.living.LivingHurtEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.TooltipFlag;
 import slimeknights.tconstruct.TConstruct;
@@ -22,10 +21,12 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ShulkingModifier extends AbstractProtectionModifier<ModifierMaxLevel> {
+
   private static final TinkerDataKey<ModifierMaxLevel> KEY = TConstruct.createKey("shulking");
+
   public ShulkingModifier() {
     super(KEY);
-    LivingEntityEvents.HURT.register(ShulkingModifier::onAttack);
+    LivingHurtEvent.HURT.register(ShulkingModifier::onAttack);
   }
 
   @Override
@@ -46,7 +47,9 @@ public class ShulkingModifier extends AbstractProtectionModifier<ModifierMaxLeve
     AbstractProtectionModifier.addResistanceTooltip(this, tool, level, 2.5f, tooltip);
   }
 
-  private static float onAttack(DamageSource source, LivingEntity damaged, float amount) {
+  private static void onAttack(LivingHurtEvent event) {
+    DamageSource source = event.getSource();
+    float amount = event.getAmount();
     // if the attacker is crouching, deal less damage
     Entity attacker = source.getEntity();
     AtomicReference<Float> newAmount = new AtomicReference<>(amount);
@@ -58,6 +61,6 @@ public class ShulkingModifier extends AbstractProtectionModifier<ModifierMaxLeve
         }
       });
     }
-    return newAmount.get();
+    event.setAmount(newAmount.get());
   }
 }

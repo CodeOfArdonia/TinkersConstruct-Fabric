@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.tools.modifiers.defense;
 
-import io.github.fabricators_of_create.porting_lib.event.common.ExplosionEvents;
 import io.github.fabricators_of_create.porting_lib.entity.events.LivingEntityEvents;
+import io.github.fabricators_of_create.porting_lib.event.common.ExplosionEvents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.Mth;
@@ -27,12 +27,16 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class BlastProtectionModifier extends AbstractProtectionModifier<BlastData> {
-  /** Entity data key for the data associated with this modifier */
+
+  /**
+   * Entity data key for the data associated with this modifier
+   */
   private static final TinkerDataKey<BlastData> BLAST_DATA = TConstruct.createKey("blast_protection");
+
   public BlastProtectionModifier() {
     super(BLAST_DATA);
     ExplosionEvents.DETONATE.register(BlastProtectionModifier::onExplosionDetonate);
-    LivingEntityEvents.TICK.register(BlastProtectionModifier::livingTick);
+    LivingEntityEvents.LivingTickEvent.TICK.register(BlastProtectionModifier::livingTick);
   }
 
   @Override
@@ -58,7 +62,9 @@ public class BlastProtectionModifier extends AbstractProtectionModifier<BlastDat
     data.wasKnockback = false;
   }
 
-  /** On explosion, checks if any blast protected entity is involved, if so marks them for knockback update next tick */
+  /**
+   * On explosion, checks if any blast protected entity is involved, if so marks them for knockback update next tick
+   */
   private static void onExplosionDetonate(Level world, Explosion explosion, List<Entity> list, double d) {
     Vec3 center = new Vec3(explosion.x, explosion.y, explosion.z);
     float diameter = explosion.radius * 2;
@@ -75,7 +81,7 @@ public class BlastProtectionModifier extends AbstractProtectionModifier<BlastDat
             if (x != 0 || z != 0 || (entity.getEyeY() - center.y) != 0) {
               // we need two numbers to calculate the knockback: distance to explosion and block density
               double y = entity.getY() - center.y;
-              double distance = Mth.sqrt((float)(x * x + y * y + z * z)) / diameter;
+              double distance = Mth.sqrt((float) (x * x + y * y + z * z)) / diameter;
               if (distance <= 1) {
                 blastData.wasKnockback = true;
               }
@@ -86,8 +92,11 @@ public class BlastProtectionModifier extends AbstractProtectionModifier<BlastDat
     }
   }
 
-  /** If the entity is marked for knockback update, adjust velocity */
-  private static void livingTick(LivingEntity living) {
+  /**
+   * If the entity is marked for knockback update, adjust velocity
+   */
+  private static void livingTick(LivingEntityEvents.LivingTickEvent event) {
+    LivingEntity living = event.getEntity();
     if (!living.level().isClientSide && !living.isSpectator()) {
       TinkerDataCapability.CAPABILITY.maybeGet(living).ifPresent(data -> {
         BlastData blastData = data.get(BLAST_DATA);
@@ -110,9 +119,14 @@ public class BlastProtectionModifier extends AbstractProtectionModifier<BlastDat
     }
   }
 
-  /** Data object for the modifier */
+  /**
+   * Data object for the modifier
+   */
   protected static class BlastData extends ModifierMaxLevel {
-    /** If true, the entity was knocked back and needs their velocity adjusted */
+
+    /**
+     * If true, the entity was knocked back and needs their velocity adjusted
+     */
     boolean wasKnockback = false;
   }
 }

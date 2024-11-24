@@ -1,13 +1,14 @@
 package slimeknights.tconstruct.tools.logic;
 
 import com.google.common.collect.Multiset;
-import io.github.fabricators_of_create.porting_lib.entity.events.EntityEvents;
 import io.github.fabricators_of_create.porting_lib.core.event.BaseEvent.Result;
-import io.github.fabricators_of_create.porting_lib.entity.events.ProjectileImpactEvent;
-import io.github.fabricators_of_create.porting_lib.event.common.GrindstoneEvents;
-import io.github.fabricators_of_create.porting_lib.entity.events.LivingEntityEvents.LivingVisibilityEvent;
+import io.github.fabricators_of_create.porting_lib.entity.events.EntityEvents;
 import io.github.fabricators_of_create.porting_lib.entity.events.LivingEntityEvents;
+import io.github.fabricators_of_create.porting_lib.entity.events.LivingEntityEvents.LivingVisibilityEvent;
 import io.github.fabricators_of_create.porting_lib.entity.events.PlayerEvents;
+import io.github.fabricators_of_create.porting_lib.entity.events.ProjectileImpactEvent;
+import io.github.fabricators_of_create.porting_lib.entity.events.living.LivingHurtEvent;
+import io.github.fabricators_of_create.porting_lib.event.common.GrindstoneEvents;
 import io.github.fabricators_of_create.porting_lib.util.EntityHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -40,8 +41,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
-import org.apache.commons.lang3.mutable.MutableDouble;
-import org.jetbrains.annotations.Nullable;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.common.config.Config;
 import slimeknights.tconstruct.library.events.TinkerToolEvent.ToolHarvestEvent;
@@ -50,7 +49,6 @@ import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.library.modifiers.TinkerHooks;
 import slimeknights.tconstruct.library.modifiers.data.ModifierMaxLevel;
 import slimeknights.tconstruct.library.modifiers.dynamic.MobDisguiseModifier;
-import slimeknights.tconstruct.library.modifiers.modules.MobDisguiseModule;
 import slimeknights.tconstruct.library.tools.capability.EntityModifierCapability;
 import slimeknights.tconstruct.library.tools.capability.PersistentDataCapability;
 import slimeknights.tconstruct.library.tools.capability.TinkerDataCapability;
@@ -83,10 +81,10 @@ public class ToolEvents {
   public static void init() {
     PlayerEvents.BREAK_SPEED.register(ToolEvents::onBreakSpeed);
     ToolHarvestEvent.EVENT.register(ToolEvents::onHarvest);
-    LivingEntityEvents.HURT.register(ToolEvents::enderDragonDamage);
-    LivingEntityEvents.HURT.register(ToolEvents::livingAttack);
-    LivingEntityEvents.HURT.register(ToolEvents::livingHurt);
-    LivingEntityEvents.TICK.register(ToolEvents::livingWalk);
+    LivingHurtEvent.HURT.register(ToolEvents::enderDragonDamage);
+    LivingHurtEvent.HURT.register(ToolEvents::livingAttack);
+    LivingHurtEvent.HURT.register(ToolEvents::livingHurt);
+    LivingEntityEvents.LivingTickEvent.TICK.register(ToolEvents::livingWalk);
     LivingVisibilityEvent.VISIBILITY.register(ToolEvents::livingVisibility);
     EntityEvents.PROJECTILE_IMPACT.register(ToolEvents::projectileHit);
     GrindstoneEvents.ON_PLACE_ITEM.register(ToolEvents::onGrindstoneChange);
@@ -188,9 +186,12 @@ public class ToolEvents {
     }
   }
 
-  static float enderDragonDamage(DamageSource source, LivingEntity entity, float amount) {
+  static void enderDragonDamage(LivingHurtEvent event) {
+    DamageSource source = event.getSource();
+    LivingEntity entity = event.getEntity();
+    float amount = event.getAmount();
     if (!Config.COMMON.dropDragonScales.get()) {
-      return amount;
+      return;
     }
     // dragon being damaged
 //    LivingEntity entity = event.getEntityLiving();
@@ -202,20 +203,18 @@ public class ToolEvents {
         ModifierUtil.dropItem(entity, new ItemStack(TinkerModifiers.dragonScale, 1 + entity.level().random.nextInt(8)));
       }
     }
-    return amount;
   }
 
-  static float livingAttack(DamageSource source, LivingEntity entity, float amount) {
+  static void livingAttack(LivingHurtEvent event) {
+    DamageSource source = event.getSource();
+    LivingEntity entity = event.getEntity();
+    float amount = event.getAmount();
 //    LivingEntity entity = event.getEntityLiving();
     // client side always returns false, so this should be fine?
-    if (entity.level().isClientSide() || entity.isDeadOrDying()) {
-      return amount;
-    }
+    if (entity.level().isClientSide() || entity.isDeadOrDying()) return;
     // I cannot think of a reason to run when invulnerable
 //    DamageSource source = event.getSource();
-    if (entity.isInvulnerableTo(source)) {
-      return amount;
-    }
+    if (entity.isInvulnerableTo(source)) return;
 
     // a lot of counterattack hooks want to detect direct attacks, so save time by calculating once
     boolean isDirectDamage = source.getEntity() != null && !source.is(DamageTypes.THORNS);
@@ -231,7 +230,7 @@ public class ToolEvents {
           if (toolStack != null && !toolStack.isBroken()) {
             for (ModifierEntry entry : toolStack.getModifierList()) {
               if (entry.getHook(TinkerHooks.DAMAGE_BLOCK).isDamageBlocked(toolStack, entry, context, slotType, source, amount)) {
-                return 0;
+                return;
               }
             }
           }
@@ -276,24 +275,27 @@ public class ToolEvents {
         }
       }
     }
-    return amount;
   }
 
   /**
    * Determines how much to damage armor based on the given damage to the player
-   * @param damage  Amount to damage the player
-   * @return  Amount to damage the armor
+   *
+   * @param damage Amount to damage the player
+   * @return Amount to damage the armor
    */
   private static int getArmorDamage(float damage) {
     damage /= 4;
     if (damage < 1) {
       return 1;
     }
-    return (int)damage;
+    return (int) damage;
   }
 
   // low priority to minimize conflict as we apply reduction as if we are the final change to damage before vanilla
-  static float livingHurt(DamageSource source, LivingEntity entity, float originalDamage) {
+  static void livingHurt(LivingHurtEvent event) {
+    DamageSource source = event.getSource();
+    LivingEntity entity = event.getEntity();
+    float originalDamage = event.getAmount();
 //    LivingEntity entity = event.getEntityLiving();
 
     // determine if there is any modifiable armor, if not nothing to do
@@ -344,7 +346,7 @@ public class ToolEvents {
       float armor = 0, toughness = 0;
       if (!source.is(DamageTypeTags.BYPASSES_ARMOR)) {
         armor = entity.getArmorValue();
-        toughness = (float)entity.getAttributeValue(Attributes.ARMOR_TOUGHNESS);
+        toughness = (float) entity.getAttributeValue(Attributes.ARMOR_TOUGHNESS);
       }
 
       // set the final dealt damage
@@ -371,13 +373,14 @@ public class ToolEvents {
           }
         }
       }
-      return finalDamage;
     }
-    return originalDamage;
   }
 
-  /** Called the modifier hook when an entity's position changes */
-  static void livingWalk(LivingEntity living) {
+  /**
+   * Called the modifier hook when an entity's position changes
+   */
+  static void livingWalk(LivingEntityEvents.LivingTickEvent event) {
+    LivingEntity living = event.getEntity();
     // this event runs before vanilla updates prevBlockPos
     BlockPos pos = living.blockPosition();
     BlockPos lastPos = EntityHelper.getLastPos(living);
@@ -392,7 +395,9 @@ public class ToolEvents {
     }
   }
 
-  /** Handles visibility effects of mob disguise and projectile protection */
+  /**
+   * Handles visibility effects of mob disguise and projectile protection
+   */
   static void livingVisibility(LivingVisibilityEvent event) {
     // always nonnull in vanilla, not sure when it would be nullable but I dont see a need for either modifier
     Entity lookingEntity = event.getLookingEntity();
@@ -420,7 +425,9 @@ public class ToolEvents {
     });
   }
 
-  /** Implements projectile hit hook */
+  /**
+   * Implements projectile hit hook
+   */
   static void projectileHit(ProjectileImpactEvent event) {
     Projectile projectile = event.getProjectile();
     ModifierNBT modifiers = EntityModifierCapability.getOrEmpty(projectile);
@@ -430,9 +437,9 @@ public class ToolEvents {
       HitResult.Type type = hit.getType();
       // extract a firing entity as that is a common need
       LivingEntity attacker = projectile.getOwner() instanceof LivingEntity l ? l : null;
-      switch(type) {
+      switch (type) {
         case ENTITY -> {
-          EntityHitResult entityHit = (EntityHitResult)hit;
+          EntityHitResult entityHit = (EntityHitResult) hit;
           // cancel all effects on endermen unless we have enderference, endermen like to teleport away
           // yes, hardcoded to enderference, if you need your own enderference for whatever reason, talk to us
           if (entityHit.getEntity().getType() != EntityType.ENDERMAN || modifiers.getLevel(TinkerModifiers.enderference.getId()) > 0) {
@@ -446,7 +453,7 @@ public class ToolEvents {
           }
         }
         case BLOCK -> {
-          BlockHitResult blockHit = (BlockHitResult)hit;
+          BlockHitResult blockHit = (BlockHitResult) hit;
           for (ModifierEntry entry : modifiers.getModifiers()) {
             if (entry.getHook(TinkerHooks.PROJECTILE_HIT).onProjectileHitBlock(modifiers, nbt, entry, projectile, blockHit, attacker)) {
               event.setCanceled(true);
