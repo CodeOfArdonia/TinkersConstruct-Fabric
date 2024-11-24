@@ -63,7 +63,6 @@ public class SmelteryControllerBlock extends HeatingControllerBlock {
     }
   }
 
-
   /* No rotation if in a structure  */
 
   @Deprecated

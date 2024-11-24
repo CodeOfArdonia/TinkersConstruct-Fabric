@@ -1,25 +1,12 @@
-# [Hephaestus](https://modrinth.com/mod/hephaestus)
+# Supporoform
 
-Modify all the things, then do it again!   
-Melt down any metals you find. 	 
-Power the world with spinning wind!
+This is a fork of Tinker's Construct/Hephaestus, contains bug fixes and some slight modification for my modpack.
 
-## Issue reporting
-Please include the following:
+Also, this is a LTS version only for 1.20.1 fabric. So don't ask me for porting to other version, please
+use [Hephaestus](https://github.com/Alpha-s-Stuff/TinkersConstruct) instead.
 
-* Minecraft version
-* Hephaestus version
-* Fabric Loader and api version/build
-* Versions of any mods potentially related to the issue 
-* Any relevant screenshots are greatly appreciated.
-* For crashes:
-	* Steps to reproduce
-	* ForgeModLoader-client-0.log (the FML log) from the root folder of the client
+## Fixes
 
-## Licenses
-Code, Textures and binaries are licensed under the [MIT License](https://tldrlegal.com/license/mit-license).
-
-You are allowed to use the mod in your modpack.
-Any modpack which uses Hephaestus takes **full** responsibility for user support queries. For anyone else, we only support official builds from the main CI server, not custom built jars. We also do not take bug reports for outdated builds of Minecraft.
-
-Any alternate licenses are noted where appropriate.
+- Casting Table will not drop casts and items correctly.
+- Crash when you open the gui provide by a broken smeltery.
+- Some recipes cannot be used due to wrong tags.

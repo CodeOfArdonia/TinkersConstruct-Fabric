@@ -34,7 +34,7 @@ body:
   - type: input
     id: hephaestus-version
     attributes:
-      label: "Hephaestus Version"
+      label: "Supporoform Version"
       description: "'Latest' is not a valid answer, write an exact version number"
     validations:
       required: true

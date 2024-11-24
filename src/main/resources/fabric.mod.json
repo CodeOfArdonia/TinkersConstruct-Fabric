@@ -3,14 +3,15 @@
   "id": "tconstruct",
   "version": "${version}",
 
-  "name": "Hephaestus",
+  "name": "Supporoform",
   "description": "A little of this, a little of that, a lot of tinkering, and a lot of tools.",
   "authors": [
     "Slime Knights",
-    "AlphaMode"
+    "AlphaMode",
+    "IAFEnvoy"
   ],
   "contact": {
-    "sources": "https://github.com/Alpha-s-Stuff/TinkersConstruct"
+    "sources": "https://github.com/CodeOfArdonia/TinkersConstruct-Fabric"
   },
 
   "license": "MIT",

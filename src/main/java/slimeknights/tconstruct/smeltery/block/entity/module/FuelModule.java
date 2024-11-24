@@ -1,10 +1,9 @@
 package slimeknights.tconstruct.smeltery.block.entity.module;
 
-import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
-import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
-import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import io.github.fabricators_of_create.porting_lib.common.util.NonNullConsumer;
 import io.github.fabricators_of_create.porting_lib.common.util.NonNullFunction;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.util.StorageProvider;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -26,7 +25,6 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.Nullable;
 import slimeknights.mantle.block.entity.MantleBlockEntity;
@@ -47,49 +45,78 @@ import java.util.function.Supplier;
  */
 @RequiredArgsConstructor
 public class FuelModule implements ContainerData {
-  /** Block position that will never be valid in world, used for sync */
+
+  /**
+   * Block position that will never be valid in world, used for sync
+   */
   private static final BlockPos NULL_POS = new BlockPos(0, Short.MIN_VALUE, 0);
-  /** Temperature used for solid fuels, hot enough to melt iron */
+  /**
+   * Temperature used for solid fuels, hot enough to melt iron
+   */
   public static final int SOLID_TEMPERATURE = 800;
 
-  /** Listener to attach to stored capability */
+  /**
+   * Listener to attach to stored capability
+   */
   private final NonNullConsumer<SlottedStorage<FluidVariant>> fluidListener = new WeakConsumerWrapper<>(this, (self, cap) -> self.reset());
   private final NonNullConsumer<SlottedStorage<ItemVariant>> itemListener = new WeakConsumerWrapper<>(this, (self, cap) -> self.reset());
 
-  /** Parent TE */
+  /**
+   * Parent TE
+   */
   private final MantleBlockEntity parent;
-  /** Supplier for the list of valid tank positions */
+  /**
+   * Supplier for the list of valid tank positions
+   */
   private final Supplier<List<BlockPos>> tankSupplier;
 
-  /** Last fuel recipe used */
+  /**
+   * Last fuel recipe used
+   */
   @Nullable
   private MeltingFuel lastRecipe;
-  /** Last fluid handler where fluid was extracted */
+  /**
+   * Last fluid handler where fluid was extracted
+   */
   @Nullable
   private StorageProvider<FluidVariant> fluidHandler;
-  /** Last item handler where items were extracted */
+  /**
+   * Last item handler where items were extracted
+   */
   @Nullable
   private StorageProvider<ItemVariant> itemHandler;
-  /** Position of the last fluid handler */
+  /**
+   * Position of the last fluid handler
+   */
   private BlockPos lastPos = NULL_POS;
 
 
-  /** Client fuel display */
+  /**
+   * Client fuel display
+   */
   private List<BlockPos> tankDisplayHandlers;
-  /** Listener to attach to display capabilities */
+  /**
+   * Listener to attach to display capabilities
+   */
   private final NonNullConsumer<SlottedStorage<FluidVariant>> displayListener = new WeakConsumerWrapper<>(this, (self, cap) -> {
     if (self.tankDisplayHandlers != null) {
       self.tankDisplayHandlers.remove(cap);
     }
   });
 
-  /** Current amount of fluid in the TE */
+  /**
+   * Current amount of fluid in the TE
+   */
   @Getter
   private int fuel = 0;
-  /** Amount of fuel produced by the last source */
+  /**
+   * Amount of fuel produced by the last source
+   */
   @Getter
   private int fuelQuality = 0;
-  /** Temperature of the current fuel */
+  /**
+   * Temperature of the current fuel
+   */
   @Getter
   private int temperature = 0;
 
@@ -105,15 +132,18 @@ public class FuelModule implements ContainerData {
     this.lastPos = NULL_POS;
   }
 
-  /** Gets a nonnull world instance from the parent */
+  /**
+   * Gets a nonnull world instance from the parent
+   */
   private Level getLevel() {
     return Objects.requireNonNull(parent.getLevel(), "Parent tile entity has null world");
   }
 
   /**
    * Finds a recipe for the given fluid
-   * @param fluid  Fluid
-   * @return  Recipe
+   *
+   * @param fluid Fluid
+   * @return Recipe
    */
   @Nullable
   private MeltingFuel findRecipe(Fluid fluid) {
@@ -132,7 +162,8 @@ public class FuelModule implements ContainerData {
 
   /**
    * Checks if we have fuel
-   * @return  True if we have fuel
+   *
+   * @return True if we have fuel
    */
   public boolean hasFuel() {
     return fuel > 0;
@@ -140,7 +171,8 @@ public class FuelModule implements ContainerData {
 
   /**
    * Consumes fuel from the module
-   * @param amount  Amount of fuel to consume
+   *
+   * @param amount Amount of fuel to consume
    */
   public void decreaseFuel(int amount) {
     fuel = Math.max(0, fuel - amount);
@@ -151,15 +183,16 @@ public class FuelModule implements ContainerData {
   /* Fuel updating */
 
   /* Cache of objects, since they are otherwise created possibly several times */
-  private final NonNullFunction<Storage<ItemVariant>,Integer> trySolidFuelConsume = handler -> trySolidFuel(handler, true);
-  private final NonNullFunction<Storage<ItemVariant>,Integer> trySolidFuelNoConsume = handler -> trySolidFuel(handler, false);
-  private final NonNullFunction<Storage<FluidVariant>,Integer> tryLiquidFuelConsume = handler -> tryLiquidFuel(handler, true);
-  private final NonNullFunction<Storage<FluidVariant>,Integer> tryLiquidFuelNoConsume = handler -> tryLiquidFuel(handler, false);
+  private final NonNullFunction<Storage<ItemVariant>, Integer> trySolidFuelConsume = handler -> trySolidFuel(handler, true);
+  private final NonNullFunction<Storage<ItemVariant>, Integer> trySolidFuelNoConsume = handler -> trySolidFuel(handler, false);
+  private final NonNullFunction<Storage<FluidVariant>, Integer> tryLiquidFuelConsume = handler -> tryLiquidFuel(handler, true);
+  private final NonNullFunction<Storage<FluidVariant>, Integer> tryLiquidFuelNoConsume = handler -> tryLiquidFuel(handler, false);
 
   /**
    * Tries to consume fuel from the given fluid handler
-   * @param handler  Handler to consume fuel from
-   * @return   Temperature of the consumed fuel, 0 if none found
+   *
+   * @param handler Handler to consume fuel from
+   * @return Temperature of the consumed fuel, 0 if none found
    */
   private int trySolidFuel(Storage<ItemVariant> handler, boolean consume) {
     for (StorageView<ItemVariant> view : handler.nonEmptyViews()) {
@@ -206,17 +239,19 @@ public class FuelModule implements ContainerData {
 
   /**
    * Gets the mapper function for solid fuel
-   * @param consume  If true, fuel is consumed
+   *
+   * @param consume If true, fuel is consumed
    * @return Mapper function for solid fuel
    */
-  private NonNullFunction<Storage<ItemVariant>,Integer> trySolidFuel(boolean consume) {
+  private NonNullFunction<Storage<ItemVariant>, Integer> trySolidFuel(boolean consume) {
     return consume ? trySolidFuelConsume : trySolidFuelNoConsume;
   }
 
   /**
    * Trys to consume fuel from the given fluid handler
-   * @param handler  Handler to consume fuel from
-   * @return   Temperature of the consumed fuel, 0 if none found
+   *
+   * @param handler Handler to consume fuel from
+   * @return Temperature of the consumed fuel, 0 if none found
    */
   private int tryLiquidFuel(Storage<FluidVariant> handler, boolean consume) {
     FluidStack fluid = TransferUtil.firstOrEmpty(handler);
@@ -247,17 +282,19 @@ public class FuelModule implements ContainerData {
 
   /**
    * Gets the mapper function for liquid fuel
-   * @param consume  If true, fuel is consumed
+   *
+   * @param consume If true, fuel is consumed
    * @return Mapper function for liquid fuel
    */
-  private NonNullFunction<Storage<FluidVariant>,Integer> tryLiquidFuel(boolean consume) {
+  private NonNullFunction<Storage<FluidVariant>, Integer> tryLiquidFuel(boolean consume) {
     return consume ? tryLiquidFuelConsume : tryLiquidFuelNoConsume;
   }
 
   /**
    * Tries to consume fuel from the given position
-   * @param pos  Position
-   * @return   Temperature of the consumed fuel, 0 if none found
+   *
+   * @param pos Position
+   * @return Temperature of the consumed fuel, 0 if none found
    */
   private int tryFindFuel(BlockPos pos, boolean consume) {
     // if we find a valid cap, try to consume fuel from it
@@ -265,7 +302,8 @@ public class FuelModule implements ContainerData {
     Optional<Integer> temperature = Optional.ofNullable(storage).map(tryLiquidFuel(consume));
     if (temperature.isPresent()) {
       itemHandler = null;
-      fluidHandler = StorageProvider.createForFluids(getLevel(), pos);;
+      fluidHandler = StorageProvider.createForFluids(getLevel(), pos);
+      ;
       tankDisplayHandlers = null;
       lastPos = pos;
       return temperature.get();
@@ -287,16 +325,17 @@ public class FuelModule implements ContainerData {
 
   /**
    * Attempts to consume fuel from one of the tanks
-   * @return  temperature of the found fluid, 0 if none
+   *
+   * @return temperature of the found fluid, 0 if none
    */
   public int findFuel(boolean consume) {
     // if we have a handler, try to use that if possible
     Optional<Integer> handlerTemp = Optional.empty();
     if (fluidHandler != null) {
-      handlerTemp = Optional.ofNullable(getFluidStorage()).map(tryLiquidFuel(consume));
+      handlerTemp = getFluidStorage().map(tryLiquidFuel(consume));
     } else if (itemHandler != null) {
-      handlerTemp = Optional.ofNullable(getItemStorage()).map(trySolidFuel(consume));
-    // if no handler, try to find one at the last position
+      handlerTemp = getItemStorage().map(trySolidFuel(consume));
+      // if no handler, try to find one at the last position
     } else if (lastPos != NULL_POS) {
       int posTemp = tryFindFuel(lastPos, consume);
       if (posTemp > 0) {
@@ -327,20 +366,16 @@ public class FuelModule implements ContainerData {
     return 0;
   }
 
-  public Storage<FluidVariant> getFluidStorage() {
-    Storage<FluidVariant> storage = fluidHandler.get(null);
-    if (storage == null) {
-      reset();
-    }
-    return storage;
+  public Optional<Storage<FluidVariant>> getFluidStorage() {
+    Optional<Storage<FluidVariant>> optional = Optional.ofNullable(fluidHandler).map(x -> x.get(null));
+    if (optional.isEmpty()) reset();
+    return optional;
   }
 
-  public Storage<ItemVariant> getItemStorage() {
-    Storage<ItemVariant> storage = itemHandler.get(null);
-    if (storage == null) {
-      reset();
-    }
-    return storage;
+  public Optional<Storage<ItemVariant>> getItemStorage() {
+    Optional<Storage<ItemVariant>> optional = Optional.ofNullable(itemHandler).map(x -> x.get(null));
+    if (optional.isEmpty()) reset();
+    return optional;
   }
 
   /* Tag */
@@ -350,7 +385,8 @@ public class FuelModule implements ContainerData {
 
   /**
    * Reads the fuel from NBT
-   * @param nbt  Tag to read from
+   *
+   * @param nbt Tag to read from
    */
   public void readFromTag(CompoundTag nbt) {
     if (nbt.contains(TAG_FUEL, Tag.TAG_ANY_NUMERIC)) {
@@ -366,8 +402,9 @@ public class FuelModule implements ContainerData {
 
   /**
    * Writes the fuel to NBT
-   * @param nbt  Tag to write to
-   * @return  Tag written to
+   *
+   * @param nbt Tag to write to
+   * @return Tag written to
    */
   public CompoundTag writeToTag(CompoundTag nbt) {
     nbt.putInt(TAG_FUEL, fuel);
@@ -396,9 +433,9 @@ public class FuelModule implements ContainerData {
   @Override
   public int get(int index) {
     return switch (index) {
-      case FUEL         -> fuel;
+      case FUEL -> fuel;
       case FUEL_QUALITY -> fuelQuality;
-      case TEMPERATURE  -> temperature;
+      case TEMPERATURE -> temperature;
       case LAST_X -> lastPos.getX();
       case LAST_Y -> lastPos.getY();
       case LAST_Z -> lastPos.getZ();
@@ -409,9 +446,9 @@ public class FuelModule implements ContainerData {
   @Override
   public void set(int index, int value) {
     switch (index) {
-      case FUEL         -> fuel = value;
+      case FUEL -> fuel = value;
       case FUEL_QUALITY -> fuelQuality = value;
-      case TEMPERATURE  -> temperature = value;
+      case TEMPERATURE -> temperature = value;
 
       // position sync takes three parts
       case LAST_X, LAST_Y, LAST_Z -> {
@@ -439,7 +476,8 @@ public class FuelModule implements ContainerData {
    * Called client side to get the fuel info for the current tank
    * Note this relies on the client side fuel handlers containing fuel, which is common for our blocks as show fluid in world.
    * If a tank does not do that this won't work.
-   * @return  Fuel info
+   *
+   * @return Fuel info
    */
   public FuelInfo getFuelInfo() {
     List<BlockPos> positions = null;
@@ -477,7 +515,7 @@ public class FuelModule implements ContainerData {
     }
 
     // determine what fluid we have and hpw many other fluids we have
-    FuelInfo info = Optional.ofNullable(getFluidStorage()).map(handler -> {
+    FuelInfo info = getFluidStorage().map(handler -> {
       for (StorageView<FluidVariant> view : handler.nonEmptyViews()) {
         FluidStack fluid = new FluidStack(view);
         int temperature = 0;
@@ -514,7 +552,7 @@ public class FuelModule implements ContainerData {
       FluidStack currentFuel = info.getFluid();
       for (BlockPos pos : tankDisplayHandlers) {
         Storage<FluidVariant> handler = FluidStorage.SIDED.find(world, pos, null);
-        if (handler != null ) {
+        if (handler != null) {
           // sum if empty (more capacity) or the same fluid (more amount and capacity)
           for (StorageView<FluidVariant> view : handler.nonEmptyViews()) {
             FluidStack fluid = new FluidStack(view);
@@ -533,13 +571,20 @@ public class FuelModule implements ContainerData {
     return info;
   }
 
-  /** Data class to hold information about the current fuel */
+  /**
+   * Data class to hold information about the current fuel
+   */
   @Getter
   @AllArgsConstructor(access = AccessLevel.PRIVATE)
   public static class FuelInfo {
-    /** Empty fuel instance */
+
+    /**
+     * Empty fuel instance
+     */
     public static final FuelInfo EMPTY = new FuelInfo(FluidStack.EMPTY, 0, 0, 0);
-    /** Item fuel instance */
+    /**
+     * Item fuel instance
+     */
     public static final FuelInfo ITEM = new FuelInfo(FluidStack.EMPTY, 0, 0, SOLID_TEMPERATURE);
 
     private final FluidStack fluid;
@@ -549,9 +594,10 @@ public class FuelModule implements ContainerData {
 
     /**
      * Gets fuel info from the given stack and capacity
-     * @param fluid     Fluid
-     * @param capacity  Capacity
-     * @return  Fuel info
+     *
+     * @param fluid    Fluid
+     * @param capacity Capacity
+     * @return Fuel info
      */
     public static FuelInfo of(FluidStack fluid, long capacity, int temperature) {
       if (fluid.isEmpty()) {
@@ -562,8 +608,9 @@ public class FuelModule implements ContainerData {
 
     /**
      * Adds an additional amount and capacity to this info
-     * @param amount    Amount to add
-     * @param capacity  Capacity to add
+     *
+     * @param amount   Amount to add
+     * @param capacity Capacity to add
      */
     protected void add(long amount, long capacity) {
       this.totalAmount += amount;
@@ -572,13 +619,16 @@ public class FuelModule implements ContainerData {
 
     /**
      * Checks if this fuel info is an item
-     * @return  True if an item
+     *
+     * @return True if an item
      */
     public boolean isItem() {
       return this == ITEM;
     }
 
-    /** Checks if this fuel info has no fluid */
+    /**
+     * Checks if this fuel info has no fluid
+     */
     public boolean isEmpty() {
       return fluid.isEmpty() || totalAmount == 0 || capacity == 0;
     }
