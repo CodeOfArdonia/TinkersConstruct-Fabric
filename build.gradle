@@ -180,6 +180,7 @@ dependencies {
             exclude(group: "net.fabricmc.fabric-api")
         }
     } else if (project.recipe_viewer == 'emi') {
+        modRuntimeOnly "mezz.jei:jei-${minecraft_version}-fabric:${jei_version}"
         modRuntimeOnly "dev.emi:emi-fabric:${project.emi_version}"
     } else {
         println("unknown recipe viewer: $recipe_viewer")

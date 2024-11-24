@@ -4,7 +4,6 @@ import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -12,7 +11,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.alchemy.Potions;
@@ -54,7 +52,6 @@ import slimeknights.tconstruct.world.TinkerStructures;
 import slimeknights.tconstruct.world.TinkerWorld;
 import slimeknights.tconstruct.world.WorldEvents;
 
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.function.Supplier;
 
@@ -90,10 +87,10 @@ public class TConstruct implements ModInitializer {
     new TinkerWorld();
     new TinkerStructures();
     // tools
-   new TinkerTables();
-   new TinkerModifiers();
-   new TinkerToolParts();
-   new TinkerTools();
+    new TinkerTables();
+    new TinkerModifiers();
+    new TinkerToolParts();
+    new TinkerTools();
     // smeltery
     new TinkerSmeltery();
 
@@ -214,8 +211,9 @@ public class TConstruct implements ModInitializer {
 
   /**
    * Gets a resource location for Tinkers
-   * @param name  Resource path
-   * @return  Location for tinkers
+   *
+   * @param name Resource path
+   * @return Location for tinkers
    */
   public static ResourceLocation getResource(String name) {
     return new ResourceLocation(MOD_ID, name);
@@ -223,8 +221,9 @@ public class TConstruct implements ModInitializer {
 
   /**
    * Gets a data key for the capability, mainly used for modifier markers
-   * @param name  Resource path
-   * @return  Location for tinkers
+   *
+   * @param name Resource path
+   * @return Location for tinkers
    */
   public static <T> TinkerDataKey<T> createKey(String name) {
     return TinkerDataKey.of(getResource(name));
@@ -232,9 +231,10 @@ public class TConstruct implements ModInitializer {
 
   /**
    * Gets a data key for the capability, mainly used for modifier markers
-   * @param name         Resource path
-   * @param constructor  Constructor for compute if absent
-   * @return  Location for tinkers
+   *
+   * @param name        Resource path
+   * @param constructor Constructor for compute if absent
+   * @return Location for tinkers
    */
   public static <T> ComputableDataKey<T> createKey(String name, Supplier<T> constructor) {
     return ComputableDataKey.of(getResource(name), constructor);
@@ -258,9 +258,10 @@ public class TConstruct implements ModInitializer {
 
   /**
    * Makes a translation key for the given name
-   * @param base  Base name, such as "block" or "gui"
-   * @param name  Object name
-   * @return  Translation key
+   *
+   * @param base Base name, such as "block" or "gui"
+   * @param name Object name
+   * @return Translation key
    */
   public static String makeTranslationKey(String base, String name) {
     return Util.makeTranslationKey(base, getResource(name));
@@ -268,9 +269,10 @@ public class TConstruct implements ModInitializer {
 
   /**
    * Makes a translation text component for the given name
-   * @param base  Base name, such as "block" or "gui"
-   * @param name  Object name
-   * @return  Translation key
+   *
+   * @param base Base name, such as "block" or "gui"
+   * @param name Object name
+   * @return Translation key
    */
   public static MutableComponent makeTranslation(String base, String name) {
     return Component.translatable(makeTranslationKey(base, name));
@@ -278,10 +280,11 @@ public class TConstruct implements ModInitializer {
 
   /**
    * Makes a translation text component for the given name
-   * @param base       Base name, such as "block" or "gui"
-   * @param name       Object name
-   * @param arguments  Additional arguments to the translation
-   * @return  Translation key
+   *
+   * @param base      Base name, such as "block" or "gui"
+   * @param name      Object name
+   * @param arguments Additional arguments to the translation
+   * @return Translation key
    */
   public static MutableComponent makeTranslation(String base, String name, Object... arguments) {
     return Component.translatable(makeTranslationKey(base, name), arguments);
@@ -291,9 +294,10 @@ public class TConstruct implements ModInitializer {
    * This function is called in the constructor in some internal classes that are a common target for addons to wrongly extend.
    * These classes will cause issues if blindly used by the addon, and are typically trivial for the addon to implement
    * the parts they need if they just put in some effort understanding the code they are copying.
-   *
+   * <p>
    * As a reminder for addon devs, anything that is not in the library package can and will change arbitrarily. If you need to use a feature outside library, request it on our github.
-   * @param self  Class to validate
+   *
+   * @param self Class to validate
    */
   public static void sealTinkersClass(Object self, String base, String solution) {
     // note for future maintainers: this does not use Java 9's sealed classes as unless you use modules those are restricted to the same package.
