@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class ModifierWorktableContainerMenu extends TabbedContainerMenu<ModifierWorktableBlockEntity> {
+
   // slots
   @Getter
   private final List<Slot> inputSlots;
@@ -37,10 +38,10 @@ public class ModifierWorktableContainerMenu extends TabbedContainerMenu<Modifier
       // slots
       this.addSlot(this.outputSlot = new LazyResultSlot(tile.getCraftingResult(), 125, 33));
       // inputs
-      inputSlots = new ArrayList<>();
-      inputSlots.add(this.addSlot(new WorktableSlot(this, tile, ModifierWorktableBlockEntity.TINKER_SLOT, 8, 15)));
+      this.inputSlots = new ArrayList<>();
+      this.inputSlots.add(this.addSlot(new WorktableSlot(this, tile, ModifierWorktableBlockEntity.TINKER_SLOT, 8, 15)));
       for (int index = 0; index < tile.getContainerSize() - 1; index++) {
-        inputSlots.add(this.addSlot(new WorktableSlot(this, tile, index + ModifierWorktableBlockEntity.INPUT_START, 8, 35 + 18*index)));
+        this.inputSlots.add(this.addSlot(new WorktableSlot(this, tile, index + ModifierWorktableBlockEntity.INPUT_START, 8, 35 + 18 * index)));
       }
 
       // listen for the button to change in the tile
@@ -85,8 +86,8 @@ public class ModifierWorktableContainerMenu extends TabbedContainerMenu<Modifier
     if (playerIn.isSpectator()) {
       return false;
     }
-    if (id >= 0 && tile != null) {
-      tile.selectModifier(id);
+    if (id >= 0 && this.tile != null) {
+      this.tile.selectModifier(id);
     }
     return true;
   }
@@ -96,11 +97,14 @@ public class ModifierWorktableContainerMenu extends TabbedContainerMenu<Modifier
     return slotIn != this.outputSlot && super.canTakeItemForPickAll(stack, slotIn);
   }
 
-  /** Slot to update recipe on change */
+  /**
+   * Slot to update recipe on change
+   */
   private static class WorktableSlot extends Slot {
 
     private final TabbedContainerMenu<?> menu;
     private final ModifierWorktableBlockEntity tile;
+
     public WorktableSlot(TabbedContainerMenu<?> menu, ModifierWorktableBlockEntity tile, int index, int xPosition, int yPosition) {
       super(tile, index, xPosition, yPosition);
       this.menu = menu;
@@ -109,9 +113,9 @@ public class ModifierWorktableContainerMenu extends TabbedContainerMenu<Modifier
 
     @Override
     public void setChanged() {
-      tile.onSlotChanged(index);
+      this.tile.onSlotChanged(this.index);
       super.setChanged();
-      menu.updateScreen();
+      this.menu.updateScreen();
     }
   }
 }

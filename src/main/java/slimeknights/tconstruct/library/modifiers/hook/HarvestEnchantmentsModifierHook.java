@@ -14,28 +14,35 @@ import java.util.function.Function;
  * TODO 1.19: move into {@link slimeknights.tconstruct.library.modifiers.hook.mining}
  */
 public interface HarvestEnchantmentsModifierHook {
+
   HarvestEnchantmentsModifierHook EMPTY = (tool, modifier, context, consumer) -> {};
 
-  /** Merger that runs all submodules */
-  Function<Collection<HarvestEnchantmentsModifierHook>,HarvestEnchantmentsModifierHook> ALL_MERGER = AllMerger::new;
+  /**
+   * Merger that runs all submodules
+   */
+  Function<Collection<HarvestEnchantmentsModifierHook>, HarvestEnchantmentsModifierHook> ALL_MERGER = AllMerger::new;
 
   /**
    * Adds harvest loot table related enchantments from this modifier's effect to the tool, called before breaking a block.
    * Needed to add enchantments for silk touch and fortune. Can add conditionally if needed. Only affects tinker tools
    * For looting, see {@link LootingModifierHook}
-   * @param tool      Tool used
-   * @param modifier  Modifier used
-   * @param context   Harvest context
-   * @param consumer  Consumer accepting any enchantments
+   *
+   * @param tool     Tool used
+   * @param modifier Modifier used
+   * @param context  Harvest context
+   * @param consumer Consumer accepting any enchantments
    */
-  void applyHarvestEnchantments(IToolStackView tool, ModifierEntry modifier, ToolHarvestContext context, BiConsumer<Enchantment,Integer> consumer);
+  void applyHarvestEnchantments(IToolStackView tool, ModifierEntry modifier, ToolHarvestContext context, BiConsumer<Enchantment, Integer> consumer);
 
 
-  /** Merger that runs all submodules */
+  /**
+   * Merger that runs all submodules
+   */
   record AllMerger(Collection<HarvestEnchantmentsModifierHook> modules) implements HarvestEnchantmentsModifierHook {
+
     @Override
-    public void applyHarvestEnchantments(IToolStackView tool, ModifierEntry modifier, ToolHarvestContext context, BiConsumer<Enchantment,Integer> consumer) {
-      for (HarvestEnchantmentsModifierHook module : modules) {
+    public void applyHarvestEnchantments(IToolStackView tool, ModifierEntry modifier, ToolHarvestContext context, BiConsumer<Enchantment, Integer> consumer) {
+      for (HarvestEnchantmentsModifierHook module : this.modules) {
         module.applyHarvestEnchantments(tool, modifier, context, consumer);
       }
     }

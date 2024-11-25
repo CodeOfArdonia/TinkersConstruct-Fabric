@@ -6,10 +6,16 @@ import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 
-/** Effect extension with a few helpers */
+/**
+ * Effect extension with a few helpers
+ */
 public class TinkerEffect extends MobEffect {
-  /** If true, effect is visible, false for hidden */
+
+  /**
+   * If true, effect is visible, false for hidden
+   */
   private final boolean show;
+
   public TinkerEffect(MobEffectCategory typeIn, boolean show) {
     this(typeIn, 0xffffff, show);
   }
@@ -26,12 +32,12 @@ public class TinkerEffect extends MobEffect {
     return new MobEffectRenderer() {
       @Override
       public boolean isVisibleInInventory(MobEffectInstance effect) {
-        return show;
+        return TinkerEffect.this.show;
       }
 
       @Override
       public boolean isVisibleInGui(MobEffectInstance effect) {
-        return show;
+        return TinkerEffect.this.show;
       }
     };
   }
@@ -40,9 +46,10 @@ public class TinkerEffect extends MobEffect {
 
   /**
    * Applies this potion to an entity
-   * @param entity    Entity
-   * @param duration  Duration
-   * @return  Applied instance
+   *
+   * @param entity   Entity
+   * @param duration Duration
+   * @return Applied instance
    */
   public MobEffectInstance apply(LivingEntity entity, int duration) {
     return this.apply(entity, duration, 0);
@@ -50,10 +57,11 @@ public class TinkerEffect extends MobEffect {
 
   /**
    * Applies this potion to an entity
-   * @param entity    Entity
-   * @param duration  Duration
-   * @param level     Effect level
-   * @return  Applied instance
+   *
+   * @param entity   Entity
+   * @param duration Duration
+   * @param level    Effect level
+   * @return Applied instance
    */
   public MobEffectInstance apply(LivingEntity entity, int duration, int level) {
     return this.apply(entity, duration, level, false);
@@ -61,11 +69,12 @@ public class TinkerEffect extends MobEffect {
 
   /**
    * Applies this potion to an entity
-   * @param entity    Entity
-   * @param duration  Duration
-   * @param level     Effect level
-   * @param showIcon  If true, shows an icon in the HUD
-   * @return  Applied instance
+   *
+   * @param entity   Entity
+   * @param duration Duration
+   * @param level    Effect level
+   * @param showIcon If true, shows an icon in the HUD
+   * @return Applied instance
    */
   public MobEffectInstance apply(LivingEntity entity, int duration, int level, boolean showIcon) {
     MobEffectInstance effect = new MobEffectInstance(this, duration, level, false, false, showIcon);
@@ -75,8 +84,9 @@ public class TinkerEffect extends MobEffect {
 
   /**
    * Gets the level of the effect on the entity, or -1 if not active
-   * @param entity  Entity to check
-   * @return  Level, or -1 if inactive
+   *
+   * @param entity Entity to check
+   * @return Level, or -1 if inactive
    */
   public int getLevel(LivingEntity entity) {
     MobEffectInstance effect = entity.getEffect(this);

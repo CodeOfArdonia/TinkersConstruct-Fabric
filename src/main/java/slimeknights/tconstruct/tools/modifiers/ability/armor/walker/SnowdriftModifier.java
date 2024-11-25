@@ -10,6 +10,7 @@ import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 import slimeknights.tconstruct.tools.TinkerModifiers;
 
 public class SnowdriftModifier extends AbstractWalkerModifier {
+
   @Override
   public int getPriority() {
     return 90; // after frostwalker

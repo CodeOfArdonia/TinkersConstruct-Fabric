@@ -20,7 +20,7 @@ public class EntityTypeTagProvider extends FabricTagProvider.EntityTypeTagProvid
   @Override
   public void addTags(HolderLookup.Provider provider) {
     this.tag(TinkerTags.EntityTypes.SLIMES)
-        .add(EntityType.SLIME, TinkerWorld.earthSlimeEntity.get(), TinkerWorld.skySlimeEntity.get(), TinkerWorld.enderSlimeEntity.get(), TinkerWorld.terracubeEntity.get());
+      .add(EntityType.SLIME, TinkerWorld.earthSlimeEntity.get(), TinkerWorld.skySlimeEntity.get(), TinkerWorld.enderSlimeEntity.get(), TinkerWorld.terracubeEntity.get());
     this.tag(TinkerTags.EntityTypes.BACON_PRODUCER).add(EntityType.PIG, EntityType.PIGLIN, EntityType.HOGLIN);
 
     this.tag(TinkerTags.EntityTypes.MELTING_SHOW).add(EntityType.IRON_GOLEM, EntityType.SNOW_GOLEM, EntityType.VILLAGER, EntityType.PLAYER);
@@ -40,7 +40,7 @@ public class EntityTypeTagProvider extends FabricTagProvider.EntityTypeTagProvid
 
   @Override
   protected FabricTagBuilder tag(TagKey<EntityType<?>> tagKey) {
-    return getOrCreateTagBuilder(tagKey);
+    return this.getOrCreateTagBuilder(tagKey);
   }
 
   @Override

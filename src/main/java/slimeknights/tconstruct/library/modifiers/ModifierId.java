@@ -30,8 +30,9 @@ public class ModifierId extends ResourceLocation {
 
   /**
    * Creates a new modifier ID from the given string
-   * @param string  String
-   * @return  Material ID, or null if invalid
+   *
+   * @param string String
+   * @return Material ID, or null if invalid
    */
   @Nullable
   public static ModifierId tryParse(String string) {
@@ -44,9 +45,10 @@ public class ModifierId extends ResourceLocation {
 
   /**
    * Gets a modifier ID from JSON, throwing a nice exception if invalid
-   * @param tag  Compound object
-   * @param key   Key to fetch
-   * @return  Resource location parsed
+   *
+   * @param tag Compound object
+   * @param key Key to fetch
+   * @return Resource location parsed
    */
   public static ModifierId getFromNbt(CompoundTag tag, String key) {
     String text = tag.getString(key);
@@ -59,9 +61,10 @@ public class ModifierId extends ResourceLocation {
 
   /**
    * Gets a modifier ID from JSON, throwing a nice exception if invalid
-   * @param json  JSON object
-   * @param key   Key to fetch
-   * @return  Resource location parsed
+   *
+   * @param json JSON object
+   * @param key  Key to fetch
+   * @return Resource location parsed
    */
   public static ModifierId getFromJson(JsonObject json, String key) {
     String text = GsonHelper.getAsString(json, key);
@@ -74,9 +77,10 @@ public class ModifierId extends ResourceLocation {
 
   /**
    * Gets a modifier ID from JSON, throwing a nice exception if invalid
-   * @param json  JSON object
-   * @param key   Key to fetch
-   * @return  Resource location parsed
+   *
+   * @param json JSON object
+   * @param key  Key to fetch
+   * @return Resource location parsed
    */
   public static ModifierId convertFromJson(JsonElement json, String key) {
     String text = GsonHelper.convertToString(json, key);
@@ -87,12 +91,16 @@ public class ModifierId extends ResourceLocation {
     return location;
   }
 
-  /** Writes an ID to the packet buffer */
+  /**
+   * Writes an ID to the packet buffer
+   */
   public void toNetwork(FriendlyByteBuf buf) {
-    buf.writeUtf(toString());
+    buf.writeUtf(this.toString());
   }
 
-  /** Reads an ID from the packet buffer */
+  /**
+   * Reads an ID from the packet buffer
+   */
   public static ModifierId fromNetwork(FriendlyByteBuf buf) {
     return new ModifierId(buf.readUtf(Short.MAX_VALUE));
   }

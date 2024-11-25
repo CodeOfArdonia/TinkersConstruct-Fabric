@@ -1,9 +1,7 @@
 package slimeknights.tconstruct.library.client.modifiers;
 
-import com.google.common.collect.ImmutableList;
 import com.mojang.math.Transformation;
 import net.fabricmc.fabric.api.renderer.v1.mesh.Mesh;
-import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.nbt.Tag;
@@ -18,9 +16,14 @@ import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 import javax.annotation.Nullable;
 import java.util.function.Function;
 
-/** Modifier model that copies dye from a key and is breakable */
+/**
+ * Modifier model that copies dye from a key and is breakable
+ */
 public class BreakableDyedModifierModel implements IBakedModifierModel {
-  /** Constant unbaked model instance, as they are all the same */
+
+  /**
+   * Constant unbaked model instance, as they are all the same
+   */
   public static final IUnbakedModifierModel UNBAKED_INSTANCE = (smallGetter, largeGetter) -> {
     Material smallTexture = smallGetter.apply("");
     Material brokenSmall = smallGetter.apply("_broken");
@@ -32,7 +35,9 @@ public class BreakableDyedModifierModel implements IBakedModifierModel {
     return null;
   };
 
-  /** Textures to show */
+  /**
+   * Textures to show
+   */
   private final Material[] textures;
 
   public BreakableDyedModifierModel(@Nullable Material normalSmall, @Nullable Material brokenSmall, @Nullable Material normalLarge, @Nullable Material brokenLarge) {
@@ -52,8 +57,8 @@ public class BreakableDyedModifierModel implements IBakedModifierModel {
   }
 
   @Override
-  public Mesh getQuads(IToolStackView tool, ModifierEntry modifier, Function<Material,TextureAtlasSprite> spriteGetter, Transformation transforms, boolean isLarge, int startTintIndex, @Nullable ItemLayerPixels pixels) {
-    Material texture = textures[(isLarge ? 2 : 0) | (tool.isBroken() ? 1 : 0)];
+  public Mesh getQuads(IToolStackView tool, ModifierEntry modifier, Function<Material, TextureAtlasSprite> spriteGetter, Transformation transforms, boolean isLarge, int startTintIndex, @Nullable ItemLayerPixels pixels) {
+    Material texture = this.textures[(isLarge ? 2 : 0) | (tool.isBroken() ? 1 : 0)];
     if (texture != null) {
       IModDataView data = tool.getPersistentData();
       ResourceLocation key = modifier.getId();
@@ -64,6 +69,8 @@ public class BreakableDyedModifierModel implements IBakedModifierModel {
     return EMPTY_MESH;
   }
 
-  /** Data class to cache a colored texture */
+  /**
+   * Data class to cache a colored texture
+   */
   private record CacheKey(ModifierId modifier, int color) {}
 }

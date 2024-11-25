@@ -61,8 +61,7 @@ public class SlimeTree extends AbstractTreeGrower {
     world.setBlock(pos, Blocks.AIR.defaultBlockState(), 4);
     if (configuredFeature.place(world, chunkGenerator, rand, pos)) {
       return true;
-    }
-    else {
+    } else {
       world.setBlock(pos, state, 4);
       return false;
     }

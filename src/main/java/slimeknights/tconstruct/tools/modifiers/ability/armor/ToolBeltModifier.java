@@ -38,18 +38,21 @@ import javax.annotation.Nullable;
 import static slimeknights.tconstruct.library.tools.capability.ToolInventoryCapability.isBlacklisted;
 
 public class ToolBeltModifier extends InventoryMenuModifier {
+
   private static final Pattern PATTERN = new Pattern(TConstruct.MOD_ID, "tool_belt");
   private static final ResourceLocation SLOT_OVERRIDE = TConstruct.getResource("tool_belt_override");
 
-  /** Loader instance */
+  /**
+   * Loader instance
+   */
   public static final IGenericLoader<ToolBeltModifier> LOADER = new IGenericLoader<>() {
     @Override
     public ToolBeltModifier deserialize(JsonObject json) {
       JsonArray slotJson = GsonHelper.getAsJsonArray(json, "level_slots");
       int[] slots = new int[slotJson.size()];
       for (int i = 0; i < slots.length; i++) {
-        slots[i] = GsonHelper.convertToInt(slotJson.get(i), "level_slots["+i+"]");
-        if (i > 0 && slots[i] <= slots[i-1]) {
+        slots[i] = GsonHelper.convertToInt(slotJson.get(i), "level_slots[" + i + "]");
+        if (i > 0 && slots[i] <= slots[i - 1]) {
           throw new JsonSyntaxException("level_slots must be increasing");
         }
       }
@@ -77,6 +80,7 @@ public class ToolBeltModifier extends InventoryMenuModifier {
   };
 
   private final int[] counts;
+
   public ToolBeltModifier(int[] counts) {
     super(counts[0]);
     this.counts = counts;
@@ -97,27 +101,29 @@ public class ToolBeltModifier extends InventoryMenuModifier {
     return 85; // after shield strap, before pockets
   }
 
-  /** Gets the proper number of slots for the given level */
+  /**
+   * Gets the proper number of slots for the given level
+   */
   private int getProperSlots(int level) {
     if (level <= 0) {
       return 0;
     }
-    if (level > counts.length) {
+    if (level > this.counts.length) {
       return 9;
     } else {
-      return counts[level - 1];
+      return this.counts[level - 1];
     }
   }
 
   @Override
   public void addVolatileData(ToolRebuildContext context, int level, ModDataNBT volatileData) {
-    int properSlots = getProperSlots(level);
+    int properSlots = this.getProperSlots(level);
     int slots;
     // find the largest slot index and either add or update the override as needed
     // TODO: can probably remove this code for 1.19
     if (properSlots < 9) {
       slots = properSlots;
-      ResourceLocation key = getInventoryKey();
+      ResourceLocation key = this.getInventoryKey();
       IModDataView modData = context.getPersistentData();
       if (modData.contains(key, Tag.TAG_LIST)) {
         ListTag list = modData.get(key, GET_COMPOUND_LIST);
@@ -142,7 +148,7 @@ public class ToolBeltModifier extends InventoryMenuModifier {
 
   @Override
   public int getSlots(IToolContext tool, int level) {
-    int properSlots = getProperSlots(level);
+    int properSlots = this.getProperSlots(level);
     if (properSlots >= 9) {
       return 9;
     }
@@ -151,7 +157,7 @@ public class ToolBeltModifier extends InventoryMenuModifier {
 
   @Override
   public ValidatedResult validate(IToolStackView tool, int level) {
-    return validateForMaxSlots(tool, getProperSlots(level));
+    return this.validateForMaxSlots(tool, this.getProperSlots(level));
   }
 
   @Override
@@ -165,13 +171,13 @@ public class ToolBeltModifier extends InventoryMenuModifier {
       }
 
       boolean didChange = false;
-      int slots = getSlots(tool, modifier.getLevel());
+      int slots = this.getSlots(tool, modifier.getLevel());
       ModDataNBT persistentData = tool.getPersistentData();
       ListTag list = new ListTag();
       boolean[] swapped = new boolean[slots];
       // if we have existing items, swap stacks at each index
       Inventory inventory = player.getInventory();
-      ResourceLocation key = getInventoryKey();
+      ResourceLocation key = this.getInventoryKey();
       if (persistentData.contains(key, Tag.TAG_LIST)) {
         ListTag original = persistentData.get(key, GET_COMPOUND_LIST);
         if (!original.isEmpty()) {

@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.world.item.ItemStack;
 
 public class EmptySlottedStorage implements SlottedStackStorage {
+
   public static final EmptySlottedStorage EMPTY = new EmptySlottedStorage();
   public static final EmptySlot EMPTY_SLOT = new EmptySlot();
 

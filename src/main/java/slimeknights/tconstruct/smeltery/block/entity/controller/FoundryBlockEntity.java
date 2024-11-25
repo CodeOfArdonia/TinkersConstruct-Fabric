@@ -19,12 +19,19 @@ import slimeknights.tconstruct.smeltery.block.entity.multiblock.HeatingStructure
 import javax.annotation.Nullable;
 
 public class FoundryBlockEntity extends HeatingStructureBlockEntity {
-  /** Fluid capacity per internal block */
+
+  /**
+   * Fluid capacity per internal block
+   */
   private static final long CAPACITY_PER_BLOCK = FluidValues.INGOT * 8;
-  /** GUI name */
+  /**
+   * GUI name
+   */
   private static final Component NAME = TConstruct.makeTranslation("gui", "foundry");
-  /** Number of wall blocks needed to increase the fuel cost by 1
-   * this is a bit higher than the smeltery as the structure uses more blocks, balances out in larger structures */
+  /**
+   * Number of wall blocks needed to increase the fuel cost by 1
+   * this is a bit higher than the smeltery as the structure uses more blocks, balances out in larger structures
+   */
   private static final int BLOCKS_PER_FUEL = 18;
 
   public FoundryBlockEntity(BlockPos pos, BlockState state) {
@@ -39,7 +46,7 @@ public class FoundryBlockEntity extends HeatingStructureBlockEntity {
 
   @Override
   protected MeltingModuleInventory createMeltingInventory() {
-    return new ByproductMeltingModuleInventory(this, tank, Config.COMMON.foundryOreRate);
+    return new ByproductMeltingModuleInventory(this, this.tank, Config.COMMON.foundryOreRate);
   }
 
   @Override
@@ -49,51 +56,51 @@ public class FoundryBlockEntity extends HeatingStructureBlockEntity {
 
   @Override
   protected void heat() {
-    if (structure == null || level == null) {
+    if (this.structure == null || this.level == null) {
       return;
     }
 
     // the next set of behaviors all require fuel, skip if no tanks
-    if (structure.hasTanks()) {
+    if (this.structure.hasTanks()) {
       // every second, interact with entities, will consume fuel if needed
       boolean entityMelted = false;
-      if (tick == 12) {
-        entityMelted = entityModule.interactWithEntities();
+      if (this.tick == 12) {
+        entityMelted = this.entityModule.interactWithEntities();
       }
 
       // run in four phases alternating each tick, so each thing runs once every 4 ticks
-      switch (tick % 4) {
+      switch (this.tick % 4) {
         // first tick, find fuel if needed
         case 0:
-          if (!fuelModule.hasFuel()) {
+          if (!this.fuelModule.hasFuel()) {
             // if we melted something already, we need fuel
             if (entityMelted) {
-              fuelModule.findFuel(true);
+              this.fuelModule.findFuel(true);
             } else {
               // both alloying and melting need to know the temperature
-              if (meltingInventory.canHeat(fuelModule.findFuel(false))) {
-                fuelModule.findFuel(true);
+              if (this.meltingInventory.canHeat(this.fuelModule.findFuel(false))) {
+                this.fuelModule.findFuel(true);
               }
             }
           }
           break;
         // second tick: melt items
         case 1:
-          if (fuelModule.hasFuel()) {
-            meltingInventory.heatItems(fuelModule.getTemperature());
+          if (this.fuelModule.hasFuel()) {
+            this.meltingInventory.heatItems(this.fuelModule.getTemperature());
           } else {
-            meltingInventory.coolItems();
+            this.meltingInventory.coolItems();
           }
           break;
         // fourth tick: consume fuel, update fluids
         case 3: {
           // update the active state
-          boolean hasFuel = fuelModule.hasFuel();
-          BlockState state = getBlockState();
+          boolean hasFuel = this.fuelModule.hasFuel();
+          BlockState state = this.getBlockState();
           if (state.getValue(ControllerBlock.ACTIVE) != hasFuel) {
-            level.setBlockAndUpdate(worldPosition, state.setValue(ControllerBlock.ACTIVE, hasFuel));
+            this.level.setBlockAndUpdate(this.worldPosition, state.setValue(ControllerBlock.ACTIVE, hasFuel));
           }
-          fuelModule.decreaseFuel(fuelRate);
+          this.fuelModule.decreaseFuel(this.fuelRate);
           break;
         }
       }
@@ -106,12 +113,12 @@ public class FoundryBlockEntity extends HeatingStructureBlockEntity {
     if (structure != null) {
       int dx = structure.getInnerX(), dy = structure.getInnerY(), dz = structure.getInnerZ();
       // tank capacity includes walls and floor
-      tank.setCapacity(CAPACITY_PER_BLOCK * (dx + 2) * (dy + 1) * (dz + 2));
+      this.tank.setCapacity(CAPACITY_PER_BLOCK * (dx + 2) * (dy + 1) * (dz + 2));
       // item capacity uses just inner space
-      meltingInventory.resize(dx * dy * dz, dropItem);
+      this.meltingInventory.resize(dx * dy * dz, this.dropItem);
       // fuel rate: every 20 blocks in the wall makes the fuel cost 1 more
       // perimeter: to prevent double counting, frame just added on X and floor
-      fuelRate = 1 + (2 * ((dx+2) * dy) + 2 * (dy * dz) + ((dx+2) * (dz+2))) / BLOCKS_PER_FUEL;
+      this.fuelRate = 1 + (2 * ((dx + 2) * dy) + 2 * (dy * dz) + ((dx + 2) * (dz + 2))) / BLOCKS_PER_FUEL;
     }
   }
 }

@@ -24,7 +24,10 @@ import java.util.List;
  * Interface for a module in a composable modifier
  */
 public interface ModifierModule extends IHaveLoader<ModifierModule> {
-  /** Loader instance to register new modules. Note that loaders should not use the key "hooks" else composable modifiers will not parse */
+
+  /**
+   * Loader instance to register new modules. Note that loaders should not use the key "hooks" else composable modifiers will not parse
+   */
   GenericLoaderRegistry<ModifierModule> LOADER = new GenericLoaderRegistry<>();
 
   /**
@@ -41,6 +44,7 @@ public interface ModifierModule extends IHaveLoader<ModifierModule> {
    *   <li>If one module has nonnull priority, that priority will be used</li>
    *   <li>If two or more modules has nonnull priority, the first will be used and a warning will be logged</li>
    * </ol>>
+   *
    * @return Priority
    */
   @Nullable
@@ -48,19 +52,26 @@ public interface ModifierModule extends IHaveLoader<ModifierModule> {
     return null;
   }
 
-  /** Represents a modifier module with a list of hooks */
+  /**
+   * Represents a modifier module with a list of hooks
+   */
   record ModuleWithHooks(ModifierModule module, List<ModifierHook<?>> hooks) {
-    /** Gets the list of hooks to use for this module */
+
+    /**
+     * Gets the list of hooks to use for this module
+     */
     public List<ModifierHook<?>> getModuleHooks() {
-      if (hooks.isEmpty()) {
-        return module.getDefaultHooks();
+      if (this.hooks.isEmpty()) {
+        return this.module.getDefaultHooks();
       }
-      return hooks;
+      return this.hooks;
     }
 
-    /** Serializes this to a JSON object */
+    /**
+     * Serializes this to a JSON object
+     */
     public JsonObject serialize() {
-      JsonElement json = LOADER.serialize(module);
+      JsonElement json = LOADER.serialize(this.module);
       if (!json.isJsonObject()) {
         throw new JsonSyntaxException("Serializers for modifier modules must return json objects");
       }
@@ -75,13 +86,15 @@ public interface ModifierModule extends IHaveLoader<ModifierModule> {
       return object;
     }
 
-    /** Deserializes a module with hooks from a JSON object */
+    /**
+     * Deserializes a module with hooks from a JSON object
+     */
     public static ModuleWithHooks deserialize(JsonObject json) {
       // if there are no hooks in JSON, we use the default list from the module
       List<ModifierHook<?>> hooks = Collections.emptyList();
       if (json.has("hooks")) {
         hooks = JsonHelper.parseList(json, "hooks", (element, key) -> {
-          ResourceLocation name = JsonHelper.convertToResourceLocation(element, key) ;
+          ResourceLocation name = JsonHelper.convertToResourceLocation(element, key);
           ModifierHook<?> hook = ModifierHooks.getHook(name);
           if (hook == null) {
             throw new JsonSyntaxException("Unknown modifier hook " + name);
@@ -93,16 +106,20 @@ public interface ModifierModule extends IHaveLoader<ModifierModule> {
       return new ModuleWithHooks(module, hooks);
     }
 
-    /** Writes this module to the buffer */
+    /**
+     * Writes this module to the buffer
+     */
     public void toNetwork(FriendlyByteBuf buffer) {
-      buffer.writeVarInt(hooks.size());
-      for (ModifierHook<?> hook : hooks) {
+      buffer.writeVarInt(this.hooks.size());
+      for (ModifierHook<?> hook : this.hooks) {
         buffer.writeResourceLocation(hook.getName());
       }
-      LOADER.toNetwork(module, buffer);
+      LOADER.toNetwork(this.module, buffer);
     }
 
-    /** Reads this module from the buffer */
+    /**
+     * Reads this module from the buffer
+     */
     public static ModuleWithHooks fromNetwork(FriendlyByteBuf buffer) {
       int hookCount = buffer.readVarInt();
       ImmutableList.Builder<ModifierHook<?>> hooks = ImmutableList.builder();
@@ -121,8 +138,9 @@ public interface ModifierModule extends IHaveLoader<ModifierModule> {
 
   /**
    * Creates a modifier hook map from the given module list
-   * @param modules  List of modules
-   * @return  Modifier hook map
+   *
+   * @param modules List of modules
+   * @return Modifier hook map
    */
   static ModifierHookMap createMap(List<ModuleWithHooks> modules) {
     ModifierHookMap.Builder builder = new ModifierHookMap.Builder();

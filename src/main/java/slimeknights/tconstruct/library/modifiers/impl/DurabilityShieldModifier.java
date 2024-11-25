@@ -11,10 +11,11 @@ import slimeknights.tconstruct.library.tools.nbt.ModDataNBT;
 import javax.annotation.Nullable;
 
 public abstract class DurabilityShieldModifier extends Modifier {
+
   @Override
   public Component getDisplayName(IToolStackView tool, int level) {
-    return getDisplayName(level).copy()
-                                .append(": " + getShield(tool) + " / " + getShieldCapacity(tool, level));
+    return this.getDisplayName(level).copy()
+      .append(": " + this.getShield(tool) + " / " + this.getShieldCapacity(tool, level));
   }
 
 
@@ -24,9 +25,9 @@ public abstract class DurabilityShieldModifier extends Modifier {
   public ValidatedResult validate(IToolStackView tool, int level) {
     // clear excess overslime
     if (level > 0) {
-      int cap = getShieldCapacity(tool, level);
-      if (getShield(tool) > cap) {
-        setShield(tool.getPersistentData(), cap);
+      int cap = this.getShieldCapacity(tool, level);
+      if (this.getShield(tool) > cap) {
+        this.setShield(tool.getPersistentData(), cap);
       }
     }
     return ValidatedResult.PASS;
@@ -35,7 +36,7 @@ public abstract class DurabilityShieldModifier extends Modifier {
   @Override
   public void onRemoved(IToolStackView tool) {
     // remove all overslime on removal
-    tool.getPersistentData().remove(getShieldKey());
+    tool.getPersistentData().remove(this.getShieldKey());
   }
 
 
@@ -43,25 +44,25 @@ public abstract class DurabilityShieldModifier extends Modifier {
 
   @Override
   public int onDamageTool(IToolStackView tool, int level, int amount, @Nullable LivingEntity holder) {
-    int shield = getShield(tool);
+    int shield = this.getShield(tool);
     if (shield > 0) {
       // if we have more overslime than amount, remove some overslime
       if (shield >= amount) {
-        setShield(tool, level, shield - amount);
+        this.setShield(tool, level, shield - amount);
         return 0;
       }
       // amount is more than overslime, reduce and clear overslime
       amount -= shield;
-      setShield(tool, level, 0);
+      this.setShield(tool, level, 0);
     }
     return amount;
   }
 
   @Override
   public double getDamagePercentage(IToolStackView tool, int level) {
-    int shield = getShield(tool);
+    int shield = this.getShield(tool);
     if (shield > 0) {
-      int cap = getShieldCapacity(tool, level);
+      int cap = this.getShieldCapacity(tool, level);
       if (shield > cap) {
         return 0;
       }
@@ -73,37 +74,46 @@ public abstract class DurabilityShieldModifier extends Modifier {
 
   /* Helpers */
 
-  /** Gets the key to use for teh shield */
+  /**
+   * Gets the key to use for teh shield
+   */
   protected ResourceLocation getShieldKey() {
-    return getId();
+    return this.getId();
   }
 
-  /** Gets the current shield amount */
+  /**
+   * Gets the current shield amount
+   */
   protected int getShield(IToolStackView tool) {
-    return tool.getPersistentData().getInt(getShieldKey());
+    return tool.getPersistentData().getInt(this.getShieldKey());
   }
 
-  /** Gets the capacity of the shield for the given tool */
+  /**
+   * Gets the capacity of the shield for the given tool
+   */
   protected abstract int getShieldCapacity(IToolStackView tool, int level);
 
   /**
    * Sets the shield, bypassing the capacity
-   * @param persistentData  Persistent data
-   * @param amount          Amount to set
+   *
+   * @param persistentData Persistent data
+   * @param amount         Amount to set
    */
   protected void setShield(ModDataNBT persistentData, int amount) {
-    persistentData.putInt(getShieldKey(), Math.max(amount, 0));
+    persistentData.putInt(this.getShieldKey(), Math.max(amount, 0));
   }
 
   /**
    * Sets the shield on a tool
    */
   protected void setShield(IToolStackView tool, int level, int amount) {
-    setShield(tool.getPersistentData(), Math.min(amount, getShieldCapacity(tool, level)));
+    this.setShield(tool.getPersistentData(), Math.min(amount, this.getShieldCapacity(tool, level)));
   }
 
-  /** Adds the given amount to the current shield */
+  /**
+   * Adds the given amount to the current shield
+   */
   protected void addShield(IToolStackView tool, int level, int amount) {
-    setShield(tool, level, amount + getShield(tool));
+    this.setShield(tool, level, amount + this.getShield(tool));
   }
 }

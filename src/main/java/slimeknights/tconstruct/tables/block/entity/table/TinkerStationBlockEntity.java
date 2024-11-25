@@ -2,7 +2,6 @@ package slimeknights.tconstruct.tables.block.entity.table;
 
 import io.github.fabricators_of_create.porting_lib.event.common.ItemCraftedCallback;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
-import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -35,20 +34,34 @@ import slimeknights.tconstruct.tables.network.UpdateTinkerStationRecipePacket;
 import javax.annotation.Nullable;
 
 public class TinkerStationBlockEntity extends RetexturedTableBlockEntity implements ILazyCrafter {
-  /** Slot index of the tool slot */
+
+  /**
+   * Slot index of the tool slot
+   */
   public static final int TINKER_SLOT = 0;
-  /** Slot index of the first input slot */
+  /**
+   * Slot index of the first input slot
+   */
   public static final int INPUT_SLOT = 1;
-  /** Name of the TE */
+  /**
+   * Name of the TE
+   */
   private static final Component NAME = TConstruct.makeTranslation("gui", "tinker_station");
 
-  /** Last crafted crafting recipe */
-  @Nullable @Getter
+  /**
+   * Last crafted crafting recipe
+   */
+  @Nullable
+  @Getter
   private ITinkerStationRecipe lastRecipe;
-  /** Result inventory, lazy loads results */
+  /**
+   * Result inventory, lazy loads results
+   */
   @Getter
   private final LazyResultContainer craftingResult;
-  /** Crafting inventory for the recipe calls */
+  /**
+   * Crafting inventory for the recipe calls
+   */
   private final TinkerStationContainerWrapper inventoryWrapper;
 
   @Getter
@@ -79,16 +92,17 @@ public class TinkerStationBlockEntity extends RetexturedTableBlockEntity impleme
 
   /**
    * Gets the number of item input slots, ignoring the tool
-   * @return  Input count
+   *
+   * @return Input count
    */
   public int getInputCount() {
-    return getContainerSize() - 1;
+    return this.getContainerSize() - 1;
   }
 
   @Override
   public void resize(int size) {
     super.resize(size);
-    inventoryWrapper.resize();
+    this.inventoryWrapper.resize();
   }
 
   @Nullable
@@ -113,7 +127,7 @@ public class TinkerStationBlockEntity extends RetexturedTableBlockEntity impleme
       RecipeManager manager = this.level.getServer().getRecipeManager();
 
       // first, try the cached recipe
-      ITinkerStationRecipe recipe = lastRecipe;
+      ITinkerStationRecipe recipe = this.lastRecipe;
       // if it does not match, find a new recipe
       if (recipe == null || !recipe.matches(this.inventoryWrapper, this.level)) {
         recipe = manager.getRecipeFor(TinkerRecipeTypes.TINKER_STATION.get(), this.inventoryWrapper, this.level).orElse(null);
@@ -123,7 +137,7 @@ public class TinkerStationBlockEntity extends RetexturedTableBlockEntity impleme
       boolean needsSync = true;
       if (recipe != null) {
         // sync if the recipe is different
-        if (lastRecipe != recipe) {
+        if (this.lastRecipe != recipe) {
           this.lastRecipe = recipe;
           this.syncToRelevantPlayers(this::syncRecipe);
           needsSync = false;
@@ -143,8 +157,8 @@ public class TinkerStationBlockEntity extends RetexturedTableBlockEntity impleme
       }
     }
     // client side only needs to update result, server syncs message elsewhere
-    else if (this.lastRecipe != null && this.lastRecipe.matches(this.inventoryWrapper, level)) {
-      ValidatedResult validatedResult = this.lastRecipe.getValidatedResult(this.inventoryWrapper, level.registryAccess());
+    else if (this.lastRecipe != null && this.lastRecipe.matches(this.inventoryWrapper, this.level)) {
+      ValidatedResult validatedResult = this.lastRecipe.getValidatedResult(this.inventoryWrapper, this.level.registryAccess());
       if (validatedResult.isSuccess()) {
         result = validatedResult.getResult();
       } else if (validatedResult.hasError()) {
@@ -153,8 +167,8 @@ public class TinkerStationBlockEntity extends RetexturedTableBlockEntity impleme
     }
 
     // set name if we have one
-    if (!result.isEmpty() && !itemName.isEmpty()) {
-      TooltipUtil.setDisplayName(result, itemName);
+    if (!result.isEmpty() && !this.itemName.isEmpty()) {
+      TooltipUtil.setDisplayName(result, this.itemName);
     }
 
     return result;
@@ -174,13 +188,13 @@ public class TinkerStationBlockEntity extends RetexturedTableBlockEntity impleme
     // run the recipe, will shrink inputs
     // run both sides for the sake of shift clicking
     this.inventoryWrapper.setPlayer(player);
-    this.lastRecipe.updateInputs(result, inventoryWrapper, !level.isClientSide);
+    this.lastRecipe.updateInputs(result, this.inventoryWrapper, !this.level.isClientSide);
     this.inventoryWrapper.setPlayer(null);
 
     // remove the center slot item, just clear it entirely (if you want shrinking you should use the outer slots or ask nicely for a shrink amount hook)
     ItemStack tinkerable = this.getItem(TINKER_SLOT);
     if (!tinkerable.isEmpty()) {
-      int shrinkToolSlot = lastRecipe.shrinkToolSlotBy();
+      int shrinkToolSlot = this.lastRecipe.shrinkToolSlotBy();
       if (tinkerable.getCount() <= shrinkToolSlot) {
         this.setItem(TINKER_SLOT, ItemStack.EMPTY);
       } else {
@@ -197,7 +211,7 @@ public class TinkerStationBlockEntity extends RetexturedTableBlockEntity impleme
     this.craftingResult.clearContent();
     this.inventoryWrapper.refreshInput(slot);
   }
-  
+
   @Override
   protected void playCraftSound(Player player) {
     SoundUtils.playSoundForAll(player, this.getInputCount() > 4 ? SoundEvents.ANVIL_USE : Sounds.SAW.getSound(), 0.8f, 0.8f + 0.4f * player.level().random.nextFloat());
@@ -206,15 +220,17 @@ public class TinkerStationBlockEntity extends RetexturedTableBlockEntity impleme
 
   /* Item name */
 
-  /** Sets the name of the item */
+  /**
+   * Sets the name of the item
+   */
   public void setItemName(String name) {
     this.itemName = name;
-    ItemStack result = craftingResult.getResult();
+    ItemStack result = this.craftingResult.getResult();
     if (!result.isEmpty()) {
       // if blank, set name to original name
       if (StringUtils.isBlank(name)) {
         // if the input was named, instead of clearing restore the old name
-        ItemStack input = getItem(TINKER_SLOT);
+        ItemStack input = this.getItem(TINKER_SLOT);
         if (!input.isEmpty()) {
           name = TooltipUtil.getDisplayName(input);
         } else {
@@ -231,7 +247,8 @@ public class TinkerStationBlockEntity extends RetexturedTableBlockEntity impleme
 
   /**
    * Sends the current recipe to the given player
-   * @param player  Player to send an update to
+   *
+   * @param player Player to send an update to
    */
   public void syncRecipe(Player player) {
     // must have a last recipe and a server level
@@ -242,7 +259,8 @@ public class TinkerStationBlockEntity extends RetexturedTableBlockEntity impleme
 
   /**
    * Updates the recipe from the server
-   * @param recipe  New recipe
+   *
+   * @param recipe New recipe
    */
   public void updateRecipe(ITinkerStationRecipe recipe) {
     this.lastRecipe = recipe;

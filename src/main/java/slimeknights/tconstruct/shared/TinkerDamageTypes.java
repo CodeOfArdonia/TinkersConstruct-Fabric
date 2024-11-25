@@ -5,17 +5,23 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.damagesource.DamageType;
 import slimeknights.tconstruct.TConstruct;
 
 public class TinkerDamageTypes {
-  /** Self damage source */
+
+  /**
+   * Self damage source
+   */
   public static final ResourceKey<DamageType> SELF_DESTRUCT = ResourceKey.create(Registries.DAMAGE_TYPE, TConstruct.getResource("self_destruct"));
   public static final ResourceKey<DamageType> BLEEDING = ResourceKey.create(Registries.DAMAGE_TYPE, TConstruct.getResource("bleed"));
-  /** Standard damage source for melting most mobs */
+  /**
+   * Standard damage source for melting most mobs
+   */
   public static final ResourceKey<DamageType> SMELTERY_DAMAGE = ResourceKey.create(Registries.DAMAGE_TYPE, TConstruct.getResource("smeltery_heat"));
-  /** Special damage source for "absorbing" hot entities */
+  /**
+   * Special damage source for "absorbing" hot entities
+   */
   public static final ResourceKey<DamageType> SMELTERY_MAGIC = ResourceKey.create(Registries.DAMAGE_TYPE, TConstruct.getResource("smeltery_magic"));
   public static final ResourceKey<DamageType> PLAYER_ATTACK_BYPASS_ARMOR = ResourceKey.create(Registries.DAMAGE_TYPE, TConstruct.getResource("player_attack_bypass_armor"));
   public static final ResourceKey<DamageType> MOB_ATTACK_BYPASS_ARMOR = ResourceKey.create(Registries.DAMAGE_TYPE, TConstruct.getResource("mob_attack_bypass_armor"));

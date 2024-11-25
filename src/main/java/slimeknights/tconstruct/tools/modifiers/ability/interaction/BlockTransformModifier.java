@@ -34,6 +34,7 @@ import java.util.Iterator;
 
 @RequiredArgsConstructor
 public class BlockTransformModifier extends InteractionModifier.NoLevels implements BlockInteractionModifierHook {
+
   @Getter
   private final int priority;
   private final ToolAction action;
@@ -58,12 +59,12 @@ public class BlockTransformModifier extends InteractionModifier.NoLevels impleme
 
   @Override
   public boolean shouldDisplay(boolean advanced) {
-    return priority > Short.MIN_VALUE;
+    return this.priority > Short.MIN_VALUE;
   }
 
   @Override
   public boolean canPerformAction(IToolStackView tool, int level, ToolAction toolAction) {
-    return action == toolAction;
+    return this.action == toolAction;
   }
 
   @Override
@@ -79,7 +80,7 @@ public class BlockTransformModifier extends InteractionModifier.NoLevels impleme
     }
 
     // for hoes and shovels, must have nothing but plants above
-    if (requireGround && context.getClickedFace() == Direction.DOWN) {
+    if (this.requireGround && context.getClickedFace() == Direction.DOWN) {
       return InteractionResult.PASS;
     }
 
@@ -88,7 +89,7 @@ public class BlockTransformModifier extends InteractionModifier.NoLevels impleme
     BlockPos pos = context.getClickedPos();
     BlockState original = world.getBlockState(pos);
     ItemStack stack = context.getItemInHand();
-    boolean didTransform = transform(context, original, true);
+    boolean didTransform = this.transform(context, original, true);
 
     // if we made a successful transform, client can stop early
     EquipmentSlot slotType = source.getSlot(context.getHand());
@@ -97,7 +98,7 @@ public class BlockTransformModifier extends InteractionModifier.NoLevels impleme
         return InteractionResult.SUCCESS;
       }
 
-      BlockTransformModifierHook.afterTransformBlock(tool, context, original, pos, action);
+      BlockTransformModifierHook.afterTransformBlock(tool, context, original, pos, this.action);
 
       // if the tool breaks or it was a campfire, we are done
       if (ToolDamageUtil.damage(tool, 1, player, stack)) {
@@ -127,7 +128,7 @@ public class BlockTransformModifier extends InteractionModifier.NoLevels impleme
           BlockState newTarget = world.getBlockState(newPos);
 
           // limit to playing 40 sounds, that's more than enough for most transforms
-          if (transform(offsetContext, newTarget, totalTransformed < 40)) {
+          if (this.transform(offsetContext, newTarget, totalTransformed < 40)) {
             totalTransformed++;
             didTransform = true;
 
@@ -135,7 +136,7 @@ public class BlockTransformModifier extends InteractionModifier.NoLevels impleme
               break;
             }
 
-            BlockTransformModifierHook.afterTransformBlock(tool, context, newTarget, newPos, action);
+            BlockTransformModifierHook.afterTransformBlock(tool, context, newTarget, newPos, this.action);
 
             // stop if the tool broke
             if (ToolDamageUtil.damageAnimated(tool, 1, player, slotType)) {
@@ -155,14 +156,16 @@ public class BlockTransformModifier extends InteractionModifier.NoLevels impleme
     return didTransform ? InteractionResult.sidedSuccess(world.isClientSide) : InteractionResult.PASS;
   }
 
-  /** Transforms the given block */
+  /**
+   * Transforms the given block
+   */
   protected boolean transform(UseOnContext context, BlockState original, boolean playSound) {
     Level level = context.getLevel();
     BlockPos pos = context.getClickedPos();
     BlockPos above = pos.above();
 
     // hoes and shovels: air or plants above
-    if (requireGround) {
+    if (this.requireGround) {
       if (!level.getBlockState(above).canBeReplaced()) {
         return false;
       }
@@ -170,17 +173,17 @@ public class BlockTransformModifier extends InteractionModifier.NoLevels impleme
 
     // normal action transform
     Player player = context.getPlayer();
-    BlockState transformed = original.getToolModifiedState(context, action, false);
+    BlockState transformed = original.getToolModifiedState(context, this.action, false);
     if (transformed != null) {
       if (playSound) {
-        level.playSound(player, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
-        if (eventId != -1) {
-          level.levelEvent(player, eventId, pos, 0);
+        level.playSound(player, pos, this.sound, SoundSource.BLOCKS, 1.0F, 1.0F);
+        if (this.eventId != -1) {
+          level.levelEvent(player, this.eventId, pos, 0);
         }
       }
       if (!level.isClientSide) {
         level.setBlock(pos, transformed, Block.UPDATE_ALL_IMMEDIATE);
-        if (requireGround) {
+        if (this.requireGround) {
           level.destroyBlock(above, true);
         }
       }

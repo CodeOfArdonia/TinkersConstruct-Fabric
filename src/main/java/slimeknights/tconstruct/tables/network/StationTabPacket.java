@@ -16,6 +16,7 @@ import slimeknights.tconstruct.tables.block.ITabbedBlock;
 
 @RequiredArgsConstructor
 public class StationTabPacket implements IThreadsafePacket {
+
   private final BlockPos pos;
 
   public StationTabPacket(FriendlyByteBuf buffer) {
@@ -24,7 +25,7 @@ public class StationTabPacket implements IThreadsafePacket {
 
   @Override
   public void encode(FriendlyByteBuf buffer) {
-    buffer.writeBlockPos(pos);
+    buffer.writeBlockPos(this.pos);
   }
 
   @Override
@@ -38,16 +39,16 @@ public class StationTabPacket implements IThreadsafePacket {
       }
 
       Level world = sender.getCommandSenderWorld();
-      if (!world.hasChunkAt(pos)) {
+      if (!world.hasChunkAt(this.pos)) {
         return;
       }
-      BlockState state = world.getBlockState(pos);
+      BlockState state = world.getBlockState(this.pos);
       if (state.getBlock() instanceof ITabbedBlock) {
-        ((ITabbedBlock) state.getBlock()).openGui(sender, sender.getCommandSenderWorld(), pos);
+        ((ITabbedBlock) state.getBlock()).openGui(sender, sender.getCommandSenderWorld(), this.pos);
       } else {
-        MenuProvider provider = state.getMenuProvider(sender.getCommandSenderWorld(), pos);
+        MenuProvider provider = state.getMenuProvider(sender.getCommandSenderWorld(), this.pos);
         if (provider != null) {
-          NetworkHooks.openScreen(sender, provider, pos);
+          NetworkHooks.openScreen(sender, provider, this.pos);
         }
       }
 

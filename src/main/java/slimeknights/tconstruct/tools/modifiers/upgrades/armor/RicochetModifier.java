@@ -9,13 +9,17 @@ import slimeknights.tconstruct.library.tools.capability.TinkerDataCapability;
 import slimeknights.tconstruct.library.tools.capability.TinkerDataCapability.TinkerDataKey;
 
 public class RicochetModifier extends TotalArmorLevelModifier {
+
   private static final TinkerDataKey<Integer> LEVELS = TConstruct.createKey("ricochet");
+
   public RicochetModifier() {
     super(LEVELS);
     LivingEntityEvents.KNOCKBACK_STRENGTH.register(this::livingKnockback);
   }
 
-  /** Called on knockback to adjust player knockback */
+  /**
+   * Called on knockback to adjust player knockback
+   */
   private double livingKnockback(double strength, Player player) {
     AtomicDouble newStrength = new AtomicDouble(strength);
     TinkerDataCapability.CAPABILITY.maybeGet(player).ifPresent(data -> {

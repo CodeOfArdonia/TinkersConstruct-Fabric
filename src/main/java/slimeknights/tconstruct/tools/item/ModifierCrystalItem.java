@@ -3,7 +3,6 @@ package slimeknights.tconstruct.tools.item;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroupEntries;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -21,11 +20,15 @@ import slimeknights.tconstruct.tools.TinkerModifiers;
 import javax.annotation.Nullable;
 import java.util.List;
 
-/** Dynamic item holding a modifier */
+/**
+ * Dynamic item holding a modifier
+ */
 public class ModifierCrystalItem extends Item {
+
   private static final Component TOOLTIP_MISSING = TConstruct.makeTranslation("item", "modifier_crystal.missing").withStyle(ChatFormatting.GRAY);
   private static final Component TOOLTIP_APPLY = TConstruct.makeTranslation("item", "modifier_crystal.tooltip").withStyle(ChatFormatting.GRAY);
   private static final String TAG_MODIFIER = "modifier";
+
   public ModifierCrystalItem(Properties props, ResourceKey<CreativeModeTab> tab) {
     super(props);
     ItemGroupEvents.modifyEntriesEvent(tab).register(this::fillItemCategory);
@@ -40,7 +43,7 @@ public class ModifierCrystalItem extends Item {
   public Component getName(ItemStack stack) {
     ModifierId modifier = getModifier(stack);
     if (modifier != null) {
-      return Component.translatable(getDescriptionId(stack) + ".format", Component.translatable(Util.makeTranslationKey("modifier", modifier)));
+      return Component.translatable(this.getDescriptionId(stack) + ".format", Component.translatable(Util.makeTranslationKey("modifier", modifier)));
     }
     return super.getName(stack);
   }
@@ -49,8 +52,7 @@ public class ModifierCrystalItem extends Item {
   public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag advanced) {
     if (getModifier(stack) != null) {
       tooltip.add(TOOLTIP_APPLY);
-    }
-    else {
+    } else {
       tooltip.add(TOOLTIP_MISSING);
     }
   }
@@ -68,14 +70,18 @@ public class ModifierCrystalItem extends Item {
 
   /* Helpers */
 
-  /** Creates a stack with the given modifier */
+  /**
+   * Creates a stack with the given modifier
+   */
   public static ItemStack withModifier(ModifierId modifier) {
     ItemStack stack = new ItemStack(TinkerModifiers.modifierCrystal.get());
     stack.getOrCreateTag().putString(TAG_MODIFIER, modifier.toString());
     return stack;
   }
 
-  /** Gets the modifier stored on this stack */
+  /**
+   * Gets the modifier stored on this stack
+   */
   @Nullable
   public static ModifierId getModifier(ItemStack stack) {
     CompoundTag tag = stack.getTag();

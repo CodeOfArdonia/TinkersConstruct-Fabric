@@ -12,6 +12,7 @@ import slimeknights.tconstruct.plugin.rei.TinkersCategory;
 import java.util.List;
 
 public class EntityMeltingRecipeDisplay implements Display {
+
   @Getter
   private final List<EntryIngredient> inputEntries, outputEntries;
   @Getter
@@ -32,6 +33,6 @@ public class EntityMeltingRecipeDisplay implements Display {
   }
 
   public int getDamage() {
-    return recipe.getDamage();
+    return this.recipe.getDamage();
   }
 }

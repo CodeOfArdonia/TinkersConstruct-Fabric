@@ -20,7 +20,6 @@ import slimeknights.tconstruct.smeltery.TinkerSmeltery;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -29,6 +28,7 @@ import java.util.function.Consumer;
 @SuppressWarnings("removal")
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class MeltingRecipeBuilder extends AbstractRecipeBuilder<MeltingRecipeBuilder> {
+
   private final Ingredient input;
   private final FluidStack output;
   private final int temperature;
@@ -43,24 +43,27 @@ public class MeltingRecipeBuilder extends AbstractRecipeBuilder<MeltingRecipeBui
 
   /**
    * Creates a new builder instance using a specific temperature
-   * @param input        Recipe input
-   * @param output       Recipe output
-   * @param temperature  Temperature required
-   * @param time         Time this recipe takes
-   * @return  Builder instance
+   *
+   * @param input       Recipe input
+   * @param output      Recipe output
+   * @param temperature Temperature required
+   * @param time        Time this recipe takes
+   * @return Builder instance
    */
   public static MeltingRecipeBuilder melting(Ingredient input, FluidStack output, int temperature, int time) {
-    if (temperature < 0) throw new IllegalArgumentException("Invalid temperature " + temperature + ", must be greater than zero");
+    if (temperature < 0)
+      throw new IllegalArgumentException("Invalid temperature " + temperature + ", must be greater than zero");
     if (time <= 0) throw new IllegalArgumentException("Invalid time " + time + ", must be greater than zero");
     return new MeltingRecipeBuilder(input, output, temperature, time);
   }
 
   /**
    * Creates a new builder instance using a specific temperature
-   * @param input        Recipe input
-   * @param output       Recipe output
-   * @param timeFactor   Factor this recipe takes compared to the standard of ingots
-   * @return  Builder instance
+   *
+   * @param input      Recipe input
+   * @param output     Recipe output
+   * @param timeFactor Factor this recipe takes compared to the standard of ingots
+   * @return Builder instance
    */
   public static MeltingRecipeBuilder melting(Ingredient input, FluidStack output, float timeFactor) {
     int temperature = FluidVariantAttributes.getTemperature(output.getType()) - 300;
@@ -69,11 +72,12 @@ public class MeltingRecipeBuilder extends AbstractRecipeBuilder<MeltingRecipeBui
 
   /**
    * Creates a new builder instance using a specific temperature
-   * @param input       Recipe input
-   * @param fluid       Fluid result
-   * @param amount      Fluid returned from recipe
-   * @param timeFactor  Factor this recipe takes compared to the standard of ingots
-   * @return  Builder instance
+   *
+   * @param input      Recipe input
+   * @param fluid      Fluid result
+   * @param amount     Fluid returned from recipe
+   * @param timeFactor Factor this recipe takes compared to the standard of ingots
+   * @return Builder instance
    */
   public static MeltingRecipeBuilder melting(Ingredient input, Fluid fluid, long amount, float timeFactor) {
     return melting(input, new FluidStack(fluid, amount), timeFactor);
@@ -81,10 +85,11 @@ public class MeltingRecipeBuilder extends AbstractRecipeBuilder<MeltingRecipeBui
 
   /**
    * Creates a new builder instance using a specific temperature
-   * @param input       Recipe input
-   * @param fluid       Fluid result
-   * @param amount      Fluid returned from recipe
-   * @return  Builder instance
+   *
+   * @param input  Recipe input
+   * @param fluid  Fluid result
+   * @param amount Fluid returned from recipe
+   * @return Builder instance
    */
   public static MeltingRecipeBuilder melting(Ingredient input, Fluid fluid, long amount) {
     return melting(input, new FluidStack(fluid, amount), IMeltingRecipe.calcTimeFactor(amount));
@@ -92,7 +97,8 @@ public class MeltingRecipeBuilder extends AbstractRecipeBuilder<MeltingRecipeBui
 
   /**
    * Sets this recipe as an ore recipe, output multiplied based on the melter
-   * @return  Builder instance
+   *
+   * @return Builder instance
    */
   public MeltingRecipeBuilder setOre(OreRateType rate, OreRateType... byproductRates) {
     this.oreRate = rate;
@@ -102,7 +108,8 @@ public class MeltingRecipeBuilder extends AbstractRecipeBuilder<MeltingRecipeBui
 
   /**
    * Marks this item as damagable, the output should scale based on the input damage
-   * @return  Builder instance
+   *
+   * @return Builder instance
    */
   public MeltingRecipeBuilder setDamagable(long... unitSizes) {
     this.unitSizes = unitSizes;
@@ -111,22 +118,23 @@ public class MeltingRecipeBuilder extends AbstractRecipeBuilder<MeltingRecipeBui
 
   /**
    * Adds a byproduct to this recipe
-   * @param fluidStack  Byproduct to add
-   * @return  Builder instance
+   *
+   * @param fluidStack Byproduct to add
+   * @return Builder instance
    */
   public MeltingRecipeBuilder addByproduct(FluidStack fluidStack) {
-    byproducts.add(fluidStack);
+    this.byproducts.add(fluidStack);
     return this;
   }
 
   @Override
   public void save(Consumer<FinishedRecipe> consumer) {
-    save(consumer, BuiltInRegistries.FLUID.getKey(output.getFluid()));
+    this.save(consumer, BuiltInRegistries.FLUID.getKey(this.output.getFluid()));
   }
 
   @Override
   public void save(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
-    if (oreRate != null && unitSizes != null) {
+    if (this.oreRate != null && this.unitSizes != null) {
       throw new IllegalStateException("Builder cannot be both ore and damagable");
     }
     // only build JSON if needed
@@ -135,39 +143,40 @@ public class MeltingRecipeBuilder extends AbstractRecipeBuilder<MeltingRecipeBui
   }
 
   private class Result extends AbstractFinishedRecipe {
+
     public Result(ResourceLocation ID, @Nullable ResourceLocation advancementID) {
       super(ID, advancementID);
     }
 
     @Override
     public void serializeRecipeData(JsonObject json) {
-      if (oreRate != null) {
-        json.addProperty("rate", oreRate.getName());
+      if (MeltingRecipeBuilder.this.oreRate != null) {
+        json.addProperty("rate", MeltingRecipeBuilder.this.oreRate.getName());
       }
-      if (!group.isEmpty()) {
-        json.addProperty("group", group);
+      if (!MeltingRecipeBuilder.this.group.isEmpty()) {
+        json.addProperty("group", MeltingRecipeBuilder.this.group);
       }
-      json.add("ingredient", input.toJson());
-      JsonObject result = RecipeHelper.serializeFluidStack(output);
-      if (unitSizes != null) {
-        if (unitSizes.length > 0) {
-          result.addProperty("unit_size", unitSizes[0]);
+      json.add("ingredient", MeltingRecipeBuilder.this.input.toJson());
+      JsonObject result = RecipeHelper.serializeFluidStack(MeltingRecipeBuilder.this.output);
+      if (MeltingRecipeBuilder.this.unitSizes != null) {
+        if (MeltingRecipeBuilder.this.unitSizes.length > 0) {
+          result.addProperty("unit_size", MeltingRecipeBuilder.this.unitSizes[0]);
         } else {
           result.addProperty("unit_size", 1);
         }
       }
       json.add("result", result);
-      json.addProperty("temperature", temperature);
-      json.addProperty("time", time);
-      if (!byproducts.isEmpty()) {
+      json.addProperty("temperature", MeltingRecipeBuilder.this.temperature);
+      json.addProperty("time", MeltingRecipeBuilder.this.time);
+      if (!MeltingRecipeBuilder.this.byproducts.isEmpty()) {
         JsonArray array = new JsonArray();
-        for (int i = 0; i < byproducts.size(); i++) {
-          FluidStack fluidStack = byproducts.get(i);
+        for (int i = 0; i < MeltingRecipeBuilder.this.byproducts.size(); i++) {
+          FluidStack fluidStack = MeltingRecipeBuilder.this.byproducts.get(i);
           JsonObject byproduct = RecipeHelper.serializeFluidStack(fluidStack);
-          if (unitSizes != null && i <= unitSizes.length) {
-            byproduct.addProperty("unit_size", unitSizes[i+1]);
-          } else if (oreRate != null && byproductRates != null && i < byproductRates.length) {
-            OreRateType rate = byproductRates[i];
+          if (MeltingRecipeBuilder.this.unitSizes != null && i <= MeltingRecipeBuilder.this.unitSizes.length) {
+            byproduct.addProperty("unit_size", MeltingRecipeBuilder.this.unitSizes[i + 1]);
+          } else if (MeltingRecipeBuilder.this.oreRate != null && MeltingRecipeBuilder.this.byproductRates != null && i < MeltingRecipeBuilder.this.byproductRates.length) {
+            OreRateType rate = MeltingRecipeBuilder.this.byproductRates[i];
             if (rate != null) {
               byproduct.addProperty("rate", rate.getName());
             }
@@ -180,10 +189,10 @@ public class MeltingRecipeBuilder extends AbstractRecipeBuilder<MeltingRecipeBui
 
     @Override
     public RecipeSerializer<?> getType() {
-      if (oreRate != null) {
+      if (MeltingRecipeBuilder.this.oreRate != null) {
         return TinkerSmeltery.oreMeltingSerializer.get();
       }
-      if (unitSizes != null) {
+      if (MeltingRecipeBuilder.this.unitSizes != null) {
         return TinkerSmeltery.damagableMeltingSerializer.get();
       }
       return TinkerSmeltery.meltingSerializer.get();

@@ -27,19 +27,20 @@ public class DuctItemHandler extends SingleItemHandler<DuctBlockEntity> {
 
   /**
    * Sets the stack in this duct
-   * @param newStack  New stack
+   *
+   * @param newStack New stack
    */
   @Override
   public void setStack(ItemStack newStack) {
-    Level world = parent.getLevel();
-    boolean hasChange = world != null && !ItemStack.matches(getStack(), newStack);
+    Level world = this.parent.getLevel();
+    boolean hasChange = world != null && !ItemStack.matches(this.getStack(), newStack);
     super.setStack(newStack);
     if (hasChange) {
       if (!world.isClientSide) {
-        BlockPos pos = parent.getBlockPos();
+        BlockPos pos = this.parent.getBlockPos();
         TinkerNetwork.getInstance().sendToClientsAround(new InventorySlotSyncPacket(newStack, 0, pos), world, pos);
       } else {
-        parent.updateFluid();
+        this.parent.updateFluid();
       }
     }
   }
@@ -63,10 +64,11 @@ public class DuctItemHandler extends SingleItemHandler<DuctBlockEntity> {
 
   /**
    * Gets the fluid filter for this duct
-   * @return  Fluid filter
+   *
+   * @return Fluid filter
    */
   public FluidStack getFluid() {
-    ItemStack stack = getStack();
+    ItemStack stack = this.getStack();
     if (stack.isEmpty()) {
       return FluidStack.EMPTY;
     }

@@ -13,6 +13,7 @@ public record StatPredicate(INumericToolStat<?> stat, float min, float max) impl
 
   /**
    * Creates a predicate matching the exact value
+   *
    * @param stat  Stat
    * @param value Value to match
    * @return Predicate
@@ -23,6 +24,7 @@ public record StatPredicate(INumericToolStat<?> stat, float min, float max) impl
 
   /**
    * Creates a predicate matching the exact value
+   *
    * @param stat Stat
    * @param min  Min value
    * @return Predicate
@@ -33,6 +35,7 @@ public record StatPredicate(INumericToolStat<?> stat, float min, float max) impl
 
   /**
    * Creates a predicate matching the exact value
+   *
    * @param stat Stat
    * @param max  Max value
    * @return Predicate
@@ -43,12 +46,13 @@ public record StatPredicate(INumericToolStat<?> stat, float min, float max) impl
 
   @Override
   public boolean test(StatsNBT statsNBT) {
-    float value = statsNBT.get(stat).floatValue();
-    return value >= min && value <= max;
+    float value = statsNBT.get(this.stat).floatValue();
+    return value >= this.min && value <= this.max;
   }
 
   /**
    * Deserializes the predicate from JSON
+   *
    * @param json JSON
    * @return Predicate
    */
@@ -65,12 +69,12 @@ public record StatPredicate(INumericToolStat<?> stat, float min, float max) impl
    */
   public JsonObject serialize() {
     JsonObject json = new JsonObject();
-    json.addProperty("stat", stat.getName().toString());
-    if (min > Float.NEGATIVE_INFINITY) {
-      json.addProperty("min", min);
+    json.addProperty("stat", this.stat.getName().toString());
+    if (this.min > Float.NEGATIVE_INFINITY) {
+      json.addProperty("min", this.min);
     }
-    if (max < Float.POSITIVE_INFINITY) {
-      json.addProperty("max", max);
+    if (this.max < Float.POSITIVE_INFINITY) {
+      json.addProperty("max", this.max);
     }
     return json;
   }

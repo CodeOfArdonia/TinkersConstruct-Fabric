@@ -43,7 +43,7 @@ public class ConstantFluidContainerWrapper extends SnapshotParticipant<Boolean> 
 
   @Override
   public long getCapacity() {
-    return fluid.getAmount();
+    return this.fluid.getAmount();
   }
 
   @Override
@@ -54,30 +54,30 @@ public class ConstantFluidContainerWrapper extends SnapshotParticipant<Boolean> 
   @Override
   public long extract(FluidVariant resource, long maxDrain, TransactionContext transaction) {
     // cannot drain if: already drained, requested the wrong type, or requested too little
-    if (empty || maxDrain < fluid.getAmount()) {
+    if (this.empty || maxDrain < this.fluid.getAmount()) {
       return 0;
     }
-    updateSnapshots(transaction);
-    if (context.exchange(ItemVariant.of(container.getRecipeRemainder()), 1, transaction) == 1) {
-      empty = true;
-      return fluid.getAmount();
+    this.updateSnapshots(transaction);
+    if (this.context.exchange(ItemVariant.of(this.container.getRecipeRemainder()), 1, transaction) == 1) {
+      this.empty = true;
+      return this.fluid.getAmount();
     }
     return 0;
   }
 
   @Override
   public boolean isResourceBlank() {
-    return empty ? true : fluid.getType().isBlank();
+    return this.empty || this.fluid.getType().isBlank();
   }
 
   @Override
   public FluidVariant getResource() {
-    return empty ? FluidVariant.blank() : fluid.getType();
+    return this.empty ? FluidVariant.blank() : this.fluid.getType();
   }
 
   @Override
   public long getAmount() {
-    return empty ? 0 : fluid.getAmount();
+    return this.empty ? 0 : this.fluid.getAmount();
   }
 
   @Override

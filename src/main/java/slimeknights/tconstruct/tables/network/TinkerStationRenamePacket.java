@@ -7,9 +7,12 @@ import slimeknights.mantle.network.packet.IThreadsafePacket;
 import slimeknights.tconstruct.tables.block.entity.table.TinkerStationBlockEntity;
 import slimeknights.tconstruct.tables.menu.TinkerStationContainerMenu;
 
-/** Packet to send to the server to update the name in the UI */
+/**
+ * Packet to send to the server to update the name in the UI
+ */
 @RequiredArgsConstructor
 public class TinkerStationRenamePacket implements IThreadsafePacket {
+
   private final String name;
 
   public TinkerStationRenamePacket(FriendlyByteBuf buf) {
@@ -18,7 +21,7 @@ public class TinkerStationRenamePacket implements IThreadsafePacket {
 
   @Override
   public void encode(FriendlyByteBuf buf) {
-    buf.writeUtf(name);
+    buf.writeUtf(this.name);
   }
 
   @Override
@@ -27,7 +30,7 @@ public class TinkerStationRenamePacket implements IThreadsafePacket {
     if (sender != null && sender.containerMenu instanceof TinkerStationContainerMenu station) {
       TinkerStationBlockEntity tile = station.getTile();
       if (tile != null) {
-        station.getTile().setItemName(name);
+        station.getTile().setItemName(this.name);
       }
     }
   }

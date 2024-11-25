@@ -35,10 +35,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -48,23 +45,34 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
-/** Actual logic to generate tool textures */
+/**
+ * Actual logic to generate tool textures
+ */
 @Log4j2
 public class ClientGeneratePartTexturesCommand {
+
   private static final String SUCCESS_KEY = TConstruct.makeTranslationKey("command", "generate_part_textures.finish");
   private static final Component NO_PARTS = TConstruct.makeTranslation("command", "generate_part_textures.no_parts");
   private static final Component NO_MATERIALS = TConstruct.makeTranslation("command", "generate_part_textures.no_materials");
-  /** Path to add the data */
+  /**
+   * Path to add the data
+   */
   private static final String PACK_NAME = "TinkersConstructGeneratedPartTextures";
-  /** Part file to load, pulls from all namespaces, but no merging */
+  /**
+   * Part file to load, pulls from all namespaces, but no merging
+   */
   private static final String GENERATOR_PART_TEXTURES = "tinkering/generator_part_textures.json";
 
-  /** Gets the clickable output link */
+  /**
+   * Gets the clickable output link
+   */
   protected static Component getOutputComponent(File file) {
     return (Component.literal(file.getAbsolutePath())).withStyle((style) -> style.withUnderlined(true).withClickEvent(new ClickEvent(Action.OPEN_FILE, file.getAbsolutePath())));
   }
 
-  /** Generates all textures using the resource pack list */
+  /**
+   * Generates all textures using the resource pack list
+   */
   public static void generateTextures(Operation operation, String modId, String materialPath) {
     long time = System.nanoTime();
     ResourceManager manager = Minecraft.getInstance().getResourceManager();
@@ -97,7 +105,7 @@ public class ClientGeneratePartTexturesCommand {
 
     // prepare the output directory
     Path path = Minecraft.getInstance().getResourcePackDirectory().resolve(PACK_NAME);
-    BiConsumer<ResourceLocation,NativeImage> saver = (outputPath, image) -> saveImage(path, outputPath, image);
+    BiConsumer<ResourceLocation, NativeImage> saver = (outputPath, image) -> saveImage(path, outputPath, image);
 
     // create a pack.mcmeta so its a valid resource pack
     savePackMcmeta(path);
@@ -142,7 +150,9 @@ public class ClientGeneratePartTexturesCommand {
     }
   }
 
-  /** Creates the MCMeta to make this a valid resource pack */
+  /**
+   * Creates the MCMeta to make this a valid resource pack
+   */
   private static void savePackMcmeta(Path folder) {
     Path path = folder.resolve("pack.mcmeta");
     JsonObject meta = new JsonObject();
@@ -162,10 +172,12 @@ public class ClientGeneratePartTexturesCommand {
     }
   }
 
-  /** Saves an image to the output folder */
+  /**
+   * Saves an image to the output folder
+   */
   private static void saveImage(Path folder, ResourceLocation location, NativeImage image) {
     Path path = folder.resolve(Paths.get(PackType.CLIENT_RESOURCES.getDirectory(),
-                location.getNamespace(), MaterialPartTextureGenerator.FOLDER, location.getPath() + ".png"));
+      location.getNamespace(), MaterialPartTextureGenerator.FOLDER, location.getPath() + ".png"));
     try {
       Files.createDirectories(path.getParent());
       image.writeToFile(path);
@@ -174,7 +186,9 @@ public class ClientGeneratePartTexturesCommand {
     }
   }
 
-  /** Loads all part sprites file */
+  /**
+   * Loads all part sprites file
+   */
   private static List<PartSpriteInfo> loadPartSprites(ResourceManager manager) {
     ImmutableList.Builder<PartSpriteInfo> builder = ImmutableList.builder();
 
@@ -212,15 +226,16 @@ public class ClientGeneratePartTexturesCommand {
 
   /**
    * Loads all material render info that contain palette generator info into the given consumer
-   * @param manager          Resource manager instance
-   * @param validMaterialId  Predicate to check if a material ID should be considered
+   *
+   * @param manager         Resource manager instance
+   * @param validMaterialId Predicate to check if a material ID should be considered
    * @return List of material sprites loaded
    */
   private static List<MaterialSpriteInfo> loadMaterialRenderInfoGenerators(ResourceManager manager, Predicate<MaterialVariantId> validMaterialId) {
     ImmutableList.Builder<MaterialSpriteInfo> builder = ImmutableList.builder();
 
     int trim = MaterialRenderInfoLoader.FOLDER.length() + 1;
-    for(Map.Entry<ResourceLocation, Resource> entry : manager.listResources(MaterialRenderInfoLoader.FOLDER, loc -> loc.getPath().endsWith(".json")).entrySet()) {
+    for (Map.Entry<ResourceLocation, Resource> entry : manager.listResources(MaterialRenderInfoLoader.FOLDER, loc -> loc.getPath().endsWith(".json")).entrySet()) {
       // clean up ID by trimming off the extension
       ResourceLocation location = entry.getKey();
       String path = location.getPath();

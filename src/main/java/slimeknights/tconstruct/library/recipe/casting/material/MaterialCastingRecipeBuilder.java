@@ -18,24 +18,26 @@ import slimeknights.tconstruct.library.tools.part.IMaterialItem;
 import slimeknights.tconstruct.smeltery.TinkerSmeltery;
 
 import javax.annotation.Nullable;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 @RequiredArgsConstructor(staticName = "castingRecipe")
 public class MaterialCastingRecipeBuilder extends AbstractRecipeBuilder<MaterialCastingRecipeBuilder> {
+
   private final IMaterialItem result;
   private final Serializer<?> recipeSerializer;
   private Ingredient cast = Ingredient.EMPTY;
-  @Setter @Accessors(chain = true)
+  @Setter
+  @Accessors(chain = true)
   private int itemCost = 0;
   private boolean consumed = false;
   private boolean switchSlots = false;
 
   /**
    * Creates a new material casting recipe for an basin recipe
-   * @param result            Material item result
-   * @return  Builder instance
+   *
+   * @param result Material item result
+   * @return Builder instance
    */
   public static MaterialCastingRecipeBuilder basinRecipe(IMaterialItem result) {
     return castingRecipe(result, TinkerSmeltery.basinMaterialSerializer.get());
@@ -43,8 +45,9 @@ public class MaterialCastingRecipeBuilder extends AbstractRecipeBuilder<Material
 
   /**
    * Creates a new material casting recipe for an table recipe
-   * @param result            Material item result
-   * @return  Builder instance
+   *
+   * @param result Material item result
+   * @return Builder instance
    */
   public static MaterialCastingRecipeBuilder tableRecipe(IMaterialItem result) {
     return castingRecipe(result, TinkerSmeltery.tableMaterialSerializer.get());
@@ -52,9 +55,10 @@ public class MaterialCastingRecipeBuilder extends AbstractRecipeBuilder<Material
 
   /**
    * Sets the cast to the given tag
-   * @param tag       Cast tag
-   * @param consumed  If true, cast is consumed
-   * @return  Builder instance
+   *
+   * @param tag      Cast tag
+   * @param consumed If true, cast is consumed
+   * @return Builder instance
    */
   public MaterialCastingRecipeBuilder setCast(TagKey<Item> tag, boolean consumed) {
     return this.setCast(Ingredient.of(tag), consumed);
@@ -62,9 +66,10 @@ public class MaterialCastingRecipeBuilder extends AbstractRecipeBuilder<Material
 
   /**
    * Sets the cast to the given item
-   * @param item      Cast item
-   * @param consumed  If true, cast is consumed
-   * @return  Builder instance
+   *
+   * @param item     Cast item
+   * @param consumed If true, cast is consumed
+   * @return Builder instance
    */
   public MaterialCastingRecipeBuilder setCast(ItemLike item, boolean consumed) {
     return this.setCast(Ingredient.of(item), consumed);
@@ -72,9 +77,10 @@ public class MaterialCastingRecipeBuilder extends AbstractRecipeBuilder<Material
 
   /**
    * Set the cast to the given ingredient
-   * @param cast      Ingredient
-   * @param consumed  If true, cast is consumed
-   * @return  Builder instance
+   *
+   * @param cast     Ingredient
+   * @param consumed If true, cast is consumed
+   * @return Builder instance
    */
   public MaterialCastingRecipeBuilder setCast(Ingredient cast, boolean consumed) {
     this.cast = cast;
@@ -106,31 +112,32 @@ public class MaterialCastingRecipeBuilder extends AbstractRecipeBuilder<Material
   }
 
   private class Result extends AbstractFinishedRecipe {
+
     public Result(ResourceLocation ID, @Nullable ResourceLocation advancementID) {
       super(ID, advancementID);
     }
 
     @Override
     public RecipeSerializer<?> getType() {
-      return recipeSerializer;
+      return MaterialCastingRecipeBuilder.this.recipeSerializer;
     }
 
     @Override
     public void serializeRecipeData(JsonObject json) {
-      if (!group.isEmpty()) {
-        json.addProperty("group", group);
+      if (!MaterialCastingRecipeBuilder.this.group.isEmpty()) {
+        json.addProperty("group", MaterialCastingRecipeBuilder.this.group);
       }
-      if (cast != Ingredient.EMPTY) {
-        json.add("cast", cast.toJson());
-        if (consumed) {
+      if (MaterialCastingRecipeBuilder.this.cast != Ingredient.EMPTY) {
+        json.add("cast", MaterialCastingRecipeBuilder.this.cast.toJson());
+        if (MaterialCastingRecipeBuilder.this.consumed) {
           json.addProperty("cast_consumed", true);
         }
       }
-      if (switchSlots) {
+      if (MaterialCastingRecipeBuilder.this.switchSlots) {
         json.addProperty("switch_slots", true);
       }
-      json.addProperty("item_cost", itemCost);
-      json.addProperty("result", BuiltInRegistries.ITEM.getKey(result.asItem()).toString());
+      json.addProperty("item_cost", MaterialCastingRecipeBuilder.this.itemCost);
+      json.addProperty("result", BuiltInRegistries.ITEM.getKey(MaterialCastingRecipeBuilder.this.result.asItem()).toString());
     }
   }
 }

@@ -47,7 +47,7 @@ public class Exploder {
   private int currentRadius;
   private int curX, curY, curZ;
 
-  private List<ItemStack> droppedItems; // map containing all items dropped by the explosion and their amounts
+  private final List<ItemStack> droppedItems; // map containing all items dropped by the explosion and their amounts
 
   public Exploder(Level world, EFLNExplosion explosion, Entity exploder, BlockPos location, double r, double explosionStrength, int blocksPerIteration) {
     this.r = r;

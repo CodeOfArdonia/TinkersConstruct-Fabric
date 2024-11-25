@@ -27,6 +27,7 @@ import java.util.List;
  * Recipe to craft an ordinary item using the part builder
  */
 public class ItemPartRecipe implements IDisplayPartBuilderRecipe {
+
   @Getter
   private final ResourceLocation id;
   @Getter
@@ -50,13 +51,13 @@ public class ItemPartRecipe implements IDisplayPartBuilderRecipe {
   @Override
   public boolean partialMatch(IPartBuilderContainer inv) {
     // first, must have a pattern
-    if (!patternItem.test(inv.getPatternStack())) {
+    if (!this.patternItem.test(inv.getPatternStack())) {
       return false;
     }
     // if there is a material item, it must have a valid material and be craftable
     if (!inv.getStack().isEmpty()) {
       IMaterialValue materialRecipe = inv.getMaterial();
-      return materialRecipe != null && material.matchesVariant(materialRecipe.getMaterial());
+      return materialRecipe != null && this.material.matchesVariant(materialRecipe.getMaterial());
     }
     // no material item? return match in case we get one later
     return true;
@@ -65,13 +66,13 @@ public class ItemPartRecipe implements IDisplayPartBuilderRecipe {
   @Override
   public boolean matches(IPartBuilderContainer inv, Level worldIn) {
     IMaterialValue materialRecipe = inv.getMaterial();
-    return materialRecipe != null && material.matchesVariant(materialRecipe.getMaterial())
-           && inv.getStack().getCount() >= materialRecipe.getItemsUsed(cost);
+    return materialRecipe != null && this.material.matchesVariant(materialRecipe.getMaterial())
+      && inv.getStack().getCount() >= materialRecipe.getItemsUsed(this.cost);
   }
 
   @Override
   public ItemStack getResultItem(RegistryAccess registryAccess) {
-    return result.get();
+    return this.result.get();
   }
 
   @Override
@@ -84,10 +85,11 @@ public class ItemPartRecipe implements IDisplayPartBuilderRecipe {
 
   @Override
   public List<ItemStack> getPatternItems() {
-    return Arrays.asList(patternItem.getItems());
+    return Arrays.asList(this.patternItem.getItems());
   }
 
   public static class Serializer extends LoggingRecipeSerializer<ItemPartRecipe> {
+
     @Override
     public ItemPartRecipe fromJson(ResourceLocation id, JsonObject json) {
       MaterialVariantId materialId = MaterialVariantId.fromJson(json, "material");

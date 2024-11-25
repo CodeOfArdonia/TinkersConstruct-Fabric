@@ -24,7 +24,9 @@ import java.util.function.Consumer;
 
 public class TConstructCommand {
 
-  /** Registers all TConstruct command related content */
+  /**
+   * Registers all TConstruct command related content
+   */
   public static void init() {
     ArgumentTypeInfos.register(BuiltInRegistries.COMMAND_ARGUMENT_TYPE, TConstruct.resourceString("slot_type"), SlotTypeArgument.class, SingletonArgumentInfo.contextFree(SlotTypeArgument::slotType));
     ArgumentTypeInfos.register(BuiltInRegistries.COMMAND_ARGUMENT_TYPE, TConstruct.resourceString("tool_stat"), ToolStatArgument.class, SingletonArgumentInfo.contextFree(ToolStatArgument::stat));
@@ -35,14 +37,18 @@ public class TConstructCommand {
     CommandRegistrationCallback.EVENT.register(TConstructCommand::registerCommand);
   }
 
-  /** Registers a sub command for the root Mantle command */
+  /**
+   * Registers a sub command for the root Mantle command
+   */
   private static void register(LiteralArgumentBuilder<CommandSourceStack> root, String name, Consumer<LiteralArgumentBuilder<CommandSourceStack>> consumer) {
     LiteralArgumentBuilder<CommandSourceStack> subCommand = Commands.literal(name);
     consumer.accept(subCommand);
     root.then(subCommand);
   }
 
-  /** Event listener to register the Mantle command */
+  /**
+   * Event listener to register the Mantle command
+   */
   private static void registerCommand(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext registryAccess, Commands.CommandSelection environment) {
     LiteralArgumentBuilder<CommandSourceStack> builder = Commands.literal(TConstruct.MOD_ID);
 

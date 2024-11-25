@@ -28,18 +28,21 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoField;
 
 public class ArmoredSlimeEntity extends Slime {
+
   public ArmoredSlimeEntity(EntityType<? extends Slime> type, Level world) {
     super(type, world);
     if (!world.isClientSide) {
-      tryAddAttribute(Attributes.ARMOR, new AttributeModifier("tconstruct.small_armor_bonus", 3, Operation.MULTIPLY_TOTAL));
-      tryAddAttribute(Attributes.ARMOR_TOUGHNESS, new AttributeModifier("tconstruct.small_toughness_bonus", 3, Operation.MULTIPLY_TOTAL));
-      tryAddAttribute(Attributes.KNOCKBACK_RESISTANCE, new AttributeModifier("tconstruct.small_resistence_bonus", 3, Operation.MULTIPLY_TOTAL));
+      this.tryAddAttribute(Attributes.ARMOR, new AttributeModifier("tconstruct.small_armor_bonus", 3, Operation.MULTIPLY_TOTAL));
+      this.tryAddAttribute(Attributes.ARMOR_TOUGHNESS, new AttributeModifier("tconstruct.small_toughness_bonus", 3, Operation.MULTIPLY_TOTAL));
+      this.tryAddAttribute(Attributes.KNOCKBACK_RESISTANCE, new AttributeModifier("tconstruct.small_resistence_bonus", 3, Operation.MULTIPLY_TOTAL));
     }
   }
 
-  /** Adds an attribute if possible */
+  /**
+   * Adds an attribute if possible
+   */
   private void tryAddAttribute(Attribute attribute, AttributeModifier modifier) {
-    AttributeInstance instance = getAttribute(attribute);
+    AttributeInstance instance = this.getAttribute(attribute);
     if (instance != null) {
       instance.addTransientModifier(modifier);
     }
@@ -56,7 +59,7 @@ public class ArmoredSlimeEntity extends Slime {
     // pumpkins on halloween
     if (this.getItemBySlot(EquipmentSlot.HEAD).isEmpty()) {
       LocalDate localdate = LocalDate.now();
-      if (localdate.get(ChronoField.MONTH_OF_YEAR) == 10 && localdate.get(ChronoField.DAY_OF_MONTH) == 31 && this.random.nextFloat() < 0.25F) {
+      if (localdate.getMonth() == 10 && localdate.getDayOfMonth() == 31 && this.random.nextFloat() < 0.25F) {
         this.setItemSlot(EquipmentSlot.HEAD, new ItemStack(this.random.nextFloat() < 0.1F ? Blocks.JACK_O_LANTERN : Blocks.CARVED_PUMPKIN));
         this.armorDropChances[EquipmentSlot.HEAD.getIndex()] = 0.0F;
       }
@@ -87,7 +90,7 @@ public class ArmoredSlimeEntity extends Slime {
     float slotChance = this.getEquipmentDropChance(EquipmentSlot.HEAD);
     // items do not always drop if a large slime, increases chance of inheritance
     // small slimes always drop, no losing gear
-    if (slotChance > 0.25f && getSize() > 1) {
+    if (slotChance > 0.25f && this.getSize() > 1) {
       slotChance = 0.25f;
     }
     boolean alwaysDrop = slotChance > 1.0F;
@@ -114,15 +117,15 @@ public class ArmoredSlimeEntity extends Slime {
       int newSize = size / 2;
       int count = 2 + this.random.nextInt(3);
       // determine which child will receive the helmet
-      ItemStack helmet = getItemBySlot(EquipmentSlot.HEAD);
+      ItemStack helmet = this.getItemBySlot(EquipmentSlot.HEAD);
       int helmetIndex = -1;
       if (!helmet.isEmpty()) {
         helmetIndex = this.random.nextInt(count);
       }
 
       // spawn all children
-      float dropChance = getEquipmentDropChance(EquipmentSlot.HEAD);
-      for(int i = 0; i < count; ++i) {
+      float dropChance = this.getEquipmentDropChance(EquipmentSlot.HEAD);
+      for (int i = 0; i < count; ++i) {
         float x = ((i % 2) - 0.5F) * offset;
         float z = ((i / 2) - 0.5F) * offset;
         Slime slime = this.getType().create(this.level());
@@ -136,8 +139,8 @@ public class ArmoredSlimeEntity extends Slime {
         slime.setSize(newSize, true);
         if (i == helmetIndex) {
           slime.setItemSlot(EquipmentSlot.HEAD, helmet.copy());
-          setItemSlot(EquipmentSlot.HEAD, ItemStack.EMPTY);
-        } else if (dropChance < 1 && random.nextFloat() < 0.25) {
+          this.setItemSlot(EquipmentSlot.HEAD, ItemStack.EMPTY);
+        } else if (dropChance < 1 && this.random.nextFloat() < 0.25) {
           slime.setItemSlot(EquipmentSlot.HEAD, helmet.copy());
         }
         slime.moveTo(this.getX() + x, this.getY() + 0.5D, this.getZ() + z, this.random.nextFloat() * 360.0F, 0.0F);

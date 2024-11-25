@@ -22,6 +22,7 @@ import java.util.List;
 @ToString
 @With
 public class HandleMaterialStats extends BaseMaterialStats {
+
   public static final MaterialStatsId ID = new MaterialStatsId(TConstruct.getResource("handle"));
   public static final HandleMaterialStats DEFAULT = new HandleMaterialStats(1f, 1f, 1f, 1f);
   // tooltip prefixes
@@ -77,22 +78,30 @@ public class HandleMaterialStats extends BaseMaterialStats {
     return DESCRIPTION;
   }
 
-  /** Applies formatting for durability */
+  /**
+   * Applies formatting for durability
+   */
   public static Component formatDurability(float quality) {
     return IToolStat.formatColoredMultiplier(DURABILITY_PREFIX, quality);
   }
 
-  /** Applies formatting for attack speed */
+  /**
+   * Applies formatting for attack speed
+   */
   public static Component formatAttackDamage(float quality) {
     return IToolStat.formatColoredMultiplier(ATTACK_DAMAGE_PREFIX, quality);
   }
 
-  /** Applies formatting for attack speed */
+  /**
+   * Applies formatting for attack speed
+   */
   public static Component formatAttackSpeed(float quality) {
     return IToolStat.formatColoredMultiplier(ATTACK_SPEED_PREFIX, quality);
   }
 
-  /** Applies formatting for mining speed */
+  /**
+   * Applies formatting for mining speed
+   */
   public static Component formatMiningSpeed(float quality) {
     return IToolStat.formatColoredMultiplier(MINING_SPEED_PREFIX, quality);
   }

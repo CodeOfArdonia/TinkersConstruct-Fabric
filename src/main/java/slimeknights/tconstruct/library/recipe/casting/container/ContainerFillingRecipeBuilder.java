@@ -20,16 +20,18 @@ import java.util.function.Consumer;
 @AllArgsConstructor(staticName = "castingRecipe")
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class ContainerFillingRecipeBuilder extends AbstractRecipeBuilder<ContainerFillingRecipeBuilder> {
+
   private final ResourceLocation result;
   private final long fluidAmount;
   private final ContainerFillingRecipeSerializer<?> recipeSerializer;
 
   /**
    * Creates a new builder instance using the given result, amount, and serializer
-   * @param result            Recipe result
-   * @param fluidAmount       Container size
-   * @param recipeSerializer  Serializer
-   * @return  Builder instance
+   *
+   * @param result           Recipe result
+   * @param fluidAmount      Container size
+   * @param recipeSerializer Serializer
+   * @return Builder instance
    */
   public static ContainerFillingRecipeBuilder castingRecipe(ItemLike result, long fluidAmount, ContainerFillingRecipeSerializer<?> recipeSerializer) {
     return new ContainerFillingRecipeBuilder(Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(result.asItem())), fluidAmount, recipeSerializer);
@@ -37,9 +39,10 @@ public class ContainerFillingRecipeBuilder extends AbstractRecipeBuilder<Contain
 
   /**
    * Creates a new basin recipe builder using the given result, amount, and serializer
-   * @param result            Recipe result
-   * @param fluidAmount       Container size
-   * @return  Builder instance
+   *
+   * @param result      Recipe result
+   * @param fluidAmount Container size
+   * @return Builder instance
    */
   public static ContainerFillingRecipeBuilder basinRecipe(ResourceLocation result, long fluidAmount) {
     return castingRecipe(result, fluidAmount, TinkerSmeltery.basinFillingRecipeSerializer.get());
@@ -47,9 +50,10 @@ public class ContainerFillingRecipeBuilder extends AbstractRecipeBuilder<Contain
 
   /**
    * Creates a new basin recipe builder using the given result, amount, and serializer
-   * @param result            Recipe result
-   * @param fluidAmount       Container size
-   * @return  Builder instance
+   *
+   * @param result      Recipe result
+   * @param fluidAmount Container size
+   * @return Builder instance
    */
   public static ContainerFillingRecipeBuilder basinRecipe(ItemLike result, long fluidAmount) {
     return castingRecipe(result, fluidAmount, TinkerSmeltery.basinFillingRecipeSerializer.get());
@@ -57,9 +61,10 @@ public class ContainerFillingRecipeBuilder extends AbstractRecipeBuilder<Contain
 
   /**
    * Creates a new table recipe builder using the given result, amount, and serializer
-   * @param result            Recipe result
-   * @param fluidAmount       Container size
-   * @return  Builder instance
+   *
+   * @param result      Recipe result
+   * @param fluidAmount Container size
+   * @return Builder instance
    */
   public static ContainerFillingRecipeBuilder tableRecipe(ResourceLocation result, long fluidAmount) {
     return castingRecipe(result, fluidAmount, TinkerSmeltery.tableFillingRecipeSerializer.get());
@@ -67,9 +72,10 @@ public class ContainerFillingRecipeBuilder extends AbstractRecipeBuilder<Contain
 
   /**
    * Creates a new table recipe builder using the given result, amount, and serializer
-   * @param result            Recipe result
-   * @param fluidAmount       Container size
-   * @return  Builder instance
+   *
+   * @param result      Recipe result
+   * @param fluidAmount Container size
+   * @return Builder instance
    */
   public static ContainerFillingRecipeBuilder tableRecipe(ItemLike result, long fluidAmount) {
     return castingRecipe(result, fluidAmount, TinkerSmeltery.tableFillingRecipeSerializer.get());
@@ -87,22 +93,23 @@ public class ContainerFillingRecipeBuilder extends AbstractRecipeBuilder<Contain
   }
 
   private class Result extends AbstractFinishedRecipe {
+
     public Result(ResourceLocation ID, @Nullable ResourceLocation advancementID) {
       super(ID, advancementID);
     }
 
     @Override
     public RecipeSerializer<?> getType() {
-      return recipeSerializer;
+      return ContainerFillingRecipeBuilder.this.recipeSerializer;
     }
 
     @Override
     public void serializeRecipeData(JsonObject json) {
-      if (!group.isEmpty()) {
-        json.addProperty("group", group);
+      if (!ContainerFillingRecipeBuilder.this.group.isEmpty()) {
+        json.addProperty("group", ContainerFillingRecipeBuilder.this.group);
       }
-      json.addProperty("fluid_amount", fluidAmount);
-      json.addProperty("container", result.toString());
+      json.addProperty("fluid_amount", ContainerFillingRecipeBuilder.this.fluidAmount);
+      json.addProperty("container", ContainerFillingRecipeBuilder.this.result.toString());
     }
   }
 }

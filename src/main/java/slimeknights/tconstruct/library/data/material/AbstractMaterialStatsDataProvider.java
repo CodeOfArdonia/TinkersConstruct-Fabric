@@ -19,10 +19,15 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-/** Base data generator for use in addons, depends on the regular material provider */
+/**
+ * Base data generator for use in addons, depends on the regular material provider
+ */
 public abstract class AbstractMaterialStatsDataProvider extends GenericDataProvider {
-  /** All material stats generated so far */
-  private final Map<MaterialId,List<IMaterialStats>> allMaterialStats = new HashMap<>();
+
+  /**
+   * All material stats generated so far
+   */
+  private final Map<MaterialId, List<IMaterialStats>> allMaterialStats = new HashMap<>();
   /* Materials data provider for validation */
   private final AbstractMaterialDataProvider materials;
 
@@ -31,24 +36,26 @@ public abstract class AbstractMaterialStatsDataProvider extends GenericDataProvi
     this.materials = materials;
   }
 
-  /** Adds all relevant material stats */
+  /**
+   * Adds all relevant material stats
+   */
   protected abstract void addMaterialStats();
 
   @Override
   public CompletableFuture<?> run(CachedOutput cache) {
-    addMaterialStats();
+    this.addMaterialStats();
 
     // ensure we have stats for all materials
-    Set<MaterialId> materialsGenerated = materials.getAllMaterials();
+    Set<MaterialId> materialsGenerated = this.materials.getAllMaterials();
     for (MaterialId material : materialsGenerated) {
-      if (!allMaterialStats.containsKey(material)) {
+      if (!this.allMaterialStats.containsKey(material)) {
         throw new IllegalStateException(String.format("Missing material stats for '%s'", material));
       }
     }
     // does not ensure we have materials for all stats, we may be adding stats for another mod
     // generate finally
     List<CompletableFuture<?>> futures = new ArrayList<>();
-    allMaterialStats.forEach((materialId, materialStats) -> futures.add(saveThing(cache, materialId, convert(materialStats))));
+    this.allMaterialStats.forEach((materialId, materialStats) -> futures.add(this.saveThing(cache, materialId, this.convert(materialStats))));
     return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
   }
 
@@ -57,19 +64,22 @@ public abstract class AbstractMaterialStatsDataProvider extends GenericDataProvi
 
   /**
    * Adds a set of material stats for the given material ID
-   * @param location  Material ID
-   * @param stats     Stats to add
+   *
+   * @param location Material ID
+   * @param stats    Stats to add
    */
   protected void addMaterialStats(MaterialId location, IMaterialStats... stats) {
-    allMaterialStats.computeIfAbsent(location, materialId -> new ArrayList<>())
-                    .addAll(Arrays.asList(stats));
+    this.allMaterialStats.computeIfAbsent(location, materialId -> new ArrayList<>())
+      .addAll(Arrays.asList(stats));
   }
 
   /* Internal */
 
-  /** Converts a material and stats list to a JSON */
+  /**
+   * Converts a material and stats list to a JSON
+   */
   private JsonWrapper convert(List<IMaterialStats> stats) {
-    Map<ResourceLocation,IMaterialStats> wrappedStats = stats.stream()
+    Map<ResourceLocation, IMaterialStats> wrappedStats = stats.stream()
       .collect(Collectors.toMap(
         IMaterialStats::getIdentifier,
         stat -> stat));
@@ -83,6 +93,7 @@ public abstract class AbstractMaterialStatsDataProvider extends GenericDataProvi
   @SuppressWarnings("unused")
   @AllArgsConstructor
   private static class JsonWrapper {
+
     private final Map<ResourceLocation, IMaterialStats> stats;
   }
 }

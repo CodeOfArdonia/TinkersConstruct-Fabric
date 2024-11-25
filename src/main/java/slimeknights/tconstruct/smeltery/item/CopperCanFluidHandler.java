@@ -15,9 +15,12 @@ import slimeknights.tconstruct.library.recipe.FluidValues;
 
 import javax.annotation.Nullable;
 
-/** Capability handler instance for the copper can item */
+/**
+ * Capability handler instance for the copper can item
+ */
 @SuppressWarnings("UnstableApiUsage")
 public class CopperCanFluidHandler extends SingleVariantItemStorage<FluidVariant> {
+
   @Getter
   private final ContainerItemContext container;
 
@@ -34,15 +37,19 @@ public class CopperCanFluidHandler extends SingleVariantItemStorage<FluidVariant
     return FluidValues.INGOT;
   }
 
-  /** Gets the contained fluid */
+  /**
+   * Gets the contained fluid
+   */
   private Fluid getFluid(ItemVariant variant) {
     return CopperCanItem.getFluid(variant.getNbt());
   }
 
-  /** Gets the contained fluid */
+  /**
+   * Gets the contained fluid
+   */
   @Nullable
   private CompoundTag getFluidTag() {
-    return CopperCanItem.getFluidTag(container.getItemVariant().getNbt());
+    return CopperCanItem.getFluidTag(this.container.getItemVariant().getNbt());
   }
 
   @Override
@@ -52,12 +59,12 @@ public class CopperCanFluidHandler extends SingleVariantItemStorage<FluidVariant
 
   @Override
   protected FluidVariant getResource(ItemVariant currentVariant) {
-    return FluidVariant.of(getFluid(currentVariant), getFluidTag());
+    return FluidVariant.of(this.getFluid(currentVariant), this.getFluidTag());
   }
 
   @Override
   protected long getAmount(ItemVariant currentVariant) {
-    return getFluid(currentVariant) == Fluids.EMPTY ? 0 : FluidValues.INGOT;
+    return this.getFluid(currentVariant) == Fluids.EMPTY ? 0 : FluidValues.INGOT;
   }
 
 
@@ -82,7 +89,7 @@ public class CopperCanFluidHandler extends SingleVariantItemStorage<FluidVariant
     }
 
     // must have a fluid, must match what they are draining
-    Fluid fluid = getFluid(container.getItemVariant());
+    Fluid fluid = this.getFluid(this.container.getItemVariant());
     if (fluid == Fluids.EMPTY || fluid != extractedResource.getFluid()) {
       return 0;
     }

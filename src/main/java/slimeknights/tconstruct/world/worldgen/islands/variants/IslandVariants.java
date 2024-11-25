@@ -3,6 +3,7 @@ package slimeknights.tconstruct.world.worldgen.islands.variants;
 import slimeknights.tconstruct.shared.block.SlimeType;
 
 public class IslandVariants {
+
   private static final IIslandVariant[] VARIANTS = new IIslandVariant[7];
 
   // earth
@@ -18,13 +19,17 @@ public class IslandVariants {
   public static final IIslandVariant ENDER = addVariant(new EnderSlimeIslandVariant(2));
 
 
-  /** Adds a new variant */
+  /**
+   * Adds a new variant
+   */
   private static IIslandVariant addVariant(IIslandVariant variant) {
     VARIANTS[variant.getIndex()] = variant;
     return variant;
   }
 
-  /** Gets the variant for the given index */
+  /**
+   * Gets the variant for the given index
+   */
   public static IIslandVariant getVariantFromIndex(int index) {
     if (index >= VARIANTS.length || index < 0) {
       index = 0;

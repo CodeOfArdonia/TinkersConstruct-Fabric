@@ -4,7 +4,6 @@ import io.github.fabricators_of_create.porting_lib.entity.PortingLibEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -17,8 +16,11 @@ import slimeknights.tconstruct.tools.TinkerTools;
 
 import javax.annotation.Nullable;
 
-/** Item entity that will never die */
+/**
+ * Item entity that will never die
+ */
 public class IndestructibleItemEntity extends ItemEntity {
+
   public IndestructibleItemEntity(EntityType<? extends IndestructibleItemEntity> entityType, Level world) {
     super(entityType, world);
     this.setExtendedLifetime();
@@ -37,13 +39,15 @@ public class IndestructibleItemEntity extends ItemEntity {
     return PortingLibEntity.getEntitySpawningPacket(this);
   }
 
-  /** Copies the pickup delay from another entity */
+  /**
+   * Copies the pickup delay from another entity
+   */
   public void setPickupDelayFrom(Entity reference) {
     if (reference instanceof ItemEntity) {
       short pickupDelay = this.getPickupDelay((ItemEntity) reference);
       this.setPickUpDelay(pickupDelay);
     }
-    setDeltaMovement(reference.getDeltaMovement());
+    this.setDeltaMovement(reference.getDeltaMovement());
   }
 
   /**
@@ -63,20 +67,23 @@ public class IndestructibleItemEntity extends ItemEntity {
   @Override
   public boolean hurt(DamageSource source, float amount) {
     // prevent any damage besides out of world
-    return source.getMsgId().equals(damageSources().fellOutOfWorld().getMsgId());
+    return source.getMsgId().equals(this.damageSources().fellOutOfWorld().getMsgId());
   }
 
-  /** Checks if the given stack has a custom entity */
+  /**
+   * Checks if the given stack has a custom entity
+   */
   public static boolean hasCustomEntity(ItemStack stack) {
     return ModifierUtil.checkVolatileFlag(stack, IModifiable.INDESTRUCTIBLE_ENTITY);
   }
 
   /**
    * Creates an indestructible item entity from the given item stack (if needed). Intended to be called in {@link net.minecraftforge.common.extensions.IForgeItem#createEntity(Level, Entity, ItemStack)}
-   * @param world     World instance
-   * @param original  Original entity
-   * @param stack     Stack to drop
-   * @return  indestructible entity, or null if the stack is not marked indestructible
+   *
+   * @param world    World instance
+   * @param original Original entity
+   * @param stack    Stack to drop
+   * @return indestructible entity, or null if the stack is not marked indestructible
    */
   @Nullable
   public static Entity createFrom(Level world, Entity original, ItemStack stack) {

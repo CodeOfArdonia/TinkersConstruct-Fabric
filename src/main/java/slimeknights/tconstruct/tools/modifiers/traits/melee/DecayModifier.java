@@ -20,6 +20,7 @@ import slimeknights.tconstruct.library.tools.nbt.NamespacedNBT;
 import javax.annotation.Nullable;
 
 public class DecayModifier extends Modifier implements ProjectileLaunchModifierHook, ProjectileHitModifierHook {
+
   /* gets the effect for the given level, including a random time */
   private static MobEffectInstance makeDecayEffect(int level) {
     // potions are 0 indexed instead of 1 indexed

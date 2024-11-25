@@ -13,14 +13,17 @@ import slimeknights.tconstruct.library.tools.nbt.ModDataNBT;
 
 import java.util.List;
 
-/** Module for setting tool's display name rarity */
+/**
+ * Module for setting tool's display name rarity
+ */
 public record RarityModule(Rarity rarity) implements VolatileDataModifierHook, ModifierModule {
+
   private static final List<ModifierHook<?>> DEFAULT_HOOKS = List.of(TinkerHooks.VOLATILE_DATA);
   public static final IGenericLoader<RarityModule> LOADER = new GenericEnumLoader<>("rarity", Rarity.class, RarityModule::new, RarityModule::rarity);
 
   @Override
   public void addVolatileData(ToolRebuildContext context, ModifierEntry modifier, ModDataNBT volatileData) {
-    IModifiable.setRarity(volatileData, rarity);
+    IModifiable.setRarity(volatileData, this.rarity);
   }
 
   @Override

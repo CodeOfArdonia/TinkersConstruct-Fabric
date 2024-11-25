@@ -25,15 +25,19 @@ import java.util.function.IntFunction;
 import java.util.function.Supplier;
 import java.util.function.ToIntFunction;
 
-/** Item object for geode related blocks. Main methods represent the block */
+/**
+ * Item object for geode related blocks. Main methods represent the block
+ */
 public class GeodeItemObject extends ItemObject<Item> {
+
   private final Supplier<? extends Block> block;
   private final Supplier<? extends Block> budding;
   private final Supplier<? extends Block> cluster;
   private final Supplier<? extends Block> smallBud;
   private final Supplier<? extends Block> mediumBud;
   private final Supplier<? extends Block> largeBud;
-  public GeodeItemObject(RegistryObject<? extends Item> shard, BlockDeferredRegister register, MapColor color, SoundType blockSound, SoundEvent chimeSound, Map<BudSize,SoundType> clusterSounds, int baseLight, Properties props) {
+
+  public GeodeItemObject(RegistryObject<? extends Item> shard, BlockDeferredRegister register, MapColor color, SoundType blockSound, SoundEvent chimeSound, Map<BudSize, SoundType> clusterSounds, int baseLight, Properties props) {
     super(shard);
     // allow the crystals to glow optionally
     IntFunction<ToIntFunction<BlockState>> light = extra -> {
@@ -43,37 +47,45 @@ public class GeodeItemObject extends ItemObject<Item> {
     String name = shard.getId().getPath();
     Function<Block, ? extends BlockItem> blockItem = block -> new BlockItem(block, props);
     ToIntFunction<BlockState> crystalLight = light.apply(0);
-    block = register.register(name + "_block", () -> new CrystalBlock(chimeSound, BlockBehaviour.Properties.of().mapColor(color).lightLevel(crystalLight).strength(1.5F).sound(blockSound).requiresCorrectToolForDrops()), blockItem);
-    budding = register.register("budding_" + name, () -> new BuddingCrystalBlock(this, chimeSound, BlockBehaviour.Properties.of().pushReaction(PushReaction.DESTROY).mapColor(color).randomTicks().lightLevel(crystalLight).strength(1.5F).sound(blockSound).requiresCorrectToolForDrops()), blockItem);
+    this.block = register.register(name + "_block", () -> new CrystalBlock(chimeSound, BlockBehaviour.Properties.of().mapColor(color).lightLevel(crystalLight).strength(1.5F).sound(blockSound).requiresCorrectToolForDrops()), blockItem);
+    this.budding = register.register("budding_" + name, () -> new BuddingCrystalBlock(this, chimeSound, BlockBehaviour.Properties.of().pushReaction(PushReaction.DESTROY).mapColor(color).randomTicks().lightLevel(crystalLight).strength(1.5F).sound(blockSound).requiresCorrectToolForDrops()), blockItem);
     // buds
     Supplier<BlockBehaviour.Properties> budProps = () -> BlockBehaviour.Properties.of().mapColor(color).noOcclusion().strength(1.5F);
-    cluster   = register.register(name + "_cluster", () -> new CrystalClusterBlock(chimeSound, 7, 3, budProps.get().lightLevel(light.apply(5)).sound(clusterSounds.get(BudSize.CLUSTER))), blockItem);
-    smallBud  = register.register("small_" + name + "_bud",  () -> new CrystalClusterBlock(chimeSound, 3, 3, budProps.get().lightLevel(light.apply(1)).sound(clusterSounds.get(BudSize.SMALL))),  blockItem);
-    mediumBud = register.register("medium_" + name + "_bud", () -> new CrystalClusterBlock(chimeSound, 4, 3, budProps.get().lightLevel(light.apply(2)).sound(clusterSounds.get(BudSize.MEDIUM))), blockItem);
-    largeBud  = register.register("large_" + name + "_bud",  () -> new CrystalClusterBlock(chimeSound, 5, 3, budProps.get().lightLevel(light.apply(4)).sound(clusterSounds.get(BudSize.LARGE))),  blockItem);
+    this.cluster = register.register(name + "_cluster", () -> new CrystalClusterBlock(chimeSound, 7, 3, budProps.get().lightLevel(light.apply(5)).sound(clusterSounds.get(BudSize.CLUSTER))), blockItem);
+    this.smallBud = register.register("small_" + name + "_bud", () -> new CrystalClusterBlock(chimeSound, 3, 3, budProps.get().lightLevel(light.apply(1)).sound(clusterSounds.get(BudSize.SMALL))), blockItem);
+    this.mediumBud = register.register("medium_" + name + "_bud", () -> new CrystalClusterBlock(chimeSound, 4, 3, budProps.get().lightLevel(light.apply(2)).sound(clusterSounds.get(BudSize.MEDIUM))), blockItem);
+    this.largeBud = register.register("large_" + name + "_bud", () -> new CrystalClusterBlock(chimeSound, 5, 3, budProps.get().lightLevel(light.apply(4)).sound(clusterSounds.get(BudSize.LARGE))), blockItem);
   }
 
-  /** Gets the block form of this */
+  /**
+   * Gets the block form of this
+   */
   public Block getBlock() {
-    return block.get();
+    return this.block.get();
   }
 
-  /** Gets the budding form of the crystal */
+  /**
+   * Gets the budding form of the crystal
+   */
   public Block getBudding() {
-    return budding.get();
+    return this.budding.get();
   }
 
-  /** Gets a specific size of bud */
+  /**
+   * Gets a specific size of bud
+   */
   public Block getBud(BudSize size) {
     return switch (size) {
-      case SMALL -> smallBud.get();
-      case MEDIUM -> mediumBud.get();
-      case LARGE -> largeBud.get();
-      case CLUSTER -> cluster.get();
+      case SMALL -> this.smallBud.get();
+      case MEDIUM -> this.mediumBud.get();
+      case LARGE -> this.largeBud.get();
+      case CLUSTER -> this.cluster.get();
     };
   }
 
-  /** Variants for the bud */
+  /**
+   * Variants for the bud
+   */
   public enum BudSize {
     SMALL,
     MEDIUM,
@@ -83,11 +95,13 @@ public class GeodeItemObject extends ItemObject<Item> {
     public static final BudSize[] SIZES = {SMALL, MEDIUM, LARGE};
 
     @Getter
-    private final String name = name().toLowerCase(Locale.ROOT);
+    private final String name = this.name().toLowerCase(Locale.ROOT);
     @Getter
-    private final int size = ordinal() + 1;
+    private final int size = this.ordinal() + 1;
 
-    /** Gets the next bud size */
+    /**
+     * Gets the next bud size
+     */
     public BudSize getNext() {
       return switch (this) {
         case SMALL -> MEDIUM;

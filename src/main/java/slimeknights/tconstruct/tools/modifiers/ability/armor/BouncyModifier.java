@@ -14,13 +14,17 @@ import slimeknights.tconstruct.library.tools.helper.ModifierUtil;
 import slimeknights.tconstruct.library.utils.SlimeBounceHandler;
 
 public class BouncyModifier extends TotalArmorLevelModifier {
+
   private static final TinkerDataKey<Integer> BOUNCY = TConstruct.createKey("bouncy");
+
   public BouncyModifier() {
     super(BOUNCY, true);
     LivingEntityEvents.FALL.register(BouncyModifier::onFall);
   }
 
-  /** Called when an entity lands to handle the event */
+  /**
+   * Called when an entity lands to handle the event
+   */
   private static void onFall(FallEvent event) {
     LivingEntity living = (LivingEntity) event.getEntity();
     // using fall distance as the event distance could be reduced by jump boost
@@ -29,7 +33,7 @@ public class BouncyModifier extends TotalArmorLevelModifier {
     }
     // can the entity bounce?
     if (ModifierUtil.getTotalModifierLevel(living, BOUNCY) == 0) {
-        return;
+      return;
     }
 
     // reduced fall damage when crouching

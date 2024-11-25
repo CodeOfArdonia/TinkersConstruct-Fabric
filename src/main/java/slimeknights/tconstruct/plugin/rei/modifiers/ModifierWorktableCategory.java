@@ -1,6 +1,5 @@
 package slimeknights.tconstruct.plugin.rei.modifiers;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import lombok.Getter;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
@@ -26,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class ModifierWorktableCategory implements TinkersCategory<ModifierWorktableDisplay> {
+
   private static final ResourceLocation BACKGROUND_LOC = TConstruct.getResource("textures/gui/jei/tinker_station.png");
   private static final Component TITLE = TConstruct.makeTranslation("jei", "modifier_worktable.title");
 
@@ -35,11 +35,12 @@ public class ModifierWorktableCategory implements TinkersCategory<ModifierWorkta
   private final Renderer icon;
   private final WidgetHolder toolIcon;
   private final WidgetHolder[] slotIcons;
+
   public ModifierWorktableCategory() {
     this.background = new WidgetHolder(BACKGROUND_LOC, 0, 166, 121, 35);
     this.icon = EntryStacks.of(TinkerTables.modifierWorktable);
     this.toolIcon = new WidgetHolder(BACKGROUND_LOC, 128, 0, 16, 16);
-    this.slotIcons = new WidgetHolder[] {
+    this.slotIcons = new WidgetHolder[]{
       new WidgetHolder(BACKGROUND_LOC, 176, 0, 16, 16),
       new WidgetHolder(BACKGROUND_LOC, 208, 0, 16, 16)
     };
@@ -72,13 +73,13 @@ public class ModifierWorktableCategory implements TinkersCategory<ModifierWorkta
   public void addWidgets(ModifierWorktableDisplay display, List<Widget> ingredients, Point origin, Rectangle bounds) {
     IModifierWorktableRecipe recipe = display.getRecipe();
     // items
-    ingredients.add(slot(23, 16, origin).markInput().entries(EntryIngredients.ofItemStacks(recipe.getInputTools())));
+    ingredients.add(this.slot(23, 16, origin).markInput().entries(EntryIngredients.ofItemStacks(recipe.getInputTools())));
     int max = Math.min(2, recipe.getInputCount());
     for (int i = 0; i < max; i++) {
-     ingredients.add(slot(43 + i*18, 16, origin).markInput().entries(EntryIngredients.ofItemStacks(recipe.getDisplayItems(i))));
+      ingredients.add(this.slot(43 + i * 18, 16, origin).markInput().entries(EntryIngredients.ofItemStacks(recipe.getDisplayItems(i))));
     }
     // modifier input
-    Slot slot = slot(82, 16, origin).entries(EntryIngredients.of(TConstructREIConstants.MODIFIER_TYPE, recipe.getModifierOptions(null)));
+    Slot slot = this.slot(82, 16, origin).entries(EntryIngredients.of(TConstructREIConstants.MODIFIER_TYPE, recipe.getModifierOptions(null)));
     if (recipe.isModifierOutput())
       slot.markOutput();
     else
@@ -86,12 +87,12 @@ public class ModifierWorktableCategory implements TinkersCategory<ModifierWorkta
     ingredients.add(slot);
 
     if (recipe.getInputTools().isEmpty()) {
-      ingredients.add(toolIcon.build(23, 16, origin));
+      ingredients.add(this.toolIcon.build(23, 16, origin));
     }
     for (int i = 0; i < 2; i++) {
       List<ItemStack> stacks = recipe.getDisplayItems(i);
       if (stacks.isEmpty()) {
-        ingredients.add(slotIcons[i].build(43 + i * 18, 16, origin));
+        ingredients.add(this.slotIcons[i].build(43 + i * 18, 16, origin));
       }
     }
   }

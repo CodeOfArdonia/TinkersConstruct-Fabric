@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.fluids.item;
 
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.item.FluidBucketWrapper;
 import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
+import io.github.fabricators_of_create.porting_lib.transfer.fluid.item.FluidBucketWrapper;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
@@ -23,16 +23,19 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.Fluid;
 import slimeknights.tconstruct.library.utils.Util;
-import slimeknights.tconstruct.smeltery.item.CopperCanFluidHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.Supplier;
 
-/** Implements filling a bucket with an NBT fluid */
+/**
+ * Implements filling a bucket with an NBT fluid
+ */
 public class PotionBucketItem extends PotionItem {
+
   private final Supplier<? extends Fluid> supplier;
+
   public PotionBucketItem(Supplier<? extends Fluid> supplier, Properties builder) {
     super(builder);
     this.supplier = supplier;
@@ -40,12 +43,12 @@ public class PotionBucketItem extends PotionItem {
   }
 
   public Fluid getFluid() {
-    return supplier.get();
+    return this.supplier.get();
   }
 
   @Override
   public String getDescriptionId(ItemStack stack) {
-    String bucketKey = PotionUtils.getPotion(stack.getTag()).getName(getDescriptionId() + ".effect.");
+    String bucketKey = PotionUtils.getPotion(stack.getTag()).getName(this.getDescriptionId() + ".effect.");
     if (Util.canTranslate(bucketKey)) {
       return bucketKey;
     }
@@ -55,12 +58,12 @@ public class PotionBucketItem extends PotionItem {
   @Override
   public Component getName(ItemStack stack) {
     Potion potion = PotionUtils.getPotion(stack.getTag());
-    String bucketKey = potion.getName(getDescriptionId() + ".effect.");
+    String bucketKey = potion.getName(this.getDescriptionId() + ".effect.");
     if (Util.canTranslate(bucketKey)) {
       return Component.translatable(bucketKey);
     }
     // default to filling with the contents
-    return Component.translatable(getDescriptionId() + ".contents", Component.translatable(potion.getName("item.minecraft.potion.effect.")));
+    return Component.translatable(this.getDescriptionId() + ".contents", Component.translatable(potion.getName("item.minecraft.potion.effect.")));
   }
 
   @Override
@@ -118,6 +121,7 @@ public class PotionBucketItem extends PotionItem {
   }
 
   public static class PotionBucketWrapper extends FluidBucketWrapper {
+
     public PotionBucketWrapper(ContainerItemContext container) {
       super(container);
     }
@@ -125,8 +129,8 @@ public class PotionBucketItem extends PotionItem {
     @Nonnull
     @Override
     public FluidStack getFluid() {
-      return new FluidStack(((PotionBucketItem)context.getItemVariant().getItem()).getFluid(),
-                            FluidConstants.BUCKET, context.getItemVariant().getNbt());
+      return new FluidStack(((PotionBucketItem) this.context.getItemVariant().getItem()).getFluid(),
+        FluidConstants.BUCKET, this.context.getItemVariant().getNbt());
     }
   }
 }

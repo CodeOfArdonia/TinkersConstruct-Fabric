@@ -14,6 +14,7 @@ import slimeknights.tconstruct.library.tools.nbt.NamespacedNBT;
 import javax.annotation.Nullable;
 
 public class PunchModifier extends Modifier implements ProjectileLaunchModifierHook {
+
   @Override
   protected void registerHooks(Builder hookBuilder) {
     hookBuilder.addHook(this, TinkerHooks.PROJECTILE_LAUNCH);

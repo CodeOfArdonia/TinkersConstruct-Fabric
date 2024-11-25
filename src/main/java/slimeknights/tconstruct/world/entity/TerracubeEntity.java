@@ -14,12 +14,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import slimeknights.tconstruct.world.TinkerWorld;
 
-import java.util.Random;
-
 /**
  * Clay based slime cube
  */
 public class TerracubeEntity extends Slime {
+
   public TerracubeEntity(EntityType<? extends TerracubeEntity> type, Level worldIn) {
     super(type, worldIn);
   }
@@ -48,7 +47,7 @@ public class TerracubeEntity extends Slime {
 
   @Override
   protected float getAttackDamage() {
-    return (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) + 2;
+    return (float) this.getAttributeValue(Attributes.ATTACK_DAMAGE) + 2;
   }
 
   @Override

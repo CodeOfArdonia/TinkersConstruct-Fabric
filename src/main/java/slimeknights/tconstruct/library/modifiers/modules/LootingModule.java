@@ -19,12 +19,13 @@ import java.util.List;
  * Currently, does not support incremental.
  */
 public record LootingModule(int level) implements LootingModifierHook, ModifierModule {
+
   private static final List<ModifierHook<?>> DEFAULT_HOOKS = List.of(TinkerHooks.TOOL_LOOTING, TinkerHooks.LEGGINGS_LOOTING, TinkerHooks.PROJECTILE_LOOTING);
   public static IGenericLoader<LootingModule> LOADER = new GenericIntSerializer<>("level", LootingModule::new, LootingModule::level);
 
   @Override
   public int getLootingValue(IToolStackView tool, ModifierEntry modifier, LivingEntity holder, Entity target, @Nullable DamageSource damageSource, int looting) {
-    return level * modifier.getLevel();
+    return this.level * modifier.getLevel();
   }
 
   @Override

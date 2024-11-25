@@ -46,9 +46,9 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    * @param isOptional If true, recipe is optional
    */
   default void tagMelting(Consumer<FinishedRecipe> consumer, Fluid fluid, long amount, String tagName, float factor, String recipePath, boolean isOptional) {
-    Consumer<FinishedRecipe> wrapped = isOptional ? withCondition(consumer, tagCondition(tagName)) : consumer;
-    MeltingRecipeBuilder.melting(Ingredient.of(getItemTag("c", tagName)), fluid, amount, factor)
-      .save(wrapped, modResource(recipePath));
+    Consumer<FinishedRecipe> wrapped = isOptional ? this.withCondition(consumer, this.tagCondition(tagName)) : consumer;
+    MeltingRecipeBuilder.melting(Ingredient.of(this.getItemTag("c", tagName)), fluid, amount, factor)
+      .save(wrapped, this.modResource(recipePath));
   }
 
   /**
@@ -66,23 +66,23 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    */
   default void oreMelting(Consumer<FinishedRecipe> consumer, Fluid fluid, long amount, String tagName, @Nullable TagKey<Item> size, float factor, String recipePath, boolean isOptional, OreRateType oreRate, float byproductScale, IByproduct... byproducts) {
     Consumer<FinishedRecipe> wrapped;
-    Ingredient baseIngredient = Ingredient.of(getItemTag("c", tagName));
+    Ingredient baseIngredient = Ingredient.of(this.getItemTag("c", tagName));
     Ingredient ingredient;
     // not everyone sets size, so treat singular as the fallback, means we want anything in the tag that is not sparse or dense
     if (size == Tags.Items.ORE_RATES_SINGULAR) {
       ingredient = DefaultCustomIngredients.difference(baseIngredient, DefaultCustomIngredients.any(Ingredient.of(Tags.Items.ORE_RATES_SPARSE), Ingredient.of(Tags.Items.ORE_RATES_DENSE)));
-      wrapped = withCondition(consumer, TagDifferencePresentCondition.ofKeys(getItemTag("c", tagName), Tags.Items.ORE_RATES_SPARSE, Tags.Items.ORE_RATES_DENSE));
+      wrapped = this.withCondition(consumer, TagDifferencePresentCondition.ofKeys(this.getItemTag("c", tagName), Tags.Items.ORE_RATES_SPARSE, Tags.Items.ORE_RATES_DENSE));
       // size tag means we want an intersection between the tag and that size
     } else if (size != null) {
       ingredient = DefaultCustomIngredients.all(baseIngredient, Ingredient.of(size));
-      wrapped = withCondition(consumer, TagIntersectionPresentCondition.ofKeys(getItemTag("c", tagName), size));
+      wrapped = this.withCondition(consumer, TagIntersectionPresentCondition.ofKeys(this.getItemTag("c", tagName), size));
       // default only need it to be in the tag
     } else {
       ingredient = baseIngredient;
-      wrapped = isOptional ? withCondition(consumer, tagCondition(tagName)) : consumer;
+      wrapped = isOptional ? this.withCondition(consumer, this.tagCondition(tagName)) : consumer;
     }
     Supplier<MeltingRecipeBuilder> supplier = () -> MeltingRecipeBuilder.melting(ingredient, fluid, amount, factor).setOre(oreRate);
-    ResourceLocation location = modResource(recipePath);
+    ResourceLocation location = this.modResource(recipePath);
 
     // if no byproducts, just build directly
     if (byproducts.length == 0) {
@@ -102,7 +102,7 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
         if (alwaysPresent) {
           builder.addCondition(TrueCondition.INSTANCE);
         } else {
-          builder.addCondition(tagCondition(byproduct.getName() + "_ingots"));
+          builder.addCondition(this.tagCondition(byproduct.getName() + "_ingots"));
         }
         builder.addRecipe(supplier.get().addByproduct(new FluidStack(byproduct.getFluid(), (int) (byproduct.getAmount() * byproductScale)))::save);
 
@@ -129,13 +129,13 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    */
   default void georeMelting(Consumer<FinishedRecipe> consumer, Fluid fluid, long unit, String name, String folder) {
     // base
-    tagMelting(consumer, fluid, unit, "geore_shards/" + name, 1.0f, folder + "geore/shard", true);
-    tagMelting(consumer, fluid, unit * 4, "geore_blocks/" + name, 2.0f, folder + "geore/block", true);
+    this.tagMelting(consumer, fluid, unit, "geore_shards/" + name, 1.0f, folder + "geore/shard", true);
+    this.tagMelting(consumer, fluid, unit * 4, "geore_blocks/" + name, 2.0f, folder + "geore/block", true);
     // clusters
-    tagMelting(consumer, fluid, unit * 4, "geore_clusters/" + name, 2.5f, folder + "geore/cluster", true);
-    tagMelting(consumer, fluid, unit, "geore_small_buds/" + name, 1.0f, folder + "geore/bud_small", true);
-    tagMelting(consumer, fluid, unit * 2, "geore_medium_buds/" + name, 1.5f, folder + "geore/bud_medium", true);
-    tagMelting(consumer, fluid, unit * 3, "geore_large_buds/" + name, 2.0f, folder + "geore/bud_large", true);
+    this.tagMelting(consumer, fluid, unit * 4, "geore_clusters/" + name, 2.5f, folder + "geore/cluster", true);
+    this.tagMelting(consumer, fluid, unit, "geore_small_buds/" + name, 1.0f, folder + "geore/bud_small", true);
+    this.tagMelting(consumer, fluid, unit * 2, "geore_medium_buds/" + name, 1.5f, folder + "geore/bud_medium", true);
+    this.tagMelting(consumer, fluid, unit * 3, "geore_large_buds/" + name, 2.0f, folder + "geore/bud_large", true);
   }
 
   /**
@@ -152,28 +152,28 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    */
   default void metalMelting(Consumer<FinishedRecipe> consumer, Fluid fluid, String name, boolean hasOre, boolean hasDust, String folder, boolean isOptional, IByproduct... byproducts) {
     String prefix = folder + "/" + name + "/";
-    tagMelting(consumer, fluid, FluidValues.METAL_BLOCK, name + "_blocks", 3.0f, prefix + "block", isOptional);
-    tagMelting(consumer, fluid, FluidValues.INGOT, name + "_ingots", 1.0f, prefix + "ingot", isOptional);
-    tagMelting(consumer, fluid, FluidValues.NUGGET, "nuggets/" + name, 1 / 3f, prefix + "nugget", isOptional);
+    this.tagMelting(consumer, fluid, FluidValues.METAL_BLOCK, name + "_blocks", 3.0f, prefix + "block", isOptional);
+    this.tagMelting(consumer, fluid, FluidValues.INGOT, name + "_ingots", 1.0f, prefix + "ingot", isOptional);
+    this.tagMelting(consumer, fluid, FluidValues.NUGGET, "nuggets/" + name, 1 / 3f, prefix + "nugget", isOptional);
     if (hasOre) {
-      oreMelting(consumer, fluid, FluidValues.INGOT, "raw_" + name + "_ores", null, 1.5f, prefix + "raw", isOptional, OreRateType.METAL, 1.0f, byproducts);
-      oreMelting(consumer, fluid, FluidValues.INGOT * 9, "raw_" + name + "_blocks", null, 6.0f, prefix + "raw_block", isOptional, OreRateType.METAL, 9.0f, byproducts);
-      oreMelting(consumer, fluid, FluidValues.INGOT, name + "_ores", Tags.Items.ORE_RATES_SPARSE, 1.5f, prefix + "ore_sparse", isOptional, OreRateType.METAL, 1.0f, byproducts);
-      oreMelting(consumer, fluid, FluidValues.INGOT * 2, name + "_ores", Tags.Items.ORE_RATES_SINGULAR, 2.5f, prefix + "ore_singular", isOptional, OreRateType.METAL, 2.0f, byproducts);
-      oreMelting(consumer, fluid, FluidValues.INGOT * 6, name + "_ores", Tags.Items.ORE_RATES_DENSE, 4.5f, prefix + "ore_dense", isOptional, OreRateType.METAL, 6.0f, byproducts);
-      georeMelting(consumer, fluid, FluidValues.INGOT, name, prefix);
+      this.oreMelting(consumer, fluid, FluidValues.INGOT, "raw_" + name + "_ores", null, 1.5f, prefix + "raw", isOptional, OreRateType.METAL, 1.0f, byproducts);
+      this.oreMelting(consumer, fluid, FluidValues.INGOT * 9, "raw_" + name + "_blocks", null, 6.0f, prefix + "raw_block", isOptional, OreRateType.METAL, 9.0f, byproducts);
+      this.oreMelting(consumer, fluid, FluidValues.INGOT, name + "_ores", Tags.Items.ORE_RATES_SPARSE, 1.5f, prefix + "ore_sparse", isOptional, OreRateType.METAL, 1.0f, byproducts);
+      this.oreMelting(consumer, fluid, FluidValues.INGOT * 2, name + "_ores", Tags.Items.ORE_RATES_SINGULAR, 2.5f, prefix + "ore_singular", isOptional, OreRateType.METAL, 2.0f, byproducts);
+      this.oreMelting(consumer, fluid, FluidValues.INGOT * 6, name + "_ores", Tags.Items.ORE_RATES_DENSE, 4.5f, prefix + "ore_dense", isOptional, OreRateType.METAL, 6.0f, byproducts);
+      this.georeMelting(consumer, fluid, FluidValues.INGOT, name, prefix);
     }
     // remaining forms are always optional as we don't ship them
     // allow disabling dust as some mods treat dust as distinct from ingots
     if (hasDust) {
-      tagMelting(consumer, fluid, FluidValues.INGOT, name + "_dusts", 0.75f, prefix + "dust", true);
+      this.tagMelting(consumer, fluid, FluidValues.INGOT, name + "_dusts", 0.75f, prefix + "dust", true);
     }
-    tagMelting(consumer, fluid, FluidValues.INGOT, name + "_plates", 1.0f, prefix + "plates", true);
-    tagMelting(consumer, fluid, FluidValues.INGOT * 4, name + "_gears", 2.0f, prefix + "gear", true);
-    tagMelting(consumer, fluid, FluidValues.NUGGET * 3, name + "_coins", 2 / 3f, prefix + "coin", true);
-    tagMelting(consumer, fluid, FluidValues.INGOT / 2, name + "_rods", 1 / 5f, prefix + "rod", true);
-    tagMelting(consumer, fluid, FluidValues.INGOT / 2, name + "_wires", 1 / 5f, prefix + "wire", true);
-    tagMelting(consumer, fluid, FluidValues.INGOT, "sheetmetals/" + name, 1.0f, prefix + "sheetmetal", true);
+    this.tagMelting(consumer, fluid, FluidValues.INGOT, name + "_plates", 1.0f, prefix + "plates", true);
+    this.tagMelting(consumer, fluid, FluidValues.INGOT * 4, name + "_gears", 2.0f, prefix + "gear", true);
+    this.tagMelting(consumer, fluid, FluidValues.NUGGET * 3, name + "_coins", 2 / 3f, prefix + "coin", true);
+    this.tagMelting(consumer, fluid, FluidValues.INGOT / 2, name + "_rods", 1 / 5f, prefix + "rod", true);
+    this.tagMelting(consumer, fluid, FluidValues.INGOT / 2, name + "_wires", 1 / 5f, prefix + "wire", true);
+    this.tagMelting(consumer, fluid, FluidValues.INGOT, "sheetmetals/" + name, 1.0f, prefix + "sheetmetal", true);
   }
 
   /**
@@ -188,7 +188,7 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    * @param byproducts List of byproduct options for this metal, first one that is present will be used
    */
   default void metalMelting(Consumer<FinishedRecipe> consumer, Fluid fluid, String name, boolean hasOre, String folder, boolean isOptional, IByproduct... byproducts) {
-    metalMelting(consumer, fluid, name, hasOre, true, folder, isOptional, byproducts);
+    this.metalMelting(consumer, fluid, name, hasOre, true, folder, isOptional, byproducts);
   }
 
   /**
@@ -205,14 +205,14 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
   default void gemMelting(Consumer<FinishedRecipe> consumer, Fluid fluid, String name, String tagSuffix, boolean hasOre, int blockSize, String folder, boolean isOptional, IByproduct... byproducts) {
     String prefix = folder + "/" + name + "/";
     // basic
-    tagMelting(consumer, fluid, FluidValues.GEM * blockSize, name + "_blocks", (float) Math.sqrt(blockSize), prefix + "block", isOptional);
-    tagMelting(consumer, fluid, FluidValues.GEM, name + tagSuffix, 1.0f, prefix + "gem", isOptional);
+    this.tagMelting(consumer, fluid, (long) FluidValues.GEM * blockSize, name + "_blocks", (float) Math.sqrt(blockSize), prefix + "block", isOptional);
+    this.tagMelting(consumer, fluid, FluidValues.GEM, name + tagSuffix, 1.0f, prefix + "gem", isOptional);
     // ores
     if (hasOre) {
-      oreMelting(consumer, fluid, FluidValues.GEM / 2, name + "_ores", Tags.Items.ORE_RATES_SPARSE, 1.0f, prefix + "ore_sparse", isOptional, OreRateType.GEM, 0.5f, byproducts);
-      oreMelting(consumer, fluid, FluidValues.GEM, name + "_ores", Tags.Items.ORE_RATES_SINGULAR, 1.5f, prefix + "ore_singular", isOptional, OreRateType.GEM, 1.0f, byproducts);
-      oreMelting(consumer, fluid, FluidValues.GEM * 3, name + "_ores", Tags.Items.ORE_RATES_DENSE, 4.5f, prefix + "ore_dense", isOptional, OreRateType.GEM, 3.0f, byproducts);
-      georeMelting(consumer, fluid, FluidValues.GEM, name, prefix);
+      this.oreMelting(consumer, fluid, FluidValues.GEM / 2, name + "_ores", Tags.Items.ORE_RATES_SPARSE, 1.0f, prefix + "ore_sparse", isOptional, OreRateType.GEM, 0.5f, byproducts);
+      this.oreMelting(consumer, fluid, FluidValues.GEM, name + "_ores", Tags.Items.ORE_RATES_SINGULAR, 1.5f, prefix + "ore_singular", isOptional, OreRateType.GEM, 1.0f, byproducts);
+      this.oreMelting(consumer, fluid, FluidValues.GEM * 3, name + "_ores", Tags.Items.ORE_RATES_DENSE, 4.5f, prefix + "ore_dense", isOptional, OreRateType.GEM, 3.0f, byproducts);
+      this.georeMelting(consumer, fluid, FluidValues.GEM, name, prefix);
     }
   }
 
@@ -234,11 +234,11 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
     ItemCastingRecipeBuilder.tableRecipe(output)
       .setFluidAndTime(fluid, forgeTag, amount)
       .setCast(cast.getMultiUseTag(), false)
-      .save(consumer, modResource(location + "_gold_cast"));
+      .save(consumer, this.modResource(location + "_gold_cast"));
     ItemCastingRecipeBuilder.tableRecipe(output)
       .setFluidAndTime(fluid, forgeTag, amount)
       .setCast(cast.getSingleUseTag(), true)
-      .save(consumer, modResource(location + "_sand_cast"));
+      .save(consumer, this.modResource(location + "_sand_cast"));
   }
 
   /**
@@ -252,7 +252,7 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    * @param location Recipe base
    */
   default void castingWithCast(Consumer<FinishedRecipe> consumer, FluidObject<?> fluid, long amount, CastItemObject cast, ItemOutput output, String location) {
-    castingWithCast(consumer, fluid, false, amount, cast, output, location);
+    this.castingWithCast(consumer, fluid, false, amount, cast, output, location);
   }
 
   /**
@@ -267,7 +267,7 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    * @param location Recipe base
    */
   default void castingWithCast(Consumer<FinishedRecipe> consumer, FluidObject<?> fluid, boolean forgeTag, long amount, CastItemObject cast, ItemLike output, String location) {
-    castingWithCast(consumer, fluid, forgeTag, amount, cast, ItemOutput.fromItem(output), location);
+    this.castingWithCast(consumer, fluid, forgeTag, amount, cast, ItemOutput.fromItem(output), location);
   }
 
   /**
@@ -281,7 +281,7 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    * @param location Recipe base
    */
   default void castingWithCast(Consumer<FinishedRecipe> consumer, FluidObject<?> fluid, long amount, CastItemObject cast, ItemLike output, String location) {
-    castingWithCast(consumer, fluid, amount, cast, ItemOutput.fromItem(output), location);
+    this.castingWithCast(consumer, fluid, amount, cast, ItemOutput.fromItem(output), location);
   }
 
   /**
@@ -298,9 +298,9 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    */
   default void tagCasting(Consumer<FinishedRecipe> consumer, FluidObject<?> fluid, boolean forgeTag, long amount, CastItemObject cast, String tagName, String recipeName, boolean optional) {
     if (optional) {
-      consumer = withCondition(consumer, tagCondition(tagName));
+      consumer = this.withCondition(consumer, this.tagCondition(tagName));
     }
-    castingWithCast(consumer, fluid, forgeTag, amount, cast, ItemOutput.fromTag(getItemTag("c", tagName), 1), recipeName);
+    this.castingWithCast(consumer, fluid, forgeTag, amount, cast, ItemOutput.fromTag(this.getItemTag("c", tagName), 1), recipeName);
   }
 
   /**
@@ -315,7 +315,7 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    * @param optional   If true, conditions the recipe on the tag
    */
   default void tagCasting(Consumer<FinishedRecipe> consumer, FluidObject<?> fluid, int amount, CastItemObject cast, String tagName, String recipeName, boolean optional) {
-    tagCasting(consumer, fluid, false, amount, cast, tagName, recipeName, optional);
+    this.tagCasting(consumer, fluid, false, amount, cast, tagName, recipeName, optional);
   }
 
 
@@ -330,7 +330,7 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    * @param location Recipe base
    */
   default void ingotCasting(Consumer<FinishedRecipe> consumer, FluidObject<?> fluid, boolean forgeTag, long amount, ItemLike ingot, String location) {
-    castingWithCast(consumer, fluid, forgeTag, amount, TinkerSmeltery.ingotCast, ingot, location);
+    this.castingWithCast(consumer, fluid, forgeTag, amount, TinkerSmeltery.ingotCast, ingot, location);
   }
 
   /**
@@ -343,7 +343,7 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    * @param location Recipe base
    */
   default void ingotCasting(Consumer<FinishedRecipe> consumer, FluidObject<?> fluid, boolean forgeTag, ItemLike ingot, String location) {
-    ingotCasting(consumer, fluid, forgeTag, FluidValues.INGOT, ingot, location);
+    this.ingotCasting(consumer, fluid, forgeTag, FluidValues.INGOT, ingot, location);
   }
 
   /**
@@ -356,7 +356,7 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    * @param location Recipe base
    */
   default void ingotCasting(Consumer<FinishedRecipe> consumer, FluidObject<?> fluid, long amount, ItemLike ingot, String location) {
-    ingotCasting(consumer, fluid, false, amount, ingot, location);
+    this.ingotCasting(consumer, fluid, false, amount, ingot, location);
   }
 
   /**
@@ -368,7 +368,7 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    * @param location Recipe base
    */
   default void ingotCasting(Consumer<FinishedRecipe> consumer, FluidObject<?> fluid, ItemLike ingot, String location) {
-    ingotCasting(consumer, fluid, FluidValues.INGOT, ingot, location);
+    this.ingotCasting(consumer, fluid, FluidValues.INGOT, ingot, location);
   }
 
   /**
@@ -380,7 +380,7 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    * @param location Recipe base
    */
   default void gemCasting(Consumer<FinishedRecipe> consumer, FluidObject<?> fluid, ItemLike gem, String location) {
-    castingWithCast(consumer, fluid, FluidValues.GEM, TinkerSmeltery.gemCast, gem, location);
+    this.castingWithCast(consumer, fluid, FluidValues.GEM, TinkerSmeltery.gemCast, gem, location);
   }
 
   /**
@@ -393,7 +393,7 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    * @param location Recipe base
    */
   default void nuggetCasting(Consumer<FinishedRecipe> consumer, FluidObject<?> fluid, boolean forgeTag, ItemLike nugget, String location) {
-    castingWithCast(consumer, fluid, forgeTag, FluidValues.NUGGET, TinkerSmeltery.nuggetCast, nugget, location);
+    this.castingWithCast(consumer, fluid, forgeTag, FluidValues.NUGGET, TinkerSmeltery.nuggetCast, nugget, location);
   }
 
   /**
@@ -405,7 +405,7 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    * @param location Recipe base
    */
   default void nuggetCastingRecipe(Consumer<FinishedRecipe> consumer, FluidObject<?> fluid, ItemLike nugget, String location) {
-    nuggetCasting(consumer, fluid, false, nugget, location);
+    this.nuggetCasting(consumer, fluid, false, nugget, location);
   }
 
   /**
@@ -424,20 +424,20 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
     if (block != null) {
       ItemCastingRecipeBuilder.basinRecipe(block)
         .setFluidAndTime(fluid, forgeTag, FluidValues.METAL_BLOCK)
-        .save(consumer, modResource(metalFolder + "block"));
+        .save(consumer, this.modResource(metalFolder + "block"));
     }
     if (ingot != null) {
-      ingotCasting(consumer, fluid, forgeTag, ingot, metalFolder + "ingot");
+      this.ingotCasting(consumer, fluid, forgeTag, ingot, metalFolder + "ingot");
     }
     if (nugget != null) {
-      nuggetCasting(consumer, fluid, forgeTag, nugget, metalFolder + "nugget");
+      this.nuggetCasting(consumer, fluid, forgeTag, nugget, metalFolder + "nugget");
     }
     // plates are always optional, we don't ship them
-    tagCasting(consumer, fluid, forgeTag, FluidValues.INGOT, TinkerSmeltery.plateCast, metal + "_plates", folder + metal + "/plate", true);
-    tagCasting(consumer, fluid, forgeTag, FluidValues.INGOT * 4, TinkerSmeltery.gearCast, metal + "_gears", folder + metal + "/gear", true);
-    tagCasting(consumer, fluid, forgeTag, FluidValues.NUGGET * 3, TinkerSmeltery.coinCast, metal + "_coins", folder + metal + "/coin", true);
-    tagCasting(consumer, fluid, forgeTag, FluidValues.INGOT / 2, TinkerSmeltery.rodCast, metal + "_rods", folder + metal + "/rod", true);
-    tagCasting(consumer, fluid, forgeTag, FluidValues.INGOT / 2, TinkerSmeltery.wireCast, metal + "_wires", folder + metal + "/wire", true);
+    this.tagCasting(consumer, fluid, forgeTag, FluidValues.INGOT, TinkerSmeltery.plateCast, metal + "_plates", folder + metal + "/plate", true);
+    this.tagCasting(consumer, fluid, forgeTag, FluidValues.INGOT * 4, TinkerSmeltery.gearCast, metal + "_gears", folder + metal + "/gear", true);
+    this.tagCasting(consumer, fluid, forgeTag, FluidValues.NUGGET * 3, TinkerSmeltery.coinCast, metal + "_coins", folder + metal + "/coin", true);
+    this.tagCasting(consumer, fluid, forgeTag, FluidValues.INGOT / 2, TinkerSmeltery.rodCast, metal + "_rods", folder + metal + "/rod", true);
+    this.tagCasting(consumer, fluid, forgeTag, FluidValues.INGOT / 2, TinkerSmeltery.wireCast, metal + "_wires", folder + metal + "/wire", true);
   }
 
   /**
@@ -451,7 +451,7 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    * @param folder   Output folder
    */
   default void metalCasting(Consumer<FinishedRecipe> consumer, FluidObject<?> fluid, @Nullable ItemLike block, @Nullable ItemLike ingot, @Nullable ItemLike nugget, String folder, String metal) {
-    metalCasting(consumer, fluid, false, block, ingot, nugget, folder, metal);
+    this.metalCasting(consumer, fluid, false, block, ingot, nugget, folder, metal);
   }
 
   /**
@@ -463,7 +463,7 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    * @param folder   Output folder
    */
   default void metalCasting(Consumer<FinishedRecipe> consumer, FluidObject<?> fluid, MetalItemObject metal, String folder, String name) {
-    metalCasting(consumer, fluid, metal.get(), metal.getIngot(), metal.getNugget(), folder, name);
+    this.metalCasting(consumer, fluid, metal.get(), metal.getIngot(), metal.getNugget(), folder, name);
   }
 
   /**
@@ -477,18 +477,18 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    */
   default void metalTagCasting(Consumer<FinishedRecipe> consumer, FluidObject<?> fluid, String name, String folder, boolean forceStandard) {
     // nugget and ingot
-    tagCasting(consumer, fluid, true, FluidValues.NUGGET, TinkerSmeltery.nuggetCast, name + "_nuggets", folder + name + "/nugget", !forceStandard);
-    tagCasting(consumer, fluid, true, FluidValues.INGOT, TinkerSmeltery.ingotCast, name + "_ingots", folder + name + "/ingot", !forceStandard);
-    tagCasting(consumer, fluid, true, FluidValues.INGOT, TinkerSmeltery.plateCast, name + "_plates", folder + name + "/plate", true);
-    tagCasting(consumer, fluid, true, FluidValues.INGOT * 4, TinkerSmeltery.gearCast, name + "_gears", folder + name + "/gear", true);
-    tagCasting(consumer, fluid, true, FluidValues.NUGGET * 3, TinkerSmeltery.coinCast, name + "_coins", folder + name + "/coin", true);
-    tagCasting(consumer, fluid, true, FluidValues.INGOT / 2, TinkerSmeltery.rodCast, name + "_rods", folder + name + "/rod", true);
-    tagCasting(consumer, fluid, true, FluidValues.INGOT / 2, TinkerSmeltery.wireCast, name + "_wires", folder + name + "/wire", true);
+    this.tagCasting(consumer, fluid, true, FluidValues.NUGGET, TinkerSmeltery.nuggetCast, name + "_nuggets", folder + name + "/nugget", !forceStandard);
+    this.tagCasting(consumer, fluid, true, FluidValues.INGOT, TinkerSmeltery.ingotCast, name + "_ingots", folder + name + "/ingot", !forceStandard);
+    this.tagCasting(consumer, fluid, true, FluidValues.INGOT, TinkerSmeltery.plateCast, name + "_plates", folder + name + "/plate", true);
+    this.tagCasting(consumer, fluid, true, FluidValues.INGOT * 4, TinkerSmeltery.gearCast, name + "_gears", folder + name + "/gear", true);
+    this.tagCasting(consumer, fluid, true, FluidValues.NUGGET * 3, TinkerSmeltery.coinCast, name + "_coins", folder + name + "/coin", true);
+    this.tagCasting(consumer, fluid, true, FluidValues.INGOT / 2, TinkerSmeltery.rodCast, name + "_rods", folder + name + "/rod", true);
+    this.tagCasting(consumer, fluid, true, FluidValues.INGOT / 2, TinkerSmeltery.wireCast, name + "_wires", folder + name + "/wire", true);
     // block
-    TagKey<Item> block = getItemTag("c", name + "_blocks");
-    Consumer<FinishedRecipe> wrapped = forceStandard ? consumer : withCondition(consumer, tagCondition(name + "_blocks"));
+    TagKey<Item> block = this.getItemTag("c", name + "_blocks");
+    Consumer<FinishedRecipe> wrapped = forceStandard ? consumer : this.withCondition(consumer, this.tagCondition(name + "_blocks"));
     ItemCastingRecipeBuilder.basinRecipe(block)
       .setFluidAndTime(fluid, true, FluidValues.METAL_BLOCK)
-      .save(wrapped, modResource(folder + name + "/block"));
+      .save(wrapped, this.modResource(folder + name + "/block"));
   }
 }

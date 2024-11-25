@@ -23,21 +23,23 @@ import slimeknights.tconstruct.library.tools.stat.ToolStats;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public record ConditionalDamageModule(IJsonPredicate<LivingEntity> predicate, float damageBonus) implements MeleeDamageModifierHook, TooltipModifierHook, ModifierModule {
+public record ConditionalDamageModule(IJsonPredicate<LivingEntity> predicate,
+                                      float damageBonus) implements MeleeDamageModifierHook, TooltipModifierHook, ModifierModule {
+
   private static final List<ModifierHook<?>> DEFAULT_HOOKS = List.of(TinkerHooks.MELEE_DAMAGE, TinkerHooks.TOOLTIP);
 
   @Override
   public float getMeleeDamage(IToolStackView tool, ModifierEntry modifier, ToolAttackContext context, float baseDamage, float damage) {
     LivingEntity target = context.getLivingTarget();
-    if (target != null && predicate.matches(target)) {
-      damage += modifier.getEffectiveLevel(tool) * damageBonus * tool.getMultiplier(ToolStats.ATTACK_DAMAGE);
+    if (target != null && this.predicate.matches(target)) {
+      damage += modifier.getEffectiveLevel(tool) * this.damageBonus * tool.getMultiplier(ToolStats.ATTACK_DAMAGE);
     }
     return damage;
   }
 
   @Override
   public void addTooltip(IToolStackView tool, ModifierEntry modifier, @Nullable Player player, List<Component> tooltip, TooltipKey tooltipKey, TooltipFlag tooltipFlag) {
-    TooltipModifierHook.addDamageBoost(tool, modifier, damageBonus, tooltip);
+    TooltipModifierHook.addDamageBoost(tool, modifier, this.damageBonus, tooltip);
   }
 
   @Override

@@ -25,7 +25,10 @@ import java.util.function.Function;
  * This model contains a single fluid region that is scaled in the TESR, and a list of two items displayed in the TESR
  */
 public class CastingModel extends InventoryModel {
-  /** Shared loader instance */
+
+  /**
+   * Shared loader instance
+   */
   public static final Loader LOADER = new Loader();
 
   private final FluidCuboid fluid;
@@ -37,23 +40,30 @@ public class CastingModel extends InventoryModel {
   }
 
   @Override
-  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location, boolean isGui3d) {
-    BakedModel baked = model.bakeModel(owner, transform, overrides, spriteGetter, location);
-    return new Baked(baked, items, fluid);
+  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location, boolean isGui3d) {
+    BakedModel baked = this.model.bakeModel(owner, transform, overrides, spriteGetter, location);
+    return new Baked(baked, this.items, this.fluid);
   }
 
-  /** Baked model, mostly a data wrapper around a normal model */
+  /**
+   * Baked model, mostly a data wrapper around a normal model
+   */
   public static class Baked extends InventoryModel.Baked {
+
     @Getter
     private final FluidCuboid fluid;
+
     private Baked(BakedModel originalModel, List<ModelItem> items, FluidCuboid fluid) {
       super(originalModel, items);
       this.fluid = fluid;
     }
   }
 
-  /** Loader for this model */
+  /**
+   * Loader for this model
+   */
   public static class Loader implements IGeometryLoader<InventoryModel> {
+
     @Override
     public InventoryModel read(JsonObject modelContents, JsonDeserializationContext deserializationContext) {
       SimpleBlockModel model = SimpleBlockModel.deserialize(deserializationContext, modelContents);

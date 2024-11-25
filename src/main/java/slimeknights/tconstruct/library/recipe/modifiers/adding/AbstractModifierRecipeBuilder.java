@@ -23,15 +23,22 @@ import slimeknights.tconstruct.tools.TinkerModifiers;
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
 
-/** Shared logic between normal and incremental modifier recipe builders */
+/**
+ * Shared logic between normal and incremental modifier recipe builders
+ */
 @SuppressWarnings("unchecked")
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class AbstractModifierRecipeBuilder<T extends AbstractModifierRecipeBuilder<T>> extends AbstractRecipeBuilder<T> {
+
   protected static final Lazy<Ingredient> DEFAULT_TOOL = Lazy.of(() -> Ingredient.of(TinkerTags.Items.MODIFIABLE));
-  /** @deprecated use {@link TinkerTags.Items#UNARMED} */
+  /**
+   * @deprecated use {@link TinkerTags.Items#UNARMED}
+   */
   @Deprecated
   protected static final Lazy<ModifierMatch> UNARMED_MODIFIER = Lazy.of(() -> ModifierMatch.entry(TinkerModifiers.ambidextrous));
-  /** @deprecated use {@link TinkerTags.Items#UNARMED} */
+  /**
+   * @deprecated use {@link TinkerTags.Items#UNARMED}
+   */
   @Deprecated
   protected static final String UNARMED_ERROR = TConstruct.makeTranslationKey("recipe", "modifier.unarmed");
   // shared
@@ -50,7 +57,9 @@ public abstract class AbstractModifierRecipeBuilder<T extends AbstractModifierRe
   protected int salvageMaxLevel = 0;
   protected boolean includeUnarmed = false;
 
-  /** Generates a second copy of this recipe for the sake of the unarmed modifier */
+  /**
+   * Generates a second copy of this recipe for the sake of the unarmed modifier
+   */
   @Deprecated
   public T includeUnarmed() {
     TConstruct.LOG.warn("Unarmed has been reworked for Tinkers 1.18. Instead of having two recipes, just include the unarmed tag as a valid input for your recipe. This method will be removed in 1.19");
@@ -60,18 +69,20 @@ public abstract class AbstractModifierRecipeBuilder<T extends AbstractModifierRe
 
   /**
    * Sets the list of tools this modifier can be applied to
-   * @param tools  Modifier tools list
-   * @return  Builder instance
+   *
+   * @param tools Modifier tools list
+   * @return Builder instance
    */
   public T setTools(Ingredient tools) {
-    return setTools(tools, ITinkerStationRecipe.DEFAULT_TOOL_STACK_SIZE);
+    return this.setTools(tools, ITinkerStationRecipe.DEFAULT_TOOL_STACK_SIZE);
   }
 
   /**
    * Sets the list of tools this modifier can be applied to
-   * @param tools    Modifier tools list
-   * @param maxSize  Max stack size this recipe applies to
-   * @return  Builder instance
+   *
+   * @param tools   Modifier tools list
+   * @param maxSize Max stack size this recipe applies to
+   * @return Builder instance
    */
   public T setTools(Ingredient tools, int maxSize) {
     this.tools = tools;
@@ -81,8 +92,9 @@ public abstract class AbstractModifierRecipeBuilder<T extends AbstractModifierRe
 
   /**
    * Sets the tag for applicable tools
-   * @param tag  Tag
-   * @return  Builder instance
+   *
+   * @param tag Tag
+   * @return Builder instance
    */
   public T setTools(TagKey<Item> tag) {
     return this.setTools(Ingredient.of(tag));
@@ -90,8 +102,9 @@ public abstract class AbstractModifierRecipeBuilder<T extends AbstractModifierRe
 
   /**
    * Sets the modifier requirements for this recipe
-   * @param requirements  Modifier requirements
-   * @return  Builder instance
+   *
+   * @param requirements Modifier requirements
+   * @return Builder instance
    */
   public T setRequirements(ModifierMatch requirements) {
     this.requirements = requirements;
@@ -100,8 +113,9 @@ public abstract class AbstractModifierRecipeBuilder<T extends AbstractModifierRe
 
   /**
    * Sets the modifier requirements error for when it does not matcH
-   * @param requirementsError  Requirements error lang key
-   * @return  Builder instance
+   *
+   * @param requirementsError Requirements error lang key
+   * @return Builder instance
    */
   public T setRequirementsError(String requirementsError) {
     this.requirementsError = requirementsError;
@@ -110,8 +124,9 @@ public abstract class AbstractModifierRecipeBuilder<T extends AbstractModifierRe
 
   /**
    * Sets the min level for the salvage recipe
-   * @param level  Min level
-   * @return  Builder instance
+   *
+   * @param level Min level
+   * @return Builder instance
    */
   public T setMinSalvageLevel(int level) {
     if (level < 1) {
@@ -123,12 +138,13 @@ public abstract class AbstractModifierRecipeBuilder<T extends AbstractModifierRe
 
   /**
    * Sets the min level for the salvage recipe
-   * @param minLevel  Min level for salvage
-   * @param maxLevel  Max level for salvage
-   * @return  Builder instance
+   *
+   * @param minLevel Min level for salvage
+   * @param maxLevel Max level for salvage
+   * @return Builder instance
    */
   public T setSalvageLevelRange(int minLevel, int maxLevel) {
-    setMinSalvageLevel(minLevel);
+    this.setMinSalvageLevel(minLevel);
     if (maxLevel < minLevel) {
       throw new IllegalArgumentException("Max level must be grater than or equal to min level");
     }
@@ -138,8 +154,9 @@ public abstract class AbstractModifierRecipeBuilder<T extends AbstractModifierRe
 
   /**
    * Sets the max level for this modifier, affects both the recipe and the salvage
-   * @param level  Max level
-   * @return  Builder instance
+   *
+   * @param level Max level
+   * @return Builder instance
    */
   public T setMaxLevel(int level) {
     if (level < 1) {
@@ -151,19 +168,21 @@ public abstract class AbstractModifierRecipeBuilder<T extends AbstractModifierRe
 
   /**
    * Allows using modifier crystals to apply this modifier
-   * @return  Builder instance
+   *
+   * @return Builder instance
    */
   public T allowCrystal() {
-    allowCrystal = true;
+    this.allowCrystal = true;
     return (T) this;
   }
 
   /**
    * Disallows using modifier crystals to apply this modifier
-   * @return  Builder instance
+   *
+   * @return Builder instance
    */
   public T disallowCrystal() {
-    allowCrystal = false;
+    this.allowCrystal = false;
     return (T) this;
   }
 
@@ -172,9 +191,10 @@ public abstract class AbstractModifierRecipeBuilder<T extends AbstractModifierRe
 
   /**
    * Sets the number of slots required by this recipe
-   * @param slotType  Slot type
-   * @param slots     Slot count
-   * @return  Builder instance
+   *
+   * @param slotType Slot type
+   * @param slots    Slot count
+   * @return Builder instance
    */
   public T setSlots(SlotType slotType, int slots) {
     if (slots < 0) {
@@ -187,20 +207,23 @@ public abstract class AbstractModifierRecipeBuilder<T extends AbstractModifierRe
 
   @Override
   public void save(Consumer<FinishedRecipe> consumer) {
-    save(consumer, result.getId());
+    this.save(consumer, this.result.getId());
   }
 
   /**
    * Builds a salvage recipe from this recipe builder
-   * @param consumer  Consumer instance
-   * @param id        Recipe ID
+   *
+   * @param consumer Consumer instance
+   * @param id       Recipe ID
    */
   public abstract T saveSalvage(Consumer<FinishedRecipe> consumer, ResourceLocation id);
 
-  /** Writes common JSON components between the two types */
+  /**
+   * Writes common JSON components between the two types
+   */
   private void writeCommon(JsonObject json, boolean unarmed) {
-    Ingredient ingredient = tools;
-    if (tools == Ingredient.EMPTY) {
+    Ingredient ingredient = this.tools;
+    if (this.tools == Ingredient.EMPTY) {
       ingredient = DEFAULT_TOOL.get();
     }
     // if true, only chestplates
@@ -208,19 +231,23 @@ public abstract class AbstractModifierRecipeBuilder<T extends AbstractModifierRe
       ingredient = DefaultCustomIngredients.any(ingredient, Ingredient.of(TinkerTags.Items.UNARMED));
     }
     json.add("tools", ingredient.toJson());
-    if (maxToolSize != ITinkerStationRecipe.DEFAULT_TOOL_STACK_SIZE) {
-      json.addProperty("max_tool_size", maxToolSize);
+    if (this.maxToolSize != ITinkerStationRecipe.DEFAULT_TOOL_STACK_SIZE) {
+      json.addProperty("max_tool_size", this.maxToolSize);
     }
-    if (slotType != null && slots > 0) {
+    if (this.slotType != null && this.slots > 0) {
       JsonObject slotJson = new JsonObject();
-      slotJson.addProperty(slotType.getName(), slots);
+      slotJson.addProperty(this.slotType.getName(), this.slots);
       json.add("slots", slotJson);
     }
   }
 
-  /** Base logic to write all relevant builder fields to JSON */
+  /**
+   * Base logic to write all relevant builder fields to JSON
+   */
   protected abstract class ModifierFinishedRecipe extends AbstractFinishedRecipe {
+
     private final boolean withUnarmed;
+
     public ModifierFinishedRecipe(ResourceLocation ID, @Nullable ResourceLocation advancementID, boolean withUnarmed) {
       super(ID, advancementID);
       this.withUnarmed = withUnarmed;
@@ -232,33 +259,36 @@ public abstract class AbstractModifierRecipeBuilder<T extends AbstractModifierRe
 
     @Override
     public void serializeRecipeData(JsonObject json) {
-      writeCommon(json, withUnarmed);
-      if (requirements != ModifierMatch.ALWAYS) {
-        JsonObject reqJson = requirements.serialize();
-        reqJson.addProperty("error", requirementsError);
+      AbstractModifierRecipeBuilder.this.writeCommon(json, this.withUnarmed);
+      if (AbstractModifierRecipeBuilder.this.requirements != ModifierMatch.ALWAYS) {
+        JsonObject reqJson = AbstractModifierRecipeBuilder.this.requirements.serialize();
+        reqJson.addProperty("error", AbstractModifierRecipeBuilder.this.requirementsError);
         json.add("requirements", reqJson);
       }
-      json.addProperty("allow_crystal", allowCrystal);
-      json.add("result", result.toJson());
-      if (maxLevel != 0) {
-        json.addProperty("max_level", maxLevel);
+      json.addProperty("allow_crystal", AbstractModifierRecipeBuilder.this.allowCrystal);
+      json.add("result", AbstractModifierRecipeBuilder.this.result.toJson());
+      if (AbstractModifierRecipeBuilder.this.maxLevel != 0) {
+        json.addProperty("max_level", AbstractModifierRecipeBuilder.this.maxLevel);
       }
     }
   }
 
-  /** Base logic to write all relevant builder fields to JSON */
+  /**
+   * Base logic to write all relevant builder fields to JSON
+   */
   protected class SalvageFinishedRecipe extends AbstractFinishedRecipe {
+
     public SalvageFinishedRecipe(ResourceLocation ID, @Nullable ResourceLocation advancementID) {
       super(ID, advancementID);
     }
 
     @Override
     public void serializeRecipeData(JsonObject json) {
-      writeCommon(json, includeUnarmed);
-      json.addProperty("modifier", result.getId().toString());
-      json.addProperty("min_level", salvageMinLevel);
-      if (salvageMaxLevel != 0) {
-        json.addProperty("max_level", salvageMaxLevel);
+      AbstractModifierRecipeBuilder.this.writeCommon(json, AbstractModifierRecipeBuilder.this.includeUnarmed);
+      json.addProperty("modifier", AbstractModifierRecipeBuilder.this.result.getId().toString());
+      json.addProperty("min_level", AbstractModifierRecipeBuilder.this.salvageMinLevel);
+      if (AbstractModifierRecipeBuilder.this.salvageMaxLevel != 0) {
+        json.addProperty("max_level", AbstractModifierRecipeBuilder.this.salvageMaxLevel);
       }
     }
 

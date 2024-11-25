@@ -25,13 +25,18 @@ import java.util.List;
 
 /**
  * Module for a extra slot modifier with multiple variants based on the slot type
- * @param key             Persistent data key containing the slot name. If null, uses the modifier ID.
- *                        Presently, changing this makes it incompatible with the swappable modifier recipe, this is added for future proofing.
- * @param slotCount       Number of slots to grant
+ *
+ * @param key       Persistent data key containing the slot name. If null, uses the modifier ID.
+ *                  Presently, changing this makes it incompatible with the swappable modifier recipe, this is added for future proofing.
+ * @param slotCount Number of slots to grant
  */
-public record SwappableSlotModule(@Nullable ResourceLocation key, int slotCount) implements VolatileDataModifierHook, DisplayNameModifierHook, ModifierRemovalHook, ModifierModule, ModuleWithKey {
+public record SwappableSlotModule(@Nullable ResourceLocation key,
+                                  int slotCount) implements VolatileDataModifierHook, DisplayNameModifierHook, ModifierRemovalHook, ModifierModule, ModuleWithKey {
+
   private static final List<ModifierHook<?>> DEFAULT_HOOKS = List.of(TinkerHooks.VOLATILE_DATA, TinkerHooks.DISPLAY_NAME, TinkerHooks.REMOVE);
-  /** Format key for swappable variant */
+  /**
+   * Format key for swappable variant
+   */
   private static final String FORMAT = TConstruct.makeTranslationKey("modifier", "extra_modifier.type_format");
 
   public SwappableSlotModule(int slotCount) {
@@ -40,7 +45,7 @@ public record SwappableSlotModule(@Nullable ResourceLocation key, int slotCount)
 
   @Override
   public Component getDisplayName(IToolStackView tool, Modifier modifier, int level, Component name) {
-    String slotName = tool.getPersistentData().getString(getKey(modifier));
+    String slotName = tool.getPersistentData().getString(this.getKey(modifier));
     if (!slotName.isEmpty()) {
       SlotType type = SlotType.getIfPresent(slotName);
       if (type != null) {
@@ -58,11 +63,11 @@ public record SwappableSlotModule(@Nullable ResourceLocation key, int slotCount)
 
   @Override
   public void addVolatileData(ToolRebuildContext context, ModifierEntry modifier, ModDataNBT volatileData) {
-    String slotName = context.getPersistentData().getString(getKey(modifier.getModifier()));
+    String slotName = context.getPersistentData().getString(this.getKey(modifier.getModifier()));
     if (!slotName.isEmpty()) {
       SlotType type = SlotType.getIfPresent(slotName);
       if (type != null) {
-        volatileData.addSlots(type, slotCount);
+        volatileData.addSlots(type, this.slotCount);
       }
     }
   }
@@ -84,7 +89,9 @@ public record SwappableSlotModule(@Nullable ResourceLocation key, int slotCount)
     return LOADER;
   }
 
-  /** Loader instance */
+  /**
+   * Loader instance
+   */
   public static final IGenericLoader<SwappableSlotModule> LOADER = new IGenericLoader<>() {
     @Override
     public SwappableSlotModule deserialize(JsonObject json) {
@@ -115,8 +122,12 @@ public record SwappableSlotModule(@Nullable ResourceLocation key, int slotCount)
     }
   };
 
-  /** Module to add (or remove) additional slots based on the given swappable slot type */
-  public record BonusSlot(@Nullable ResourceLocation key, SlotType match, SlotType bonus, int slotCount) implements VolatileDataModifierHook, ModifierModule, ModuleWithKey {
+  /**
+   * Module to add (or remove) additional slots based on the given swappable slot type
+   */
+  public record BonusSlot(@Nullable ResourceLocation key, SlotType match, SlotType bonus,
+                          int slotCount) implements VolatileDataModifierHook, ModifierModule, ModuleWithKey {
+
     private static final List<ModifierHook<?>> DEFAULT_HOOKS = List.of(TinkerHooks.VOLATILE_DATA);
 
     public BonusSlot(SlotType match, SlotType penalty, int slotCount) {
@@ -125,9 +136,9 @@ public record SwappableSlotModule(@Nullable ResourceLocation key, int slotCount)
 
     @Override
     public void addVolatileData(ToolRebuildContext context, ModifierEntry modifier, ModDataNBT volatileData) {
-      String slotName = context.getPersistentData().getString(getKey(modifier.getModifier()));
-      if (!slotName.isEmpty() && match.getName().equals(slotName)) {
-        volatileData.addSlots(bonus, slotCount);
+      String slotName = context.getPersistentData().getString(this.getKey(modifier.getModifier()));
+      if (!slotName.isEmpty() && this.match.getName().equals(slotName)) {
+        volatileData.addSlots(this.bonus, this.slotCount);
       }
     }
 

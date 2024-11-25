@@ -18,8 +18,11 @@ import slimeknights.tconstruct.library.recipe.TagPredicate;
 import slimeknights.tconstruct.library.tools.context.ToolAttackContext;
 import slimeknights.tconstruct.library.utils.JsonUtils;
 
-/** Spilling effect that pulls the potion from a NBT potion fluid and applies it */
+/**
+ * Spilling effect that pulls the potion from a NBT potion fluid and applies it
+ */
 public record PotionFluidEffect(float effectScale, TagPredicate predicate) implements ISpillingEffect {
+
   public static final ResourceLocation ID = TConstruct.getResource("potion_fluid");
 
   @Override
@@ -27,19 +30,19 @@ public record PotionFluidEffect(float effectScale, TagPredicate predicate) imple
     LivingEntity target = context.getLivingTarget();
     LivingEntity attacker = context.getAttacker();
     // must match the tag predicate
-    if (target != null && predicate.test(fluid.getTag())) {
+    if (target != null && this.predicate.test(fluid.getTag())) {
       Potion potion = PotionUtils.getPotion(fluid.getTag());
       if (potion != Potions.EMPTY) {
         // prevent effects like instant damage from hitting hurt resistance
         int oldInvulnerableTime = target.invulnerableTime;
-        float totalScale = scale * effectScale;
+        float totalScale = scale * this.effectScale;
         for (MobEffectInstance instance : potion.getEffects()) {
           MobEffect effect = instance.getEffect();
           if (effect.isInstantenous()) {
             target.invulnerableTime = 0;
             effect.applyInstantenousEffect(attacker, attacker, target, instance.getAmplifier(), totalScale);
           } else {
-            int duration = (int)(instance.getDuration() * totalScale);
+            int duration = (int) (instance.getDuration() * totalScale);
             if (duration > 10) {
               target.addEffect(new MobEffectInstance(effect, duration, instance.getAmplifier(), instance.isAmbient(), instance.isVisible(), instance.showIcon()));
             }
@@ -53,9 +56,9 @@ public record PotionFluidEffect(float effectScale, TagPredicate predicate) imple
   @Override
   public JsonObject serialize(JsonSerializationContext context) {
     JsonObject json = JsonUtils.withType(ID);
-    json.addProperty("scale", effectScale);
-    if (predicate != TagPredicate.ANY) {
-      json.add("predicate", predicate.serialize());
+    json.addProperty("scale", this.effectScale);
+    if (this.predicate != TagPredicate.ANY) {
+      json.add("predicate", this.predicate.serialize());
     }
     return json;
   }

@@ -10,7 +10,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
 public class CrystalClusterBlock extends AmethystClusterBlock {
+
   private final SoundEvent chimeSound;
+
   public CrystalClusterBlock(SoundEvent chimeSound, int height, int width, Properties props) {
     super(height, width, props);
     this.chimeSound = chimeSound;
@@ -20,8 +22,8 @@ public class CrystalClusterBlock extends AmethystClusterBlock {
   public void onProjectileHit(Level level, BlockState state, BlockHitResult hit, Projectile projectile) {
     if (!level.isClientSide) {
       BlockPos pos = hit.getBlockPos();
-      level.playSound(null, pos, getSoundType(state).getHitSound(), SoundSource.BLOCKS, 1.0F, 0.5F + level.random.nextFloat() * 1.2F);
-      level.playSound(null, pos, chimeSound, SoundSource.BLOCKS, 1.0F, 0.5F + level.random.nextFloat() * 1.2F);
+      level.playSound(null, pos, this.getSoundType(state).getHitSound(), SoundSource.BLOCKS, 1.0F, 0.5F + level.random.nextFloat() * 1.2F);
+      level.playSound(null, pos, this.chimeSound, SoundSource.BLOCKS, 1.0F, 0.5F + level.random.nextFloat() * 1.2F);
     }
   }
 }

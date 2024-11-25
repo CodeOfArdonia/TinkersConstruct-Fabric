@@ -13,22 +13,25 @@ import slimeknights.mantle.util.JsonHelper;
 import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 import slimeknights.tconstruct.library.tools.stat.ToolStats;
 
-/** Harvest logic that is effective if the tool has the correct tag */
+/**
+ * Harvest logic that is effective if the tool has the correct tag
+ */
 @RequiredArgsConstructor
 public class TagHarvestLogic implements IHarvestLogic {
+
   public static final Loader LOADER = new Loader();
 
   protected final TagKey<Block> tag;
 
   @Override
   public boolean isEffective(IToolStackView tool, BlockState state) {
-    return state.is(tag) && TierSortingRegistry.isCorrectTierForDrops(tool.getStats().get(ToolStats.HARVEST_TIER), state);
+    return state.is(this.tag) && TierSortingRegistry.isCorrectTierForDrops(tool.getStats().get(ToolStats.HARVEST_TIER), state);
   }
 
   @Override
   public float getDestroySpeed(IToolStackView tool, BlockState state) {
     // destroy speed does not require right tier to boost
-    return state.is(tag) ? tool.getStats().get(ToolStats.MINING_SPEED) : 1.0f;
+    return state.is(this.tag) ? tool.getStats().get(ToolStats.MINING_SPEED) : 1.0f;
   }
 
   @Override
@@ -37,6 +40,7 @@ public class TagHarvestLogic implements IHarvestLogic {
   }
 
   private static class Loader implements IGenericLoader<TagHarvestLogic> {
+
     @Override
     public TagHarvestLogic deserialize(JsonObject json) {
       TagKey<Block> tag = TagKey.create(Registries.BLOCK, JsonHelper.getResourceLocation(json, "effective"));

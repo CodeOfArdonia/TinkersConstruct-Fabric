@@ -108,7 +108,7 @@ public class EnderferenceModifier extends Modifier implements ProjectileHitModif
         // calculate damage, bonus on crit
         int damage = Mth.ceil(Mth.clamp(arrow.getDeltaMovement().length() * arrow.getBaseDamage(), 0.0D, Integer.MAX_VALUE));
         if (arrow.isCritArrow()) {
-          damage = (int)Math.min(RANDOM.nextInt(damage / 2 + 2) + (long)damage, Integer.MAX_VALUE);
+          damage = (int) Math.min(RANDOM.nextInt(damage / 2 + 2) + (long) damage, Integer.MAX_VALUE);
         }
 
         // create damage source, don't use projectile sources as that makes endermen ignore it
@@ -131,7 +131,7 @@ public class EnderferenceModifier extends Modifier implements ProjectileHitModif
           target.setSecondsOnFire(5);
         }
 
-        if (target.hurt(damageSource, (float)damage)) {
+        if (target.hurt(damageSource, (float) damage)) {
           if (!arrow.level().isClientSide && arrow.getPierceLevel() <= 0) {
             target.setArrowCount(target.getArrowCount() + 1);
           }

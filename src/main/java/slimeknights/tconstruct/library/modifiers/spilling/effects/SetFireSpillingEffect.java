@@ -15,21 +15,24 @@ import slimeknights.tconstruct.library.utils.JsonUtils;
  * Effect to set an entity on fire
  */
 public record SetFireSpillingEffect(int time) implements ISpillingEffect {
+
   public static final ResourceLocation ID = TConstruct.getResource("set_fire");
 
   @Override
   public void applyEffects(FluidStack fluid, float scale, ToolAttackContext context) {
-    context.getTarget().setSecondsOnFire(time);
+    context.getTarget().setSecondsOnFire(this.time);
   }
 
   @Override
   public JsonObject serialize(JsonSerializationContext context) {
     JsonObject json = JsonUtils.withType(ID);
-    json.addProperty("time", time);
+    json.addProperty("time", this.time);
     return json;
   }
 
-  /** Loader for this effect */
+  /**
+   * Loader for this effect
+   */
   public static final JsonDeserializer<SetFireSpillingEffect> LOADER = (element, type, context) ->
     new SetFireSpillingEffect(GsonHelper.getAsInt(element.getAsJsonObject(), "time"));
 }

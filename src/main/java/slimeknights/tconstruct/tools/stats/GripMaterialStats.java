@@ -19,13 +19,16 @@ import java.util.List;
 
 import static slimeknights.tconstruct.tools.stats.LimbMaterialStats.ACCURACY_PREFIX;
 
-/** Secondary stats for a bow */
+/**
+ * Secondary stats for a bow
+ */
 @RequiredArgsConstructor
 @Getter
 @EqualsAndHashCode(callSuper = false)
 @ToString
 @With
 public class GripMaterialStats extends BaseMaterialStats {
+
   public static final MaterialStatsId ID = new MaterialStatsId(TConstruct.getResource("grip"));
   public static final GripMaterialStats DEFAULT = new GripMaterialStats(1f, 0f, 0f);
 
@@ -49,9 +52,9 @@ public class GripMaterialStats extends BaseMaterialStats {
 
   @Override
   public void encode(FriendlyByteBuf buffer) {
-    buffer.writeFloat(durability);
-    buffer.writeFloat(accuracy);
-    buffer.writeFloat(meleeAttack);
+    buffer.writeFloat(this.durability);
+    buffer.writeFloat(this.accuracy);
+    buffer.writeFloat(this.meleeAttack);
   }
 
   @Override

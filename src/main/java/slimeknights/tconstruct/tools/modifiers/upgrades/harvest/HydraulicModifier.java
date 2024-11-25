@@ -18,12 +18,15 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class HydraulicModifier extends IncrementalModifier {
+
   @Override
   public int getPriority() {
     return 125; // run before trait boosts such as dwarven
   }
 
-  /** Gets the bonus for the living entity */
+  /**
+   * Gets the bonus for the living entity
+   */
   private static float getBonus(LivingEntity living) {
     float bonus = 0;
     // highest bonus in water
@@ -48,7 +51,7 @@ public class HydraulicModifier extends IncrementalModifier {
       if (!ModifierUtil.hasAquaAffinity(player) && player.isEyeInFluid(FluidTags.WATER)) {
         bonus *= 5;
       }
-      bonus *= getScaledLevel(tool, level) * tool.getMultiplier(ToolStats.MINING_SPEED) * miningSpeedModifier;
+      bonus *= this.getScaledLevel(tool, level) * tool.getMultiplier(ToolStats.MINING_SPEED) * miningSpeedModifier;
       event.setNewSpeed(event.getNewSpeed() + bonus);
     }
   }
@@ -59,6 +62,6 @@ public class HydraulicModifier extends IncrementalModifier {
     if (player != null && key == TooltipKey.SHIFT) {
       bonus = getBonus(player);
     }
-    addStatTooltip(tool, ToolStats.MINING_SPEED, TinkerTags.Items.HARVEST, bonus * getScaledLevel(tool, level), tooltip);
+    this.addStatTooltip(tool, ToolStats.MINING_SPEED, TinkerTags.Items.HARVEST, bonus * this.getScaledLevel(tool, level), tooltip);
   }
 }

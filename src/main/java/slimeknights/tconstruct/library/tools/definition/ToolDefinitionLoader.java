@@ -42,9 +42,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-/** JSON loader that loads tool definitions from JSON */
+/**
+ * JSON loader that loads tool definitions from JSON
+ */
 @Log4j2
 public class ToolDefinitionLoader extends SimpleJsonResourceReloadListener implements IdentifiableResourceReloadListener {
+
   public static final String FOLDER = "tinkering/tool_definitions";
   public static final Gson GSON = (new GsonBuilder())
     .registerTypeAdapter(ResourceLocation.class, new ResourceLocation.Serializer())
@@ -63,22 +66,30 @@ public class ToolDefinitionLoader extends SimpleJsonResourceReloadListener imple
     .create();
   private static final ToolDefinitionLoader INSTANCE = new ToolDefinitionLoader();
 
-  /** Map of loaded tool definition data */
-  private Map<ResourceLocation,ToolDefinitionData> dataMap = Collections.emptyMap();
+  /**
+   * Map of loaded tool definition data
+   */
+  private Map<ResourceLocation, ToolDefinitionData> dataMap = Collections.emptyMap();
 
-  /** Tool definitions registered to be loaded */
-  private final Map<ResourceLocation,ToolDefinition> definitions = new HashMap<>();
+  /**
+   * Tool definitions registered to be loaded
+   */
+  private final Map<ResourceLocation, ToolDefinition> definitions = new HashMap<>();
 
   private ToolDefinitionLoader() {
     super(GSON, FOLDER);
   }
 
-  /** Gets the instance of the definition loader */
+  /**
+   * Gets the instance of the definition loader
+   */
   public static ToolDefinitionLoader getInstance() {
     return INSTANCE;
   }
 
-  /** Initializes the tool definition loader */
+  /**
+   * Initializes the tool definition loader
+   */
   public static void init() {
     ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(INSTANCE);
     OnDatapackSyncCallback.EVENT.register(INSTANCE::onDatapackSync);
@@ -86,11 +97,12 @@ public class ToolDefinitionLoader extends SimpleJsonResourceReloadListener imple
 
   /**
    * Updates the tool data from the server.list. Should only be called client side
-   * @param dataMap  Server data map
+   *
+   * @param dataMap Server data map
    */
-  protected void updateDataFromServer(Map<ResourceLocation,ToolDefinitionData> dataMap) {
+  protected void updateDataFromServer(Map<ResourceLocation, ToolDefinitionData> dataMap) {
     this.dataMap = dataMap;
-    for (Entry<ResourceLocation,ToolDefinition> entry : definitions.entrySet()) {
+    for (Entry<ResourceLocation, ToolDefinition> entry : this.definitions.entrySet()) {
       ToolDefinitionData data = dataMap.get(entry.getKey());
       ToolDefinition definition = entry.getValue();
       // errored serverside, so resolve without error here
@@ -103,10 +115,10 @@ public class ToolDefinitionLoader extends SimpleJsonResourceReloadListener imple
   }
 
   @Override
-  protected void apply(Map<ResourceLocation,JsonElement> splashList, ResourceManager resourceManagerIn, ProfilerFiller profilerIn) {
+  protected void apply(Map<ResourceLocation, JsonElement> splashList, ResourceManager resourceManagerIn, ProfilerFiller profilerIn) {
     long time = System.nanoTime();
     ImmutableMap.Builder<ResourceLocation, ToolDefinitionData> builder = ImmutableMap.builder();
-    for (Entry<ResourceLocation,ToolDefinition> entry : definitions.entrySet()) {
+    for (Entry<ResourceLocation, ToolDefinition> entry : this.definitions.entrySet()) {
       ResourceLocation key = entry.getKey();
       ToolDefinition definition = entry.getValue();
       // first, need to have a json for the given name
@@ -130,24 +142,30 @@ public class ToolDefinitionLoader extends SimpleJsonResourceReloadListener imple
     log.info("Loaded {} tool definitions in {} ms", this.dataMap.size(), (System.nanoTime() - time) / 1000000f);
   }
 
-  /** Gets a list of all tool definitions registered to the loader */
+  /**
+   * Gets a list of all tool definitions registered to the loader
+   */
   public Collection<ToolDefinition> getRegisteredToolDefinitions() {
-    return definitions.values();
+    return this.definitions.values();
   }
 
-  /** Called on datapack sync to send the tool data to all players */
+  /**
+   * Called on datapack sync to send the tool data to all players
+   */
   private void onDatapackSync(PlayerList playerList, @Nullable ServerPlayer player) {
-    UpdateToolDefinitionDataPacket packet = new UpdateToolDefinitionDataPacket(dataMap);
+    UpdateToolDefinitionDataPacket packet = new UpdateToolDefinitionDataPacket(this.dataMap);
     TinkerNetwork.getInstance().sendToPlayerList(player, playerList, packet);
   }
 
-  /** Registers a tool definition with the loader */
+  /**
+   * Registers a tool definition with the loader
+   */
   public void registerToolDefinition(ToolDefinition definition) {
     ResourceLocation name = definition.getId();
-    if (definitions.containsKey(name)) {
+    if (this.definitions.containsKey(name)) {
       throw new IllegalArgumentException("Duplicate tool definition " + name);
     }
-    definitions.put(name, definition);
+    this.definitions.put(name, definition);
   }
 
   @Override
@@ -155,7 +173,9 @@ public class ToolDefinitionLoader extends SimpleJsonResourceReloadListener imple
     return TConstruct.getResource("tool_definition_loader");
   }
 
-  /** Logic to serialize and deserialize tool actions */
+  /**
+   * Logic to serialize and deserialize tool actions
+   */
   private enum ToolActionSerializer implements JsonSerializer<ToolAction>, JsonDeserializer<ToolAction> {
     INSTANCE;
 

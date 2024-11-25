@@ -18,21 +18,28 @@ import slimeknights.mantle.util.JsonHelper;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-/** Shared logic between item and material casting */
+/**
+ * Shared logic between item and material casting
+ */
 @AllArgsConstructor
 public abstract class AbstractCastingRecipe implements ICastingRecipe {
-  @Getter @Nonnull
+
+  @Getter
+  @Nonnull
   protected final RecipeType<?> type;
   @Getter
   protected final ResourceLocation id;
   @Getter
   protected final String group;
-  /** 'cast' item for recipe (doesn't have to be an actual 'cast') */
+  /**
+   * 'cast' item for recipe (doesn't have to be an actual 'cast')
+   */
   @Getter
   protected final Ingredient cast;
   @Getter
   protected final boolean consumed;
-  @Getter @Accessors(fluent = true)
+  @Getter
+  @Accessors(fluent = true)
   protected final boolean switchSlots;
 
   @Override
@@ -45,17 +52,25 @@ public abstract class AbstractCastingRecipe implements ICastingRecipe {
 
   /**
    * Seralizer for {@link ItemCastingRecipe}.
-   * @param <T>  Casting recipe class type
+   *
+   * @param <T> Casting recipe class type
    */
   @AllArgsConstructor
   public abstract static class Serializer<T extends AbstractCastingRecipe> extends LoggingRecipeSerializer<T> {
-    /** Creates a new instance from JSON */
+
+    /**
+     * Creates a new instance from JSON
+     */
     protected abstract T create(ResourceLocation idIn, String groupIn, @Nullable Ingredient cast, boolean consumed, boolean switchSlots, JsonObject json);
 
-    /** Creates a new instance from the packet buffer */
+    /**
+     * Creates a new instance from the packet buffer
+     */
     protected abstract T create(ResourceLocation idIn, String groupIn, @Nullable Ingredient cast, boolean consumed, boolean switchSlots, FriendlyByteBuf buffer);
 
-    /** Writes extra data to the packet buffer */
+    /**
+     * Writes extra data to the packet buffer
+     */
     protected abstract void writeExtra(FriendlyByteBuf buffer, T recipe);
 
     @Override
@@ -68,7 +83,7 @@ public abstract class AbstractCastingRecipe implements ICastingRecipe {
         cast = Ingredient.fromJson(JsonHelper.getElement(json, "cast"));
         consumed = GsonHelper.getAsBoolean(json, "cast_consumed", false);
       }
-      return create(recipeId, group, cast, consumed, switchSlots, json);
+      return this.create(recipeId, group, cast, consumed, switchSlots, json);
     }
 
     @Nullable
@@ -78,7 +93,7 @@ public abstract class AbstractCastingRecipe implements ICastingRecipe {
       Ingredient cast = Ingredient.fromNetwork(buffer);
       boolean consumed = buffer.readBoolean();
       boolean switchSlots = buffer.readBoolean();
-      return create(recipeId, group, cast, consumed, switchSlots, buffer);
+      return this.create(recipeId, group, cast, consumed, switchSlots, buffer);
     }
 
     @Override
@@ -87,7 +102,7 @@ public abstract class AbstractCastingRecipe implements ICastingRecipe {
       recipe.cast.toNetwork(buffer);
       buffer.writeBoolean(recipe.consumed);
       buffer.writeBoolean(recipe.switchSlots);
-      writeExtra(buffer, recipe);
+      this.writeExtra(buffer, recipe);
     }
   }
 }

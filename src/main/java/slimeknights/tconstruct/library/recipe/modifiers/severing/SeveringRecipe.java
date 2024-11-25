@@ -31,6 +31,7 @@ import java.util.Objects;
  */
 @RequiredArgsConstructor
 public class SeveringRecipe implements ICustomOutputRecipe<IEmptyContainer> {
+
   @Getter
   private final ResourceLocation id;
   protected final EntityIngredient ingredient;
@@ -42,55 +43,60 @@ public class SeveringRecipe implements ICustomOutputRecipe<IEmptyContainer> {
 
   /**
    * Checks if the recipe matches the given type
-   * @param type  Type
-   * @return  True if it matches
+   *
+   * @param type Type
+   * @return True if it matches
    */
   public boolean matches(EntityType<?> type) {
-    return ingredient.test(type);
+    return this.ingredient.test(type);
   }
 
   /**
    * Gets the output for this recipe for display in JEI, needs to be consistent
-   * @return  Display output
+   *
+   * @return Display output
    */
   public ItemStack getOutput() {
-    return output.get();
+    return this.output.get();
   }
 
   /**
    * Gets the output for this recipe, does not need to be consistent (can use randomness) and may be empty
-   * @param entity  Entity being melted
-   * @return  Item output
+   *
+   * @param entity Entity being melted
+   * @return Item output
    */
   public ItemStack getOutput(Entity entity) {
-    return getOutput().copy();
+    return this.getOutput().copy();
   }
 
   /**
    * Gets a list of inputs for display in JEI
-   * @return  Entity type inputs
+   *
+   * @return Entity type inputs
    */
   @SuppressWarnings("rawtypes")
   public List<EntityType> getEntityInputs() {
-    if (entityInputs == null) {
-      entityInputs = ImmutableList.copyOf(ingredient.getTypes());
+    if (this.entityInputs == null) {
+      this.entityInputs = ImmutableList.copyOf(this.ingredient.getTypes());
     }
-    return entityInputs;
+    return this.entityInputs;
   }
 
   /**
    * Gets a list of item inputs for recipe lookup in JEI
-   * @return  Item inputs
+   *
+   * @return Item inputs
    */
   public List<ItemStack> getItemInputs() {
-    if (itemInputs == null) {
-      itemInputs = getEntityInputs().stream()
-                                    .map(LazySpawnEggItem::fromEntityType)
-                                    .filter(Objects::nonNull)
-                                    .map(ItemStack::new)
-                                    .toList();
+    if (this.itemInputs == null) {
+      this.itemInputs = this.getEntityInputs().stream()
+        .map(LazySpawnEggItem::fromEntityType)
+        .filter(Objects::nonNull)
+        .map(ItemStack::new)
+        .toList();
     }
-    return itemInputs;
+    return this.itemInputs;
   }
 
   @Override
@@ -103,15 +109,20 @@ public class SeveringRecipe implements ICustomOutputRecipe<IEmptyContainer> {
     return TinkerRecipeTypes.SEVERING.get();
   }
 
-  /** @deprecated use {@link #matches(EntityType)}*/
+  /**
+   * @deprecated use {@link #matches(EntityType)}
+   */
   @Deprecated
   @Override
   public boolean matches(IEmptyContainer inv, Level worldIn) {
     return false;
   }
 
-  /** Serializer for this recipe */
+  /**
+   * Serializer for this recipe
+   */
   public static class Serializer extends LoggingRecipeSerializer<SeveringRecipe> {
+
     @Override
     public SeveringRecipe fromJson(ResourceLocation id, JsonObject json) {
       EntityIngredient ingredient = EntityIngredient.deserialize(JsonHelper.getElement(json, "entity"));

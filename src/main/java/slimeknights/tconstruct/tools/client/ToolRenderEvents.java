@@ -34,7 +34,10 @@ import java.util.Iterator;
 
 @SuppressWarnings("unused")
 public class ToolRenderEvents {
-  /** Maximum number of blocks from the iterator to render */
+
+  /**
+   * Maximum number of blocks from the iterator to render
+   */
   private static final int MAX_BLOCKS = 60;
 
   public static void init() {
@@ -98,13 +101,15 @@ public class ToolRenderEvents {
         rendered++;
         context.worldRenderer().renderHitOutline(context.matrixStack(), vertexBuilder, viewEntity, x, y, z, pos, world.getBlockState(pos));
       }
-    } while(rendered < MAX_BLOCKS && extraBlocks.hasNext());
+    } while (rendered < MAX_BLOCKS && extraBlocks.hasNext());
     context.matrixStack().popPose();
     buffers.endBatch();
     return true;
   }
 
-  /** Renders the block damage process on the extra blocks */
+  /**
+   * Renders the block damage process on the extra blocks
+   */
   static void renderBlockDamageProgress(WorldRenderContext context) {
     // validate required variables are set
     MultiPlayerGameMode controller = Minecraft.getInstance().gameMode;
@@ -132,7 +137,7 @@ public class ToolRenderEvents {
       return;
     }
     // find breaking progress
-    BlockHitResult blockTrace = (BlockHitResult)result;
+    BlockHitResult blockTrace = (BlockHitResult) result;
     BlockPos target = blockTrace.getBlockPos();
     BlockDestructionProgress progress = null;
     for (Int2ObjectMap.Entry<BlockDestructionProgress> entry : Minecraft.getInstance().levelRenderer.destroyingBlocks.int2ObjectEntrySet()) {

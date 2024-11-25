@@ -21,6 +21,7 @@ import java.util.Set;
  * Module that allows a modifier to perform tool actions
  */
 public record ToolActionsModule(Set<ToolAction> actions) implements ToolActionModifierHook, ModifierModule {
+
   private static final List<ModifierHook<?>> DEFAULT_HOOKS = List.of(TinkerHooks.TOOL_ACTION);
 
   public ToolActionsModule(ToolAction... actions) {
@@ -29,7 +30,7 @@ public record ToolActionsModule(Set<ToolAction> actions) implements ToolActionMo
 
   @Override
   public boolean canPerformAction(IToolStackView tool, ModifierEntry modifier, ToolAction toolAction) {
-    return actions.contains(toolAction);
+    return this.actions.contains(toolAction);
   }
 
   @Override

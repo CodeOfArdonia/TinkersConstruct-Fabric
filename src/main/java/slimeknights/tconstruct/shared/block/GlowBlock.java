@@ -3,9 +3,6 @@ package slimeknights.tconstruct.shared.block;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.NonNullList;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -92,9 +89,10 @@ public class GlowBlock extends Block {
 
   /**
    * Determines if a block side can contain a glow.
-   * @param world   World instance
-   * @param pos     Position
-   * @param facing  Side of the update
+   *
+   * @param world  World instance
+   * @param pos    Position
+   * @param facing Side of the update
    * @return true if the block side is solid and the block at the given BlockPos is not a liquid
    */
   protected boolean canBlockStay(Level world, BlockPos pos, Direction facing) {
@@ -108,10 +106,11 @@ public class GlowBlock extends Block {
 
   /**
    * Adds a glow block at the given location
-   * @param world      World instance
-   * @param pos        Position
-   * @param direction  Preferred direction, may reorient
-   * @return  True if a block was placed
+   *
+   * @param world     World instance
+   * @param pos       Position
+   * @param direction Preferred direction, may reorient
+   * @return True if a block was placed
    */
   public boolean addGlow(Level world, BlockPos pos, Direction direction) {
     // only place the block if the current block at the location is replaceable (eg, air, tall grass, etc.)

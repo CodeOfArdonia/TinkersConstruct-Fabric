@@ -26,6 +26,7 @@ import java.util.List;
  */
 @RequiredArgsConstructor
 public abstract class AbstractWorktableRecipe implements IModifierWorktableRecipe {
+
   @Getter
   private final ResourceLocation id;
   protected final Ingredient toolRequirement;
@@ -41,10 +42,10 @@ public abstract class AbstractWorktableRecipe implements IModifierWorktableRecip
 
   @Override
   public boolean matches(ITinkerableContainer inv, Level world) {
-    if (!toolRequirement.test(inv.getTinkerableStack())) {
+    if (!this.toolRequirement.test(inv.getTinkerableStack())) {
       return false;
     }
-    return ModifierRecipe.checkMatch(inv, inputs);
+    return ModifierRecipe.checkMatch(inv, this.inputs);
   }
 
   @Override
@@ -57,31 +58,33 @@ public abstract class AbstractWorktableRecipe implements IModifierWorktableRecip
 
   @Override
   public void updateInputs(IToolStackView result, ITinkerableContainer.Mutable inv, boolean isServer) {
-    ModifierRecipe.updateInputs(inv, inputs);
+    ModifierRecipe.updateInputs(inv, this.inputs);
   }
 
 
   /* JEI */
 
-  /** Gets a list of tools to display */
+  /**
+   * Gets a list of tools to display
+   */
   @Override
   public List<ItemStack> getInputTools() {
-    if (tools == null) {
-      tools = Arrays.stream(toolRequirement.getItems()).map(stack -> IModifiableDisplay.getDisplayStack(stack.getItem())).toList();
+    if (this.tools == null) {
+      this.tools = Arrays.stream(this.toolRequirement.getItems()).map(stack -> IModifiableDisplay.getDisplayStack(stack.getItem())).toList();
     }
-    return tools;
+    return this.tools;
   }
 
   @Override
   public List<ItemStack> getDisplayItems(int slot) {
-    if (slot < 0 || slot >= inputs.size()) {
+    if (slot < 0 || slot >= this.inputs.size()) {
       return Collections.emptyList();
     }
-    return inputs.get(slot).getMatchingStacks();
+    return this.inputs.get(slot).getMatchingStacks();
   }
 
   @Override
   public int getInputCount() {
-    return inputs.size();
+    return this.inputs.size();
   }
 }

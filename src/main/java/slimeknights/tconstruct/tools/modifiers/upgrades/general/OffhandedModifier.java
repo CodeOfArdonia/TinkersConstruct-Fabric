@@ -12,10 +12,11 @@ import java.util.Arrays;
 import java.util.List;
 
 public class OffhandedModifier extends Modifier {
-  private final Lazy<Component> noHandedName = Lazy.of(() -> applyStyle(Component.translatable(getTranslationKey() + ".2")));
+
+  private final Lazy<Component> noHandedName = Lazy.of(() -> this.applyStyle(Component.translatable(this.getTranslationKey() + ".2")));
   private final Lazy<List<Component>> noHandedDescription = Lazy.of(() -> Arrays.asList(
-    Component.translatable(getTranslationKey() + ".flavor").withStyle(ChatFormatting.ITALIC),
-    Component.translatable(getTranslationKey() + ".description.2")));
+    Component.translatable(this.getTranslationKey() + ".flavor").withStyle(ChatFormatting.ITALIC),
+    Component.translatable(this.getTranslationKey() + ".description.2")));
 
   @Override
   public void addVolatileData(ToolRebuildContext context, int level, ModDataNBT volatileData) {
@@ -28,7 +29,7 @@ public class OffhandedModifier extends Modifier {
   @Override
   public Component getDisplayName(int level) {
     if (level > 1) {
-      return noHandedName.get();
+      return this.noHandedName.get();
     }
     return super.getDisplayName();
   }
@@ -36,7 +37,7 @@ public class OffhandedModifier extends Modifier {
   @Override
   public List<Component> getDescriptionList(int level) {
     if (level > 1) {
-      return noHandedDescription.get();
+      return this.noHandedDescription.get();
     }
     return super.getDescriptionList();
   }

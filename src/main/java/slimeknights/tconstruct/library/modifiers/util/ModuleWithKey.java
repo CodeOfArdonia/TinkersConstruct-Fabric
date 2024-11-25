@@ -12,23 +12,29 @@ import javax.annotation.Nullable;
  * Shared boilerplate for a module with a nullable key that can alternatively be the modifier ID
  */
 public interface ModuleWithKey {
-  /** Gets the key for the module */
+
+  /**
+   * Gets the key for the module
+   */
   default ResourceLocation getKey(Modifier modifier) {
-    ResourceLocation key = key();
+    ResourceLocation key = this.key();
     if (key != null) {
       return key;
     }
     return modifier.getId();
   }
 
-  /** Gets the key field from the record */
+  /**
+   * Gets the key field from the record
+   */
   @Nullable
   ResourceLocation key();
 
   /**
    * Parses the key from JSON
-   * @param json  Json object
-   * @return  Key, or null if not present
+   *
+   * @param json Json object
+   * @return Key, or null if not present
    */
   @Nullable
   static ResourceLocation parseKey(JsonObject json) {
@@ -38,7 +44,9 @@ public interface ModuleWithKey {
     return null;
   }
 
-  /** Reads the key from the network */
+  /**
+   * Reads the key from the network
+   */
   @Nullable
   static ResourceLocation fromNetwork(FriendlyByteBuf buffer) {
     if (buffer.readBoolean()) {
@@ -47,7 +55,9 @@ public interface ModuleWithKey {
     return null;
   }
 
-  /** Writes the key to the network */
+  /**
+   * Writes the key to the network
+   */
   static void toNetwork(@Nullable ResourceLocation key, FriendlyByteBuf buffer) {
     if (key != null) {
       buffer.writeBoolean(true);

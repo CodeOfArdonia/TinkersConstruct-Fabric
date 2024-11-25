@@ -12,10 +12,12 @@ import java.util.Iterator;
  * Fluid handler wrapper that only allows filling
  */
 public class FillOnlyFluidHandler implements SlottedStorage<FluidVariant> {
-	private final SlottedStorage<FluidVariant> parent;
-	public FillOnlyFluidHandler(SlottedStorage<FluidVariant> parent) {
-		this.parent = parent;
-	}
+
+  private final SlottedStorage<FluidVariant> parent;
+
+  public FillOnlyFluidHandler(SlottedStorage<FluidVariant> parent) {
+    this.parent = parent;
+  }
 
   @Override
   public int getSlotCount() {

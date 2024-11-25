@@ -7,36 +7,44 @@ import slimeknights.tconstruct.TConstruct;
 
 /**
  * Represents a value that scales with level.
- * @param flat         Base value that is always applied
- * @param leveling     Bonus value applied for every level
- * @param randomBonus  A bonus between 0 and this is randomly applied every level
+ *
+ * @param flat        Base value that is always applied
+ * @param leveling    Bonus value applied for every level
+ * @param randomBonus A bonus between 0 and this is randomly applied every level
  */
 public record ScalingValue(float flat, float leveling, float randomBonus) {
-  /** Gets the value at the given level. Due to the random nature, value may change each time. */
+
+  /**
+   * Gets the value at the given level. Due to the random nature, value may change each time.
+   */
   public float computeValue(float level) {
     float value = this.flat + this.leveling * level;
-    if (randomBonus > 0 && level > 0) {
-      value += TConstruct.RANDOM.nextFloat() * level * randomBonus;
+    if (this.randomBonus > 0 && level > 0) {
+      value += TConstruct.RANDOM.nextFloat() * level * this.randomBonus;
     }
     return value;
   }
 
-  /** Serializes this to JSON */
+  /**
+   * Serializes this to JSON
+   */
   public JsonObject serialize() {
     JsonObject json = new JsonObject();
-    if (flat != 0) {
-      json.addProperty("flat", flat);
+    if (this.flat != 0) {
+      json.addProperty("flat", this.flat);
     }
-    if (leveling != 0) {
-      json.addProperty("leveling", leveling);
+    if (this.leveling != 0) {
+      json.addProperty("leveling", this.leveling);
     }
-    if (randomBonus != 0) {
-      json.addProperty("random", randomBonus);
+    if (this.randomBonus != 0) {
+      json.addProperty("random", this.randomBonus);
     }
     return json;
   }
 
-  /** Deserializes this from JSON */
+  /**
+   * Deserializes this from JSON
+   */
   public static ScalingValue deserialize(JsonObject json) {
     float flat = GsonHelper.getAsFloat(json, "flat", 0);
     float leveling = GsonHelper.getAsFloat(json, "leveling", 0);
@@ -44,19 +52,25 @@ public record ScalingValue(float flat, float leveling, float randomBonus) {
     return new ScalingValue(flat, leveling, random);
   }
 
-  /** Gets and deserializes this from a parent JSON */
+  /**
+   * Gets and deserializes this from a parent JSON
+   */
   public static ScalingValue get(JsonObject parent, String key) {
     return deserialize(GsonHelper.getAsJsonObject(parent, key));
   }
 
-  /** Writes this to the network */
+  /**
+   * Writes this to the network
+   */
   public void toNetwork(FriendlyByteBuf buffer) {
-    buffer.writeFloat(flat);
-    buffer.writeFloat(leveling);
-    buffer.writeFloat(randomBonus);
+    buffer.writeFloat(this.flat);
+    buffer.writeFloat(this.leveling);
+    buffer.writeFloat(this.randomBonus);
   }
 
-  /** Reads this from teh network */
+  /**
+   * Reads this from teh network
+   */
   public static ScalingValue fromNetwork(FriendlyByteBuf buffer) {
     float flat = buffer.readFloat();
     float leveling = buffer.readFloat();

@@ -11,13 +11,17 @@ import slimeknights.tconstruct.library.tools.capability.TinkerDataCapability.Tin
 import slimeknights.tconstruct.library.tools.helper.ModifierUtil;
 
 public class MithridatismModifier extends TotalArmorLevelModifier {
+
   private static final TinkerDataKey<Integer> MITHRIDATISM = TConstruct.createKey("mithridatism");
+
   public MithridatismModifier() {
     super(MITHRIDATISM, true);
     PotionEvents.POTION_APPLICABLE.register(MithridatismModifier::isPotionApplicable);
   }
 
-  /** Prevents poison on the entity */
+  /**
+   * Prevents poison on the entity
+   */
   private static InteractionResult isPotionApplicable(LivingEntity entity, MobEffectInstance effect) {
     if (effect.getEffect() == MobEffects.POISON && ModifierUtil.getTotalModifierLevel(entity, MITHRIDATISM) > 0) {
       return InteractionResult.FAIL;

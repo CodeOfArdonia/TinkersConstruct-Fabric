@@ -2,13 +2,10 @@ package slimeknights.tconstruct.tools.modifiers;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
-import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.github.fabricators_of_create.porting_lib.loot.IGlobalLootModifier;
 import io.github.fabricators_of_create.porting_lib.loot.LootModifier;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -22,16 +19,21 @@ import slimeknights.tconstruct.library.tools.nbt.ToolStack;
 import slimeknights.tconstruct.tools.TinkerModifiers;
 
 import javax.annotation.Nonnull;
-import java.util.List;
 
-/** Global loot modifier for modifiers */
+/**
+ * Global loot modifier for modifiers
+ */
 public class ModifierLootModifier extends LootModifier {
+
   public static final Supplier<Codec<ModifierLootModifier>> CODEC = Suppliers.memoize(() -> RecordCodecBuilder.create(inst -> codecStart(inst).apply(inst, ModifierLootModifier::new)));
+
   protected ModifierLootModifier(LootItemCondition[] conditionsIn) {
     super(conditionsIn);
   }
 
-  /** Creates a builder for datagen */
+  /**
+   * Creates a builder for datagen
+   */
   public static GenericLootModifierBuilder<ModifierLootModifier> builder() {
     return GenericLootModifierBuilder.builder(TinkerModifiers.modifierLootModifier.get(), ModifierLootModifier::new);
   }

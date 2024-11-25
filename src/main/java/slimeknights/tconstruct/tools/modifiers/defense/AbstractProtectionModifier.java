@@ -17,31 +17,44 @@ import slimeknights.tconstruct.tools.TinkerModifiers;
 
 import java.util.List;
 
-/** Base class for protection modifiers that want to keep track of the largest level for a bonus */
+/**
+ * Base class for protection modifiers that want to keep track of the largest level for a bonus
+ */
 @RequiredArgsConstructor
 public abstract class AbstractProtectionModifier<T extends ModifierMaxLevel> extends IncrementalModifier {
+
   private final TinkerDataKey<T> key;
 
-  /** @deprecated use {@link #createData(EquipmentChangeContext)}*/
+  /**
+   * @deprecated use {@link #createData(EquipmentChangeContext)}
+   */
   @SuppressWarnings("DeprecatedIsStillUsed")
   @Deprecated
   protected abstract T createData();
 
-  /** Creates a new data instance */
+  /**
+   * Creates a new data instance
+   */
   protected T createData(EquipmentChangeContext context) {
-    return createData();
+    return this.createData();
   }
 
-  /** @deprecated use {@link #reset(ModifierMaxLevel, EquipmentChangeContext)} */
+  /**
+   * @deprecated use {@link #reset(ModifierMaxLevel, EquipmentChangeContext)}
+   */
   @Deprecated
   protected void reset(T data) {}
 
-  /** Called when the last piece of equipment is removed to reset the data */
+  /**
+   * Called when the last piece of equipment is removed to reset the data
+   */
   protected void reset(T data, EquipmentChangeContext context) {
-    reset(data);
+    this.reset(data);
   }
 
-  /** Called to apply updates to the piece */
+  /**
+   * Called to apply updates to the piece
+   */
   protected void set(T data, EquipmentSlot slot, float scaledLevel, EquipmentChangeContext context) {
     data.set(slot, scaledLevel);
   }
@@ -52,11 +65,11 @@ public abstract class AbstractProtectionModifier<T extends ModifierMaxLevel> ext
     EquipmentSlot slot = context.getChangedSlot();
     if (ModifierUtil.validArmorSlot(tool, slot) && !entity.level().isClientSide) {
       context.getTinkerData().ifPresent(data -> {
-        T modData = data.get(key);
+        T modData = data.get(this.key);
         if (modData != null) {
-          set(modData, slot, 0, context);
+          this.set(modData, slot, 0, context);
           if (modData.getMax() == 0) {
-            reset(modData, context);
+            this.reset(modData, context);
           }
         }
       });
@@ -68,34 +81,35 @@ public abstract class AbstractProtectionModifier<T extends ModifierMaxLevel> ext
     LivingEntity entity = context.getEntity();
     EquipmentSlot slot = context.getChangedSlot();
     if (!entity.level().isClientSide && ModifierUtil.validArmorSlot(tool, slot) && !tool.isBroken()) {
-      float scaledLevel = getScaledLevel(tool, level);
+      float scaledLevel = this.getScaledLevel(tool, level);
       context.getTinkerData().ifPresent(data -> {
-        T modData = data.get(key);
+        T modData = data.get(this.key);
         if (modData == null) {
           // not calculated yet? add all vanilla values to the tracker
-          modData = createData(context);
-          data.put(key, modData);
+          modData = this.createData(context);
+          data.put(this.key, modData);
         }
         // add ourself to the data
-        set(modData, slot, scaledLevel, context);
+        this.set(modData, slot, scaledLevel, context);
       });
     }
   }
 
   /**
    * Adds the resistance type tooltip to the armor
-   * @param modifier    Modifier instance
-   * @param tool        Tool getting the tooltip
-   * @param level       Modifier level
-   * @param multiplier  Amount per level
-   * @param tooltip     Tooltip to show
+   *
+   * @param modifier   Modifier instance
+   * @param tool       Tool getting the tooltip
+   * @param level      Modifier level
+   * @param multiplier Amount per level
+   * @param tooltip    Tooltip to show
    */
   public static void addResistanceTooltip(Modifier modifier, IToolStackView tool, int level, float multiplier, List<Component> tooltip) {
     if (tool.hasTag(TinkerTags.Items.ARMOR)) {
       float cap = Math.min(0.95f, 0.8f + tool.getModifierLevel(TinkerModifiers.boundless.getId()) * 0.1f);
       tooltip.add(modifier.applyStyle(Component.literal(Util.PERCENT_BOOST_FORMAT.format(Math.min(modifier.getEffectiveLevel(tool, level) * multiplier / 25f, cap)))
-                                        .append(" ")
-                                        .append(Component.translatable(modifier.getTranslationKey() + ".resistance"))));
+        .append(" ")
+        .append(Component.translatable(modifier.getTranslationKey() + ".resistance"))));
     }
   }
 }

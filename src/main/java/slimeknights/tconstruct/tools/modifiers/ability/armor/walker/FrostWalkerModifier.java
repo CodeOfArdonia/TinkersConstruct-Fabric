@@ -17,6 +17,7 @@ import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 import slimeknights.tconstruct.tools.TinkerModifiers;
 
 public class FrostWalkerModifier extends AbstractWalkerModifier {
+
   @Override
   protected float getRadius(IToolStackView tool, int level) {
     return 3 + tool.getModifierLevel(TinkerModifiers.expanded.getId());
@@ -35,7 +36,7 @@ public class FrostWalkerModifier extends AbstractWalkerModifier {
       BlockState below = world.getBlockState(mutable);
       boolean isFull = below.getBlock() == Blocks.WATER && below.getValue(LiquidBlock.LEVEL) == 0; //TODO: Forge, modded waters?
       if (below == Blocks.WATER.defaultBlockState() && isFull
-          && frostedIce.canSurvive(world, mutable) && world.isUnobstructed(frostedIce, mutable, CollisionContext.empty())/*
+        && frostedIce.canSurvive(world, mutable) && world.isUnobstructed(frostedIce, mutable, CollisionContext.empty())/*
           && !PortingHooks.onBlockPlace(living, BlockSnapshot.create(world.dimension(), world, mutable), Direction.UP)*/) {
         world.setBlockAndUpdate(mutable, frostedIce);
         world.scheduleTick(mutable, Blocks.FROSTED_ICE, Mth.nextInt(living.getRandom(), 60, 120));

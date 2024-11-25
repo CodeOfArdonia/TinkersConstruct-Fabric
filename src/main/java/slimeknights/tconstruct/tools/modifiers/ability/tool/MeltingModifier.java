@@ -22,16 +22,22 @@ import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 import slimeknights.tconstruct.smeltery.block.entity.module.EntityMeltingModule;
 
 import java.util.Iterator;
-import java.util.List;
 
 @SuppressWarnings("removal")
 public class MeltingModifier extends TankModifier {
-  /** Max temperature allowed for melting items */
+
+  /**
+   * Max temperature allowed for melting items
+   */
   private static final int MAX_TEMPERATURE = 1000;
 
-  /** Last melting recipe used */
+  /**
+   * Last melting recipe used
+   */
   private static IMeltingRecipe lastRecipe = null;
-  /** Inventory used for finding recipes */
+  /**
+   * Inventory used for finding recipes
+   */
   private static final MeltingContainer inventory = new MeltingContainer();
 
   public MeltingModifier() {
@@ -46,9 +52,10 @@ public class MeltingModifier extends TankModifier {
 
   /**
    * Gets the fluid for the given item
-   * @param stack  Item
-   * @param world  World instance
-   * @return  Fluid
+   *
+   * @param stack Item
+   * @param world World instance
+   * @return Fluid
    */
   private static FluidStack meltItem(ItemStack stack, Level world) {
     inventory.setStack(stack);
@@ -74,8 +81,8 @@ public class MeltingModifier extends TankModifier {
   @Override
   public ObjectArrayList<ItemStack> processLoot(IToolStackView tool, int level, ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
     // if tank is full, nothing to do
-    FluidStack current = getFluid(tool);
-    int capacity = getCapacity(tool);
+    FluidStack current = this.getFluid(tool);
+    int capacity = this.getCapacity(tool);
     if (current.getAmount() >= capacity) {
       return generatedLoot;
     }
@@ -93,7 +100,7 @@ public class MeltingModifier extends TankModifier {
 
         // if it fits in the tank, remove
         if (maxCopies > 0) {
-          FluidStack filled = fill(tool, current, output, output.getAmount() * maxCopies);
+          FluidStack filled = this.fill(tool, current, output, output.getAmount() * maxCopies);
           // update current fluid stack for next iteration
           if (!filled.isEmpty()) {
             current = filled;
@@ -129,21 +136,25 @@ public class MeltingModifier extends TankModifier {
         // recipe amount determines how much we get per hit, up to twice the recipe damage
         long fluidAmount;
         if (damageDealt < damagePerOutput * 2) {
-          fluidAmount = (int)(output.getAmount() * damageDealt / damagePerOutput);
+          fluidAmount = (int) (output.getAmount() * damageDealt / damagePerOutput);
         } else {
           fluidAmount = output.getAmount() * 2;
         }
 
         // fluid must match that which is stored in the tank
-        fill(tool, getFluid(tool), output, fluidAmount);
+        this.fill(tool, this.getFluid(tool), output, fluidAmount);
       }
     }
     return 0;
   }
 
-  /** Helper for finding recipes in melting */
+  /**
+   * Helper for finding recipes in melting
+   */
   private static class MeltingContainer implements IMeltingContainer {
-    @Getter @Setter
+
+    @Getter
+    @Setter
     private ItemStack stack;
 
     @Override

@@ -68,8 +68,10 @@ public final class TinkerTables extends TinkerModule {
    * Blocks
    */
   private static final Block.Properties WOOD_TABLE = builder(SoundType.WOOD).mapColor(MapColor.WOOD).ignitedByLava().strength(1.0F, 5.0F).noOcclusion();
-  /** Call with .apply to set the tag type for a block item provider */
-  private static final BiFunction<TagKey<Item>,BooleanSupplier,Function<Block,RetexturedBlockItem>> RETEXTURED_BLOCK_ITEM = (tag, cond) -> block -> new TableBlockItem(block, tag, GENERAL_PROPS, cond);
+  /**
+   * Call with .apply to set the tag type for a block item provider
+   */
+  private static final BiFunction<TagKey<Item>, BooleanSupplier, Function<Block, RetexturedBlockItem>> RETEXTURED_BLOCK_ITEM = (tag, cond) -> block -> new TableBlockItem(block, tag, GENERAL_PROPS, cond);
   public static final ItemObject<TableBlock> craftingStation = BLOCKS.register("crafting_station", () -> new CraftingStationBlock(WOOD_TABLE), RETEXTURED_BLOCK_ITEM.apply(ItemTags.LOGS, Config.COMMON.showAllTableVariants::get));
   public static final ItemObject<TableBlock> tinkerStation = BLOCKS.register("tinker_station", () -> new TinkerStationBlock(WOOD_TABLE, 4), RETEXTURED_BLOCK_ITEM.apply(ItemTags.PLANKS, Config.COMMON.showAllTableVariants::get));
   public static final ItemObject<TableBlock> partBuilder = BLOCKS.register("part_builder", () -> new GenericTableBlock(WOOD_TABLE, PartBuilderBlockEntity::new), RETEXTURED_BLOCK_ITEM.apply(ItemTags.PLANKS, Config.COMMON.showAllTableVariants::get));
@@ -132,15 +134,15 @@ public final class TinkerTables extends TinkerModule {
   public static final RegistryObject<SpecializedRepairRecipeSerializer<?>> specializedRepairKitSerializer = RECIPE_SERIALIZERS.register("specialized_repair_kit", () -> new SpecializedRepairRecipeSerializer<>(SpecializedRepairKitRecipe::new));
 
   public TinkerTables() {
-    commonSetup();
+    this.commonSetup();
   }
 
   void commonSetup() {
 //    event.enqueueWork(() -> {
-      StationSlotLayoutLoader loader = StationSlotLayoutLoader.getInstance();
-      loader.registerRequiredLayout(tinkerStation.getRegistryName());
-      loader.registerRequiredLayout(tinkersAnvil.getRegistryName());
-      loader.registerRequiredLayout(scorchedAnvil.getRegistryName());
+    StationSlotLayoutLoader loader = StationSlotLayoutLoader.getInstance();
+    loader.registerRequiredLayout(tinkerStation.getRegistryName());
+    loader.registerRequiredLayout(tinkersAnvil.getRegistryName());
+    loader.registerRequiredLayout(scorchedAnvil.getRegistryName());
 //    });
   }
 

@@ -2,8 +2,8 @@ package slimeknights.tconstruct.plugin.jei;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import io.github.fabricators_of_create.porting_lib.mixin.accessors.common.accessor.RecipeManagerAccessor;
 import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
+import io.github.fabricators_of_create.porting_lib.mixin.accessors.common.accessor.RecipeManagerAccessor;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
@@ -28,7 +28,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.core.Holder;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -36,7 +35,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.Container;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.Potion;
@@ -120,6 +118,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unused")
 @JeiPlugin
 public class JEIPlugin implements IModPlugin {
+
   public static IModIdHelper modIdHelper;
 
   @Override
@@ -198,14 +197,14 @@ public class JEIPlugin implements IModPlugin {
 
     // modifiers
     List<IDisplayModifierRecipe> modifierRecipes = RecipeHelper.getJEIRecipes(manager, TinkerRecipeTypes.TINKER_STATION.get(), IDisplayModifierRecipe.class)
-                                                               .stream()
-                                                               .sorted((r1, r2) -> {
-                                                                 SlotType t1 = r1.getSlotType();
-                                                                 SlotType t2 = r2.getSlotType();
-                                                                 String n1 = t1 == null ? "zzzzzzzzzz" : t1.getName();
-                                                                 String n2 = t2 == null ? "zzzzzzzzzz" : t2.getName();
-                                                                 return n1.compareTo(n2);
-                                                               }).collect(Collectors.toList());
+      .stream()
+      .sorted((r1, r2) -> {
+        SlotType t1 = r1.getSlotType();
+        SlotType t2 = r2.getSlotType();
+        String n1 = t1 == null ? "zzzzzzzzzz" : t1.getName();
+        String n2 = t2 == null ? "zzzzzzzzzz" : t2.getName();
+        return n1.compareTo(n2);
+      }).collect(Collectors.toList());
     register.addRecipes(TConstructJEIConstants.MODIFIERS, modifierRecipes);
 
     // beheading
@@ -222,16 +221,17 @@ public class JEIPlugin implements IModPlugin {
 
   /**
    * Adds an item as a casting catalyst, and as a molding catalyst if it has molding recipes
-   * @param registry     Catalyst regisry
-   * @param item         Item to add
-   * @param ownCategory  Category to always add
-   * @param type         Molding recipe type
+   *
+   * @param registry    Catalyst regisry
+   * @param item        Item to add
+   * @param ownCategory Category to always add
+   * @param type        Molding recipe type
    */
   private static <T extends Recipe<C>, C extends Container> void addCastingCatalyst(IRecipeCatalystRegistration registry, ItemLike item, mezz.jei.api.recipe.RecipeType<IDisplayableCastingRecipe> ownCategory, RecipeType<MoldingRecipe> type) {
     ItemStack stack = new ItemStack(item);
     registry.addRecipeCatalyst(stack, ownCategory);
     assert Minecraft.getInstance().level != null;
-    if (!((RecipeManagerAccessor)Minecraft.getInstance().level.getRecipeManager()).port_lib$byType(type).isEmpty()) {
+    if (!((RecipeManagerAccessor) Minecraft.getInstance().level.getRecipeManager()).port_lib$byType(type).isEmpty()) {
       registry.addRecipeCatalyst(stack, TConstructJEIConstants.MOLDING);
     }
   }
@@ -356,30 +356,36 @@ public class JEIPlugin implements IModPlugin {
 
   /**
    * Removes a fluid from JEI
-   * @param manager  Manager
-   * @param fluid    Fluid to remove
-   * @param bucket   Fluid bucket to remove
+   *
+   * @param manager Manager
+   * @param fluid   Fluid to remove
+   * @param bucket  Fluid bucket to remove
    */
   private static void removeFluid(IIngredientManager manager, Fluid fluid, Item bucket) {
     manager.removeIngredientsAtRuntime(JEITypes.FLUID_STACK, Collections.singleton(new FluidStack(fluid, FluidConstants.BUCKET)));
     manager.removeIngredientsAtRuntime(VanillaTypes.ITEM_STACK, Collections.singleton(new ItemStack(bucket)));
   }
 
-  /** Helper to get an item tag */
+  /**
+   * Helper to get an item tag
+   */
   private static Iterable<Holder<Item>> getTag(ResourceLocation name) {
     return getTag(TagKey.create(Registries.ITEM, name));
   }
 
-  /** Helper to get an item tag */
+  /**
+   * Helper to get an item tag
+   */
   private static Iterable<Holder<Item>> getTag(TagKey<Item> name) {
     return Objects.requireNonNull(BuiltInRegistries.ITEM.getTagOrEmpty(name));
   }
 
   /**
    * Hides an item if the related tag is empty
-   * @param manager  Ingredient manager
-   * @param item     Cast instance
-   * @param tagName  Tag to check
+   *
+   * @param manager Ingredient manager
+   * @param item    Cast instance
+   * @param tagName Tag to check
    */
   @SuppressWarnings("SameParameterValue")
   private static void optionalItem(IIngredientManager manager, ItemLike item, String tagName) {
@@ -391,8 +397,9 @@ public class JEIPlugin implements IModPlugin {
 
   /**
    * Hides casts if the related tag is empty
-   * @param manager  Ingredient manager
-   * @param cast     Cast instance
+   *
+   * @param manager Ingredient manager
+   * @param cast    Cast instance
    */
   private static void optionalCast(IIngredientManager manager, CastItemObject cast) {
     Iterable<Holder<Item>> tag = getTag(new ResourceLocation("c", cast.getName().getPath() + "_blocks"));
@@ -433,16 +440,21 @@ public class JEIPlugin implements IModPlugin {
     modIdHelper = jeiRuntime.getJeiHelpers().getModIdHelper();
   }
 
-  /** Class to pass {@link IScreenWithFluidTank} into JEI */
+  /**
+   * Class to pass {@link IScreenWithFluidTank} into JEI
+   */
   public static class GuiContainerTankHandler<C extends AbstractContainerMenu, T extends AbstractContainerScreen<C> & IScreenWithFluidTank> implements IGuiContainerHandler<T> {
-//    @Override TODO: PORT
+
+    //    @Override TODO: PORT
     @Nullable
     public Object getIngredientUnderMouse(T containerScreen, double mouseX, double mouseY) {
       return containerScreen.getIngredientUnderMouse(mouseX, mouseY);
     }
   }
 
-  /** Subtype interpreter for tools, treats the tool as unique in ingredient list, generic in recipes */
+  /**
+   * Subtype interpreter for tools, treats the tool as unique in ingredient list, generic in recipes
+   */
   public enum ToolSubtypeInterpreter implements IIngredientSubtypeInterpreter<ItemStack> {
     ALWAYS, INGREDIENT;
 

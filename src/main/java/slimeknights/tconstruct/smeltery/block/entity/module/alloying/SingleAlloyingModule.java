@@ -12,38 +12,45 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.Optional;
 
-/** Alloying module that supports only a single output */
+/**
+ * Alloying module that supports only a single output
+ */
 @RequiredArgsConstructor
 public class SingleAlloyingModule implements IAlloyingModule {
+
   private final MantleBlockEntity parent;
   private final IMutableAlloyTank alloyTank;
   private AlloyRecipe lastRecipe;
 
-  /** Gets a nonnull world instance from the parent */
+  /**
+   * Gets a nonnull world instance from the parent
+   */
   private Level getLevel() {
-    return Objects.requireNonNull(parent.getLevel(), "Parent tile entity has null world");
+    return Objects.requireNonNull(this.parent.getLevel(), "Parent tile entity has null world");
   }
 
-  /** Finds the recipe to perform */
+  /**
+   * Finds the recipe to perform
+   */
   @Nullable
   private AlloyRecipe findRecipe() {
-    Level world = getLevel();
-    if (lastRecipe != null && lastRecipe.canPerform(alloyTank)) {
-      return lastRecipe;
+    Level world = this.getLevel();
+    if (this.lastRecipe != null && this.lastRecipe.canPerform(this.alloyTank)) {
+      return this.lastRecipe;
     }
     // fetch the first recipe that matches the inputs and fits in the tank
     // means if for some reason two recipes both are vaiud, the tank contents can be used to choose
-    Optional<AlloyRecipe> recipe = ((RecipeManagerAccessor)world.getRecipeManager())
-                                        .port_lib$byType(TinkerRecipeTypes.ALLOYING.get())
-                                        .values().stream()
-                                        .filter(r -> r instanceof AlloyRecipe)
-                                        .map(r -> (AlloyRecipe) r)
-                                        .filter(r -> alloyTank.canFit(r.getOutput(), 0) && r.canPerform(alloyTank))
-                                        .findAny();
+    Optional<AlloyRecipe> recipe = ((RecipeManagerAccessor) world.getRecipeManager())
+      .port_lib$byType(TinkerRecipeTypes.ALLOYING.get())
+      .values().stream()
+      .filter(r -> r instanceof AlloyRecipe)
+      .map(r -> (AlloyRecipe) r)
+      .filter(r -> this.alloyTank.canFit(r.getOutput(), 0) && r.canPerform(this.alloyTank))
+      .findAny();
     // if found, cache and return
     if (recipe.isPresent()) {
-      lastRecipe = recipe.get();
-      return lastRecipe;
+      this.lastRecipe = recipe.get();
+      return this.lastRecipe;
     } else {
       return null;
     }
@@ -51,14 +58,14 @@ public class SingleAlloyingModule implements IAlloyingModule {
 
   @Override
   public boolean canAlloy() {
-    return findRecipe() != null;
+    return this.findRecipe() != null;
   }
 
   @Override
   public void doAlloy() {
-    AlloyRecipe recipe = findRecipe();
+    AlloyRecipe recipe = this.findRecipe();
     if (recipe != null) {
-      recipe.performRecipe(alloyTank);
+      recipe.performRecipe(this.alloyTank);
     }
   }
 }

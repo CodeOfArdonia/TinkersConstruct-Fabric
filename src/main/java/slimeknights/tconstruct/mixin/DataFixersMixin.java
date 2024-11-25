@@ -18,6 +18,7 @@ import java.util.function.UnaryOperator;
 
 @Mixin(DataFixers.class)
 public abstract class DataFixersMixin {
+
   @Shadow
   private static UnaryOperator<String> createRenamer(String string, String string2) {
     return null;

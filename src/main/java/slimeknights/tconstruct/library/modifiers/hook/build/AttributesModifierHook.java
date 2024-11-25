@@ -13,6 +13,7 @@ import java.util.function.BiConsumer;
  * Modifier hook for adding attributes to a tool when in the correct slot.
  */
 public interface AttributesModifierHook {
+
   /**
    * Adds attributes from this modifier's effect. Called whenever the item stack refreshes attributes, typically on equipping and unequipping.
    * It is important that you return the same list when equipping and unequipping the item.
@@ -21,18 +22,22 @@ public interface AttributesModifierHook {
    * <ul>
    *   <li>{@link ToolStatsModifierHook}: Limited context, but can affect durability, mining level, and mining speed.</li>
    * </ul>
-   * @param tool      Current tool instance
-   * @param modifier  Modifier level
-   * @param slot      Slot for the attributes
-   * @param consumer  Attribute consumer
+   *
+   * @param tool     Current tool instance
+   * @param modifier Modifier level
+   * @param slot     Slot for the attributes
+   * @param consumer Attribute consumer
    */
-  void addAttributes(IToolStackView tool, ModifierEntry modifier, EquipmentSlot slot, BiConsumer<Attribute,AttributeModifier> consumer);
+  void addAttributes(IToolStackView tool, ModifierEntry modifier, EquipmentSlot slot, BiConsumer<Attribute, AttributeModifier> consumer);
 
-  /** Merger that runs all hooks */
+  /**
+   * Merger that runs all hooks
+   */
   record AllMerger(Collection<AttributesModifierHook> modules) implements AttributesModifierHook {
+
     @Override
-    public void addAttributes(IToolStackView tool, ModifierEntry modifier, EquipmentSlot slot, BiConsumer<Attribute,AttributeModifier> consumer) {
-      for (AttributesModifierHook module : modules) {
+    public void addAttributes(IToolStackView tool, ModifierEntry modifier, EquipmentSlot slot, BiConsumer<Attribute, AttributeModifier> consumer) {
+      for (AttributesModifierHook module : this.modules) {
         module.addAttributes(tool, modifier, slot, consumer);
       }
     }

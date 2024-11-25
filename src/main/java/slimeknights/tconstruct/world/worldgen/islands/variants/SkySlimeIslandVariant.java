@@ -14,19 +14,19 @@ import slimeknights.tconstruct.world.TinkerWorld;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
-import java.util.Random;
 
 /**
  * Island variant for sky slime islands
  */
 public class SkySlimeIslandVariant extends AbstractSlimeIslandVariant {
+
   public SkySlimeIslandVariant(int index, SlimeType dirtType) {
     super(index, dirtType, SlimeType.SKY);
   }
 
   @Override
   public ResourceLocation getStructureName(String variantName) {
-    return TConstruct.getResource("slime_islands/sky/" + dirtType.getSerializedName() + "_" + variantName);
+    return TConstruct.getResource("slime_islands/sky/" + this.dirtType.getSerializedName() + "_" + variantName);
   }
 
   @Override
@@ -47,7 +47,7 @@ public class SkySlimeIslandVariant extends AbstractSlimeIslandVariant {
 
   @Nullable
   @Override
-  public ConfiguredFeature<?,?> getTreeFeature(RandomSource random, RegistryAccess registryAccess) {
+  public ConfiguredFeature<?, ?> getTreeFeature(RandomSource random, RegistryAccess registryAccess) {
     return registryAccess.registryOrThrow(Registries.CONFIGURED_FEATURE).get(TinkerStructures.skySlimeIslandTree);
   }
 }

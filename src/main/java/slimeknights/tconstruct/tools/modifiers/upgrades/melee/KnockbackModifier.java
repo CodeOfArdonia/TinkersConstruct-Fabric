@@ -16,7 +16,9 @@ import java.util.UUID;
 import java.util.function.BiConsumer;
 
 public class KnockbackModifier extends Modifier {
+
   private static final UUID[] UUIDS = new UUID[4];
+
   static {
     for (EquipmentSlot slot : ModifiableArmorMaterial.ARMOR_SLOTS) {
       UUIDS[slot.getIndex()] = ModifierAttribute.getUUID("tconstruct.knockback", slot);
@@ -33,9 +35,9 @@ public class KnockbackModifier extends Modifier {
   }
 
   @Override
-  public void addAttributes(IToolStackView tool, int level, EquipmentSlot slot, BiConsumer<Attribute,AttributeModifier> consumer) {
+  public void addAttributes(IToolStackView tool, int level, EquipmentSlot slot, BiConsumer<Attribute, AttributeModifier> consumer) {
     if (slot.getType() == Type.ARMOR) {
-      consumer.accept(Attributes.ATTACK_KNOCKBACK, new AttributeModifier(UUIDS[slot.getIndex()], "tconstruct.knockback." + slot.getName(), 1 * getEffectiveLevel(tool, level), Operation.ADDITION));
+      consumer.accept(Attributes.ATTACK_KNOCKBACK, new AttributeModifier(UUIDS[slot.getIndex()], "tconstruct.knockback." + slot.getName(), 1 * this.getEffectiveLevel(tool, level), Operation.ADDITION));
     }
   }
 }

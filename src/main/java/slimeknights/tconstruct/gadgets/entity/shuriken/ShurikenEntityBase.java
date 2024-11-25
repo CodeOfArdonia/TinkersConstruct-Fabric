@@ -5,7 +5,6 @@ import io.github.fabricators_of_create.porting_lib.entity.PortingLibEntity;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -32,9 +31,10 @@ public abstract class ShurikenEntityBase extends ThrowableItemProjectile impleme
     super(type, livingEntityIn, worldIn);
   }
 
-    /**
+  /**
    * Get damage dealt by Shuriken
    * Should be <= 20.0F
+   *
    * @return float damage
    */
   public abstract float getDamage();
@@ -43,6 +43,7 @@ public abstract class ShurikenEntityBase extends ThrowableItemProjectile impleme
    * Get knockback dealt by Shuriken
    * Should be <= 1.0F, Minecraft
    * typically uses values from 0.2F-0.6F
+   *
    * @return float knockback
    */
   public abstract float getKnockback();
@@ -61,7 +62,7 @@ public abstract class ShurikenEntityBase extends ThrowableItemProjectile impleme
   protected void onHitBlock(BlockHitResult result) {
     super.onHitBlock(result);
 
-    this.spawnAtLocation(getDefaultItem());
+    this.spawnAtLocation(this.getDefaultItem());
   }
 
   @Override
@@ -69,7 +70,7 @@ public abstract class ShurikenEntityBase extends ThrowableItemProjectile impleme
     Entity entity = result.getEntity();
     entity.hurt(entity.damageSources().thrown(this, this.getOwner()), this.getDamage());
 
-    if (!level().isClientSide() && entity instanceof LivingEntity) {
+    if (!this.level().isClientSide() && entity instanceof LivingEntity) {
       Vec3 motion = this.getDeltaMovement().normalize();
       ((LivingEntity) entity).knockback(this.getKnockback(), -motion.x, -motion.z);
     }

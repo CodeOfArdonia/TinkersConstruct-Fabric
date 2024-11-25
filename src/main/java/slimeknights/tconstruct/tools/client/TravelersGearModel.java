@@ -19,11 +19,18 @@ import java.util.Map;
 import java.util.function.Function;
 
 public class TravelersGearModel extends Model {
-  /** Singleton model instance, all data is passed in via setters */
-  private static final Map<ResourceLocation,TravelersGearModel> MODELS = new HashMap<>();
-  /** Cached constructor to not need to create each tick */
-  private static final Function<ResourceLocation,TravelersGearModel> CONSTRUCTOR = TravelersGearModel::new;
-  /** default name */
+
+  /**
+   * Singleton model instance, all data is passed in via setters
+   */
+  private static final Map<ResourceLocation, TravelersGearModel> MODELS = new HashMap<>();
+  /**
+   * Cached constructor to not need to create each tick
+   */
+  private static final Function<ResourceLocation, TravelersGearModel> CONSTRUCTOR = TravelersGearModel::new;
+  /**
+   * default name
+   */
   private static final ResourceLocation TRAVELERS = TConstruct.getResource("travelers");
 
   /**
@@ -35,7 +42,9 @@ public class TravelersGearModel extends Model {
     return model;
   }
 
-  /** Gets the model for traveler */
+  /**
+   * Gets the model for traveler
+   */
   public static Model getModel(ItemStack stack, EquipmentSlot slot, HumanoidModel<?> baseModel) {
     return getModel(stack, slot, baseModel, TRAVELERS, false);
   }
@@ -47,8 +56,11 @@ public class TravelersGearModel extends Model {
   private boolean forceOverlay = false;
   private int color = -1;
   private boolean isLegs = false;
-  /** If true, applies the enchantment glint to extra layers */
+  /**
+   * If true, applies the enchantment glint to extra layers
+   */
   private boolean hasGlint = false;
+
   public TravelersGearModel(ResourceLocation name) {
     super(RenderType::entityCutoutNoCull);
     this.overlayArmor = new ResourceLocation(name.getNamespace(), "textures/models/armor/" + name.getPath() + "_overlay_1.png");
@@ -57,14 +69,14 @@ public class TravelersGearModel extends Model {
 
   @Override
   public void renderToBuffer(PoseStack matrices, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
-    if (base != null) {
-      base.renderToBuffer(matrices, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-      if ((forceOverlay || color != -1) && ArmorModelHelper.buffer != null) {
-        float newRed = (float)(color >> 16 & 255) / 255.0F;
-        float newGreen = (float)(color >> 8 & 255) / 255.0F;
-        float newBlue = (float)(color & 255) / 255.0F;
-        VertexConsumer overlayBuffer = ItemRenderer.getArmorFoilBuffer(ArmorModelHelper.buffer, RenderType.entityCutoutNoCullZOffset(isLegs ? overlayLegs : overlayArmor), false, hasGlint);
-        base.renderToBuffer(matrices, overlayBuffer, packedLightIn, packedOverlayIn, red * newRed, green * newGreen, blue * newBlue, alpha);
+    if (this.base != null) {
+      this.base.renderToBuffer(matrices, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+      if ((this.forceOverlay || this.color != -1) && ArmorModelHelper.buffer != null) {
+        float newRed = (float) (this.color >> 16 & 255) / 255.0F;
+        float newGreen = (float) (this.color >> 8 & 255) / 255.0F;
+        float newBlue = (float) (this.color & 255) / 255.0F;
+        VertexConsumer overlayBuffer = ItemRenderer.getArmorFoilBuffer(ArmorModelHelper.buffer, RenderType.entityCutoutNoCullZOffset(this.isLegs ? this.overlayLegs : this.overlayArmor), false, this.hasGlint);
+        this.base.renderToBuffer(matrices, overlayBuffer, packedLightIn, packedOverlayIn, red * newRed, green * newGreen, blue * newBlue, alpha);
       }
     }
   }
@@ -72,8 +84,8 @@ public class TravelersGearModel extends Model {
   private void setup(HumanoidModel<?> base, ItemStack stack, EquipmentSlot slot, boolean forceOverlay) {
     this.base = base;
     this.forceOverlay = forceOverlay;
-    color = ModifierUtil.getPersistentInt(stack, TinkerModifiers.dyed.getId(), -1);
-    isLegs = slot == EquipmentSlot.LEGS;
-    hasGlint = stack.hasFoil();
+    this.color = ModifierUtil.getPersistentInt(stack, TinkerModifiers.dyed.getId(), -1);
+    this.isLegs = slot == EquipmentSlot.LEGS;
+    this.hasGlint = stack.hasFoil();
   }
 }

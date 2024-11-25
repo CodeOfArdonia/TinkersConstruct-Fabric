@@ -33,12 +33,13 @@ import static slimeknights.tconstruct.library.TinkerBookIDs.PUNY_SMELTING_ID;
 import static slimeknights.tconstruct.library.TinkerBookIDs.TINKERS_GADGETRY_ID;
 
 public class TinkerBook extends BookData {
-  public static final BookData MATERIALS_AND_YOU = BookLoader.registerBook(MATERIALS_BOOK_ID,    false, false);
-  public static final BookData PUNY_SMELTING     = BookLoader.registerBook(PUNY_SMELTING_ID,     false, false);
-  public static final BookData MIGHTY_SMELTING   = BookLoader.registerBook(MIGHTY_SMELTING_ID,   false, false);
-  public static final BookData TINKERS_GADGETRY  = BookLoader.registerBook(TINKERS_GADGETRY_ID,  false, false);
+
+  public static final BookData MATERIALS_AND_YOU = BookLoader.registerBook(MATERIALS_BOOK_ID, false, false);
+  public static final BookData PUNY_SMELTING = BookLoader.registerBook(PUNY_SMELTING_ID, false, false);
+  public static final BookData MIGHTY_SMELTING = BookLoader.registerBook(MIGHTY_SMELTING_ID, false, false);
+  public static final BookData TINKERS_GADGETRY = BookLoader.registerBook(TINKERS_GADGETRY_ID, false, false);
   public static final BookData FANTASTIC_FOUNDRY = BookLoader.registerBook(FANTASTIC_FOUNDRY_ID, false, false);
-  public static final BookData ENCYCLOPEDIA      = BookLoader.registerBook(ENCYCLOPEDIA_ID,      false, false);
+  public static final BookData ENCYCLOPEDIA = BookLoader.registerBook(ENCYCLOPEDIA_ID, false, false);
 
   /**
    * Initializes the books
@@ -46,7 +47,7 @@ public class TinkerBook extends BookData {
   public static void initBook() {
     // register page types
     BookLoader.registerPageType(ContentMaterial.ID, ContentMaterial.class);
-    BookLoader.registerPageType(ContentTool.ID,     ContentTool.class);
+    BookLoader.registerPageType(ContentTool.ID, ContentTool.class);
     BookLoader.registerPageType(ContentModifier.ID, ContentModifier.class);
 
     TierRangeMaterialSectionTransformer.registerMaterialType(TConstruct.getResource("melee_harvest"), ContentMaterial::new, HeadMaterialStats.ID, HandleMaterialStats.ID, ExtraMaterialStats.ID);
@@ -124,11 +125,11 @@ public class TinkerBook extends BookData {
   public static BookData getBook(BookType bookType) {
     return switch (bookType) {
       case MATERIALS_AND_YOU -> MATERIALS_AND_YOU;
-      case PUNY_SMELTING     -> PUNY_SMELTING;
-      case MIGHTY_SMELTING   -> MIGHTY_SMELTING;
-      case TINKERS_GADGETRY  -> TINKERS_GADGETRY;
+      case PUNY_SMELTING -> PUNY_SMELTING;
+      case MIGHTY_SMELTING -> MIGHTY_SMELTING;
+      case TINKERS_GADGETRY -> TINKERS_GADGETRY;
       case FANTASTIC_FOUNDRY -> FANTASTIC_FOUNDRY;
-      case ENCYCLOPEDIA      -> ENCYCLOPEDIA;
+      case ENCYCLOPEDIA -> ENCYCLOPEDIA;
     };
   }
 }

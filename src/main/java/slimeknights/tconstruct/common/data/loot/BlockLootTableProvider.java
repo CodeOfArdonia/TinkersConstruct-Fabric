@@ -123,15 +123,15 @@ public class BlockLootTableProvider extends ModdedBlockLootSubProvider {
   private void addTools() {
     // chests
     // tinker chest - name and color
-    this.add(TinkerTables.tinkersChest.get(), block -> droppingWithFunctions(block, builder ->
+    this.add(TinkerTables.tinkersChest.get(), block -> this.droppingWithFunctions(block, builder ->
       builder.apply(CopyNameFunction.copyName(CopyNameFunction.NameSource.BLOCK_ENTITY))
         .apply(CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY).copy(TinkersChestBlockEntity.TAG_CHEST_COLOR, "display.color"))));
     // part chest - just name
     this.add(TinkerTables.partChest.get(), block ->
-      droppingWithFunctions(block, builder ->
+      this.droppingWithFunctions(block, builder ->
         builder.apply(CopyNameFunction.copyName(CopyNameFunction.NameSource.BLOCK_ENTITY))));
     // cast chest - name and inventory
-    this.add(TinkerTables.castChest.get(), block -> droppingWithFunctions(block, builder ->
+    this.add(TinkerTables.castChest.get(), block -> this.droppingWithFunctions(block, builder ->
       builder.apply(CopyNameFunction.copyName(CopyNameFunction.NameSource.BLOCK_ENTITY))
         .apply(CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY).copy("Items", "TinkerData.Items"))));
 
@@ -145,7 +145,7 @@ public class BlockLootTableProvider extends ModdedBlockLootSubProvider {
   }
 
   private void addWorld() {
-    this.add(TinkerWorld.cobaltOre.get(), block -> createOreDrop(block, TinkerWorld.rawCobalt.asItem()));
+    this.add(TinkerWorld.cobaltOre.get(), block -> this.createOreDrop(block, TinkerWorld.rawCobalt.asItem()));
     this.dropSelf(TinkerWorld.rawCobaltBlock.get());
     TinkerWorld.heads.forEach(this::dropSelf);
 
@@ -155,15 +155,15 @@ public class BlockLootTableProvider extends ModdedBlockLootSubProvider {
         this.dropSelf(block);
       }
     });
-    TinkerWorld.congealedSlime.forEach((slime, block) -> this.add(block, createSingleItemTableWithSilkTouch(block, TinkerCommons.slimeball.get(slime), ConstantValue.exactly(4))));
+    TinkerWorld.congealedSlime.forEach((slime, block) -> this.add(block, this.createSingleItemTableWithSilkTouch(block, TinkerCommons.slimeball.get(slime), ConstantValue.exactly(4))));
 
     // slime dirt and grass
     TinkerWorld.slimeDirt.forEach(this::dropSelf);
-    TinkerWorld.vanillaSlimeGrass.forEach(block -> this.add(block, createSingleItemTableWithSilkTouch(block, Blocks.DIRT)));
-    TinkerWorld.earthSlimeGrass.forEach(block -> this.add(block, createSingleItemTableWithSilkTouch(block, TinkerWorld.slimeDirt.get(SlimeType.EARTH))));
-    TinkerWorld.skySlimeGrass.forEach(block -> this.add(block, createSingleItemTableWithSilkTouch(block, TinkerWorld.slimeDirt.get(SlimeType.SKY))));
-    TinkerWorld.enderSlimeGrass.forEach(block -> this.add(block, createSingleItemTableWithSilkTouch(block, TinkerWorld.slimeDirt.get(SlimeType.ENDER))));
-    TinkerWorld.ichorSlimeGrass.forEach(block -> this.add(block, createSingleItemTableWithSilkTouch(block, TinkerWorld.slimeDirt.get(SlimeType.ICHOR))));
+    TinkerWorld.vanillaSlimeGrass.forEach(block -> this.add(block, this.createSingleItemTableWithSilkTouch(block, Blocks.DIRT)));
+    TinkerWorld.earthSlimeGrass.forEach(block -> this.add(block, this.createSingleItemTableWithSilkTouch(block, TinkerWorld.slimeDirt.get(SlimeType.EARTH))));
+    TinkerWorld.skySlimeGrass.forEach(block -> this.add(block, this.createSingleItemTableWithSilkTouch(block, TinkerWorld.slimeDirt.get(SlimeType.SKY))));
+    TinkerWorld.enderSlimeGrass.forEach(block -> this.add(block, this.createSingleItemTableWithSilkTouch(block, TinkerWorld.slimeDirt.get(SlimeType.ENDER))));
+    TinkerWorld.ichorSlimeGrass.forEach(block -> this.add(block, this.createSingleItemTableWithSilkTouch(block, TinkerWorld.slimeDirt.get(SlimeType.ICHOR))));
 
     // saplings
     TinkerWorld.slimeSapling.forEach(this::dropSelf);
@@ -174,7 +174,7 @@ public class BlockLootTableProvider extends ModdedBlockLootSubProvider {
     TinkerWorld.slimeTallGrass.forEach(block -> this.add(block, BlockLootTableProvider::onlyShears));
     for (SlimeType type : SlimeType.OVERWORLD) {
       // overworld leaves, drops with leaves and slimeballs
-      this.add(TinkerWorld.slimeLeaves.get(type), block -> randomDropSlimeBallOrSapling(type, block, TinkerWorld.slimeSapling.get(type), NORMAL_LEAVES_SAPLING_CHANCES));
+      this.add(TinkerWorld.slimeLeaves.get(type), block -> this.randomDropSlimeBallOrSapling(type, block, TinkerWorld.slimeSapling.get(type), NORMAL_LEAVES_SAPLING_CHANCES));
       this.add(TinkerWorld.slimeFern.get(type), BlockLootTableProvider::onlyShears);
     }
     for (SlimeType type : SlimeType.NETHER) {
@@ -227,7 +227,7 @@ public class BlockLootTableProvider extends ModdedBlockLootSubProvider {
     this.dropTable(TinkerSmeltery.searedChute.get());
     this.dropTable(TinkerSmeltery.searedDuct.get());
 
-    Function<Block, LootTable.Builder> dropTank = block -> droppingWithFunctions(block, builder ->
+    Function<Block, LootTable.Builder> dropTank = block -> this.droppingWithFunctions(block, builder ->
       builder.apply(CopyNameFunction.copyName(CopyNameFunction.NameSource.BLOCK_ENTITY))
         .apply(CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY).copy(NBTTags.TANK, NBTTags.TANK)));
     TinkerSmeltery.searedTank.forEach(block -> this.add(block, dropTank));
@@ -261,7 +261,7 @@ public class BlockLootTableProvider extends ModdedBlockLootSubProvider {
     this.dropTable(TinkerSmeltery.scorchedChute.get());
     this.dropTable(TinkerSmeltery.scorchedDuct.get());
 
-    Function<Block, LootTable.Builder> dropTank = block -> droppingWithFunctions(block, builder ->
+    Function<Block, LootTable.Builder> dropTank = block -> this.droppingWithFunctions(block, builder ->
       builder.apply(CopyNameFunction.copyName(CopyNameFunction.NameSource.BLOCK_ENTITY))
         .apply(CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY).copy(NBTTags.TANK, NBTTags.TANK)));
     TinkerSmeltery.scorchedTank.forEach(block -> this.add(block, dropTank));
@@ -294,26 +294,27 @@ public class BlockLootTableProvider extends ModdedBlockLootSubProvider {
   }
 
   private LootTable.Builder dropSapling(Block blockIn, Block saplingIn, float... fortuneIn) {
-    return droppingSilkOrShears(blockIn, applyExplosionCondition(blockIn, LootItem.lootTableItem(saplingIn)).when(BonusLevelTableCondition.bonusLevelFlatChance(Enchantments.BLOCK_FORTUNE, fortuneIn)));
+    return droppingSilkOrShears(blockIn, this.applyExplosionCondition(blockIn, LootItem.lootTableItem(saplingIn)).when(BonusLevelTableCondition.bonusLevelFlatChance(Enchantments.BLOCK_FORTUNE, fortuneIn)));
   }
 
   private LootTable.Builder randomDropSlimeBallOrSapling(SlimeType foliageType, Block blockIn, Block sapling, float... fortuneIn) {
-    return dropSapling(blockIn, sapling, fortuneIn)
+    return this.dropSapling(blockIn, sapling, fortuneIn)
       .withPool(LootPool.lootPool()
         .setRolls(ConstantValue.exactly(1))
         .when(HAS_NO_SHEARS_OR_SILK_TOUCH)
-        .add(applyExplosionCondition(blockIn, LootItem.lootTableItem(TinkerCommons.slimeball.get(foliageType)))
-          .when(BonusLevelTableCondition.bonusLevelFlatChance(Enchantments.BLOCK_FORTUNE, 1/50f, 1/45f, 1/40f, 1/30f, 1/20f))));
+        .add(this.applyExplosionCondition(blockIn, LootItem.lootTableItem(TinkerCommons.slimeball.get(foliageType)))
+          .when(BonusLevelTableCondition.bonusLevelFlatChance(Enchantments.BLOCK_FORTUNE, 1 / 50f, 1 / 45f, 1 / 40f, 1 / 30f, 1 / 20f))));
 
   }
 
-  private LootTable.Builder droppingWithFunctions(Block block, Function<LootItem.Builder<?>,LootItem.Builder<?>> mapping) {
-    return LootTable.lootTable().withPool(applyExplosionCondition(block, LootPool.lootPool().setRolls(ConstantValue.exactly(1)).add(mapping.apply(LootItem.lootTableItem(block)))));
+  private LootTable.Builder droppingWithFunctions(Block block, Function<LootItem.Builder<?>, LootItem.Builder<?>> mapping) {
+    return LootTable.lootTable().withPool(this.applyExplosionCondition(block, LootPool.lootPool().setRolls(ConstantValue.exactly(1)).add(mapping.apply(LootItem.lootTableItem(block)))));
   }
 
   /**
    * Registers all loot tables for a building block object
-   * @param object  Object instance
+   *
+   * @param object Object instance
    */
   private void registerBuildingLootTables(BuildingBlockObject object) {
     this.dropSelf(object.get());
@@ -323,25 +324,29 @@ public class BlockLootTableProvider extends ModdedBlockLootSubProvider {
 
   /**
    * Registers all loot tables for a wall building block object
-   * @param object  Object instance
+   *
+   * @param object Object instance
    */
   private void registerWallBuildingLootTables(WallBuildingBlockObject object) {
-    registerBuildingLootTables(object);
+    this.registerBuildingLootTables(object);
     this.dropSelf(object.getWall());
   }
 
   /**
    * Registers all loot tables for a fence building block object
-   * @param object  Object instance
+   *
+   * @param object Object instance
    */
   private void registerFenceBuildingLootTables(FenceBuildingBlockObject object) {
-    registerBuildingLootTables(object);
+    this.registerBuildingLootTables(object);
     this.dropSelf(object.getFence());
   }
 
-  /** Adds all loot tables relevant to the given wood object */
+  /**
+   * Adds all loot tables relevant to the given wood object
+   */
   private void registerWoodLootTables(WoodBlockObject object) {
-    registerFenceBuildingLootTables(object);
+    this.registerFenceBuildingLootTables(object);
     // basic
     this.dropSelf(object.getLog());
     this.dropSelf(object.getStrippedLog());
@@ -358,15 +363,19 @@ public class BlockLootTableProvider extends ModdedBlockLootSubProvider {
     this.dropSelf(object.getSign());
   }
 
-  private Function<Block, LootTable.Builder> ADD_TABLE = block -> droppingWithFunctions(block, (builder) ->
+  private final Function<Block, LootTable.Builder> ADD_TABLE = block -> this.droppingWithFunctions(block, (builder) ->
     builder.apply(CopyNameFunction.copyName(CopyNameFunction.NameSource.BLOCK_ENTITY)).apply(RetexturedLootFunction::new));
 
-  /** Registers a block that drops with its own texture stored in NBT */
+  /**
+   * Registers a block that drops with its own texture stored in NBT
+   */
   private void dropTable(Block table) {
-    this.add(table, ADD_TABLE);
+    this.add(table, this.ADD_TABLE);
   }
 
-  /** Adds all loot tables relevant to the given geode block set */
+  /**
+   * Adds all loot tables relevant to the given geode block set
+   */
   private void registerGeode(GeodeItemObject geode) {
     this.dropSelf(geode.getBlock());
     // cluster
@@ -375,7 +384,7 @@ public class BlockLootTableProvider extends ModdedBlockLootSubProvider {
         .apply(SetItemCountFunction.setCount(ConstantValue.exactly(4.0F)))
         .apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE))
         .when(MatchTool.toolMatches(ItemPredicate.Builder.item().of(ItemTags.CLUSTER_MAX_HARVESTABLES)))
-        .otherwise(applyExplosionDecay(block, LootItem.lootTableItem(geode.get()).apply(SetItemCountFunction.setCount(ConstantValue.exactly(2.0F)))))));
+        .otherwise(this.applyExplosionDecay(block, LootItem.lootTableItem(geode.get()).apply(SetItemCountFunction.setCount(ConstantValue.exactly(2.0F)))))));
     // buds
     for (BudSize size : BudSize.SIZES) {
       this.dropWhenSilkTouch(geode.getBud(size));

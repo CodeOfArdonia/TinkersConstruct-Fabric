@@ -34,8 +34,10 @@ import java.util.Locale;
 
 @SuppressWarnings("removal")
 public class SearedTankBlock extends SearedBlock implements ITankBlock, EntityBlock, BlockPickInteractionAware, LightEmissiveBlock {
+
   @Getter
   private final long capacity;
+
   public SearedTankBlock(Properties properties, long capacity) {
     super(properties);
     this.capacity = capacity;

@@ -19,6 +19,7 @@ import java.util.List;
  * Modifiable item that supports left click and right click interaction
  */
 public class ModifiableStaffItem extends ModifiableItem {
+
   public ModifiableStaffItem(Properties properties, ToolDefinition toolDefinition, ResourceKey<CreativeModeTab> tab) {
     super(properties, toolDefinition, tab);
   }

@@ -13,6 +13,7 @@ import slimeknights.tconstruct.tools.modifiers.ability.tool.OffhandAttackModifie
 
 // TODO: rename in 1.19
 public class UnarmedModifier extends OffhandAttackModifier {
+
   @Override
   public void addToolStats(ToolRebuildContext context, int level, ModifierStatsBuilder builder) {
     // main hand has 4.0 attack speed, so make the offhand have that too

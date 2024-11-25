@@ -28,20 +28,33 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
 
-/** Modifier that has an inventory */
+/**
+ * Modifier that has an inventory
+ */
 @RequiredArgsConstructor
 public class InventoryModifier extends Modifier implements InventoryModifierHook {
-  /** Mod Data NBT mapper to get a compound list */
-  protected static final BiFunction<CompoundTag,String,ListTag> GET_COMPOUND_LIST = (nbt, name) -> nbt.getList(name, Tag.TAG_COMPOUND);
-  /** Error for if the container has items preventing modifier removal */
+
+  /**
+   * Mod Data NBT mapper to get a compound list
+   */
+  protected static final BiFunction<CompoundTag, String, ListTag> GET_COMPOUND_LIST = (nbt, name) -> nbt.getList(name, Tag.TAG_COMPOUND);
+  /**
+   * Error for if the container has items preventing modifier removal
+   */
   private static final ValidatedResult HAS_ITEMS = ValidatedResult.failure(TConstruct.makeTranslationKey("modifier", "inventory_cannot_remove"));
-  /** NBT key to store the slot for a stack */
+  /**
+   * NBT key to store the slot for a stack
+   */
   protected static final String TAG_SLOT = "Slot";
 
-  /** Persistent data key for the inventory storage, if null uses the modifier ID */
+  /**
+   * Persistent data key for the inventory storage, if null uses the modifier ID
+   */
   @Nullable
   private final ResourceLocation inventoryKey;
-  /** Number of slots to add per modifier level */
+  /**
+   * Number of slots to add per modifier level
+   */
   protected final int slotsPerLevel;
 
   private final List<CompoundTag> snapshots = new ArrayList<>();
@@ -50,26 +63,29 @@ public class InventoryModifier extends Modifier implements InventoryModifierHook
     this(null, slotsPerLevel);
   }
 
-  /** Gets the inventory key used for NBT serializing */
+  /**
+   * Gets the inventory key used for NBT serializing
+   */
   protected ResourceLocation getInventoryKey() {
-    return inventoryKey == null ? getId() : inventoryKey;
+    return this.inventoryKey == null ? this.getId() : this.inventoryKey;
   }
 
   @Override
   public void addVolatileData(ToolRebuildContext context, int level, ModDataNBT volatileData) {
-    ToolInventoryCapability.addSlots(volatileData, getSlots(context, level));
+    ToolInventoryCapability.addSlots(volatileData, this.getSlots(context, level));
   }
 
   /**
    * Same as {@link #validate(IToolStackView, int)} but allows passing in a max slots count.
    * Allows the subclass to validate on a different max slots if needed
-   * @param tool      Tool to check
-   * @param maxSlots  Max slots to use in the check
-   * @return  True if the number of slots is valid
+   *
+   * @param tool     Tool to check
+   * @param maxSlots Max slots to use in the check
+   * @return True if the number of slots is valid
    */
   protected ValidatedResult validateForMaxSlots(IToolStackView tool, int maxSlots) {
     IModDataView persistentData = tool.getPersistentData();
-    ResourceLocation key = getInventoryKey();
+    ResourceLocation key = this.getInventoryKey();
     if (persistentData.contains(key, Tag.TAG_LIST)) {
       ListTag listNBT = persistentData.get(key, GET_COMPOUND_LIST);
       if (!listNBT.isEmpty()) {
@@ -78,7 +94,7 @@ public class InventoryModifier extends Modifier implements InventoryModifierHook
         }
         // first, see whether we have any available slots
         BitSet freeSlots = new BitSet(maxSlots);
-        freeSlots.set(0, maxSlots-1, true);
+        freeSlots.set(0, maxSlots - 1, true);
         for (int i = 0; i < listNBT.size(); i++) {
           freeSlots.set(listNBT.getCompound(i).getInt(TAG_SLOT), false);
         }
@@ -101,19 +117,19 @@ public class InventoryModifier extends Modifier implements InventoryModifierHook
 
   @Override
   public ValidatedResult validate(IToolStackView tool, int level) {
-    return validateForMaxSlots(tool, level == 0 ? 0 : getSlots(tool, level));
+    return this.validateForMaxSlots(tool, level == 0 ? 0 : this.getSlots(tool, level));
   }
 
   @Override
   public void onRemoved(IToolStackView tool) {
-    tool.getPersistentData().remove(getInventoryKey());
+    tool.getPersistentData().remove(this.getInventoryKey());
   }
 
   @Override
   public ItemStack getStack(IToolStackView tool, ModifierEntry modifier, int slot) {
     IModDataView modData = tool.getPersistentData();
-    ResourceLocation key = getInventoryKey();
-    if (slot < getSlots(tool, modifier) && modData.contains(key, Tag.TAG_LIST)) {
+    ResourceLocation key = this.getInventoryKey();
+    if (slot < this.getSlots(tool, modifier) && modData.contains(key, Tag.TAG_LIST)) {
       ListTag list = tool.getPersistentData().get(key, GET_COMPOUND_LIST);
       for (int i = 0; i < list.size(); i++) {
         CompoundTag compound = list.getCompound(i);
@@ -127,11 +143,11 @@ public class InventoryModifier extends Modifier implements InventoryModifierHook
 
   @Override
   public void setStack(IToolStackView tool, ModifierEntry modifier, int slot, ItemStack stack) {
-    if (slot < getSlots(tool, modifier)) {
+    if (slot < this.getSlots(tool, modifier)) {
       ListTag list;
       ModDataNBT modData = tool.getPersistentData();
       // if the tag exists, fetch it
-      ResourceLocation key = getInventoryKey();
+      ResourceLocation key = this.getInventoryKey();
       if (modData.contains(key, Tag.TAG_LIST)) {
         list = modData.get(key, GET_COMPOUND_LIST);
         // first, try to find an existing stack in the slot
@@ -166,37 +182,38 @@ public class InventoryModifier extends Modifier implements InventoryModifierHook
   @Override
   public void updateSnapshots(IToolStackView tool, ModifierEntry modifier, int slot, TransactionContext transaction) {
     // Make sure we have enough storage for snapshots
-    while (snapshots.size() <= transaction.nestingDepth()) {
-      snapshots.add(null);
+    while (this.snapshots.size() <= transaction.nestingDepth()) {
+      this.snapshots.add(null);
     }
 
     // If the snapshot is null, we need to create it, and we need to register a callback.
-    if (snapshots.get(transaction.nestingDepth()) == null) {
+    if (this.snapshots.get(transaction.nestingDepth()) == null) {
       CompoundTag snapshot = new CompoundTag();
       tool.getPersistentData().writeToNbt(snapshot);
       Objects.requireNonNull(snapshot, "Snapshot may not be null!");
 
-      snapshots.set(transaction.nestingDepth(), snapshot);
+      this.snapshots.set(transaction.nestingDepth(), snapshot);
       transaction.addCloseCallback(new OnClose(tool));
     }
   }
 
   @AllArgsConstructor
   public class OnClose implements TransactionContext.CloseCallback {
+
     private final IToolStackView tool;
 
     @Override
     public void onClose(TransactionContext t, TransactionContext.Result result) {
       // Get and remove the relevant snapshot.
-      CompoundTag lastSnapshot = snapshots.set(t.nestingDepth(), null);
+      CompoundTag lastSnapshot = InventoryModifier.this.snapshots.set(t.nestingDepth(), null);
 
       if (result.wasAborted()) {
         // If the transaction was aborted, we just revert to the state of the snapshot.
-        tool.setPersistentData(ModDataNBT.readFromNBT(lastSnapshot));;
+        this.tool.setPersistentData(ModDataNBT.readFromNBT(lastSnapshot));
       } else if (t.nestingDepth() > 0) {
-        if (snapshots.get(t.nestingDepth() - 1) == null) {
+        if (InventoryModifier.this.snapshots.get(t.nestingDepth() - 1) == null) {
           // No snapshot yet, so move the snapshot one nesting level up.
-          snapshots.set(t.nestingDepth() - 1, lastSnapshot);
+          InventoryModifier.this.snapshots.set(t.nestingDepth() - 1, lastSnapshot);
           // This is the first snapshot at this level: we need to call addCloseCallback.
           t.getOpenTransaction(t.nestingDepth() - 1).addCloseCallback(this);
         }
@@ -204,14 +221,16 @@ public class InventoryModifier extends Modifier implements InventoryModifierHook
     }
   }
 
-  /** Gets the number of slots for this modifier */
+  /**
+   * Gets the number of slots for this modifier
+   */
   public int getSlots(IToolContext tool, int level) {
-    return level * slotsPerLevel;
+    return level * this.slotsPerLevel;
   }
 
   @Override
   public final int getSlots(IToolStackView tool, ModifierEntry modifier) {
-    return getSlots(tool, modifier.getLevel());
+    return this.getSlots(tool, modifier.getLevel());
   }
 
   @Override
@@ -220,7 +239,9 @@ public class InventoryModifier extends Modifier implements InventoryModifierHook
     hookBuilder.addHook(this, ToolInventoryCapability.HOOK);
   }
 
-  /** Writes a stack to NBT, including the slot */
+  /**
+   * Writes a stack to NBT, including the slot
+   */
   protected static CompoundTag write(ItemStack stack, int slot) {
     CompoundTag compound = new CompoundTag();
     stack.save(compound);

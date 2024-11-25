@@ -20,9 +20,12 @@ import slimeknights.tconstruct.library.utils.HarvestTiers;
 
 import java.util.Objects;
 
-/** Harvest logic that is effective if the tool has the correct tag with a fixed tier */
+/**
+ * Harvest logic that is effective if the tool has the correct tag with a fixed tier
+ */
 @RequiredArgsConstructor
 public class FixedTierHarvestLogic implements IHarvestLogic {
+
   public static final Loader LOADER = new Loader();
 
   protected final TagKey<Block> tag;
@@ -30,7 +33,7 @@ public class FixedTierHarvestLogic implements IHarvestLogic {
 
   @Override
   public boolean isEffective(IToolStackView tool, BlockState state) {
-    return state.is(tag) && TierSortingRegistry.isCorrectTierForDrops(getTier(tool), state);
+    return state.is(this.tag) && TierSortingRegistry.isCorrectTierForDrops(this.getTier(tool), state);
   }
 
   @Override
@@ -44,6 +47,7 @@ public class FixedTierHarvestLogic implements IHarvestLogic {
   }
 
   private static class Loader implements IGenericLoader<FixedTierHarvestLogic> {
+
     @Override
     public FixedTierHarvestLogic deserialize(JsonObject json) {
       TagKey<Block> tag = TagKey.create(Registries.BLOCK, JsonHelper.getResourceLocation(json, "effective"));
@@ -66,7 +70,9 @@ public class FixedTierHarvestLogic implements IHarvestLogic {
       return new FixedTierHarvestLogic(tag, tier);
     }
 
-    /** Helper to get tier name or error */
+    /**
+     * Helper to get tier name or error
+     */
     private static ResourceLocation getTierName(Tier tier) {
       return Objects.requireNonNull(TierSortingRegistry.getName(tier), "Attempt to serialize unregistered tier");
     }

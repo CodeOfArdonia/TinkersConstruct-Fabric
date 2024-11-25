@@ -36,10 +36,13 @@ import slimeknights.tconstruct.library.tools.nbt.NamespacedNBT;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
-/** @deprecated use {@link slimeknights.tconstruct.library.modifiers.modules.MobEffectModule} */
+/**
+ * @deprecated use {@link slimeknights.tconstruct.library.modifiers.modules.MobEffectModule}
+ */
 @Deprecated
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class MobEffectModifier extends IncrementalModifier implements ProjectileHitModifierHook, ProjectileLaunchModifierHook {
+
   private final MobEffect effect;
   private final float levelBase;
   private final float levelMultiplier;
@@ -47,22 +50,24 @@ public class MobEffectModifier extends IncrementalModifier implements Projectile
   private final int timeMultiplierFlat;
   private final int timeMultiplierRandom;
 
-  /** Applies the effect for the given level */
+  /**
+   * Applies the effect for the given level
+   */
   private void applyEffect(@Nullable LivingEntity target, float scaledLevel) {
     if (target == null) {
       return;
     }
-    int level = Math.round(levelBase + scaledLevel * levelMultiplier) - 1;
+    int level = Math.round(this.levelBase + scaledLevel * this.levelMultiplier) - 1;
     if (level < 0) {
       return;
     }
-    float duration = timeBase + scaledLevel * timeMultiplierFlat;
-    int randomBonus = (int)(timeMultiplierRandom * scaledLevel);
+    float duration = this.timeBase + scaledLevel * this.timeMultiplierFlat;
+    int randomBonus = (int) (this.timeMultiplierRandom * scaledLevel);
     if (randomBonus > 0) {
       duration += RANDOM.nextInt(randomBonus);
     }
     if (duration > 0) {
-      target.addEffect(new MobEffectInstance(effect, (int)duration, level));
+      target.addEffect(new MobEffectInstance(this.effect, (int) duration, level));
     }
   }
 
@@ -71,9 +76,9 @@ public class MobEffectModifier extends IncrementalModifier implements Projectile
     Entity attacker = source.getEntity();
     if (isDirectDamage && attacker instanceof LivingEntity living) {
       // 15% chance of working per level
-      float scaledLevel = getEffectiveLevel(tool, level);
+      float scaledLevel = this.getEffectiveLevel(tool, level);
       if (RANDOM.nextFloat() < (scaledLevel * 0.25f)) {
-        applyEffect(living, scaledLevel);
+        this.applyEffect(living, scaledLevel);
         ToolDamageUtil.damageAnimated(tool, 1, context.getEntity(), slotType);
       }
     }
@@ -81,18 +86,18 @@ public class MobEffectModifier extends IncrementalModifier implements Projectile
 
   @Override
   public int afterEntityHit(IToolStackView tool, int level, ToolAttackContext context, float damageDealt) {
-    applyEffect(context.getLivingTarget(), getEffectiveLevel(tool, level));
+    this.applyEffect(context.getLivingTarget(), this.getEffectiveLevel(tool, level));
     return 0;
   }
 
   @Override
   public void onProjectileLaunch(IToolStackView tool, ModifierEntry modifier, LivingEntity shooter, Projectile projectile, @Nullable AbstractArrow arrow, NamespacedNBT persistentData, boolean primary) {
-    persistentData.putFloat(getId(), modifier.getEffectiveLevel(tool));
+    persistentData.putFloat(this.getId(), modifier.getEffectiveLevel(tool));
   }
 
   @Override
   public boolean onProjectileHitEntity(ModifierNBT modifiers, NamespacedNBT persistentData, ModifierEntry modifier, Projectile projectile, EntityHitResult hit, @Nullable LivingEntity attacker, @Nullable LivingEntity target) {
-    applyEffect(target, persistentData.getFloat(getId()));
+    this.applyEffect(target, persistentData.getFloat(this.getId()));
     return false;
   }
 
@@ -106,7 +111,9 @@ public class MobEffectModifier extends IncrementalModifier implements Projectile
     return LOADER;
   }
 
-  /** Loader for this modifier */
+  /**
+   * Loader for this modifier
+   */
   public static final IGenericLoader<MobEffectModifier> LOADER = new IGenericLoader<>() {
     @Override
     public MobEffectModifier deserialize(JsonObject json) {
@@ -161,10 +168,13 @@ public class MobEffectModifier extends IncrementalModifier implements Projectile
     }
   };
 
-  /** Builder for this modifier in datagen */
+  /**
+   * Builder for this modifier in datagen
+   */
   @RequiredArgsConstructor(staticName = "effect")
   @Accessors(fluent = true)
   public static class Builder {
+
     private final MobEffect effect;
     private float levelBase = 1;
     private float levelMultiplier = 0;
@@ -177,19 +187,22 @@ public class MobEffectModifier extends IncrementalModifier implements Projectile
 
     /**
      * Sets the effect level
-     * @param base        Base level granted for the modifier
-     * @param multiplier  Bonus granted per level
-     * @return  Builder
+     *
+     * @param base       Base level granted for the modifier
+     * @param multiplier Bonus granted per level
+     * @return Builder
      */
     public Builder level(float base, float multiplier) {
-      levelBase = base;
-      levelMultiplier = multiplier;
+      this.levelBase = base;
+      this.levelMultiplier = multiplier;
       return this;
     }
 
-    /** Builds the finished modifier */
+    /**
+     * Builds the finished modifier
+     */
     public MobEffectModifier build() {
-      return new MobEffectModifier(effect, levelBase, levelMultiplier, timeBase, timeMultiplierFlat, timeMultiplierRandom);
+      return new MobEffectModifier(this.effect, this.levelBase, this.levelMultiplier, this.timeBase, this.timeMultiplierFlat, this.timeMultiplierRandom);
     }
   }
 }

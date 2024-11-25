@@ -7,6 +7,7 @@ import slimeknights.tconstruct.library.recipe.melting.IMeltingContainer.IOreRate
 import slimeknights.tconstruct.library.recipe.melting.IMeltingRecipe;
 
 public class ByproductMeltingModuleInventory extends MeltingModuleInventory {
+
   public ByproductMeltingModuleInventory(MantleBlockEntity parent, SlottedStorage<FluidVariant> fluidHandler, IOreRate oreRate, int size) {
     super(parent, fluidHandler, oreRate, size);
   }
@@ -18,7 +19,7 @@ public class ByproductMeltingModuleInventory extends MeltingModuleInventory {
   @Override
   protected boolean tryFillTank(int index, IMeltingRecipe recipe) {
     if (super.tryFillTank(index, recipe)) {
-      recipe.handleByproducts(getModule(index), fluidHandler);
+      recipe.handleByproducts(this.getModule(index), this.fluidHandler);
       return true;
     }
     return false;

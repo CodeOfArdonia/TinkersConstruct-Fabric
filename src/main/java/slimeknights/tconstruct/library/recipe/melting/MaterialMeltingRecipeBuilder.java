@@ -24,11 +24,14 @@ import java.util.function.Consumer;
 @SuppressWarnings("removal")
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class MaterialMeltingRecipeBuilder extends AbstractRecipeBuilder<MaterialMeltingRecipeBuilder> {
+
   private final MaterialVariantId inputId;
   private final int temperature;
   private final FluidStack result;
 
-  /** Creates a recipe using the fluids temperature */
+  /**
+   * Creates a recipe using the fluids temperature
+   */
   public static MaterialMeltingRecipeBuilder material(MaterialVariantId materialId, int temperature, FluidStack result) {
     if (temperature < 0) {
       throw new IllegalArgumentException("Invalid temperature " + temperature + ", must be 0 or greater");
@@ -36,19 +39,23 @@ public class MaterialMeltingRecipeBuilder extends AbstractRecipeBuilder<Material
     return new MaterialMeltingRecipeBuilder(materialId, temperature, result);
   }
 
-  /** Creates a recipe using the fluids temperature */
+  /**
+   * Creates a recipe using the fluids temperature
+   */
   public static MaterialMeltingRecipeBuilder material(MaterialVariantId materialId, FluidStack result) {
     return material(materialId, FluidVariantAttributes.getTemperature(result.getType()) - 300, result);
   }
 
-  /** Creates a recipe using the fluids temperature */
+  /**
+   * Creates a recipe using the fluids temperature
+   */
   public static MaterialMeltingRecipeBuilder material(MaterialId materialId, Fluid result, int amount) {
     return material(materialId, new FluidStack(result, amount));
   }
 
   @Override
   public void save(Consumer<FinishedRecipe> consumer) {
-    save(consumer, inputId.getId());
+    this.save(consumer, this.inputId.getId());
   }
 
   @Override
@@ -58,15 +65,16 @@ public class MaterialMeltingRecipeBuilder extends AbstractRecipeBuilder<Material
   }
 
   private class Result extends AbstractFinishedRecipe {
+
     public Result(ResourceLocation ID, @Nullable ResourceLocation advancementID) {
       super(ID, advancementID);
     }
 
     @Override
     public void serializeRecipeData(JsonObject json) {
-      json.addProperty("input", inputId.toString());
-      json.addProperty("temperature", temperature);
-      json.add("result", RecipeHelper.serializeFluidStack(result));
+      json.addProperty("input", MaterialMeltingRecipeBuilder.this.inputId.toString());
+      json.addProperty("temperature", MaterialMeltingRecipeBuilder.this.temperature);
+      json.add("result", RecipeHelper.serializeFluidStack(MaterialMeltingRecipeBuilder.this.result));
     }
 
     @Override

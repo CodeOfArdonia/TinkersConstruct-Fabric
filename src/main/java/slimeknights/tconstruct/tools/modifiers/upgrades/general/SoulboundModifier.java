@@ -23,7 +23,9 @@ import java.util.Collection;
 import java.util.Iterator;
 
 public class SoulboundModifier extends NoLevelsModifier {
+
   private static final ResourceLocation SLOT = TConstruct.getResource("soulbound_slot");
+
   public SoulboundModifier() {
     // high priority so we do it before other possibly death-inventory-modifying mods
     ServerPlayerEvents.ALLOW_DEATH.register(this::onPlayerDeath);
@@ -31,7 +33,9 @@ public class SoulboundModifier extends NoLevelsModifier {
     ServerPlayerEvents.COPY_FROM.register(this::onPlayerClone);
   }
 
-  /** Called when the player dies to store the item in the original inventory */
+  /**
+   * Called when the player dies to store the item in the original inventory
+   */
   private boolean onPlayerDeath(ServerPlayer player, DamageSource damageSource, float damageAmount) {
 //    if (event.isCanceled()) {
 //      return;
@@ -54,7 +58,9 @@ public class SoulboundModifier extends NoLevelsModifier {
     return true;
   }
 
-  /** Called when the player dies to store the item in the original inventory */
+  /**
+   * Called when the player dies to store the item in the original inventory
+   */
   private boolean onPlayerDropItems(LivingEntity entity, DamageSource source, Collection<ItemEntity> drops, int lootingLevel, boolean recentlyHit) {
 //    if (event.isCanceled()) {
 //      return;
@@ -92,7 +98,9 @@ public class SoulboundModifier extends NoLevelsModifier {
     return false;
   }
 
-  /** Called when the new player is created to fetch the soulbound item from the old */
+  /**
+   * Called when the new player is created to fetch the soulbound item from the old
+   */
   private void onPlayerClone(ServerPlayer original, ServerPlayer clone, boolean alive) {
     if (alive) {
       return;
@@ -104,7 +112,7 @@ public class SoulboundModifier extends NoLevelsModifier {
     // find the soulbound items
     Inventory originalInv = original.getInventory();
     Inventory cloneInv = clone.getInventory();
-    for(int i = 0; i < originalInv.getContainerSize(); i++) {
+    for (int i = 0; i < originalInv.getContainerSize(); i++) {
       ItemStack stack = originalInv.getItem(i);
       if (!stack.isEmpty() && stack.is(TinkerTags.Items.MODIFIABLE)) {
         ToolStack tool = ToolStack.from(stack);

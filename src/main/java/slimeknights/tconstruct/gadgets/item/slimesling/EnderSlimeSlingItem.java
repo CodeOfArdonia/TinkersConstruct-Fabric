@@ -17,15 +17,16 @@ public class EnderSlimeSlingItem extends BaseSlimeSlingItem {
     super(props, SlimeType.ENDER);
   }
 
-  /** Called when the player stops using an Item (stops holding the right mouse button). */
+  /**
+   * Called when the player stops using an Item (stops holding the right mouse button).
+   */
   @Override
   public void releaseUsing(ItemStack stack, Level worldIn, LivingEntity entityLiving, int timeLeft) {
-    if (worldIn.isClientSide || !(entityLiving instanceof ServerPlayer)) {
+    if (worldIn.isClientSide || !(entityLiving instanceof ServerPlayer player)) {
       return;
     }
 
-    ServerPlayer player = (ServerPlayer) entityLiving;
-    float f = getForce(stack, timeLeft);
+    float f = this.getForce(stack, timeLeft);
 
     Vec3 look = player.getLookAngle();
     double offX = look.x * f;
@@ -69,10 +70,10 @@ public class EnderSlimeSlingItem extends BaseSlimeSlingItem {
           worldIn.addParticle(ParticleTypes.PORTAL, player.getX(), player.getY() + worldIn.random.nextDouble() * 2.0D, player.getZ(), worldIn.random.nextGaussian(), 0.0D, worldIn.random.nextGaussian());
         }
         worldIn.playSound(null, player.getX(), player.getY(), player.getZ(), Sounds.SLIME_SLING_TELEPORT.getSound(), player.getSoundSource(), 1f, 1f);
-        onSuccess(player, stack);
+        this.onSuccess(player, stack);
         return;
       }
     }
-    playMissSound(player);
+    this.playMissSound(player);
   }
 }

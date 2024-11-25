@@ -11,9 +11,12 @@ import slimeknights.tconstruct.world.TinkerWorld;
 
 import javax.annotation.Nullable;
 
-/** Common logic for slime islands, that is islands made of slimy dirt and grass */
+/**
+ * Common logic for slime islands, that is islands made of slimy dirt and grass
+ */
 @RequiredArgsConstructor
 public abstract class AbstractSlimeIslandVariant implements IIslandVariant {
+
   @Getter
   private final int index;
   protected final SlimeType dirtType;
@@ -21,21 +24,23 @@ public abstract class AbstractSlimeIslandVariant implements IIslandVariant {
 
   @Override
   public BlockState getLakeBottom() {
-    return TinkerWorld.slimeGrass.get(dirtType).get(foliageType).defaultBlockState();
+    return TinkerWorld.slimeGrass.get(this.dirtType).get(this.foliageType).defaultBlockState();
   }
 
-  /** Gets the type of congealed slime to place */
+  /**
+   * Gets the type of congealed slime to place
+   */
   protected abstract SlimeType getCongealedSlimeType(RandomSource random);
 
   @Override
   public BlockState getCongealedSlime(RandomSource random) {
-    return TinkerWorld.congealedSlime.get(getCongealedSlimeType(random)).defaultBlockState();
+    return TinkerWorld.congealedSlime.get(this.getCongealedSlimeType(random)).defaultBlockState();
   }
 
   @Nullable
   @Override
   public BlockState getPlant(RandomSource random) {
-    EnumObject<SlimeType,? extends Block> enumObject = random.nextInt(8) == 0 ? TinkerWorld.slimeFern : TinkerWorld.slimeTallGrass;
-    return enumObject.get(foliageType).defaultBlockState();
+    EnumObject<SlimeType, ? extends Block> enumObject = random.nextInt(8) == 0 ? TinkerWorld.slimeFern : TinkerWorld.slimeTallGrass;
+    return enumObject.get(this.foliageType).defaultBlockState();
   }
 }

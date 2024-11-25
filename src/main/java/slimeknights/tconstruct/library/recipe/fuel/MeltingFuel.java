@@ -25,6 +25,7 @@ import java.util.List;
  * Recipe for a fuel for the melter or smeltery
  */
 public class MeltingFuel implements ICustomOutputRecipe<IFluidContainer> {
+
   @Getter
   private final ResourceLocation id;
   @Getter
@@ -51,42 +52,46 @@ public class MeltingFuel implements ICustomOutputRecipe<IFluidContainer> {
 
   @Override
   public boolean matches(IFluidContainer inv, Level worldIn) {
-    return matches(inv.getFluid());
+    return this.matches(inv.getFluid());
   }
 
   /**
    * Checks if this fuel matches the given fluid
-   * @param fluid  Fluid
-   * @return  True if matches
+   *
+   * @param fluid Fluid
+   * @return True if matches
    */
   public boolean matches(Fluid fluid) {
-    return input.test(fluid);
+    return this.input.test(fluid);
   }
 
   /**
    * Gets the amount of fluid consumed for the given fluid
-   * @param inv  Inventory instance
-   * @return  Amount of fluid consumed
+   *
+   * @param inv Inventory instance
+   * @return Amount of fluid consumed
    */
   public long getAmount(IFluidContainer inv) {
-    return getAmount(inv.getFluid());
+    return this.getAmount(inv.getFluid());
   }
 
   /**
    * Gets the amount of fluid consumed for the given fluid
-   * @param fluid  Fluid
-   * @return  Amount of fluid consumed
+   *
+   * @param fluid Fluid
+   * @return Amount of fluid consumed
    */
   public long getAmount(Fluid fluid) {
-    return input.getAmount(fluid);
+    return this.input.getAmount(fluid);
   }
 
   /**
    * Gets a list of all valid input fluids for this recipe
-   * @return  Input fluids
+   *
+   * @return Input fluids
    */
   public List<FluidStack> getInputs() {
-    return input.getFluids();
+    return this.input.getFluids();
   }
 
   /* Recipe type methods */
@@ -110,6 +115,7 @@ public class MeltingFuel implements ICustomOutputRecipe<IFluidContainer> {
    * Serializer for {@link MeltingFuel}
    */
   public static class Serializer extends LoggingRecipeSerializer<MeltingFuel> {
+
     @Override
     public MeltingFuel fromJson(ResourceLocation id, JsonObject json) {
       String group = GsonHelper.getAsString(json, "group", "");

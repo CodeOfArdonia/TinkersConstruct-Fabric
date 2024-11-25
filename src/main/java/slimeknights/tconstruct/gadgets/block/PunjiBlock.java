@@ -6,10 +6,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Direction.AxisDirection;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -44,12 +42,12 @@ public class PunjiBlock extends Block implements LandPathNodeTypesRegistry.Stati
   public PunjiBlock(Properties properties) {
     super(properties);
     this.registerDefaultState(this.stateDefinition.any()
-                                            .setValue(FACING, Direction.DOWN)
-                                            .setValue(NORTH, false)
-                                            .setValue(EAST, false)
-                                            .setValue(NORTHEAST, false)
-                                            .setValue(NORTHWEST, false)
-                                            .setValue(WATERLOGGED, false));
+      .setValue(FACING, Direction.DOWN)
+      .setValue(NORTH, false)
+      .setValue(EAST, false)
+      .setValue(NORTHEAST, false)
+      .setValue(NORTHWEST, false)
+      .setValue(WATERLOGGED, false));
     LandPathNodeTypesRegistry.register(this, this);
   }
 
@@ -77,15 +75,15 @@ public class PunjiBlock extends Block implements LandPathNodeTypesRegistry.Stati
     Direction north = getLocalNorth(direction);
     Direction east = getLocalEast(direction);
     if (facing == north) {
-      state = state.setValue(NORTH, isConnected(world, direction, facingPos));
+      state = state.setValue(NORTH, this.isConnected(world, direction, facingPos));
     } else if (facing == east) {
-      state = state.setValue(EAST, isConnected(world, direction, facingPos));
+      state = state.setValue(EAST, this.isConnected(world, direction, facingPos));
     }
 
     // always update northeast and northwest, never gets direct updates
     BlockPos northPos = pos.relative(north);
-    return state.setValue(NORTHEAST, isConnected(world, direction, northPos.relative(east)))
-                .setValue(NORTHWEST, isConnected(world, direction, northPos.relative(east.getOpposite())));
+    return state.setValue(NORTHEAST, this.isConnected(world, direction, northPos.relative(east)))
+      .setValue(NORTHWEST, this.isConnected(world, direction, northPos.relative(east.getOpposite())));
   }
 
   @Override
@@ -122,19 +120,20 @@ public class PunjiBlock extends Block implements LandPathNodeTypesRegistry.Stati
     Direction north = getLocalNorth(direction);
     Direction east = getLocalEast(direction);
     BlockPos northPos = pos.relative(north);
-    return state.setValue(NORTH,     isConnected(world, direction, northPos))
-                .setValue(EAST,      isConnected(world, direction, pos.relative(east)))
-                .setValue(NORTHEAST, isConnected(world, direction, northPos.relative(east)))
-                .setValue(NORTHWEST, isConnected(world, direction, northPos.relative(east.getOpposite())))
-                .setValue(WATERLOGGED, context.getLevel().getFluidState(context.getClickedPos()).getType() == Fluids.WATER);
+    return state.setValue(NORTH, this.isConnected(world, direction, northPos))
+      .setValue(EAST, this.isConnected(world, direction, pos.relative(east)))
+      .setValue(NORTHEAST, this.isConnected(world, direction, northPos.relative(east)))
+      .setValue(NORTHWEST, this.isConnected(world, direction, northPos.relative(east.getOpposite())))
+      .setValue(WATERLOGGED, context.getLevel().getFluidState(context.getClickedPos()).getType() == Fluids.WATER);
   }
 
   /**
    * Checks if this should connect to the block at the position
-   * @param world   World instance
-   * @param facing  Punji stick facing
-   * @param target  Position to check
-   * @return  True if connected
+   *
+   * @param world  World instance
+   * @param facing Punji stick facing
+   * @param target Position to check
+   * @return True if connected
    */
   private boolean isConnected(LevelReader world, Direction facing, BlockPos target) {
     BlockState state = world.getBlockState(target);
@@ -143,8 +142,9 @@ public class PunjiBlock extends Block implements LandPathNodeTypesRegistry.Stati
 
   /**
    * Gets the facing relative north
-   * @param facing  Punji stick facing
-   * @return  North for the given facing
+   *
+   * @param facing Punji stick facing
+   * @return North for the given facing
    */
   private static Direction getLocalNorth(Direction facing) {
     return switch (facing) {
@@ -156,8 +156,9 @@ public class PunjiBlock extends Block implements LandPathNodeTypesRegistry.Stati
 
   /**
    * Gets the facing relative east
-   * @param facing  Punji stick facing
-   * @return  East for the given facing
+   *
+   * @param facing Punji stick facing
+   * @return East for the given facing
    */
   private static Direction getLocalEast(Direction facing) {
     if (facing.getAxis() == Axis.Y) {

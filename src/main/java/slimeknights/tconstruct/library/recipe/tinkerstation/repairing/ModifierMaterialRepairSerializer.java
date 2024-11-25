@@ -18,13 +18,14 @@ import javax.annotation.Nullable;
  */
 @RequiredArgsConstructor
 public class ModifierMaterialRepairSerializer<T extends Recipe<?> & IModifierMaterialRepairRecipe> extends LoggingRecipeSerializer<T> {
+
   private final IFactory<T> factory;
 
   @Override
   public T fromJson(ResourceLocation id, JsonObject json) {
     ModifierId modifier = new ModifierId(JsonHelper.getResourceLocation(json, "modifier"));
     MaterialId repairMaterial = MaterialId.fromJson(json, "repair_material");
-    return factory.create(id, modifier, repairMaterial);
+    return this.factory.create(id, modifier, repairMaterial);
   }
 
   @Nullable
@@ -32,7 +33,7 @@ public class ModifierMaterialRepairSerializer<T extends Recipe<?> & IModifierMat
   protected T fromNetworkSafe(ResourceLocation id, FriendlyByteBuf buffer) {
     ModifierId modifierId = new ModifierId(buffer.readUtf(Short.MAX_VALUE));
     MaterialId repairMaterial = new MaterialId(buffer.readUtf(Short.MAX_VALUE));
-    return factory.create(id, modifierId, repairMaterial);
+    return this.factory.create(id, modifierId, repairMaterial);
   }
 
   @Override
@@ -41,18 +42,28 @@ public class ModifierMaterialRepairSerializer<T extends Recipe<?> & IModifierMat
     buffer.writeUtf(recipe.getRepairMaterial().toString());
   }
 
-  /** Interface for serializing the recipe */
+  /**
+   * Interface for serializing the recipe
+   */
   public interface IModifierMaterialRepairRecipe {
-    /** Gets the modifier required to apply this repair */
+
+    /**
+     * Gets the modifier required to apply this repair
+     */
     ModifierId getModifier();
 
-    /** Gets the material ID from the recipe */
+    /**
+     * Gets the material ID from the recipe
+     */
     MaterialId getRepairMaterial();
   }
 
-  /** Factory constructor for this serializer */
+  /**
+   * Factory constructor for this serializer
+   */
   @FunctionalInterface
   public interface IFactory<T extends Recipe<?> & IModifierMaterialRepairRecipe> {
+
     T create(ResourceLocation id, ModifierId modifierId, MaterialId repairMaterial);
   }
 }

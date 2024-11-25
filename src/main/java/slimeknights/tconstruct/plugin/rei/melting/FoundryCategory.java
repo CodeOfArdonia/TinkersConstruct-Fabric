@@ -27,11 +27,16 @@ import slimeknights.tconstruct.smeltery.TinkerSmeltery;
 
 import java.util.List;
 
-/** Extension of melting for byproducts, but ditchs solid fuels */
+/**
+ * Extension of melting for byproducts, but ditchs solid fuels
+ */
 public class FoundryCategory extends AbstractMeltingCategory {
+
   private static final Component TITLE = TConstruct.makeTranslation("jei", "foundry.title");
 
-  /** Tooltip callback for fluids */
+  /**
+   * Tooltip callback for fluids
+   */
   private static final IRecipeTooltipReplacement METAL_ORE_TOOLTIP = new MeltingFluidCallback(IMeltingContainer.OreRateType.METAL);
   private static final IRecipeTooltipReplacement GEM_ORE_TOOLTIP = new MeltingFluidCallback(IMeltingContainer.OreRateType.GEM);
   @Getter
@@ -56,7 +61,7 @@ public class FoundryCategory extends AbstractMeltingCategory {
   public void addWidgets(MeltingDisplay display, List<Widget> ingredients, Point origin, Rectangle bounds) {
     super.addWidgets(display, ingredients, origin, bounds);
     // input
-    ingredients.add(slot(24, 18, origin).markInput().disableBackground().entries(display.getInputEntries().get(0)));
+    ingredients.add(this.slot(24, 18, origin).markInput().disableBackground().entries(display.getInputEntries().get(0)));
 
     // output fluid
     IMeltingContainer.OreRateType oreType = display.getOreType();
@@ -71,7 +76,7 @@ public class FoundryCategory extends AbstractMeltingCategory {
     AlloyRecipeCategory.drawVariableFluids(ingredients, false, 96, 4, origin, 32, 32, display.getRecipe().getOutputWithByproducts(), FluidValues.METAL_BLOCK, tooltip);
 
     // fuel
-    Slot renderSlot = slot(4, 4, origin)
+    Slot renderSlot = this.slot(4, 4, origin)
       .disableBackground()
       .entries(EntryIngredients.of(VanillaEntryTypes.FLUID, TinkersCategory.toREIFluids(MeltingFuelHandler.getUsableFuels(display.getTemperature()))));
     TinkersCategory.setEntryTooltip(renderSlot, FUEL_TOOLTIP);
@@ -79,15 +84,18 @@ public class FoundryCategory extends AbstractMeltingCategory {
     ingredients.add(renderSlot);
   }
 
-  /** Adds amounts to outputs and temperatures to fuels */
+  /**
+   * Adds amounts to outputs and temperatures to fuels
+   */
   @RequiredArgsConstructor
   private static class MeltingFluidCallback extends AbstractMeltingCategory.MeltingFluidCallback {
+
     @Getter
     private final IMeltingContainer.OreRateType oreRate;
 
     @Override
     protected boolean appendMaterial(FluidStack stack, List<Component> list) {
-      return FluidTooltipHandler.appendMaterialNoShift(stack.getFluid(), Config.COMMON.foundryOreRate.applyOreBoost(oreRate, stack.getAmount()), list);
+      return FluidTooltipHandler.appendMaterialNoShift(stack.getFluid(), Config.COMMON.foundryOreRate.applyOreBoost(this.oreRate, stack.getAmount()), list);
     }
   }
 }

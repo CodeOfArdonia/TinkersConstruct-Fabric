@@ -14,8 +14,11 @@ import slimeknights.tconstruct.library.utils.JsonUtils;
 import slimeknights.tconstruct.library.utils.TeleportHelper;
 import slimeknights.tconstruct.library.utils.TeleportHelper.ITeleportEventFactory;
 
-/** Effect that teleports the entity */
+/**
+ * Effect that teleports the entity
+ */
 public class TeleportSpillingEffect implements ISpillingEffect {
+
   public static final ResourceLocation ID = TConstruct.getResource("teleport");
   public static final TeleportSpillingEffect INSTANCE = new TeleportSpillingEffect();
   public static final JsonDeserializer<TeleportSpillingEffect> LOADER = (json, type, context) -> INSTANCE;

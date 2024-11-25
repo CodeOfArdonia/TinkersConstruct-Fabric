@@ -13,9 +13,12 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class SweepingEdgeModifier extends IncrementalModifier {
+
   private static final Component SWEEPING_BONUS = TConstruct.makeTranslation("modifier", "sweeping_edge.attack_damage");
 
-  /** Gets the damage dealt by this tool, boosted properly by sweeping */
+  /**
+   * Gets the damage dealt by this tool, boosted properly by sweeping
+   */
   public float getSweepingDamage(IToolStackView toolStack, float baseDamage) {
     int level = toolStack.getModifierLevel(this);
     float sweepingDamage = 1;
@@ -23,14 +26,14 @@ public class SweepingEdgeModifier extends IncrementalModifier {
       sweepingDamage = baseDamage;
     } else if (level > 0) {
       // gives 25% per level, cap at base damage
-      sweepingDamage = Math.min(baseDamage, getScaledLevel(toolStack, level) * 0.25f * baseDamage + 1);
+      sweepingDamage = Math.min(baseDamage, this.getScaledLevel(toolStack, level) * 0.25f * baseDamage + 1);
     }
     return sweepingDamage;
   }
 
   @Override
   public void addInformation(IToolStackView tool, int level, @Nullable Player player, List<Component> tooltip, TooltipKey tooltipKey, TooltipFlag tooltipFlag) {
-    float amount = getScaledLevel(tool, level) * 0.25f;
-    tooltip.add(applyStyle(Component.literal(Util.PERCENT_FORMAT.format(amount)).append(" ").append(SWEEPING_BONUS)));
+    float amount = this.getScaledLevel(tool, level) * 0.25f;
+    tooltip.add(this.applyStyle(Component.literal(Util.PERCENT_FORMAT.format(amount)).append(" ").append(SWEEPING_BONUS)));
   }
 }

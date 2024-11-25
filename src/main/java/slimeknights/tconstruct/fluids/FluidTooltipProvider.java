@@ -21,6 +21,7 @@ import static slimeknights.tconstruct.common.TinkerTags.Fluids.WATER_TOOLTIPS;
 
 @SuppressWarnings("removal")
 public class FluidTooltipProvider extends AbstractFluidTooltipProvider {
+
   public FluidTooltipProvider(FabricDataOutput output) {
     super(output, TConstruct.MOD_ID);
   }
@@ -28,51 +29,51 @@ public class FluidTooltipProvider extends AbstractFluidTooltipProvider {
   @Override
   protected void addFluids() {
     // screen capacities
-    add("ingots").addUnit("ingot", FluidValues.INGOT);
-    addRedirect(AlloyerContainerMenu.TOOLTIP_FORMAT, id("ingots"));
-    addRedirect(MelterContainerMenu.TOOLTIP_FORMAT, id("ingots"));
-    addRedirect(TinkerSmeltery.smeltery.getId(), id("ingots"));
-    addRedirect(TinkerSmeltery.foundry.getId(), id("ingots"));
+    this.add("ingots").addUnit("ingot", FluidValues.INGOT);
+    this.addRedirect(AlloyerContainerMenu.TOOLTIP_FORMAT, this.id("ingots"));
+    this.addRedirect(MelterContainerMenu.TOOLTIP_FORMAT, this.id("ingots"));
+    this.addRedirect(TinkerSmeltery.smeltery.getId(), this.id("ingots"));
+    this.addRedirect(TinkerSmeltery.foundry.getId(), this.id("ingots"));
 
     // standard fluids
-    add("metals", METAL_TOOLTIPS)
+    this.add("metals", METAL_TOOLTIPS)
       .addUnit("block", FluidValues.METAL_BLOCK)
       .addUnit("ingot", FluidValues.INGOT)
       .addUnit("nugget", FluidValues.NUGGET);
-    add("large_gems", LARGE_GEM_TOOLTIPS)
+    this.add("large_gems", LARGE_GEM_TOOLTIPS)
       .addUnit("block", FluidValues.LARGE_GEM_BLOCK)
       .addUnit("gem", FluidValues.GEM)
       .addUnit("shard", FluidValues.GEM_SHARD);
-    add("small_gems", SMALL_GEM_TOOLTIPS)
+    this.add("small_gems", SMALL_GEM_TOOLTIPS)
       .addUnit("block", FluidValues.SMALL_GEM_BLOCK)
       .addUnit("gem", FluidValues.GEM)
       .addUnit("shard", FluidValues.GEM_SHARD);
 
-    add("clay", CLAY_TOOLTIPS)
+    this.add("clay", CLAY_TOOLTIPS)
       .addUnit("block", FluidValues.BRICK_BLOCK)
       .addUnit("brick", FluidValues.BRICK);
-    add("slime", SLIME_TOOLTIPS)
+    this.add("slime", SLIME_TOOLTIPS)
       .addUnit("block", FluidValues.SLIME_BLOCK)
       .addUnit("slimeball", FluidValues.SLIMEBALL);
-    add("glass", GLASS_TOOLTIPS)
+    this.add("glass", GLASS_TOOLTIPS)
       .addUnit("block", FluidValues.GLASS_BLOCK)
       .addUnit("pane", FluidValues.GLASS_PANE);
 
-    add("water", WATER_TOOLTIPS)
+    this.add("water", WATER_TOOLTIPS)
       .addUnit("kilobucket", "mantle", FluidConstants.BUCKET * 1000)
-      .addUnit("bucket",     "mantle", FluidConstants.BUCKET)
+      .addUnit("bucket", "mantle", FluidConstants.BUCKET)
       .addUnit("bottle", FluidValues.BOTTLE);
-    add("venom", TinkerFluids.venom.getLocalTag())
+    this.add("venom", TinkerFluids.venom.getLocalTag())
       .addUnit("kilobucket", "mantle", FluidConstants.BUCKET * 1000)
-      .addUnit("bucket",     "mantle", FluidConstants.BUCKET)
+      .addUnit("bucket", "mantle", FluidConstants.BUCKET)
       .addUnit("bottle", FluidValues.BOTTLE);
-    add("honey", TinkerFluids.honey.getForgeTag())
+    this.add("honey", TinkerFluids.honey.getForgeTag())
       .addUnit("block", FluidValues.BOTTLE * 4)
       .addUnit("bottle", FluidValues.BOTTLE);
-    add("soup", SOUP_TOOLTIPS)
+    this.add("soup", SOUP_TOOLTIPS)
       .addUnit("bowl", FluidValues.BOWL);
 
-    add("potion", TinkerTags.Fluids.POTION)
+    this.add("potion", TinkerTags.Fluids.POTION)
       .addUnit("bottle", FluidValues.BOTTLE);
   }
 

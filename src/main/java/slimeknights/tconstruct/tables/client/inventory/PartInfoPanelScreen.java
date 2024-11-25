@@ -15,6 +15,7 @@ import slimeknights.tconstruct.tables.client.inventory.module.InfoPanelScreen;
 import java.util.ListIterator;
 
 public class PartInfoPanelScreen extends InfoPanelScreen {
+
   private static final String COST_KEY = TConstruct.makeTranslationKey("gui", "part_builder.cost");
   private static final String MATERIAL_VALUE_KEY = TConstruct.makeTranslationKey("gui", "part_builder.material_value");
 
@@ -39,14 +40,17 @@ public class PartInfoPanelScreen extends InfoPanelScreen {
 
   /**
    * Sets the pattern cost
-   * @param cost  Pattern cost
+   *
+   * @param cost Pattern cost
    */
   public void setPatternCost(int cost) {
     this.patternCost = Component.translatable(COST_KEY, cost).withStyle(ChatFormatting.GOLD);
     this.updateSliderParameters();
   }
 
-  /** If true, has pattern cost text */
+  /**
+   * If true, has pattern cost text
+   */
   private boolean hasPatternCost() {
     return this.patternCost != null && this.patternCost != Component.empty();
   }
@@ -55,7 +59,8 @@ public class PartInfoPanelScreen extends InfoPanelScreen {
 
   /**
    * Sets the material value
-   * @param value  Value text
+   *
+   * @param value Value text
    */
   public void setMaterialValue(Component value) {
     this.materialValue = Component.translatable(MATERIAL_VALUE_KEY, value).withStyle(style -> style.withColor(TextColor.fromRgb(0x7fffff)));
@@ -70,7 +75,9 @@ public class PartInfoPanelScreen extends InfoPanelScreen {
     this.updateSliderParameters();
   }
 
-  /** If true, has material value text */
+  /**
+   * If true, has material value text
+   */
   private boolean hasMaterialValue() {
     return this.materialValue != null && this.materialValue != Component.empty();
   }
@@ -80,7 +87,7 @@ public class PartInfoPanelScreen extends InfoPanelScreen {
     int neededHeight = 0;
 
     if (!this.hasInitialized()) {
-      return height;
+      return this.height;
     }
 
     int scaledFontHeight = this.getScaledFontHeight();
@@ -127,7 +134,7 @@ public class PartInfoPanelScreen extends InfoPanelScreen {
 
     // info ? in the top right corner
     if (this.hasTooltips()) {
-      graphics.drawString(this.font, "?", guiRight() - this.border.w - this.font.width("?") / 2, this.topPos + 5, 0xff5f5f5f, false);
+      graphics.drawString(this.font, "?", this.guiRight() - this.border.w - this.font.width("?") / 2, this.topPos + 5, 0xff5f5f5f, false);
     }
 
     int scaledFontHeight = this.getScaledFontHeight();
@@ -162,7 +169,7 @@ public class PartInfoPanelScreen extends InfoPanelScreen {
       return;
     }
 
-    float textHeight = font.lineHeight + 0.5f;
+    float textHeight = this.font.lineHeight + 0.5f;
     float lowerBound = (this.topPos + this.imageHeight - 5) / this.textScale;
     //RenderSystem.scalef(this.textScale, this.textScale, 1.0f);
     graphics.pose().pushPose();

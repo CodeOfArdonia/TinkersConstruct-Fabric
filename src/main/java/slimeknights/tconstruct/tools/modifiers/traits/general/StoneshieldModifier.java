@@ -10,12 +10,12 @@ import slimeknights.tconstruct.library.tools.stat.ToolStats;
 
 import javax.annotation.Nullable;
 import java.util.Iterator;
-import java.util.List;
 
 public class StoneshieldModifier extends DurabilityShieldModifier {
+
   @Override
   protected int getShieldCapacity(IToolStackView tool, int level) {
-    return (int)(level * 100 * tool.getMultiplier(ToolStats.DURABILITY));
+    return (int) (level * 100 * tool.getMultiplier(ToolStats.DURABILITY));
   }
 
   @Override
@@ -60,7 +60,7 @@ public class StoneshieldModifier extends DurabilityShieldModifier {
     // if we found any stone, add shield
     if (addedShield > 0) {
       // 3 stoneshield per stone eaten
-      addShield(tool, level, addedShield * 3);
+      this.addShield(tool, level, addedShield * 3);
     }
 
     return generatedLoot;
@@ -72,12 +72,12 @@ public class StoneshieldModifier extends DurabilityShieldModifier {
   @Override
   public Boolean showDurabilityBar(IToolStackView tool, int level) {
     // only show if we have any shield
-    return getShield(tool) > 0 ? true : null;
+    return this.getShield(tool) > 0 ? true : null;
   }
 
   @Override
   public int getDurabilityRGB(IToolStackView tool, int level) {
-    if (getShield(tool) > 0) {
+    if (this.getShield(tool) > 0) {
       // stoneshield shows in light grey
       return 0x7F7F7F;
     }

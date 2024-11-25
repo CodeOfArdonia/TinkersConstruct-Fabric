@@ -21,6 +21,7 @@ import java.util.Objects;
 
 @ToString
 public class HeadMaterialStats extends BaseMaterialStats implements IRepairableMaterialStats {
+
   public static final MaterialStatsId ID = new MaterialStatsId(TConstruct.getResource("head"));
   public static final HeadMaterialStats DEFAULT = new HeadMaterialStats(1, 1f, Tiers.WOOD, 1f);
   // tooltip descriptions
@@ -37,7 +38,9 @@ public class HeadMaterialStats extends BaseMaterialStats implements IRepairableM
   @Getter
   private final float attack;
 
-  /** Cached tier fetched from the sorting registry */
+  /**
+   * Cached tier fetched from the sorting registry
+   */
   private transient Tier tier;
 
   public HeadMaterialStats(int durability, float miningSpeed, Tier tier, float attack) {
@@ -55,20 +58,24 @@ public class HeadMaterialStats extends BaseMaterialStats implements IRepairableM
     this.attack = buffer.readFloat();
   }
 
-  /** Gets the ID of the tier from the tier sorting registry */
+  /**
+   * Gets the ID of the tier from the tier sorting registry
+   */
   public ResourceLocation getTierId() {
-    return harvestTier;
+    return this.harvestTier;
   }
 
-  /** Gets the tier stored in this object */
+  /**
+   * Gets the tier stored in this object
+   */
   public Tier getTier() {
     if (this.tier == null) {
       // fetch by name, fallback to the first tier
       if (this.harvestTier != null) {
-        this.tier = TierSortingRegistry.byName(harvestTier);
+        this.tier = TierSortingRegistry.byName(this.harvestTier);
       }
       if (this.tier == null) {
-        TConstruct.LOG.error("Failed to find tool tier by name " + harvestTier);
+        TConstruct.LOG.error("Failed to find tool tier by name " + this.harvestTier);
         this.tier = DEFAULT.getTier();
       }
     }
@@ -111,13 +118,13 @@ public class HeadMaterialStats extends BaseMaterialStats implements IRepairableM
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    HeadMaterialStats that = (HeadMaterialStats)o;
+    if (o == null || this.getClass() != o.getClass()) return false;
+    HeadMaterialStats that = (HeadMaterialStats) o;
     return this.durability == that.durability && this.miningSpeed == that.miningSpeed && this.attack == that.attack && Objects.equals(this.harvestTier, that.harvestTier);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(durability, miningSpeed, harvestTier, attack);
+    return Objects.hash(this.durability, this.miningSpeed, this.harvestTier, this.attack);
   }
 }

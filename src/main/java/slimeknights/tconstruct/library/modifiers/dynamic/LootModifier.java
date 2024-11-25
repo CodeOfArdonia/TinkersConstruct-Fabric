@@ -26,12 +26,16 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 
-/** Modifier to boost loot, from mobs or blocks
+/**
+ * Modifier to boost loot, from mobs or blocks
+ *
  * @deprecated use {@link ComposableModifier} with {@link slimeknights.tconstruct.library.modifiers.modules.LootingModule}
- * or {@link slimeknights.tconstruct.library.modifiers.modules.EnchantmentModule.Harvest} */
+ * or {@link slimeknights.tconstruct.library.modifiers.modules.EnchantmentModule.Harvest}
+ */
 @Deprecated
 @RequiredArgsConstructor
 public class LootModifier extends Modifier implements LootingModifierHook, HarvestEnchantmentsModifierHook {
+
   @Nullable
   private final Enchantment enchantment;
   private final int enchantmentLevel;
@@ -50,12 +54,12 @@ public class LootModifier extends Modifier implements LootingModifierHook, Harve
   protected void registerHooks(Builder hookBuilder) {
     super.registerHooks(hookBuilder);
     hookBuilder.addHook(this, TinkerHooks.TOOL_LOOTING, TinkerHooks.LEGGINGS_LOOTING, TinkerHooks.PROJECTILE_LOOTING,
-                        TinkerHooks.TOOL_HARVEST_ENCHANTMENTS, TinkerHooks.LEGGINGS_HARVEST_ENCHANTMENTS);
+      TinkerHooks.TOOL_HARVEST_ENCHANTMENTS, TinkerHooks.LEGGINGS_HARVEST_ENCHANTMENTS);
   }
 
   @Override
   public Component getDisplayName(int level) {
-    return levelDisplay.nameForLevel(this, level);
+    return this.levelDisplay.nameForLevel(this, level);
   }
 
   @Override
@@ -64,9 +68,9 @@ public class LootModifier extends Modifier implements LootingModifierHook, Harve
   }
 
   @Override
-  public void applyHarvestEnchantments(IToolStackView tool, ModifierEntry modifier, ToolHarvestContext context, BiConsumer<Enchantment,Integer> consumer) {
-    if (enchantment != null && enchantmentLevel > 0) {
-      consumer.accept(enchantment, enchantmentLevel * modifier.getLevel());
+  public void applyHarvestEnchantments(IToolStackView tool, ModifierEntry modifier, ToolHarvestContext context, BiConsumer<Enchantment, Integer> consumer) {
+    if (this.enchantment != null && this.enchantmentLevel > 0) {
+      consumer.accept(this.enchantment, this.enchantmentLevel * modifier.getLevel());
     }
   }
 
@@ -75,7 +79,9 @@ public class LootModifier extends Modifier implements LootingModifierHook, Harve
     return LOADER;
   }
 
-  /** Loader for this modifier */
+  /**
+   * Loader for this modifier
+   */
   public static final IGenericLoader<LootModifier> LOADER = new IGenericLoader<>() {
     @Override
     public LootModifier deserialize(JsonObject json) {

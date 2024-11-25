@@ -22,6 +22,7 @@ import java.util.List;
  */
 @Getter(AccessLevel.PROTECTED)
 public class RangedToolStatsBuilder extends ToolStatsBuilder {
+
   private final List<LimbMaterialStats> limbs;
   private final List<GripMaterialStats> grips;
   private final List<BowstringMaterialStats> strings;
@@ -34,7 +35,9 @@ public class RangedToolStatsBuilder extends ToolStatsBuilder {
     this.strings = strings;
   }
 
-  /** Creates a builder from the definition and materials */
+  /**
+   * Creates a builder from the definition and materials
+   */
   public static ToolStatsBuilder from(ToolDefinition toolDefinition, MaterialNBT materials) {
     ToolDefinitionData data = toolDefinition.getData();
     List<PartRequirement> requiredComponents = data.getParts();
@@ -43,53 +46,63 @@ public class RangedToolStatsBuilder extends ToolStatsBuilder {
       return ToolStatsBuilder.noParts(toolDefinition);
     }
     return new RangedToolStatsBuilder(data,
-                                      listOfCompatibleWith(LimbMaterialStats.ID, materials, requiredComponents),
-                                      listOfCompatibleWith(GripMaterialStats.ID, materials, requiredComponents),
-                                      listOfCompatibleWith(BowstringMaterialStats.ID, materials, requiredComponents)
+      listOfCompatibleWith(LimbMaterialStats.ID, materials, requiredComponents),
+      listOfCompatibleWith(GripMaterialStats.ID, materials, requiredComponents),
+      listOfCompatibleWith(BowstringMaterialStats.ID, materials, requiredComponents)
     );
   }
 
   @Override
   protected void setStats(StatsNBT.Builder builder) {
     // add in specific stat types handled by our materials
-    builder.set(ToolStats.DURABILITY, buildDurability());
-    builder.set(ToolStats.DRAW_SPEED, buildDrawSpeed());
-    builder.set(ToolStats.VELOCITY, buildVelocity());
-    builder.set(ToolStats.ACCURACY, buildAccuracy());
-    builder.set(ToolStats.ATTACK_DAMAGE, buildAttackDamage());
+    builder.set(ToolStats.DURABILITY, this.buildDurability());
+    builder.set(ToolStats.DRAW_SPEED, this.buildDrawSpeed());
+    builder.set(ToolStats.VELOCITY, this.buildVelocity());
+    builder.set(ToolStats.ACCURACY, this.buildAccuracy());
+    builder.set(ToolStats.ATTACK_DAMAGE, this.buildAttackDamage());
   }
 
   @Override
   protected boolean handles(IToolStat<?> stat) {
     return stat == ToolStats.DURABILITY || stat == ToolStats.ATTACK_DAMAGE
-           || stat == ToolStats.DRAW_SPEED || stat == ToolStats.VELOCITY || stat == ToolStats.ACCURACY;
+      || stat == ToolStats.DRAW_SPEED || stat == ToolStats.VELOCITY || stat == ToolStats.ACCURACY;
   }
 
-  /** Builds durability for the tool */
+  /**
+   * Builds durability for the tool
+   */
   public float buildDurability() {
-    double averageHeadDurability = getTotalValue(limbs, LimbMaterialStats::getDurability) + getStatOrDefault(ToolStats.DURABILITY, 0f);
-    double averageHandleModifier = getAverageValue(grips, GripMaterialStats::getDurability, 1);
+    double averageHeadDurability = getTotalValue(this.limbs, LimbMaterialStats::getDurability) + this.getStatOrDefault(ToolStats.DURABILITY, 0f);
+    double averageHandleModifier = getAverageValue(this.grips, GripMaterialStats::getDurability, 1);
     // durability should never be below 1
-    return Math.max(1, (int)(averageHeadDurability * averageHandleModifier));
+    return Math.max(1, (int) (averageHeadDurability * averageHandleModifier));
   }
 
-  /** Builds attack speed for the tool */
+  /**
+   * Builds attack speed for the tool
+   */
   public float buildDrawSpeed() {
-    return (float)Math.max(0, getStatOrDefault(ToolStats.DRAW_SPEED, 1f) + getTotalValue(limbs, LimbMaterialStats::getDrawSpeed));
+    return (float) Math.max(0, this.getStatOrDefault(ToolStats.DRAW_SPEED, 1f) + getTotalValue(this.limbs, LimbMaterialStats::getDrawSpeed));
   }
 
-  /** Builds velocity for the tool */
+  /**
+   * Builds velocity for the tool
+   */
   public float buildVelocity() {
-    return (float)Math.max(0, getStatOrDefault(ToolStats.VELOCITY, 1f) + getTotalValue(limbs, LimbMaterialStats::getVelocity));
+    return (float) Math.max(0, this.getStatOrDefault(ToolStats.VELOCITY, 1f) + getTotalValue(this.limbs, LimbMaterialStats::getVelocity));
   }
 
-  /** Builds velocity for the tool */
+  /**
+   * Builds velocity for the tool
+   */
   public float buildAccuracy() {
-    return (float)Math.max(0, getStatOrDefault(ToolStats.ACCURACY, 0.75f) + getTotalValue(limbs, LimbMaterialStats::getAccuracy) + getTotalValue(grips, GripMaterialStats::getAccuracy));
+    return (float) Math.max(0, this.getStatOrDefault(ToolStats.ACCURACY, 0.75f) + getTotalValue(this.limbs, LimbMaterialStats::getAccuracy) + getTotalValue(this.grips, GripMaterialStats::getAccuracy));
   }
 
-  /** Builds attack damage for the tool */
+  /**
+   * Builds attack damage for the tool
+   */
   public float buildAttackDamage() {
-    return (float)Math.max(0.0d, getStatOrDefault(ToolStats.ATTACK_DAMAGE, 0f) + getAverageValue(grips, GripMaterialStats::getMeleeAttack));
+    return (float) Math.max(0.0d, this.getStatOrDefault(ToolStats.ATTACK_DAMAGE, 0f) + getAverageValue(this.grips, GripMaterialStats::getMeleeAttack));
   }
 }

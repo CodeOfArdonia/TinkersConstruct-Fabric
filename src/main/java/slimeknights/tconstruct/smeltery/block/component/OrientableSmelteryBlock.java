@@ -17,11 +17,15 @@ import slimeknights.tconstruct.smeltery.block.entity.component.SmelteryComponent
 
 import javax.annotation.Nullable;
 
-/** Shared logic for smeltery blocks with four directions to face */
+/**
+ * Shared logic for smeltery blocks with four directions to face
+ */
 public class OrientableSmelteryBlock extends SearedBlock implements EntityBlock {
+
   public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 
   private final BlockEntitySupplier<? extends SmelteryComponentBlockEntity> blockEntity;
+
   public OrientableSmelteryBlock(Properties properties, BlockEntitySupplier<? extends SmelteryComponentBlockEntity> blockEntity) {
     super(properties);
     this.blockEntity = blockEntity;
@@ -30,11 +34,11 @@ public class OrientableSmelteryBlock extends SearedBlock implements EntityBlock 
   @Override
   @Nullable
   public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
-    return blockEntity.create(pPos, pState);
+    return this.blockEntity.create(pPos, pState);
   }
 
   @Override
-  protected void createBlockStateDefinition(StateDefinition.Builder<Block,BlockState> builder) {
+  protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
     builder.add(FACING, IN_STRUCTURE);
   }
 

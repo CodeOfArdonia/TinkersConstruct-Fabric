@@ -24,11 +24,12 @@ import java.util.List;
  * Module that applies a stat boost on a tool
  */
 public record ToolStatModule(ModifierStatBoost boost) implements ToolStatsModifierHook, ModifierModule {
+
   private static final List<ModifierHook<?>> DEFAULT_HOOKS = List.of(TinkerHooks.TOOL_STATS);
 
   @Override
   public void addToolStats(ToolRebuildContext context, ModifierEntry modifier, ModifierStatsBuilder builder) {
-    boost.apply(context, modifier.getEffectiveLevel(context), builder);
+    this.boost.apply(context, modifier.getEffectiveLevel(context), builder);
   }
 
   @Override
@@ -66,36 +67,48 @@ public record ToolStatModule(ModifierStatBoost boost) implements ToolStatsModifi
 
   /* Helpers */
 
-  /** Updates a stat in the builder */
+  /**
+   * Updates a stat in the builder
+   */
   @SafeVarargs
   public static <T> ToolStatModule update(IToolStat<T> stat, T value, TagKey<Item>... tagRequirements) {
     return new ToolStatModule(new StatUpdate<>(stat, value, List.of(tagRequirements)));
   }
 
-  /** Adds a general boost */
+  /**
+   * Adds a general boost
+   */
   private static ToolStatModule boost(INumericToolStat<?> stat, BoostType type, float amount, TagKey<Item>[] tagRequirements) {
     return new ToolStatModule(new StatBoost(stat, type, amount, List.of(tagRequirements)));
   }
 
-  /** Adds a numeric boost */
+  /**
+   * Adds a numeric boost
+   */
   @SafeVarargs
   public static ToolStatModule add(INumericToolStat<?> stat, float amount, TagKey<Item>... tagRequirements) {
     return boost(stat, ModifierStatBoost.BoostType.ADD, amount, tagRequirements);
   }
 
-  /** Multiplies the base value of a stat */
+  /**
+   * Multiplies the base value of a stat
+   */
   @SafeVarargs
   public static ToolStatModule multiplyBase(INumericToolStat<?> stat, float amount, TagKey<Item>... tagRequirements) {
     return boost(stat, ModifierStatBoost.BoostType.MULTIPLY_BASE, amount, tagRequirements);
   }
 
-  /** Multiplies conditional boosts */
+  /**
+   * Multiplies conditional boosts
+   */
   @SafeVarargs
   public static ToolStatModule multiplyConditional(INumericToolStat<?> stat, float amount, TagKey<Item>... tagRequirements) {
     return boost(stat, ModifierStatBoost.BoostType.MULTIPLY_CONDITIONAL, amount, tagRequirements);
   }
 
-  /** Multiplies both base and conditional boosts */
+  /**
+   * Multiplies both base and conditional boosts
+   */
   @SafeVarargs
   public static ToolStatModule multiplyAll(INumericToolStat<?> stat, float amount, TagKey<Item>... tagRequirements) {
     return boost(stat, ModifierStatBoost.BoostType.MULTIPLY_ALL, amount, tagRequirements);

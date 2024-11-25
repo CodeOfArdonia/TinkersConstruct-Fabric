@@ -25,12 +25,14 @@ import slimeknights.tconstruct.tools.TinkerModifiers;
 import javax.annotation.Nullable;
 
 public class ModifierRepairCraftingRecipe extends CustomRecipe implements IModifierRepairRecipe {
+
   @Getter
   private final ModifierId modifier;
   @Getter
   private final Ingredient ingredient;
   @Getter
   private final int repairAmount;
+
   public ModifierRepairCraftingRecipe(ResourceLocation idIn, ModifierId modifier, Ingredient ingredient, int repairAmount) {
     super(idIn, CraftingBookCategory.MISC);
     this.modifier = modifier;
@@ -40,8 +42,9 @@ public class ModifierRepairCraftingRecipe extends CustomRecipe implements IModif
 
   /**
    * Gets the tool stack and the repair kit material from the crafting grid
-   * @param inv  Crafting inventory
-   * @return  Relevant inputs, or null if invalid
+   *
+   * @param inv Crafting inventory
+   * @return Relevant inputs, or null if invalid
    */
   @Nullable
   protected Pair<ToolStack, Integer> getRelevantInputs(CraftingContainer inv) {
@@ -65,13 +68,13 @@ public class ModifierRepairCraftingRecipe extends CustomRecipe implements IModif
           return null;
         }
         // tool must have the modifier
-        modifierLevel = tool.getModifierLevel(modifier);
+        modifierLevel = tool.getModifierLevel(this.modifier);
         if (modifierLevel == 0) {
           return null;
         }
 
         // if we found a stack, add it to our count
-      } else if (ingredient.test(stack)) {
+      } else if (this.ingredient.test(stack)) {
         itemsFound++;
       } else {
         // unknown item input
@@ -82,19 +85,19 @@ public class ModifierRepairCraftingRecipe extends CustomRecipe implements IModif
     if (tool == null || itemsFound == 0) {
       return null;
     }
-    return Pair.of(tool, repairAmount * itemsFound * modifierLevel);
+    return Pair.of(tool, this.repairAmount * itemsFound * modifierLevel);
   }
 
   @Override
   public boolean matches(CraftingContainer inv, Level world) {
-    return getRelevantInputs(inv) != null;
+    return this.getRelevantInputs(inv) != null;
   }
 
   @Override
   public ItemStack assemble(CraftingContainer inv, RegistryAccess registryAccess) {
-    Pair<ToolStack, Integer> inputs = getRelevantInputs(inv);
+    Pair<ToolStack, Integer> inputs = this.getRelevantInputs(inv);
     if (inputs == null) {
-      TConstruct.LOG.error("Recipe repair on {} failed to find items after matching", getId());
+      TConstruct.LOG.error("Recipe repair on {} failed to find items after matching", this.getId());
       return ItemStack.EMPTY;
     }
 
@@ -111,7 +114,7 @@ public class ModifierRepairCraftingRecipe extends CustomRecipe implements IModif
 
     // repair the tool
     tool = tool.copy();
-    ToolDamageUtil.repair(tool, (int)repairAmount);
+    ToolDamageUtil.repair(tool, (int) repairAmount);
     return tool.createStack();
   }
 
@@ -119,13 +122,13 @@ public class ModifierRepairCraftingRecipe extends CustomRecipe implements IModif
   public NonNullList<ItemStack> getRemainingItems(CraftingContainer inv) {
     NonNullList<ItemStack> list = NonNullList.withSize(inv.getContainerSize(), ItemStack.EMPTY);
     // step 1: find out how much we need to repair
-    Pair<ToolStack, Integer> inputs = getRelevantInputs(inv);
+    Pair<ToolStack, Integer> inputs = this.getRelevantInputs(inv);
     int repairPerItem = 0;
     int repairNeeded = 0;
     if (inputs != null) {
       ToolStack tool = inputs.getFirst();
       repairNeeded = tool.getDamage();
-      float repairFloat = tool.getModifierLevel(modifier) * repairAmount;
+      float repairFloat = tool.getModifierLevel(this.modifier) * this.repairAmount;
       if (repairFloat > 0) {
         for (ModifierEntry entry : tool.getModifierList()) {
           repairFloat = entry.getHook(TinkerHooks.REPAIR_FACTOR).getRepairFactor(tool, entry, repairFloat);
@@ -133,14 +136,14 @@ public class ModifierRepairCraftingRecipe extends CustomRecipe implements IModif
             break;
           }
         }
-        repairPerItem = (int)repairFloat;
+        repairPerItem = (int) repairFloat;
       }
     }
 
     // step 2: consume as many items as are needed to do the repair
     for (int i = 0; i < inv.getContainerSize(); i++) {
       ItemStack stack = inv.getItem(i);
-      if (ingredient.test(stack)) {
+      if (this.ingredient.test(stack)) {
         // if done repairing, leave the items
         if (repairNeeded <= 0) {
           continue;

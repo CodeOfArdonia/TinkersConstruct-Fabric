@@ -12,6 +12,7 @@ import java.util.function.BooleanSupplier;
 import static slimeknights.tconstruct.common.json.ConfigEnabledCondition.PROPS;
 
 public class TinkerConditons {
+
   public static ConfigEnabledCondition configEnabled(String configName, BooleanSupplier supplier) {
     return new ConfigEnabledCondition(configName, supplier);
   }

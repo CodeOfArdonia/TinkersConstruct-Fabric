@@ -34,44 +34,55 @@ import java.util.function.Supplier;
  */
 @RequiredArgsConstructor
 public class EntityMeltingModule {
+
   private final MantleBlockEntity parent;
   private final SlottedStorage<FluidVariant> tank;
-  /** Supplier that returns true if the tank has space */
+  /**
+   * Supplier that returns true if the tank has space
+   */
   private final BooleanSupplier canMeltEntities;
-  /** Function that tries to insert an item into the inventory */
+  /**
+   * Function that tries to insert an item into the inventory
+   */
   private final Function<ItemStack, ItemStack> insertFunction;
-  /** Function that returns the bounds to check for entities */
+  /**
+   * Function that returns the bounds to check for entities
+   */
   private final Supplier<AABB> bounds;
 
   @Nullable
   private EntityMeltingRecipe lastRecipe;
 
-  /** Gets a nonnull world instance from the parent */
+  /**
+   * Gets a nonnull world instance from the parent
+   */
   private Level getLevel() {
-    return Objects.requireNonNull(parent.getLevel(), "Parent tile entity has null world");
+    return Objects.requireNonNull(this.parent.getLevel(), "Parent tile entity has null world");
   }
 
   /**
    * Finds a recipe for the given entity type
-   * @param type  Entity type
-   * @return  Recipe
+   *
+   * @param type Entity type
+   * @return Recipe
    */
   @Nullable
   private EntityMeltingRecipe findRecipe(EntityType<?> type) {
-    if (lastRecipe != null && lastRecipe.matches(type)) {
-      return lastRecipe;
+    if (this.lastRecipe != null && this.lastRecipe.matches(type)) {
+      return this.lastRecipe;
     }
     // find a new recipe if the last recipe does not match
-    EntityMeltingRecipe recipe = EntityMeltingRecipeCache.findRecipe(getLevel().getRecipeManager(), type);
+    EntityMeltingRecipe recipe = EntityMeltingRecipeCache.findRecipe(this.getLevel().getRecipeManager(), type);
     if (recipe != null) {
-      lastRecipe = recipe;
+      this.lastRecipe = recipe;
     }
     return recipe;
   }
 
   /**
    * Gets the default fluid result
-   * @return  Default fluid
+   *
+   * @return Default fluid
    */
   public static FluidStack getDefaultFluid() {
     // TODO: consider a way to put this in a recipe
@@ -80,31 +91,33 @@ public class EntityMeltingModule {
 
   /**
    * checks if an entity can be melted
-   * @param entity  Entity to check
-   * @return  True if they can be melted
+   *
+   * @param entity Entity to check
+   * @return True if they can be melted
    */
   private boolean canMeltEntity(LivingEntity entity) {
     // fire based mobs are absorbed instead of damaged
     return !entity.isInvulnerableTo(entity.fireImmune() ? TinkerDamageTypes.getSource(entity.level().registryAccess(), TinkerDamageTypes.SMELTERY_MAGIC) : TinkerDamageTypes.getSource(entity.level().registryAccess(), TinkerDamageTypes.SMELTERY_DAMAGE))
-           // have to special case players because for some dumb reason creative players do not return true to invulnerable to
-           && !(entity instanceof Player && ((Player)entity).getAbilities().invulnerable)
-           // also have to special case fire resistance, so a blaze with fire resistance is immune to the smeltery
-           && !entity.hasEffect(MobEffects.FIRE_RESISTANCE);
+      // have to special case players because for some dumb reason creative players do not return true to invulnerable to
+      && !(entity instanceof Player && ((Player) entity).getAbilities().invulnerable)
+      // also have to special case fire resistance, so a blaze with fire resistance is immune to the smeltery
+      && !entity.hasEffect(MobEffects.FIRE_RESISTANCE);
   }
 
   /**
    * Interacts with entities in the structure
+   *
    * @return True if something was melted and fuel is needed
    */
   public boolean interactWithEntities() {
-    AABB boundingBox = bounds.get();
+    AABB boundingBox = this.bounds.get();
     if (boundingBox == null) {
       return false;
     }
 
     Boolean canMelt = null;
     boolean melted = false;
-    for (Entity entity : getLevel().getEntitiesOfClass(Entity.class, boundingBox)) {
+    for (Entity entity : this.getLevel().getEntitiesOfClass(Entity.class, boundingBox)) {
       if (!entity.isAlive()) {
         continue;
       }
@@ -112,7 +125,7 @@ public class EntityMeltingModule {
       // items are placed inside the smeltery
       EntityType<?> type = entity.getType();
       if (entity instanceof ItemEntity itemEntity) {
-        ItemStack stack = insertFunction.apply(itemEntity.getItem());
+        ItemStack stack = this.insertFunction.apply(itemEntity.getItem());
         // picked up whole stack
         if (stack.isEmpty()) {
           entity.discard();
@@ -124,16 +137,16 @@ public class EntityMeltingModule {
       // only can melt living, ensure its not immune to our damage
       // if canMelt is already found as false, skip instance checks, we only care about items now
       // if the type is hidden, skip as well, I suppose thats your blacklist if you must have one
-      else if (canMelt != Boolean.FALSE && !type.is(EntityTypes.MELTING_HIDE) && entity instanceof LivingEntity && canMeltEntity((LivingEntity)entity)) {
+      else if (canMelt != Boolean.FALSE && !type.is(EntityTypes.MELTING_HIDE) && entity instanceof LivingEntity && this.canMeltEntity((LivingEntity) entity)) {
         // only fetch boolean once, its not the fastest as it tries to consume fuel
-        if (canMelt == null) canMelt = canMeltEntities.getAsBoolean();
+        if (canMelt == null) canMelt = this.canMeltEntities.getAsBoolean();
 
         // ensure we have fuel/any other needed smeltery states
         if (canMelt) {
           // determine what we are melting
           FluidStack fluid;
           int damage;
-          EntityMeltingRecipe recipe = findRecipe(entity.getType());
+          EntityMeltingRecipe recipe = this.findRecipe(entity.getType());
           if (recipe != null) {
             fluid = recipe.getOutput((LivingEntity) entity);
             damage = recipe.getDamage();
@@ -146,7 +159,7 @@ public class EntityMeltingModule {
           if (entity.hurt(entity.fireImmune() ? TinkerDamageTypes.getSource(entity.level().registryAccess(), TinkerDamageTypes.SMELTERY_MAGIC) : TinkerDamageTypes.getSource(entity.level().registryAccess(), TinkerDamageTypes.SMELTERY_DAMAGE), damage)) {
             // its fine if we don't fill it all, leftover fluid is just lost
             try (Transaction tx = TransferUtil.getTransaction()) {
-              tank.insert(fluid.getType(), fluid.getAmount(), tx);
+              this.tank.insert(fluid.getType(), fluid.getAmount(), tx);
               tx.commit();
             }
             melted = true;

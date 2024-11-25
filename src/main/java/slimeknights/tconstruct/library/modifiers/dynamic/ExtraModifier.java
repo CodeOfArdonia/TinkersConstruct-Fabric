@@ -16,11 +16,16 @@ import slimeknights.tconstruct.library.tools.SlotType.SlotCount;
 import slimeknights.tconstruct.library.tools.context.ToolRebuildContext;
 import slimeknights.tconstruct.library.tools.nbt.ModDataNBT;
 
-/** @deprecated use {@link slimeknights.tconstruct.library.modifiers.modules.ModifierSlotModule} */
+/**
+ * @deprecated use {@link slimeknights.tconstruct.library.modifiers.modules.ModifierSlotModule}
+ */
 @Deprecated
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class ExtraModifier extends Modifier {
-  /** Loader instance */
+
+  /**
+   * Loader instance
+   */
   public static final IGenericLoader<ExtraModifier> LOADER = new IGenericLoader<>() {
     @Override
     public ExtraModifier deserialize(JsonObject json) {
@@ -57,16 +62,26 @@ public class ExtraModifier extends Modifier {
     }
   };
 
-  /** Type of slot to grant */
+  /**
+   * Type of slot to grant
+   */
   private final SlotType type;
-  /** Slots to grant each level */
+  /**
+   * Slots to grant each level
+   */
   private final int slotsPerLevel;
-  /** Formatter for level display */
+  /**
+   * Formatter for level display
+   */
   private final ModifierLevelDisplay levelDisplay;
-  /** If false, modifier only shows in the tinker station */
+  /**
+   * If false, modifier only shows in the tinker station
+   */
   private final boolean alwaysShow;
 
-  /** Creates a new builder */
+  /**
+   * Creates a new builder
+   */
   public static Builder builder(SlotType slotType) {
     return new Builder(slotType);
   }
@@ -78,29 +93,32 @@ public class ExtraModifier extends Modifier {
 
   @Override
   public boolean shouldDisplay(boolean advanced) {
-    return alwaysShow || advanced;
+    return this.alwaysShow || advanced;
   }
 
   @Override
   public void addVolatileData(ToolRebuildContext context, int level, ModDataNBT volatileData) {
-    volatileData.addSlots(type, level * slotsPerLevel);
+    volatileData.addSlots(this.type, level * this.slotsPerLevel);
   }
 
   @Override
   public Component getDisplayName(int level) {
-    return levelDisplay.nameForLevel(this, level);
+    return this.levelDisplay.nameForLevel(this, level);
   }
 
   @Override
   public int getPriority() {
     // show lower priority so they group together, if it always shows put it a bit higher
-    return alwaysShow ? 60 : 50;
+    return this.alwaysShow ? 60 : 50;
   }
 
-  /** Builder for an extra modifier */
+  /**
+   * Builder for an extra modifier
+   */
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
   @Accessors(fluent = true)
   public static class Builder {
+
     private final SlotType type;
     private boolean alwaysShow = false;
     @Setter
@@ -108,15 +126,19 @@ public class ExtraModifier extends Modifier {
     @Setter
     private int slotsPerLevel = 1;
 
-    /** Sets the modifier to always show, by default it only shows when in the tinker station */
+    /**
+     * Sets the modifier to always show, by default it only shows when in the tinker station
+     */
     public Builder alwaysShow() {
       this.alwaysShow = true;
       return this;
     }
 
-    /** Builds a new modifier */
+    /**
+     * Builds a new modifier
+     */
     public ExtraModifier build() {
-      return new ExtraModifier(type, slotsPerLevel, display, alwaysShow);
+      return new ExtraModifier(this.type, this.slotsPerLevel, this.display, this.alwaysShow);
     }
   }
 }

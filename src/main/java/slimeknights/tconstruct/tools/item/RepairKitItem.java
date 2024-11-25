@@ -22,6 +22,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class RepairKitItem extends MaterialItem implements IRepairKitItem {
+
   public RepairKitItem(Properties properties, ResourceKey<CreativeModeTab> tab) {
     super(properties, tab);
   }
@@ -29,9 +30,9 @@ public class RepairKitItem extends MaterialItem implements IRepairKitItem {
   @Override
   public boolean canUseMaterial(MaterialId material) {
     return MaterialRegistry.getInstance()
-                           .getAllStats(material)
-                           .stream()
-                           .anyMatch(stats -> stats instanceof IRepairableMaterialStats);
+      .getAllStats(material)
+      .stream()
+      .anyMatch(stats -> stats instanceof IRepairableMaterialStats);
   }
 
   @Override

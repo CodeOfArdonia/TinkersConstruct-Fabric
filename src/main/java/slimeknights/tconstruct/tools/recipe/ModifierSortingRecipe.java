@@ -30,12 +30,14 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
-/** Reorders modifiers ion a tool */
+/**
+ * Reorders modifiers ion a tool
+ */
 public class ModifierSortingRecipe extends AbstractWorktableRecipe {
+
   private static final Component TITLE = TConstruct.makeTranslation("recipe", "modifier_sorting.title");
   private static final Component DESCRIPTION = TConstruct.makeTranslation("recipe", "modifier_sorting.description");
   private static final Component NOT_ENOUGH_MODIFIERS = TConstruct.makeTranslation("recipe", "modifier_sorting.not_enough_modifiers");
@@ -49,7 +51,7 @@ public class ModifierSortingRecipe extends AbstractWorktableRecipe {
     if (!inv.getTinkerableStack().is(TinkerTags.Items.MODIFIABLE)) {
       return false;
     }
-    return ModifierRecipe.checkMatch(inv, inputs);
+    return ModifierRecipe.checkMatch(inv, this.inputs);
   }
 
   @Override
@@ -72,8 +74,8 @@ public class ModifierSortingRecipe extends AbstractWorktableRecipe {
     // find the modifier to remove
     List<ModifierEntry> upgrades = tool.getUpgrades().getModifiers();
     int toMove = IntStream.range(0, upgrades.size())
-                          .filter(i -> upgrades.get(i).matches(modifier.getId()))
-                          .findFirst().orElse(-1);
+      .filter(i -> upgrades.get(i).matches(modifier.getId()))
+      .findFirst().orElse(-1);
     // if no change, no need to do anything
     if (toMove == -1) {
       return RecipeResult.pass();
@@ -105,6 +107,7 @@ public class ModifierSortingRecipe extends AbstractWorktableRecipe {
   }
 
   public static class Serializer extends LoggingRecipeSerializer<ModifierSortingRecipe> {
+
     @Override
     public ModifierSortingRecipe fromJson(ResourceLocation id, JsonObject json) {
       List<SizedIngredient> ingredients = JsonHelper.parseList(json, "inputs", SizedIngredient::deserialize);
@@ -133,21 +136,23 @@ public class ModifierSortingRecipe extends AbstractWorktableRecipe {
 
   @RequiredArgsConstructor(staticName = "sorting")
   public static class Builder extends AbstractSizedIngredientRecipeBuilder<Builder> {
+
     @Override
     public void save(Consumer<FinishedRecipe> consumer) {
-      save(consumer, BuiltInRegistries.ITEM.getKey(inputs.get(0).getMatchingStacks().get(0).getItem()));
+      this.save(consumer, BuiltInRegistries.ITEM.getKey(this.inputs.get(0).getMatchingStacks().get(0).getItem()));
     }
 
     @Override
     public void save(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
-      if (inputs.isEmpty()) {
+      if (this.inputs.isEmpty()) {
         throw new IllegalStateException("Must have at least one ingredient");
       }
-      ResourceLocation advancementId = buildOptionalAdvancement(id, "modifiers");
+      ResourceLocation advancementId = this.buildOptionalAdvancement(id, "modifiers");
       consumer.accept(new Finished(id, advancementId));
     }
 
     private class Finished extends SizedFinishedRecipe {
+
       public Finished(ResourceLocation ID, @Nullable ResourceLocation advancementID) {
         super(ID, advancementID);
       }

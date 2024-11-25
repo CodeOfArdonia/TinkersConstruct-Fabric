@@ -24,8 +24,9 @@ public class ToolStatId extends ResourceLocation {
 
   /**
    * Tries to create a tool stat ID from the given string, for NBT parsing
-   * @param string  String
-   * @return  Tool stat ID, or null of invalid
+   *
+   * @param string String
+   * @return Tool stat ID, or null of invalid
    */
   @Nullable
   public static ToolStatId tryCreate(String string) {

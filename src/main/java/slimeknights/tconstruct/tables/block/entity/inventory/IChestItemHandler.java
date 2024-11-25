@@ -5,8 +5,13 @@ import io.github.fabricators_of_create.porting_lib.transfer.item.SlottedStackSto
 import net.minecraft.nbt.CompoundTag;
 import slimeknights.mantle.block.entity.MantleBlockEntity;
 
-/** Interface for tinker chest TEs */
+/**
+ * Interface for tinker chest TEs
+ */
 public interface IChestItemHandler extends SlottedStackStorage, INBTSerializable<CompoundTag>, IScalingContainer {
-  /** Sets the parent of this block */
+
+  /**
+   * Sets the parent of this block
+   */
   void setParent(MantleBlockEntity parent);
 }

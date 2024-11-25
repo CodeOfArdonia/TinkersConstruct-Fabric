@@ -37,61 +37,78 @@ import java.util.Set;
 @EqualsAndHashCode
 @ToString
 public class StatsNBT {
-  /** Serializer to parse this from JSON */
+
+  /**
+   * Serializer to parse this from JSON
+   */
   public static Serializer SERIALIZER = new Serializer();
-  /** Set of all tool stat IDs that failed to parse, to reduce log spam as they get parsed many times in UIs when dumb mods don't call proper methods */
+  /**
+   * Set of all tool stat IDs that failed to parse, to reduce log spam as they get parsed many times in UIs when dumb mods don't call proper methods
+   */
   static final Set<String> ERRORED_IDS = new HashSet<>();
-  /** Empty stats */
+  /**
+   * Empty stats
+   */
   public static final StatsNBT EMPTY = new StatsNBT(ImmutableMap.of());
 
-  /** All currently contained stats */
+  /**
+   * All currently contained stats
+   */
   private final Map<IToolStat<?>, Object> stats;
 
-  /** Creates a new stats builder */
+  /**
+   * Creates a new stats builder
+   */
   public static Builder builder() {
     return new Builder();
   }
 
   /**
    * Gets a set of all stats contained
-   * @return  Stat type set
+   *
+   * @return Stat type set
    */
   public Set<IToolStat<?>> getContainedStats() {
-    return stats.keySet();
+    return this.stats.keySet();
   }
 
   /**
    * Checks if the NBT contains the given stat
-   * @param stat  Stat to check for
-   * @return  True if the stat is contained
+   *
+   * @param stat Stat to check for
+   * @return True if the stat is contained
    */
   public boolean hasStat(IToolStat<?> stat) {
-    return stats.containsKey(stat);
+    return this.stats.containsKey(stat);
   }
 
   /**
    * Gets the given tool stat as a float
-   * @param stat  Stat
-   * @return  Value, or default if the stat is missing
+   *
+   * @param stat Stat
+   * @return Value, or default if the stat is missing
    */
   @SuppressWarnings("unchecked")
   public <T> T get(IToolStat<T> stat) {
-    return (T)stats.getOrDefault(stat, stat.getDefaultValue());
+    return (T) this.stats.getOrDefault(stat, stat.getDefaultValue());
   }
 
   /**
    * Gets the given tool stat as an int
-   * @param stat  Stat
-   * @return  Value, or default if the stat is missing
+   *
+   * @param stat Stat
+   * @return Value, or default if the stat is missing
    */
   public int getInt(IToolStat<? extends Number> stat) {
-    return get(stat).intValue();
+    return this.get(stat).intValue();
   }
 
 
   /* NBT parsing */
 
-  /** Reads a tool stat ID from a NBT string */
+  /**
+   * Reads a tool stat ID from a NBT string
+   */
   @Nullable
   static IToolStat<?> readStatIdFromNBT(String name) {
     ToolStatId statName = ToolStatId.tryCreate(name);
@@ -108,7 +125,9 @@ public class StatsNBT {
     return null;
   }
 
-  /** Reads the stat from NBT */
+  /**
+   * Reads the stat from NBT
+   */
   public static StatsNBT readFromNBT(@Nullable Tag inbt) {
     if (inbt == null || inbt.getId() != Tag.TAG_COMPOUND) {
       return EMPTY;
@@ -117,7 +136,7 @@ public class StatsNBT {
     ImmutableMap.Builder<IToolStat<?>, Object> builder = ImmutableMap.builder();
 
     // simply try each key as a tool stat
-    CompoundTag nbt = (CompoundTag)inbt;
+    CompoundTag nbt = (CompoundTag) inbt;
     for (String key : nbt.getAllKeys()) {
       Tag tag = nbt.get(key);
       if (tag != null) {
@@ -133,17 +152,21 @@ public class StatsNBT {
     return new StatsNBT(builder.build());
   }
 
-  /** Serializes a stat to NBT, method done to help with generics */
+  /**
+   * Serializes a stat to NBT, method done to help with generics
+   */
   @SuppressWarnings("unchecked")
   @Nullable
   private static <T> Tag serialize(IToolStat<T> stat, Object value) {
     return stat.write((T) value);
   }
 
-  /** Writes these stats to NBT */
+  /**
+   * Writes these stats to NBT
+   */
   public CompoundTag serializeToNBT() {
     CompoundTag nbt = new CompoundTag();
-    for (Entry<IToolStat<?>,Object> entry : stats.entrySet()) {
+    for (Entry<IToolStat<?>, Object> entry : this.stats.entrySet()) {
       IToolStat<?> stat = entry.getKey();
       Tag serialized = serialize(stat, entry.getValue());
       if (serialized != null) {
@@ -156,23 +179,29 @@ public class StatsNBT {
 
   /* Network */
 
-  /** Generic helper to write to network */
+  /**
+   * Generic helper to write to network
+   */
   @SuppressWarnings("unchecked")
   private static <T> void toNetwork(FriendlyByteBuf buffer, IToolStat<T> stat, Object value) {
     stat.toNetwork(buffer, (T) value);
   }
 
-  /** Writes this to a packet buffer */
+  /**
+   * Writes this to a packet buffer
+   */
   public void toNetwork(FriendlyByteBuf buffer) {
-    buffer.writeVarInt(stats.size());
-    for (Entry<IToolStat<?>,Object> entry : stats.entrySet()) {
+    buffer.writeVarInt(this.stats.size());
+    for (Entry<IToolStat<?>, Object> entry : this.stats.entrySet()) {
       IToolStat<?> stat = entry.getKey();
       buffer.writeUtf(stat.getName().toString());
       toNetwork(buffer, stat, entry.getValue());
     }
   }
 
-  /** Reads a tool definition stat object from a packet buffer */
+  /**
+   * Reads a tool definition stat object from a packet buffer
+   */
   public static StatsNBT fromNetwork(FriendlyByteBuf buffer) {
     ImmutableMap.Builder<IToolStat<?>, Object> builder = ImmutableMap.builder();
     int max = buffer.readVarInt();
@@ -183,20 +212,27 @@ public class StatsNBT {
     return new StatsNBT(builder.build());
   }
 
-  /** Create a builder for stats, really just safety checks on the generics for the set method */
+  /**
+   * Create a builder for stats, really just safety checks on the generics for the set method
+   */
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   public static class Builder {
+
     private final ImmutableMap.Builder<IToolStat<?>, Object> builder = ImmutableMap.builder();
 
-    /** Sets the given stat in the builder */
+    /**
+     * Sets the given stat in the builder
+     */
     public <T> Builder set(IToolStat<T> stat, T value) {
-      builder.put(stat, stat.clamp(value));
+      this.builder.put(stat, stat.clamp(value));
       return this;
     }
 
-    /** Builds the stats from the given values */
+    /**
+     * Builds the stats from the given values
+     */
     public StatsNBT build() {
-      Map<IToolStat<?>,Object> map = builder.build();
+      Map<IToolStat<?>, Object> map = this.builder.build();
       if (map.isEmpty()) {
         return EMPTY;
       }
@@ -204,20 +240,25 @@ public class StatsNBT {
     }
   }
 
-  /** Serializes and deserializes from JSON */
+  /**
+   * Serializes and deserializes from JSON
+   */
   protected static class Serializer implements JsonDeserializer<StatsNBT>, JsonSerializer<StatsNBT> {
+
     @Override
     public StatsNBT deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
       JsonObject object = GsonHelper.convertToJsonObject(json, "stats");
-      ImmutableMap.Builder<IToolStat<?>,Object> builder = ImmutableMap.builder();
-      for (Entry<String,JsonElement> entry : object.entrySet()) {
+      ImmutableMap.Builder<IToolStat<?>, Object> builder = ImmutableMap.builder();
+      for (Entry<String, JsonElement> entry : object.entrySet()) {
         IToolStat<?> stat = ToolStats.fromJson(entry.getKey());
         builder.put(stat, stat.deserialize(entry.getValue()));
       }
       return new StatsNBT(builder.build());
     }
 
-    /** Serializes a stat to NBT */
+    /**
+     * Serializes a stat to NBT
+     */
     @SuppressWarnings("unchecked")
     private static <T> JsonElement serialize(IToolStat<T> stat, Object value) {
       return stat.serialize((T) value);
@@ -226,7 +267,7 @@ public class StatsNBT {
     @Override
     public JsonElement serialize(StatsNBT stats, Type typeOfSrc, JsonSerializationContext context) {
       JsonObject json = new JsonObject();
-      for (Entry<IToolStat<?>,Object> entry : stats.stats.entrySet()) {
+      for (Entry<IToolStat<?>, Object> entry : stats.stats.entrySet()) {
         IToolStat<?> stat = entry.getKey();
         json.add(stat.getName().toString(), serialize(stat, entry.getValue()));
       }

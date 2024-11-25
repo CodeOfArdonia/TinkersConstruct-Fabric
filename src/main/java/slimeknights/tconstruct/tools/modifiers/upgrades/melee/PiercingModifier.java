@@ -32,6 +32,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class PiercingModifier extends IncrementalModifier implements ProjectileHitModifierHook, ProjectileLaunchModifierHook {
+
   private static final ResourceLocation PIERCING_DEBUFF = TConstruct.getResource("piercing_debuff");
 
   @Override
@@ -41,7 +42,7 @@ public class PiercingModifier extends IncrementalModifier implements ProjectileH
 
   @Override
   public void addVolatileData(ToolRebuildContext context, int level, ModDataNBT volatileData) {
-    float toRemove = 0.5f * getScaledLevel(context, level);
+    float toRemove = 0.5f * this.getScaledLevel(context, level);
     float baseDamage = context.getBaseStats().get(ToolStats.ATTACK_DAMAGE);
     if (baseDamage < toRemove) {
       volatileData.putFloat(PIERCING_DEBUFF, toRemove - baseDamage);
@@ -50,7 +51,7 @@ public class PiercingModifier extends IncrementalModifier implements ProjectileH
 
   @Override
   public void addToolStats(ToolRebuildContext context, int level, ModifierStatsBuilder builder) {
-    float toRemove = 0.5f * getScaledLevel(context, level) - context.getVolatileData().getFloat(PIERCING_DEBUFF);
+    float toRemove = 0.5f * this.getScaledLevel(context, level) - context.getVolatileData().getFloat(PIERCING_DEBUFF);
     ToolStats.ATTACK_DAMAGE.add(builder, -toRemove);
   }
 
@@ -64,7 +65,7 @@ public class PiercingModifier extends IncrementalModifier implements ProjectileH
     } else {
       source = context.getAttacker().damageSources().source(TinkerDamageTypes.MOB_ATTACK_BYPASS_ARMOR, context.getAttacker());
     }
-    float secondaryDamage = (getScaledLevel(tool, level) * tool.getMultiplier(ToolStats.ATTACK_DAMAGE) - tool.getVolatileData().getFloat(PIERCING_DEBUFF)) * context.getCooldown();
+    float secondaryDamage = (this.getScaledLevel(tool, level) * tool.getMultiplier(ToolStats.ATTACK_DAMAGE) - tool.getVolatileData().getFloat(PIERCING_DEBUFF)) * context.getCooldown();
     if (context.isCritical()) {
       secondaryDamage *= 1.5f;
     }
@@ -75,7 +76,7 @@ public class PiercingModifier extends IncrementalModifier implements ProjectileH
   @Override
   public void onProjectileLaunch(IToolStackView tool, ModifierEntry modifier, LivingEntity shooter, Projectile projectile, @Nullable AbstractArrow arrow, NamespacedNBT persistentData, boolean primary) {
     // store the float level as we don't have access to the incremental level in the projectile hit hook
-    persistentData.putFloat(getId(), modifier.getEffectiveLevel(tool));
+    persistentData.putFloat(this.getId(), modifier.getEffectiveLevel(tool));
   }
 
   @Override
@@ -89,12 +90,12 @@ public class PiercingModifier extends IncrementalModifier implements ProjectileH
     } else {
       source = projectile.damageSources().generic();
     }
-    ToolAttackUtil.attackEntitySecondary(source, persistentData.getFloat(getId()), hit.getEntity(), target, true);
+    ToolAttackUtil.attackEntitySecondary(source, persistentData.getFloat(this.getId()), hit.getEntity(), target, true);
     return false;
   }
 
   @Override
   public void addInformation(IToolStackView tool, int level, @Nullable Player player, List<Component> tooltip, TooltipKey tooltipKey, TooltipFlag tooltipFlag) {
-    addDamageTooltip(tool, getScaledLevel(tool, level) - tool.getVolatileData().getFloat(PIERCING_DEBUFF), tooltip);
+    this.addDamageTooltip(tool, this.getScaledLevel(tool, level) - tool.getVolatileData().getFloat(PIERCING_DEBUFF), tooltip);
   }
 }

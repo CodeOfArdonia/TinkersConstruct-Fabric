@@ -32,6 +32,7 @@ import java.util.function.Supplier;
  */
 @RequiredArgsConstructor
 public class PotionCastingRecipe implements ICastingRecipe, IMultiRecipe<DisplayCastingRecipe> {
+
   @Getter
   private final RecipeType<?> type;
   @Getter
@@ -40,25 +41,33 @@ public class PotionCastingRecipe implements ICastingRecipe, IMultiRecipe<Display
   private final ResourceLocation id;
   @Getter
   private final String group;
-  /** Input on the casting table, always consumed */
+  /**
+   * Input on the casting table, always consumed
+   */
   private final Ingredient bottle;
-  /** Potion ingredient, typically just the potion tag */
+  /**
+   * Potion ingredient, typically just the potion tag
+   */
   private final FluidIngredient fluid;
-  /** Potion item result, will be given the proper NBT */
+  /**
+   * Potion item result, will be given the proper NBT
+   */
   private final Item result;
-  /** Cooling time, used for arrows */
+  /**
+   * Cooling time, used for arrows
+   */
   private final int coolingTime;
 
   private List<DisplayCastingRecipe> displayRecipes = null;
 
   @Override
   public boolean matches(ICastingContainer inv, Level level) {
-    return bottle.test(inv.getStack()) && fluid.test(inv.getFluid());
+    return this.bottle.test(inv.getStack()) && this.fluid.test(inv.getFluid());
   }
 
   @Override
   public long getFluidAmount(ICastingContainer inv) {
-    return fluid.getAmount(inv.getFluid());
+    return this.fluid.getAmount(inv.getFluid());
   }
 
   @Override
@@ -73,7 +82,7 @@ public class PotionCastingRecipe implements ICastingRecipe, IMultiRecipe<Display
 
   @Override
   public int getCoolingTime(ICastingContainer inv) {
-    return coolingTime;
+    return this.coolingTime;
   }
 
   @Override
@@ -85,19 +94,19 @@ public class PotionCastingRecipe implements ICastingRecipe, IMultiRecipe<Display
 
   @Override
   public List<DisplayCastingRecipe> getRecipes() {
-    if (displayRecipes == null) {
+    if (this.displayRecipes == null) {
       // create a subrecipe for every potion variant
-      List<ItemStack> bottles = List.of(bottle.getItems());
-      displayRecipes = BuiltInRegistries.POTION.stream()
+      List<ItemStack> bottles = List.of(this.bottle.getItems());
+      this.displayRecipes = BuiltInRegistries.POTION.stream()
         .map(potion -> {
           ItemStack result = PotionUtils.setPotion(new ItemStack(this.result), potion);
-          return new DisplayCastingRecipe(type, bottles, fluid.getFluids().stream()
-                                                              .map(fluid -> new FluidStack(fluid.getFluid(), fluid.getAmount(), result.getTag()))
-                                                              .toList(),
-                                          result, coolingTime, true);
+          return new DisplayCastingRecipe(this.type, bottles, this.fluid.getFluids().stream()
+            .map(fluid -> new FluidStack(fluid.getFluid(), fluid.getAmount(), result.getTag()))
+            .toList(),
+            result, this.coolingTime, true);
         }).toList();
     }
-    return displayRecipes;
+    return this.displayRecipes;
   }
 
 
@@ -105,10 +114,12 @@ public class PotionCastingRecipe implements ICastingRecipe, IMultiRecipe<Display
 
   @Override
   public NonNullList<Ingredient> getIngredients() {
-    return NonNullList.of(Ingredient.EMPTY, bottle);
+    return NonNullList.of(Ingredient.EMPTY, this.bottle);
   }
 
-  /** @deprecated use {@link #assemble(Container, RegistryAccess)} */
+  /**
+   * @deprecated use {@link #assemble(Container, RegistryAccess)}
+   */
   @Deprecated
   @Override
   public ItemStack getResultItem(RegistryAccess registryAccess) {
@@ -117,6 +128,7 @@ public class PotionCastingRecipe implements ICastingRecipe, IMultiRecipe<Display
 
   @RequiredArgsConstructor
   public static class Serializer extends LoggingRecipeSerializer<PotionCastingRecipe> {
+
     private final Supplier<RecipeType<ICastingRecipe>> type;
 
     @Override
@@ -126,7 +138,7 @@ public class PotionCastingRecipe implements ICastingRecipe, IMultiRecipe<Display
       FluidIngredient fluid = FluidIngredient.deserialize(json, "fluid");
       Item result = JsonHelper.getAsEntry(BuiltInRegistries.ITEM, json, "result");
       int coolingTime = GsonHelper.getAsInt(json, "cooling_time");
-      return new PotionCastingRecipe(type.get(), this, id, group, bottle, fluid, result, coolingTime);
+      return new PotionCastingRecipe(this.type.get(), this, id, group, bottle, fluid, result, coolingTime);
     }
 
     @Nullable
@@ -137,7 +149,7 @@ public class PotionCastingRecipe implements ICastingRecipe, IMultiRecipe<Display
       FluidIngredient fluid = FluidIngredient.read(buffer);
       Item result = BuiltInRegistries.ITEM.get(buffer.readResourceLocation());
       int coolingTime = buffer.readVarInt();
-      return new PotionCastingRecipe(type.get(), this, id, group, bottle, fluid, result, coolingTime);
+      return new PotionCastingRecipe(this.type.get(), this, id, group, bottle, fluid, result, coolingTime);
     }
 
     @Override

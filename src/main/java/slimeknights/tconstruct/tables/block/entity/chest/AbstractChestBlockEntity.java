@@ -22,12 +22,16 @@ import slimeknights.tconstruct.tables.menu.TinkerChestContainerMenu;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-/** Shared base logic for all Tinkers' chest tile entities */
+/**
+ * Shared base logic for all Tinkers' chest tile entities
+ */
 public abstract class AbstractChestBlockEntity extends NameableBlockEntity implements SidedStorageBlockEntity {
+
   private static final String KEY_ITEMS = "Items";
 
   @Getter
   private final IChestItemHandler itemHandler;
+
   protected AbstractChestBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, Component name, IChestItemHandler itemHandler) {
     super(type, pos, state, name);
     itemHandler.setParent(this);
@@ -37,7 +41,7 @@ public abstract class AbstractChestBlockEntity extends NameableBlockEntity imple
   @Nonnull
   @Override
   public Storage<ItemVariant> getItemStorage(@Nullable Direction direction) {
-    return itemHandler;
+    return this.itemHandler;
   }
 
   @Nullable
@@ -48,9 +52,10 @@ public abstract class AbstractChestBlockEntity extends NameableBlockEntity imple
 
   /**
    * Checks if the given item should be inserted into the chest on interact
-   * @param player    Player inserting
-   * @param heldItem  Stack to insert
-   * @return  Return true
+   *
+   * @param player   Player inserting
+   * @param heldItem Stack to insert
+   * @return Return true
    */
   public boolean canInsert(Player player, ItemStack heldItem) {
     return true;
@@ -61,21 +66,23 @@ public abstract class AbstractChestBlockEntity extends NameableBlockEntity imple
     super.saveAdditional(tags);
     // move the items from the serialized result
     // we don't care about the size and need it here for compat with old worlds
-    CompoundTag handlerNBT = itemHandler.serializeNBT();
+    CompoundTag handlerNBT = this.itemHandler.serializeNBT();
     tags.put(KEY_ITEMS, handlerNBT.getList(KEY_ITEMS, Tag.TAG_COMPOUND));
   }
 
-  /** Reads the inventory from NBT */
+  /**
+   * Reads the inventory from NBT
+   */
   public void readInventory(CompoundTag tags) {
     // copy in just the items key for deserializing, don't want to change the size
     CompoundTag handlerNBT = new CompoundTag();
     handlerNBT.put(KEY_ITEMS, tags.getList(KEY_ITEMS, Tag.TAG_COMPOUND));
-    itemHandler.deserializeNBT(handlerNBT);
+    this.itemHandler.deserializeNBT(handlerNBT);
   }
 
   @Override
   public void load(CompoundTag tags) {
     super.load(tags);
-    readInventory(tags);
+    this.readInventory(tags);
   }
 }

@@ -25,13 +25,21 @@ import java.util.Objects;
  */
 @RequiredArgsConstructor
 public class ModifierEntry implements Comparable<ModifierEntry> {
-  /** JSON serializer instance for GSON */
+
+  /**
+   * JSON serializer instance for GSON
+   */
   public static final Serializer SERIALIZER = new Serializer();
 
-  /** Modifier instance */
+  /**
+   * Modifier instance
+   */
   private final LazyModifier modifier;
-  /** Current level */
-  @Getter @With
+  /**
+   * Current level
+   */
+  @Getter
+  @With
   private final int level;
 
   public ModifierEntry(ModifierId id, int level) {
@@ -42,53 +50,70 @@ public class ModifierEntry implements Comparable<ModifierEntry> {
     this(new LazyModifier(modifier), level);
   }
 
-  /** Checks if the given modifier is bound */
+  /**
+   * Checks if the given modifier is bound
+   */
   public boolean isBound() {
-    return modifier.isBound();
+    return this.modifier.isBound();
   }
 
-  /** Gets the contained modifier ID, prevents resolving the lazy modifier if not needed */
+  /**
+   * Gets the contained modifier ID, prevents resolving the lazy modifier if not needed
+   */
   public ModifierId getId() {
-    return modifier.getId();
+    return this.modifier.getId();
   }
 
-  /** Gets the contained modifier */
+  /**
+   * Gets the contained modifier
+   */
   public Modifier getModifier() {
-    return modifier.get();
+    return this.modifier.get();
   }
 
-  /** Helper for efficiency, returns the lazy modifier instance directly, which can then be copied along */
+  /**
+   * Helper for efficiency, returns the lazy modifier instance directly, which can then be copied along
+   */
   public LazyModifier getLazyModifier() {
-    return modifier;
+    return this.modifier;
   }
 
   /**
    * Gets the level scaled based on attributes of modifier data. Used mainly for incremental modifiers.
-   * @param tool  Tool context
-   * @return  Entry level, possibly adjusted by tool properties
+   *
+   * @param tool Tool context
+   * @return Entry level, possibly adjusted by tool properties
    */
   public float getEffectiveLevel(IToolContext tool) {
-    return modifier.get().getEffectiveLevel(tool, level);
+    return this.modifier.get().getEffectiveLevel(tool, this.level);
   }
 
-  /** Gets the given hook from the modifier, returning default instance if not present */
+  /**
+   * Gets the given hook from the modifier, returning default instance if not present
+   */
   public final <T> T getHook(ModifierHook<T> hook) {
-    return modifier.get().getHook(hook);
+    return this.modifier.get().getHook(hook);
   }
 
-  /** Checks if this entry matches the given modifier */
+  /**
+   * Checks if this entry matches the given modifier
+   */
   public boolean matches(ModifierId id) {
-    return modifier.getId().equals(id);
+    return this.modifier.getId().equals(id);
   }
 
-  /** Checks if this entry matches the given modifier */
+  /**
+   * Checks if this entry matches the given modifier
+   */
   public boolean matches(Modifier modifier) {
-    return matches(modifier.getId());
+    return this.matches(modifier.getId());
   }
 
-  /** Checks if the modifier is in the given tag */
+  /**
+   * Checks if the modifier is in the given tag
+   */
   public boolean matches(TagKey<Modifier> tag) {
-    return modifier.is(tag);
+    return this.modifier.is(tag);
   }
 
   @Override
@@ -106,8 +131,9 @@ public class ModifierEntry implements Comparable<ModifierEntry> {
 
   /**
    * Parses a modifier entry from JSON
-   * @param json  JSON object
-   * @return  Parsed JSON
+   *
+   * @param json JSON object
+   * @return Parsed JSON
    */
   public static ModifierEntry fromJson(JsonObject json) {
     return new ModifierEntry(ModifierId.getFromJson(json, "name"), GsonHelper.getAsInt(json, "level", 1));
@@ -115,30 +141,33 @@ public class ModifierEntry implements Comparable<ModifierEntry> {
 
   /**
    * Converts this entry to JSON
-   * @return  Json object of entry
+   *
+   * @return Json object of entry
    */
   public JsonObject toJson() {
     JsonObject json = new JsonObject();
-    json.addProperty("name", getId().toString());
-    json.addProperty("level", level);
+    json.addProperty("name", this.getId().toString());
+    json.addProperty("level", this.level);
     return json;
   }
 
   /**
    * Converts this entry to Nbt
-   * @return  Compound tag of entry
+   *
+   * @return Compound tag of entry
    */
   public CompoundTag toNbt() {
     CompoundTag tag = new CompoundTag();
-    tag.putString("name", getId().toString());
-    tag.putInt("level", level);
+    tag.putString("name", this.getId().toString());
+    tag.putInt("level", this.level);
     return tag;
   }
 
   /**
    * Parses a modifier entry from JSON
-   * @param tag  Compound object
-   * @return  Parsed Compound
+   *
+   * @param tag Compound object
+   * @return Parsed Compound
    */
   public static ModifierEntry fromNbt(CompoundTag tag) {
     return new ModifierEntry(ModifierId.getFromNbt(tag, "name"), tag.getInt("level"));
@@ -146,8 +175,9 @@ public class ModifierEntry implements Comparable<ModifierEntry> {
 
   /**
    * Reads this modifier entry from the packet buffer
-   * @param buffer  Buffer instance
-   * @return  Read entry
+   *
+   * @param buffer Buffer instance
+   * @return Read entry
    */
   public static ModifierEntry read(FriendlyByteBuf buffer) {
     return new ModifierEntry(ModifierId.fromNetwork(buffer), buffer.readVarInt());
@@ -155,32 +185,34 @@ public class ModifierEntry implements Comparable<ModifierEntry> {
 
   /**
    * Writes this modifier entry to the packet buffer
-   * @param buffer  Buffer instance
+   *
+   * @param buffer Buffer instance
    */
   public void write(FriendlyByteBuf buffer) {
-    getId().toNetwork(buffer);
-    buffer.writeVarInt(level);
+    this.getId().toNetwork(buffer);
+    buffer.writeVarInt(this.level);
   }
 
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    ModifierEntry entry = (ModifierEntry)o;
-    return this.matches(entry.getId()) && level == entry.level;
+    if (o == null || this.getClass() != o.getClass()) return false;
+    ModifierEntry entry = (ModifierEntry) o;
+    return this.matches(entry.getId()) && this.level == entry.level;
   }
 
   @Override
   public int hashCode() {
-    return 31 * modifier.hashCode() + Objects.hash(level);
+    return 31 * this.modifier.hashCode() + Objects.hash(this.level);
   }
 
   @Override
   public String toString() {
-    return "ModifierEntry{" + modifier.getId() + ",level=" + level + '}';
+    return "ModifierEntry{" + this.modifier.getId() + ",level=" + this.level + '}';
   }
 
   private static class Serializer implements JsonDeserializer<ModifierEntry>, JsonSerializer<ModifierEntry> {
+
     @Override
     public ModifierEntry deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
       return fromJson(GsonHelper.convertToJsonObject(json, "modifier"));

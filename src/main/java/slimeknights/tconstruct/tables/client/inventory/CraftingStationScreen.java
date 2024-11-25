@@ -7,12 +7,13 @@ import net.minecraft.world.entity.player.Inventory;
 import slimeknights.tconstruct.tables.block.entity.table.CraftingStationBlockEntity;
 import slimeknights.tconstruct.tables.menu.CraftingStationContainerMenu;
 
-public class CraftingStationScreen extends BaseTabbedScreen<CraftingStationBlockEntity,CraftingStationContainerMenu> {
+public class CraftingStationScreen extends BaseTabbedScreen<CraftingStationBlockEntity, CraftingStationContainerMenu> {
+
   private static final ResourceLocation CRAFTING_TABLE_GUI_TEXTURES = new ResourceLocation("textures/gui/container/crafting_table.png");
 
   public CraftingStationScreen(CraftingStationContainerMenu container, Inventory playerInventory, Component title) {
     super(container, playerInventory, title);
-    addChestSideInventory(playerInventory);
+    this.addChestSideInventory(playerInventory);
   }
 
   @Override

@@ -9,7 +9,9 @@ import javax.annotation.Nullable;
 import java.util.Locale;
 import java.util.function.Supplier;
 
-/** Enum representing all heads provided by Tinkers */
+/**
+ * Enum representing all heads provided by Tinkers
+ */
 @RequiredArgsConstructor
 public enum TinkerHeadType implements Type, StringRepresentable {
   BLAZE(() -> EntityType.BLAZE),
@@ -27,9 +29,11 @@ public enum TinkerHeadType implements Type, StringRepresentable {
 
   private final Supplier<EntityType<?>> type;
 
-  /** Gets the associated entity type */
+  /**
+   * Gets the associated entity type
+   */
   public EntityType<?> getType() {
-    return type.get();
+    return this.type.get();
   }
 
   @Override
@@ -39,8 +43,9 @@ public enum TinkerHeadType implements Type, StringRepresentable {
 
   /**
    * Gets the head type for the given entity type
-   * @param type  Entity type
-   * @return  Head type
+   *
+   * @param type Entity type
+   * @return Head type
    */
   @Nullable
   public static TinkerHeadType fromEntityType(EntityType<?> type) {

@@ -24,11 +24,12 @@ import java.util.Locale;
  * Effect that damages an entity
  */
 public record DamageSpillingEffect(DamageType type, float damage) implements ISpillingEffect {
+
   public static final ResourceLocation ID = TConstruct.getResource("damage");
 
   @Override
   public void applyEffects(FluidStack fluid, float scale, ToolAttackContext context) {
-    DamageSource source = type.apply(context);
+    DamageSource source = this.type.apply(context);
     // special effects
     ToolAttackUtil.attackEntitySecondary(source, this.damage * scale, context.getTarget(), context.getLivingTarget(), true);
   }
@@ -36,8 +37,8 @@ public record DamageSpillingEffect(DamageType type, float damage) implements ISp
   @Override
   public JsonObject serialize(JsonSerializationContext context) {
     JsonObject json = JsonUtils.withType(ID);
-    json.addProperty("damage_type", type.getName());
-    json.addProperty("damage_amount", damage);
+    json.addProperty("damage_type", this.type.getName());
+    json.addProperty("damage_amount", this.damage);
     return json;
   }
 
@@ -105,10 +106,14 @@ public record DamageSpillingEffect(DamageType type, float damage) implements ISp
     @Getter
     private final String name = this.name().toLowerCase(Locale.US);
 
-    /** Applies this effect to the given damage source */
+    /**
+     * Applies this effect to the given damage source
+     */
     public abstract DamageSource apply(ToolAttackContext context);
 
-    /** Gets the type for the given name */
+    /**
+     * Gets the type for the given name
+     */
     @Nullable
     public static DamageType byName(String name) {
       for (DamageType type : DamageType.values()) {

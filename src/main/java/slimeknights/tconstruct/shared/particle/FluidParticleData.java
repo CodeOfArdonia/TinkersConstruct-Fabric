@@ -8,7 +8,6 @@ import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
-import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -19,10 +18,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
 
-/** Particle data for a fluid particle */
+/**
+ * Particle data for a fluid particle
+ */
 @SuppressWarnings("removal")
 @RequiredArgsConstructor
 public class FluidParticleData implements ParticleOptions {
+
   private static final DynamicCommandExceptionType UNKNOWN_FLUID = new DynamicCommandExceptionType(arg -> Component.translatable("command.tconstruct.fluid.not_found", arg));
   private static final ParticleOptions.Deserializer<FluidParticleData> DESERIALIZER = new ParticleOptions.Deserializer<>() {
     @Override
@@ -54,24 +56,27 @@ public class FluidParticleData implements ParticleOptions {
 
   @Override
   public void writeToNetwork(FriendlyByteBuf buffer) {
-    fluid.writeToPacket(buffer);
+    this.fluid.writeToPacket(buffer);
   }
 
   @Override
   public String writeToString() {
     StringBuilder builder = new StringBuilder();
-    builder.append(BuiltInRegistries.PARTICLE_TYPE.getKey(getType()));
+    builder.append(BuiltInRegistries.PARTICLE_TYPE.getKey(this.getType()));
     builder.append(" ");
-    builder.append(BuiltInRegistries.FLUID.getKey(fluid.getFluid()));
-    CompoundTag nbt = fluid.getTag();
+    builder.append(BuiltInRegistries.FLUID.getKey(this.fluid.getFluid()));
+    CompoundTag nbt = this.fluid.getTag();
     if (nbt != null) {
       builder.append(nbt);
     }
     return builder.toString();
   }
 
-  /** Particle type for a fluid particle */
+  /**
+   * Particle type for a fluid particle
+   */
   public static class Type extends ParticleType<FluidParticleData> {
+
     public Type() {
       super(false, DESERIALIZER);
     }

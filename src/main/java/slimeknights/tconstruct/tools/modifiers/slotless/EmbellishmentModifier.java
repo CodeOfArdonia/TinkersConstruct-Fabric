@@ -8,11 +8,12 @@ import slimeknights.tconstruct.library.modifiers.impl.NoLevelsModifier;
 import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 
 public class EmbellishmentModifier extends NoLevelsModifier {
+
   private static final String FORMAT_KEY = TConstruct.makeTranslationKey("modifier", "embellishment.formatted");
 
   @Override
   public Component getDisplayName(IToolStackView tool, int level) {
-    MaterialVariantId materialVariant = MaterialVariantId.tryParse(tool.getPersistentData().getString(getId()));
+    MaterialVariantId materialVariant = MaterialVariantId.tryParse(tool.getPersistentData().getString(this.getId()));
     if (materialVariant != null) {
       return Component.translatable(FORMAT_KEY, MaterialTooltipCache.getDisplayName(materialVariant)).withStyle(style -> style.withColor(MaterialTooltipCache.getColor(materialVariant)));
     }
@@ -21,6 +22,6 @@ public class EmbellishmentModifier extends NoLevelsModifier {
 
   @Override
   public void onRemoved(IToolStackView tool) {
-    tool.getPersistentData().remove(getId());
+    tool.getPersistentData().remove(this.getId());
   }
 }

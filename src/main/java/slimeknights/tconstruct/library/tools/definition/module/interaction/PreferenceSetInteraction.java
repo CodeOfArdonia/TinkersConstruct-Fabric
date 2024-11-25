@@ -16,10 +16,12 @@ import java.util.Locale;
 /**
  * Interaction that makes only a limited set work in the preferred hand, the rest working in the other hand
  */
-public record PreferenceSetInteraction(InteractionSource preferredSource, IJsonPredicate<ModifierId> preferenceModifiers) implements InteractionToolModule, IToolModule {
+public record PreferenceSetInteraction(InteractionSource preferredSource,
+                                       IJsonPredicate<ModifierId> preferenceModifiers) implements InteractionToolModule, IToolModule {
+
   @Override
   public boolean canInteract(IToolStackView tool, ModifierId modifier, InteractionSource source) {
-    return (source == preferredSource) == preferenceModifiers.matches(modifier);
+    return (source == this.preferredSource) == this.preferenceModifiers.matches(modifier);
   }
 
   @Override
@@ -27,7 +29,9 @@ public record PreferenceSetInteraction(InteractionSource preferredSource, IJsonP
     return LOADER;
   }
 
-  /** Loader instance */
+  /**
+   * Loader instance
+   */
   public static final IGenericLoader<PreferenceSetInteraction> LOADER = new IGenericLoader<>() {
     @Override
     public PreferenceSetInteraction deserialize(JsonObject json) {

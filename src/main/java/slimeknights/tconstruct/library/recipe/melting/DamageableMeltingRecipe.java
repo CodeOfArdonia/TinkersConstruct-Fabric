@@ -16,21 +16,31 @@ import slimeknights.tconstruct.smeltery.TinkerSmeltery;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
-/** Melting recipe that scale output based on input damage */
+/**
+ * Melting recipe that scale output based on input damage
+ */
 public class DamageableMeltingRecipe extends MeltingRecipe {
+
   private static final int[] EMPTY_SIZE = {};
 
-  /** Sizes of each unit in the recipe. Index 0 is the main output, 1 and onwards is secondary outputs */
+  /**
+   * Sizes of each unit in the recipe. Index 0 is the main output, 1 and onwards is secondary outputs
+   */
   private final int unitSize;
-  /** Sizes of byproducts */
+  /**
+   * Sizes of byproducts
+   */
   private final int[] byproductSizes;
+
   public DamageableMeltingRecipe(ResourceLocation id, String group, Ingredient input, FluidStack output, int temperature, int time, List<FluidStack> byproducts, int unitSize, int... byproductSizes) {
     super(id, group, input, output, temperature, time, byproducts);
     this.unitSize = unitSize;
     this.byproductSizes = byproductSizes;
   }
 
-  /** Scales a fluid stack based on the damage */
+  /**
+   * Scales a fluid stack based on the damage
+   */
   private static FluidStack scaleOutput(FluidStack fluid, int damage, int maxDamage, int unitSize) {
     long amount = fluid.getAmount() * (maxDamage - damage) / maxDamage;
     // mimimum output is one unit
@@ -48,14 +58,14 @@ public class DamageableMeltingRecipe extends MeltingRecipe {
 
   @Override
   public FluidStack getOutput(IMeltingContainer inv) {
-    FluidStack output = getOutput();
+    FluidStack output = this.getOutput();
     ItemStack input = inv.getStack();
     int maxDamage = input.getMaxDamage();
     if (maxDamage <= 0) {
       return output.copy();
     }
     // scale output based on damage value, its possible 1mb is a lot for some high durability things, but whatever
-    return scaleOutput(output, input.getDamageValue(), maxDamage, unitSize);
+    return scaleOutput(output, input.getDamageValue(), maxDamage, this.unitSize);
   }
 
   @Override
@@ -67,9 +77,9 @@ public class DamageableMeltingRecipe extends MeltingRecipe {
     } else {
       // fill byproducts until we run out of space or byproducts
       int itemDamage = input.getDamageValue();
-      for (int i = 0; i < byproducts.size(); i++) {
-        FluidStack fluidStack = byproducts.get(i);
-        TransferUtil.insertFluid(handler, scaleOutput(fluidStack, itemDamage, maxDamage, i < byproductSizes.length ? byproductSizes[i] : unitSize));
+      for (int i = 0; i < this.byproducts.size(); i++) {
+        FluidStack fluidStack = this.byproducts.get(i);
+        TransferUtil.insertFluid(handler, scaleOutput(fluidStack, itemDamage, maxDamage, i < this.byproductSizes.length ? this.byproductSizes[i] : this.unitSize));
       }
     }
   }
@@ -87,8 +97,8 @@ public class DamageableMeltingRecipe extends MeltingRecipe {
       int[] byproductSizes = EMPTY_SIZE;
       if (json.has("byproducts")) {
         byproductSizes = StreamSupport.stream(GsonHelper.getAsJsonArray(json, "byproducts").spliterator(), false)
-                                 .mapToInt(element -> GsonHelper.getAsInt(element.getAsJsonObject(), "unit_size", 1))
-                                 .toArray();
+          .mapToInt(element -> GsonHelper.getAsInt(element.getAsJsonObject(), "unit_size", 1))
+          .toArray();
       }
       return new DamageableMeltingRecipe(id, group, input, output, temperature, time, byproducts, unitSize, byproductSizes);
     }

@@ -15,13 +15,20 @@ import slimeknights.tconstruct.library.tools.capability.TinkerDataCapability.Tin
 import slimeknights.tconstruct.library.tools.context.EquipmentChangeContext;
 import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 
-/** @deprecated use {@link MobDisguiseModule} */
+/**
+ * @deprecated use {@link MobDisguiseModule}
+ */
 @Deprecated
 @RequiredArgsConstructor
 public class MobDisguiseModifier extends NoLevelsModifier {
-  /** Loader instance */
+
+  /**
+   * Loader instance
+   */
   public static final IGenericLoader<MobDisguiseModifier> LOADER = new GenericRegistryEntrySerializer<>("entity", BuiltInRegistries.ENTITY_TYPE, MobDisguiseModifier::new, m -> m.type);
-  /** @deprecated use {@link MobDisguiseModule#DISGUISES} */
+  /**
+   * @deprecated use {@link MobDisguiseModule#DISGUISES}
+   */
   @Deprecated
   public static final TinkerDataKey<Multiset<EntityType<?>>> DISGUISES = MobDisguiseModule.DISGUISES;
 
@@ -41,7 +48,7 @@ public class MobDisguiseModifier extends NoLevelsModifier {
           disguises = HashMultiset.create();
           data.put(DISGUISES, disguises);
         }
-        disguises.add(type);
+        disguises.add(this.type);
       });
     }
   }
@@ -52,7 +59,7 @@ public class MobDisguiseModifier extends NoLevelsModifier {
       context.getTinkerData().ifPresent(data -> {
         Multiset<EntityType<?>> disguises = data.get(DISGUISES);
         if (disguises != null) {
-          disguises.remove(type);
+          disguises.remove(this.type);
         }
       });
     }

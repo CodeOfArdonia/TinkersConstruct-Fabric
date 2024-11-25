@@ -1,7 +1,5 @@
 package slimeknights.tconstruct.plugin.rei.entity;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import lombok.RequiredArgsConstructor;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.entry.renderer.EntryRenderer;
@@ -11,16 +9,13 @@ import me.shedaniel.rei.api.common.entry.EntryStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
-import org.joml.Quaternionf;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.client.RenderUtils;
 import slimeknights.tconstruct.plugin.jei.entity.EntityMeltingRecipeCategory;
@@ -39,21 +34,28 @@ import java.util.Set;
 @SuppressWarnings("rawtypes")
 @RequiredArgsConstructor
 public class EntityEntryRenderer implements EntryRenderer<EntityType> {
+
   public static final EntityEntryRenderer INSTANCE = new EntityEntryRenderer(16);
 
-  /** Entity types that will not render, as they either errored or are the wrong type */
+  /**
+   * Entity types that will not render, as they either errored or are the wrong type
+   */
   private static final Set<EntityType<?>> IGNORED_ENTITIES = new HashSet<>();
 
-  /** Square size of the renderer in pixels */
+  /**
+   * Square size of the renderer in pixels
+   */
   private final int size;
 
-  /** Cache of entities for each entity type */
+  /**
+   * Cache of entities for each entity type
+   */
   private final Map<EntityType<?>, Entity> ENTITY_MAP = new HashMap<>();
 
   @Override
   public void render(EntryStack<EntityType> entry, GuiGraphics graphics, Rectangle bounds, int mouseX, int mouseY, float delta) {
     graphics.pose().pushPose();
-    graphics.pose().translate(bounds.getCenterX() - size / 2, bounds.getCenterY() - size / 2, 0);
+    graphics.pose().translate(bounds.getCenterX() - this.size / 2, bounds.getCenterY() - this.size / 2, 0);
     Level world = Minecraft.getInstance().level;
     EntityType type = entry.getValue();
     if (world != null && !IGNORED_ENTITIES.contains(type)) {
@@ -64,37 +66,37 @@ public class EntityEntryRenderer implements EntryRenderer<EntityType> {
         entity = Minecraft.getInstance().player;
       } else {
         // entity is created with the client world, but the entity map is thrown away when JEI restarts so they should be okay I think
-        entity = ENTITY_MAP.computeIfAbsent(type, t -> t.create(world));
+        entity = this.ENTITY_MAP.computeIfAbsent(type, t -> t.create(world));
       }
       // only can draw living entities, plus non-living ones don't get recipes anyways
       if (entity instanceof LivingEntity livingEntity) {
         // scale down large mobs, but don't scale up small ones
-        int scale = size / 2;
+        int scale = this.size / 2;
         float height = entity.getBbHeight();
         float width = entity.getBbWidth();
         if (height > 2 || width > 2) {
-          scale = (int)(size / Math.max(height, width));
+          scale = (int) (this.size / Math.max(height, width));
         }
         // catch exceptions drawing the entity to be safe, any caught exceptions blacklist the entity
         try {
-          InventoryScreen.renderEntityInInventoryFollowsMouse(graphics, size / 2, size, scale, 0, 10, livingEntity);
+          InventoryScreen.renderEntityInInventoryFollowsMouse(graphics, this.size / 2, this.size, scale, 0, 10, livingEntity);
           graphics.pose().popPose();
           return;
         } catch (Exception e) {
           TConstruct.LOG.error("Error drawing entity " + BuiltInRegistries.ENTITY_TYPE.getKey(type), e);
           IGNORED_ENTITIES.add(type);
-          ENTITY_MAP.remove(type);
+          this.ENTITY_MAP.remove(type);
         }
       } else {
         // not living, so might as well skip next time
         IGNORED_ENTITIES.add(type);
-        ENTITY_MAP.remove(type);
+        this.ENTITY_MAP.remove(type);
       }
     }
 
     // fallback, draw a pink and black "spawn egg"
     RenderUtils.setup(EntityMeltingRecipeCategory.BACKGROUND_LOC);
-    int offset = (size - 16) / 2;
+    int offset = (this.size - 16) / 2;
     graphics.blit(EntityMeltingRecipeCategory.BACKGROUND_LOC, offset, offset, 149f, 58f, 16, 16, 256, 256);
     graphics.pose().popPose();
   }

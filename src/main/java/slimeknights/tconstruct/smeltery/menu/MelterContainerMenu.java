@@ -26,6 +26,7 @@ import java.util.function.Consumer;
 
 @SuppressWarnings("UnstableApiUsage")
 public class MelterContainerMenu extends TriggeringBaseContainerMenu<MelterBlockEntity> {
+
   public static final ResourceLocation TOOLTIP_FORMAT = TConstruct.getResource("melter");
 
   @SuppressWarnings("MismatchedReadAndWriteOfArray")
@@ -33,15 +34,16 @@ public class MelterContainerMenu extends TriggeringBaseContainerMenu<MelterBlock
   private final Slot[] inputs;
   @Getter
   private boolean hasFuelSlot = false;
+
   public MelterContainerMenu(int id, @Nullable Inventory inv, @Nullable MelterBlockEntity melter) {
     super(TinkerSmeltery.melterContainer.get(), id, inv, melter);
 
     // create slots
     if (melter != null) {
       MeltingModuleInventory inventory = melter.getMeltingInventory();
-      inputs = new Slot[inventory.getSlotCount()];
-      for (int i = 0; i < inputs.length; i++) {
-        inputs[i] = this.addSlot(new SmartItemHandlerSlot(inventory, i, 22, 16 + (i * 18)));
+      this.inputs = new Slot[inventory.getSlotCount()];
+      for (int i = 0; i < this.inputs.length; i++) {
+        this.inputs[i] = this.addSlot(new SmartItemHandlerSlot(inventory, i, 22, 16 + (i * 18)));
       }
 
       // add fuel slot if present, we only add for the melter though
@@ -51,7 +53,7 @@ public class MelterContainerMenu extends TriggeringBaseContainerMenu<MelterBlock
         Storage<ItemVariant> storage = ItemStorage.SIDED.find(world, down, null);
         if (storage instanceof SlottedStackStorage slottedStorage) {
           this.addSlot(new SmartItemHandlerSlot(slottedStorage, 0, 151, 32));
-          hasFuelSlot = true;
+          this.hasFuelSlot = true;
         }
       }
 
@@ -62,7 +64,7 @@ public class MelterContainerMenu extends TriggeringBaseContainerMenu<MelterBlock
       ValidZeroDataSlot.trackIntArray(referenceConsumer, melter.getFuelModule());
       inventory.trackInts(array -> ValidZeroDataSlot.trackIntArray(referenceConsumer, array));
     } else {
-      inputs = new Slot[0];
+      this.inputs = new Slot[0];
     }
   }
 

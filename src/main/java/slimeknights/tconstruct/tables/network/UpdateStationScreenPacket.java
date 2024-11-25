@@ -7,6 +7,7 @@ import slimeknights.mantle.network.packet.IThreadsafePacket;
 import slimeknights.tconstruct.tables.client.inventory.BaseTabbedScreen;
 
 public class UpdateStationScreenPacket implements IThreadsafePacket {
+
   public static final UpdateStationScreenPacket INSTANCE = new UpdateStationScreenPacket();
 
   private UpdateStationScreenPacket() {}
@@ -19,13 +20,16 @@ public class UpdateStationScreenPacket implements IThreadsafePacket {
     HandleClient.handle();
   }
 
-  /** Safely runs client side only code in a method only called on client */
+  /**
+   * Safely runs client side only code in a method only called on client
+   */
   private static class HandleClient {
+
     private static void handle() {
       Screen screen = Minecraft.getInstance().screen;
       if (screen != null) {
         if (screen instanceof BaseTabbedScreen) {
-          ((BaseTabbedScreen<?,?>) screen).updateDisplay();
+          ((BaseTabbedScreen<?, ?>) screen).updateDisplay();
         }
       }
     }

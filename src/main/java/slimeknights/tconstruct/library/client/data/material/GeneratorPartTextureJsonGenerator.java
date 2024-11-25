@@ -14,14 +14,18 @@ import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.client.data.material.AbstractPartSpriteProvider.PartSpriteInfo;
 import slimeknights.tconstruct.library.materials.stats.MaterialStatsId;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-/** Generates the file that tells the part generator command which parts are needed for your tools */
+/**
+ * Generates the file that tells the part generator command which parts are needed for your tools
+ */
 public class GeneratorPartTextureJsonGenerator extends GenericDataProvider {
-  /** GSON adapter for material info deserializing */
+
+  /**
+   * GSON adapter for material info deserializing
+   */
   public static final Gson GSON = (new GsonBuilder())
     .registerTypeAdapter(ResourceLocation.class, new ResourceLocation.Serializer())
     .registerTypeAdapter(MaterialStatsId.class, new ResourceLocationSerializer<>(MaterialStatsId::new, TConstruct.MOD_ID))
@@ -31,6 +35,7 @@ public class GeneratorPartTextureJsonGenerator extends GenericDataProvider {
 
   private final String modId;
   private final AbstractPartSpriteProvider spriteProvider;
+
   public GeneratorPartTextureJsonGenerator(FabricDataOutput output, String modId, AbstractPartSpriteProvider spriteProvider) {
     super(output, PackType.CLIENT_RESOURCES, "tinkering", GSON);
     this.modId = modId;
@@ -42,18 +47,18 @@ public class GeneratorPartTextureJsonGenerator extends GenericDataProvider {
     JsonObject json = new JsonObject();
     json.addProperty("replace", false);
     JsonArray parts = new JsonArray();
-    for (PartSpriteInfo spriteInfo : spriteProvider.getSprites()) {
+    for (PartSpriteInfo spriteInfo : this.spriteProvider.getSprites()) {
       parts.add(GSON.toJsonTree(spriteInfo));
     }
     json.add("parts", parts);
     List<CompletableFuture<?>> futures = new ArrayList<>();
-    futures.add(saveThing(cache, new ResourceLocation(modId, "generator_part_textures"), json));
+    futures.add(this.saveThing(cache, new ResourceLocation(this.modId, "generator_part_textures"), json));
 
     return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
   }
 
   @Override
   public String getName() {
-    return modId + " Command Part Texture JSON Generator";
+    return this.modId + " Command Part Texture JSON Generator";
   }
 }

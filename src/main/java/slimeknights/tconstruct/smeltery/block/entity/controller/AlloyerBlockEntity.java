@@ -1,6 +1,5 @@
 package slimeknights.tconstruct.smeltery.block.entity.controller;
 
-import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import lombok.Getter;
 import lombok.Setter;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
@@ -40,32 +39,50 @@ import java.util.Collections;
  * Dedicated alloying block
  */
 public class AlloyerBlockEntity extends NameableBlockEntity implements ITankBlockEntity, SidedStorageBlockEntity {
-  /** Max capacity for the tank */
+
+  /**
+   * Max capacity for the tank
+   */
   private static final long TANK_CAPACITY = TankType.INGOT_TANK.getCapacity();
-  /** Name of the container */
+  /**
+   * Name of the container
+   */
   private static final Component NAME = TConstruct.makeTranslation("gui", "alloyer");
 
   public static final BlockEntityTicker<AlloyerBlockEntity> SERVER_TICKER = (level, pos, state, self) -> self.tick(level, pos, state);
 
-  /** Tank for this mixer */
+  /**
+   * Tank for this mixer
+   */
   @Getter
   protected final FluidTankAnimated tank = new FluidTankAnimated(TANK_CAPACITY, this);
 
   // modules
-  /** Logic for a mixer alloying */
+  /**
+   * Logic for a mixer alloying
+   */
   @Getter
-  private final MixerAlloyTank alloyTank = new MixerAlloyTank(this, tank);
-  /** Base alloy logic */
-  private final SingleAlloyingModule alloyingModule = new SingleAlloyingModule(this, alloyTank);
-  /** Fuel handling logic */
+  private final MixerAlloyTank alloyTank = new MixerAlloyTank(this, this.tank);
+  /**
+   * Base alloy logic
+   */
+  private final SingleAlloyingModule alloyingModule = new SingleAlloyingModule(this, this.alloyTank);
+  /**
+   * Fuel handling logic
+   */
   @Getter
   private final FuelModule fuelModule = new FuelModule(this, () -> Collections.singletonList(this.worldPosition.below()));
 
-  /** Last comparator strength to reduce block updates */
-  @Getter @Setter
+  /**
+   * Last comparator strength to reduce block updates
+   */
+  @Getter
+  @Setter
   private int lastStrength = -1;
 
-  /** Internal tick counter */
+  /**
+   * Internal tick counter
+   */
   private int tick;
 
   public AlloyerBlockEntity(BlockPos pos, BlockState state) {
@@ -83,7 +100,7 @@ public class AlloyerBlockEntity extends NameableBlockEntity implements ITankBloc
   @Nonnull
   @Override
   public Storage<FluidVariant> getFluidStorage(@org.jetbrains.annotations.Nullable Direction direction) {
-    return tank;
+    return this.tank;
   }
 
 
@@ -91,29 +108,33 @@ public class AlloyerBlockEntity extends NameableBlockEntity implements ITankBloc
    * Alloying
    */
 
-  /** Checks if the tile entity is active */
+  /**
+   * Checks if the tile entity is active
+   */
   private boolean isFormed() {
     BlockState state = this.getBlockState();
     return state.hasProperty(MelterBlock.IN_STRUCTURE) && state.getValue(MelterBlock.IN_STRUCTURE);
   }
 
-  /** Handles server tick */
+  /**
+   * Handles server tick
+   */
   private void tick(Level level, BlockPos pos, BlockState state) {
-    if (!isFormed()) {
+    if (!this.isFormed()) {
       return;
     }
 
-    switch (tick) {
+    switch (this.tick) {
       // tick 0: find fuel
       case 0 -> {
-        alloyTank.setTemperature(fuelModule.findFuel(false));
-        if (!fuelModule.hasFuel() && alloyingModule.canAlloy()) {
-          fuelModule.findFuel(true);
+        this.alloyTank.setTemperature(this.fuelModule.findFuel(false));
+        if (!this.fuelModule.hasFuel() && this.alloyingModule.canAlloy()) {
+          this.fuelModule.findFuel(true);
         }
       }
       // tick 2: alloy alloys and consume fuel
       case 2 -> {
-        boolean hasFuel = fuelModule.hasFuel();
+        boolean hasFuel = this.fuelModule.hasFuel();
 
         // update state for new fuel state
         if (state.getValue(ControllerBlock.ACTIVE) != hasFuel) {
@@ -128,21 +149,22 @@ public class AlloyerBlockEntity extends NameableBlockEntity implements ITankBloc
 
         // actual alloying
         if (hasFuel) {
-          alloyTank.setTemperature(fuelModule.getTemperature());
-          alloyingModule.doAlloy();
-          fuelModule.decreaseFuel(1);
+          this.alloyTank.setTemperature(this.fuelModule.getTemperature());
+          this.alloyingModule.doAlloy();
+          this.fuelModule.decreaseFuel(1);
         }
       }
     }
-    tick = (tick + 1) % 4;
+    this.tick = (this.tick + 1) % 4;
   }
 
   /**
    * Called when a neighbor of this block is changed to update the tank cache
-   * @param side  Side changed
+   *
+   * @param side Side changed
    */
   public void neighborChanged(Direction side) {
-    alloyTank.refresh(side, true);
+    this.alloyTank.refresh(side, true);
   }
 
   /*
@@ -168,19 +190,19 @@ public class AlloyerBlockEntity extends NameableBlockEntity implements ITankBloc
   @Override
   public void saveSynced(CompoundTag tag) {
     super.saveSynced(tag);
-    tag.put(NBTTags.TANK, tank.writeToNBT(new CompoundTag()));
+    tag.put(NBTTags.TANK, this.tank.writeToNBT(new CompoundTag()));
   }
 
   @Override
   public void saveAdditional(CompoundTag tag) {
     super.saveAdditional(tag);
-    fuelModule.writeToTag(tag);
+    this.fuelModule.writeToTag(tag);
   }
 
   @Override
   public void load(CompoundTag nbt) {
     super.load(nbt);
-    tank.readFromNBT(nbt.getCompound(NBTTags.TANK));
-    fuelModule.readFromTag(nbt);
+    this.tank.readFromNBT(nbt.getCompound(NBTTags.TANK));
+    this.fuelModule.readFromTag(nbt);
   }
 }

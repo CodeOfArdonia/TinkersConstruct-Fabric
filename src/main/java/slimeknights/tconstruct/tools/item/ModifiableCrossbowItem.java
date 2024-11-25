@@ -57,9 +57,13 @@ import java.util.List;
 import java.util.function.Predicate;
 
 public class ModifiableCrossbowItem extends ModifiableLauncherItem {
-  /** Key containing the stored crossbow ammo */
+
+  /**
+   * Key containing the stored crossbow ammo
+   */
   public static final ResourceLocation KEY_CROSSBOW_AMMO = TConstruct.getResource("crossbow_ammo");
   private static final String PROJECTILE_KEY = "item.minecraft.crossbow.projectile";
+
   public ModifiableCrossbowItem(Properties properties, ToolDefinition toolDefinition, ResourceKey<CreativeModeTab> tab) {
     super(properties, toolDefinition, tab);
   }
@@ -96,7 +100,9 @@ public class ModifiableCrossbowItem extends ModifiableLauncherItem {
 
   /* Arrow launching */
 
-  /** Gets the arrow pitch */
+  /**
+   * Gets the arrow pitch
+   */
   private static float getRandomShotPitch(float angle, RandomSource pRandom) {
     if (angle == 0) {
       return 1.0f;
@@ -126,12 +132,12 @@ public class ModifiableCrossbowItem extends ModifiableLauncherItem {
       }
 
       // if we have ammo, start charging
-      if (BowAmmoModifierHook.hasAmmo(tool, bow, player, getSupportedHeldProjectiles())) {
+      if (BowAmmoModifierHook.hasAmmo(tool, bow, player, this.getSupportedHeldProjectiles())) {
         player.startUsingItem(hand);
         float drawspeed = ConditionalStatModifierHook.getModifiedStat(tool, player, ToolStats.DRAW_SPEED) / 20f;
         TinkerDataCapability.CAPABILITY.maybeGet(player).ifPresent(data -> data.put(DRAWSPEED, drawspeed));
         // we want an int version to make sounds more precise
-        persistentData.putInt(KEY_DRAWTIME, (int)Math.ceil(1 / drawspeed));
+        persistentData.putInt(KEY_DRAWTIME, (int) Math.ceil(1 / drawspeed));
         if (!level.isClientSide) {
           level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.CROSSBOW_QUICK_CHARGE_1, SoundSource.PLAYERS, 0.75F, 1.0F);
         }
@@ -153,10 +159,11 @@ public class ModifiableCrossbowItem extends ModifiableLauncherItem {
 
   /**
    * Fires the crossbow
-   * @param tool       Tool instance
-   * @param player     Player firing
-   * @param hand       Hand fired from
-   * @param heldAmmo   Ammo used to fire, should be non-empty
+   *
+   * @param tool     Tool instance
+   * @param player   Player firing
+   * @param hand     Hand fired from
+   * @param heldAmmo Ammo used to fire, should be non-empty
    */
   public static void fireCrossbow(IToolStackView tool, Player player, InteractionHand hand, CompoundTag heldAmmo) {
     // ammo already loaded? time to fire
@@ -186,7 +193,7 @@ public class ModifiableCrossbowItem extends ModifiableLauncherItem {
           speed = 1.5f;
           damage += 3;
         } else {
-          ArrowItem arrowItem = ammo.getItem() instanceof ArrowItem a ? a : (ArrowItem)Items.ARROW;
+          ArrowItem arrowItem = ammo.getItem() instanceof ArrowItem a ? a : (ArrowItem) Items.ARROW;
           arrow = arrowItem.createArrow(level, ammo, player);
           projectile = arrow;
           arrow.setCritArrow(true);
@@ -196,7 +203,7 @@ public class ModifiableCrossbowItem extends ModifiableLauncherItem {
           damage += 1;
 
           // vanilla arrows have a base damage of 2, cancel that out then add in our base damage to account for custom arrows with higher base damage
-          float baseArrowDamage = (float)(arrow.getBaseDamage() - 2 + tool.getStats().get(ToolStats.PROJECTILE_DAMAGE));
+          float baseArrowDamage = (float) (arrow.getBaseDamage() - 2 + tool.getStats().get(ToolStats.PROJECTILE_DAMAGE));
           arrow.setBaseDamage(ConditionalStatModifierHook.getModifiedStat(tool, player, ToolStats.PROJECTILE_DAMAGE, baseArrowDamage));
 
           // fortunately, don't need to deal with vanilla infinity here, our infinity was dealt with during loading
@@ -255,12 +262,12 @@ public class ModifiableCrossbowItem extends ModifiableLauncherItem {
     }
 
     // did we charge enough?
-    if ((getUseDuration(bow) - chargeRemaining) < persistentData.getInt(KEY_DRAWTIME)) {
+    if ((this.getUseDuration(bow) - chargeRemaining) < persistentData.getInt(KEY_DRAWTIME)) {
       return;
     }
 
     // find ammo and store it on the bow
-    ItemStack ammo = BowAmmoModifierHook.findAmmo(tool, bow, player, getSupportedHeldProjectiles());
+    ItemStack ammo = BowAmmoModifierHook.findAmmo(tool, bow, player, this.getSupportedHeldProjectiles());
     if (!ammo.isEmpty()) {
       level.playSound(null, living.getX(), living.getY(), living.getZ(), SoundEvents.CROSSBOW_LOADING_END, SoundSource.PLAYERS, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.5F + 1.0F) + 0.2F);
       if (!level.isClientSide) {
@@ -281,7 +288,7 @@ public class ModifiableCrossbowItem extends ModifiableLauncherItem {
   @Override
   public void onUseTick(Level level, LivingEntity living, ItemStack bow, int chargeRemaining) {
     // play the sound at the end of loading as an indicator its loaded, texture is another indicator
-    if (!level.isClientSide && (getUseDuration(bow) - chargeRemaining) == ModifierUtil.getPersistentInt(bow, KEY_DRAWTIME, 0)) {
+    if (!level.isClientSide && (this.getUseDuration(bow) - chargeRemaining) == ModifierUtil.getPersistentInt(bow, KEY_DRAWTIME, 0)) {
       level.playSound(null, living.getX(), living.getY(), living.getZ(), SoundEvents.CROSSBOW_LOADING_MIDDLE, SoundSource.PLAYERS, 0.75F, 1.0F);
     }
   }

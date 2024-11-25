@@ -20,8 +20,10 @@ import java.util.List;
  * Extension of melting recipe to boost results of ores
  */
 public class OreMeltingRecipe extends MeltingRecipe {
+
   @Getter
   private final OreRateType oreType;
+
   public OreMeltingRecipe(ResourceLocation id, String group, Ingredient input, FluidStack output, int temperature, int time, List<FluidStack> byproducts, OreRateType oreType) {
     super(id, group, input, output, temperature, time, byproducts);
     this.oreType = oreType;
@@ -29,8 +31,8 @@ public class OreMeltingRecipe extends MeltingRecipe {
 
   @Override
   public FluidStack getOutput(IMeltingContainer inv) {
-    FluidStack output = getOutput();
-    return inv.getOreRate().applyOreBoost(oreType, output);
+    FluidStack output = this.getOutput();
+    return inv.getOreRate().applyOreBoost(this.oreType, output);
   }
 
   @Override
@@ -39,6 +41,7 @@ public class OreMeltingRecipe extends MeltingRecipe {
   }
 
   public static class Serializer extends MeltingRecipe.AbstractSerializer<OreMeltingRecipe> {
+
     @Override
     protected OreMeltingRecipe createFromJson(ResourceLocation id, String group, Ingredient input, FluidStack output, int temperature, int time, List<FluidStack> byproducts, JsonObject json) {
       OreRateType rate = OreRateType.parse(json, "rate");

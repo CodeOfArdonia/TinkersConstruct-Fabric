@@ -13,9 +13,11 @@ import java.util.function.Supplier;
  * Contains helpers to use for registering client events
  */
 public abstract class ClientEventBase {
+
   /**
    * Registers a block colors alias for the given block
-   * @param block        Block to register
+   *
+   * @param block Block to register
    */
   protected static void registerBlockItemColorAlias(Block block) {
     ColorProviderRegistry<ItemLike, ItemColor> i = ColorProviderRegistry.ITEM;
@@ -25,7 +27,8 @@ public abstract class ClientEventBase {
 
   /**
    * Registers a block colors alias for the given block suppliers
-   * @param block        Block to register
+   *
+   * @param block Block to register
    */
   protected static void registerBlockItemColorAlias(Supplier<? extends Block> block) {
     registerBlockItemColorAlias(block.get());
@@ -33,9 +36,10 @@ public abstract class ClientEventBase {
 
   /**
    * Registers a block colors alias for all blocks in the given instance
-   * @param blocks       EnumBlock instance
+   *
+   * @param blocks EnumBlock instance
    */
-  protected static <B extends Block> void registerBlockItemColorAlias(EnumObject<?,B> blocks) {
+  protected static <B extends Block> void registerBlockItemColorAlias(EnumObject<?, B> blocks) {
     for (B block : blocks.values()) {
       registerBlockItemColorAlias(block);
     }

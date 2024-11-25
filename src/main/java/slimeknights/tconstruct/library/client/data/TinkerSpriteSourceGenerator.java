@@ -16,6 +16,7 @@ import java.lang.reflect.Method;
 import java.util.Optional;
 
 public class TinkerSpriteSourceGenerator extends SpriteSourceProvider {
+
   private final ExistingFileHelper helper;
 
   public TinkerSpriteSourceGenerator(FabricDataOutput output, ExistingFileHelper helper) {
@@ -27,16 +28,16 @@ public class TinkerSpriteSourceGenerator extends SpriteSourceProvider {
   protected void addSources() {
     ResourceManager resourceManager;
     try {
-      Method method = helper.getClass().getDeclaredMethod("getManager", PackType.class);
+      Method method = this.helper.getClass().getDeclaredMethod("getManager", PackType.class);
       method.setAccessible(true);
-      resourceManager = (ResourceManager) method.invoke(helper, PackType.CLIENT_RESOURCES);
+      resourceManager = (ResourceManager) method.invoke(this.helper, PackType.CLIENT_RESOURCES);
       method.setAccessible(false);
     } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }
 
 
-    var sourceList = atlas(BLOCKS_ATLAS);
+    var sourceList = this.atlas(BLOCKS_ATLAS);
     ModifierIconManager.INSTANCE.onReloadSafe(resourceManager);
     ModifierIconManager.modifierIcons.values().forEach(list -> list.forEach(resourceLocation -> {
       sourceList.addSource(new SingleFile(new ResourceLocation(resourceLocation.toString().replace(".png", "").replace("textures/", "")), Optional.empty()));

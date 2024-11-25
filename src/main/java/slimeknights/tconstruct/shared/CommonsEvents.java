@@ -12,7 +12,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -55,7 +54,9 @@ public class CommonsEvents {
     }
   }
 
-  /** Handles opening our containers as the vanilla logic does not grant TE access */
+  /**
+   * Handles opening our containers as the vanilla logic does not grant TE access
+   */
   static InteractionResult openSpectatorMenu(Player player, Level world, InteractionHand hand, BlockHitResult hitResult) {
     if (player.isSpectator()) {
       BlockPos pos = hitResult.getBlockPos();

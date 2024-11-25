@@ -16,13 +16,14 @@ import net.minecraft.world.level.block.state.BlockState;
 import slimeknights.tconstruct.library.tools.definition.ToolDefinition;
 
 public class ModifiableDaggerItem extends ModifiableSwordItem {
+
   public ModifiableDaggerItem(Properties properties, ToolDefinition toolDefinition, ResourceKey<CreativeModeTab> tab) {
     super(properties, toolDefinition, tab);
   }
 
   @Override
   public int getItemStackLimit(ItemStack stack) {
-    return getDamage(stack) == 0 ? 2 : 1;
+    return this.getDamage(stack) == 0 ? 2 : 1;
   }
 
   @Override

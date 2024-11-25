@@ -15,7 +15,9 @@ import java.util.Collection;
  */
 @RequiredArgsConstructor
 public class UpdateTinkerSlotLayoutsPacket implements IThreadsafePacket {
-  @Getter(AccessLevel.PACKAGE) @VisibleForTesting
+
+  @Getter(AccessLevel.PACKAGE)
+  @VisibleForTesting
   private final Collection<StationSlotLayout> layouts;
 
   public UpdateTinkerSlotLayoutsPacket(FriendlyByteBuf buffer) {
@@ -24,19 +26,19 @@ public class UpdateTinkerSlotLayoutsPacket implements IThreadsafePacket {
     for (int i = 0; i < max; i++) {
       builder.add(StationSlotLayout.read(buffer));
     }
-    layouts = builder.build();
+    this.layouts = builder.build();
   }
 
   @Override
   public void encode(FriendlyByteBuf buffer) {
-    buffer.writeVarInt(layouts.size());
-    for (StationSlotLayout layout : layouts) {
+    buffer.writeVarInt(this.layouts.size());
+    for (StationSlotLayout layout : this.layouts) {
       layout.write(buffer);
     }
   }
 
   @Override
   public void handleThreadsafe(Context context) {
-    StationSlotLayoutLoader.getInstance().setSlots(layouts);
+    StationSlotLayoutLoader.getInstance().setSlots(this.layouts);
   }
 }

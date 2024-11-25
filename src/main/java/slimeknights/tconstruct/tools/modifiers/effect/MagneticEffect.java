@@ -5,6 +5,7 @@ import net.minecraft.world.entity.LivingEntity;
 import slimeknights.tconstruct.tools.modifiers.upgrades.general.MagneticModifier;
 
 public class MagneticEffect extends NoMilkEffect {
+
   public MagneticEffect() {
     super(MobEffectCategory.BENEFICIAL, 0x720000, false);
   }

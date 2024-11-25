@@ -7,8 +7,11 @@ import slimeknights.tconstruct.common.TinkerEffect;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Effect that cannot be cured with milk */
+/**
+ * Effect that cannot be cured with milk
+ */
 public class NoMilkEffect extends TinkerEffect {
+
   public NoMilkEffect(MobEffectCategory typeIn, int color, boolean show) {
     super(typeIn, color, show);
   }

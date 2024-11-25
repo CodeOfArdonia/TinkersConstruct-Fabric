@@ -29,42 +29,46 @@ import java.util.function.BiConsumer;
  * Shared logic for jagged and stonebound. Trait boosts attack damage as it lowers mining speed.
  */
 public class DamageSpeedTradeModifier extends Modifier {
+
   private static final Component MINING_SPEED = TConstruct.makeTranslation("modifier", "fake_attribute.mining_speed");
   private final float multiplier;
-  private final Lazy<UUID> uuid = Lazy.of(() -> UUID.nameUUIDFromBytes(getId().toString().getBytes()));
+  private final Lazy<UUID> uuid = Lazy.of(() -> UUID.nameUUIDFromBytes(this.getId().toString().getBytes()));
   private final Lazy<String> attributeName = Lazy.of(() -> {
-    ResourceLocation id = getId();
+    ResourceLocation id = this.getId();
     return id.getPath() + "." + id.getNamespace() + ".attack_damage";
   });
 
   /**
    * Creates a new instance of
-   * @param multiplier  Multiplier. Positive boosts damage, negative boosts mining speed
+   *
+   * @param multiplier Multiplier. Positive boosts damage, negative boosts mining speed
    */
   public DamageSpeedTradeModifier(float multiplier) {
     this.multiplier = multiplier;
   }
 
-  /** Gets the multiplier for this modifier at the current durability and level */
+  /**
+   * Gets the multiplier for this modifier at the current durability and level
+   */
   private double getMultiplier(IToolStackView tool, int level) {
-    return Math.sqrt(tool.getDamage() * level / tool.getMultiplier(ToolStats.DURABILITY)) * multiplier;
+    return Math.sqrt(tool.getDamage() * level / tool.getMultiplier(ToolStats.DURABILITY)) * this.multiplier;
   }
 
   @Override
   public void addInformation(IToolStackView tool, int level, @Nullable Player player, List<Component> tooltip, TooltipKey tooltipKey, TooltipFlag tooltipFlag) {
-    double boost = getMultiplier(tool, level);
+    double boost = this.getMultiplier(tool, level);
     if (boost != 0 && tool.hasTag(TinkerTags.Items.HARVEST)) {
-      tooltip.add(applyStyle(Component.literal(Util.PERCENT_BOOST_FORMAT.format(-boost)).append(" ").append(MINING_SPEED)));
+      tooltip.add(this.applyStyle(Component.literal(Util.PERCENT_BOOST_FORMAT.format(-boost)).append(" ").append(MINING_SPEED)));
     }
   }
 
   @Override
-  public void addAttributes(IToolStackView tool, int level, EquipmentSlot slot, BiConsumer<Attribute,AttributeModifier> consumer) {
+  public void addAttributes(IToolStackView tool, int level, EquipmentSlot slot, BiConsumer<Attribute, AttributeModifier> consumer) {
     if (slot == EquipmentSlot.MAINHAND) {
-      double boost = getMultiplier(tool, level);
+      double boost = this.getMultiplier(tool, level);
       if (boost != 0) {
         // half boost for attack speed, its
-        consumer.accept(Attributes.ATTACK_DAMAGE, new AttributeModifier(uuid.get(), attributeName.get(), boost / 2, Operation.MULTIPLY_TOTAL));
+        consumer.accept(Attributes.ATTACK_DAMAGE, new AttributeModifier(this.uuid.get(), this.attributeName.get(), boost / 2, Operation.MULTIPLY_TOTAL));
       }
     }
   }
@@ -72,7 +76,7 @@ public class DamageSpeedTradeModifier extends Modifier {
   @Override
   public void onBreakSpeed(IToolStackView tool, int level, PlayerEvents.BreakSpeed event, Direction sideHit, boolean isEffective, float miningSpeedModifier) {
     if (isEffective) {
-      event.setNewSpeed((float)(event.getNewSpeed() * (1 - getMultiplier(tool, level))));
+      event.setNewSpeed((float) (event.getNewSpeed() * (1 - this.getMultiplier(tool, level))));
     }
   }
 }

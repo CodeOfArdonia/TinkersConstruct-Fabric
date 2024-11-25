@@ -1,6 +1,5 @@
 package slimeknights.tconstruct.smeltery.client.screen;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -20,6 +19,7 @@ import slimeknights.tconstruct.smeltery.menu.AlloyerContainerMenu;
 import javax.annotation.Nullable;
 
 public class AlloyerScreen extends AbstractContainerScreen<AlloyerContainerMenu> implements IScreenWithFluidTank {
+
   private static final int[] INPUT_TANK_START_X = {54, 22, 38, 70, 6};
   private static final ResourceLocation BACKGROUND = TConstruct.getResource("textures/gui/alloyer.png");
   private static final ElementScreen SCALA = new ElementScreen(176, 0, 34, 52, 256, 256);
@@ -30,23 +30,26 @@ public class AlloyerScreen extends AbstractContainerScreen<AlloyerContainerMenu>
   private final GuiFuelModule fuel;
   private final GuiTankModule outputTank;
   private GuiTankModule[] inputTanks = new GuiTankModule[0];
+
   public AlloyerScreen(AlloyerContainerMenu container, Inventory inv, Component name) {
     super(container, inv, name);
     AlloyerBlockEntity te = container.getTile();
     if (te != null) {
       FuelModule fuelModule = te.getFuelModule();
-      fuel = new GuiFuelModule(this, fuelModule, 153, 32, 12, 36, 152, 15, container.isHasFuelSlot());
-      outputTank = new GuiTankModule(this, te.getTank(), 114, 16, 34, 52, AlloyerContainerMenu.TOOLTIP_FORMAT);
-      updateTanks();
+      this.fuel = new GuiFuelModule(this, fuelModule, 153, 32, 12, 36, 152, 15, container.isHasFuelSlot());
+      this.outputTank = new GuiTankModule(this, te.getTank(), 114, 16, 34, 52, AlloyerContainerMenu.TOOLTIP_FORMAT);
+      this.updateTanks();
     } else {
-      fuel = null;
-      outputTank = null;
+      this.fuel = null;
+      this.outputTank = null;
     }
   }
 
-  /** Updates the tanks from the tile entity */
+  /**
+   * Updates the tanks from the tile entity
+   */
   private void updateTanks() {
-    AlloyerBlockEntity te = menu.getTile();
+    AlloyerBlockEntity te = this.menu.getTile();
     if (te != null) {
       MixerAlloyTank alloyTank = te.getAlloyTank();
       int numTanks = alloyTank.getTanks();
@@ -63,8 +66,8 @@ public class AlloyerScreen extends AbstractContainerScreen<AlloyerContainerMenu>
   protected void containerTick() {
     super.containerTick();
     // if the input count changes, update
-    AlloyerBlockEntity te = menu.getTile();
-    if (te != null && te.getAlloyTank().getTanks() != inputTanks.length) {
+    AlloyerBlockEntity te = this.menu.getTile();
+    if (te != null && te.getAlloyTank().getTanks() != this.inputTanks.length) {
       this.updateTanks();
     }
   }
@@ -81,27 +84,27 @@ public class AlloyerScreen extends AbstractContainerScreen<AlloyerContainerMenu>
     GuiUtil.drawBackground(graphics, this, BACKGROUND);
 
     // fluids
-    if (outputTank != null) outputTank.draw(graphics);
+    if (this.outputTank != null) this.outputTank.draw(graphics);
 
     // draw tank backgrounds first, then draw tank contents, less binding
     RenderUtils.setup(BACKGROUND);
-    for (GuiTankModule tankModule : inputTanks) {
+    for (GuiTankModule tankModule : this.inputTanks) {
       INPUT_TANK.draw(graphics, BACKGROUND, tankModule.getX() - 1 + this.leftPos, tankModule.getY() - 1 + this.topPos);
     }
 
     // fuel
-    if (fuel != null) {
+    if (this.fuel != null) {
       // draw the correct background for the fuel type
-      if (menu.isHasFuelSlot()) {
-        FUEL_SLOT.draw(graphics, BACKGROUND, leftPos + 150, topPos + 31);
+      if (this.menu.isHasFuelSlot()) {
+        FUEL_SLOT.draw(graphics, BACKGROUND, this.leftPos + 150, this.topPos + 31);
       } else {
-        FUEL_TANK.draw(graphics, BACKGROUND, leftPos + 152, topPos + 31);
+        FUEL_TANK.draw(graphics, BACKGROUND, this.leftPos + 152, this.topPos + 31);
       }
-      fuel.draw(graphics, BACKGROUND);
+      this.fuel.draw(graphics, BACKGROUND);
     }
 
     // draw tank contents last, reduces bind calls
-    for (GuiTankModule tankModule : inputTanks) {
+    for (GuiTankModule tankModule : this.inputTanks) {
       tankModule.draw(graphics);
     }
   }
@@ -113,16 +116,16 @@ public class AlloyerScreen extends AbstractContainerScreen<AlloyerContainerMenu>
     int checkY = mouseY - this.topPos;
 
     // highlight hovered tank
-    if (outputTank != null) outputTank.highlightHoveredFluid(graphics, checkX, checkY);
-    for (GuiTankModule tankModule : inputTanks) {
+    if (this.outputTank != null) this.outputTank.highlightHoveredFluid(graphics, checkX, checkY);
+    for (GuiTankModule tankModule : this.inputTanks) {
       tankModule.highlightHoveredFluid(graphics, checkX, checkY);
     }
 
     // highlight hovered fuel
-    if (fuel != null) fuel.renderHighlight(graphics, checkX, checkY);
+    if (this.fuel != null) this.fuel.renderHighlight(graphics, checkX, checkY);
 
     // scala
-    assert minecraft != null;
+    assert this.minecraft != null;
     RenderUtils.setup(BACKGROUND);
     SCALA.draw(graphics, BACKGROUND, 114, 16);
   }
@@ -132,36 +135,36 @@ public class AlloyerScreen extends AbstractContainerScreen<AlloyerContainerMenu>
     super.renderTooltip(graphics, mouseX, mouseY);
 
     // tank tooltip
-    if (outputTank != null) outputTank.renderTooltip(graphics, mouseX, mouseY);
+    if (this.outputTank != null) this.outputTank.renderTooltip(graphics, mouseX, mouseY);
 
-    for (GuiTankModule tankModule : inputTanks) {
+    for (GuiTankModule tankModule : this.inputTanks) {
       tankModule.renderTooltip(graphics, mouseX, mouseY);
     }
 
     // fuel tooltip
-    if (fuel != null) fuel.addTooltip(graphics, mouseX, mouseY, true);
+    if (this.fuel != null) this.fuel.addTooltip(graphics, mouseX, mouseY, true);
   }
 
   @Nullable
   @Override
   public Object getIngredientUnderMouse(double mouseX, double mouseY) {
     Object ingredient = null;
-    int checkX = (int) mouseX - leftPos;
-    int checkY = (int) mouseY - topPos;
+    int checkX = (int) mouseX - this.leftPos;
+    int checkY = (int) mouseY - this.topPos;
 
     // try fuel first, its faster
-    if (fuel != null) {
-      ingredient = fuel.getIngredient(checkX, checkY);
+    if (this.fuel != null) {
+      ingredient = this.fuel.getIngredient(checkX, checkY);
     }
 
     // next output tank
-    if (outputTank != null && ingredient == null) {
-      ingredient = outputTank.getIngreientUnderMouse(checkX, checkY);
+    if (this.outputTank != null && ingredient == null) {
+      ingredient = this.outputTank.getIngreientUnderMouse(checkX, checkY);
     }
 
     // finally input tanks
     if (ingredient == null) {
-      for (GuiTankModule tankModule : inputTanks) {
+      for (GuiTankModule tankModule : this.inputTanks) {
         ingredient = tankModule.getIngreientUnderMouse(checkX, checkY);
         if (ingredient != null) {
           return ingredient;

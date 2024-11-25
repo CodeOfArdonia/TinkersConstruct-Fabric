@@ -1,13 +1,10 @@
 package slimeknights.tconstruct.smeltery.block.entity;
 
 import io.github.fabricators_of_create.porting_lib.block.CustomRenderBoundingBoxBlockEntity;
-import io.github.fabricators_of_create.porting_lib.common.util.NonNullConsumer;
 import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
-import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import io.github.fabricators_of_create.porting_lib.util.StorageProvider;
 import lombok.Getter;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -24,7 +21,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 import slimeknights.mantle.block.entity.MantleBlockEntity;
-import slimeknights.mantle.util.WeakConsumerWrapper;
 import slimeknights.tconstruct.common.network.TinkerNetwork;
 import slimeknights.tconstruct.library.recipe.FluidValues;
 import slimeknights.tconstruct.smeltery.TinkerSmeltery;
@@ -34,9 +30,14 @@ import static slimeknights.tconstruct.smeltery.block.FaucetBlock.FACING;
 
 @SuppressWarnings("removal")
 public class FaucetBlockEntity extends MantleBlockEntity implements CustomRenderBoundingBoxBlockEntity {
-  /** amount of MB to extract from the input at a time */
+
+  /**
+   * amount of MB to extract from the input at a time
+   */
   public static final long PACKET_SIZE = FluidValues.INGOT;
-  /** Transfer rate of the faucet */
+  /**
+   * Transfer rate of the faucet
+   */
   public static final int DROPLETS_PER_TICK = 810;
 
   public static final BlockEntityTicker<FaucetBlockEntity> SERVER_TICKER = (level, pos, world, self) -> self.tick();
@@ -47,21 +48,35 @@ public class FaucetBlockEntity extends MantleBlockEntity implements CustomRender
   private static final String TAG_STATE = "state";
   private static final String TAG_LAST_REDSTONE = "lastRedstone";
 
-  /** If true, faucet is currently pouring */
+  /**
+   * If true, faucet is currently pouring
+   */
   private FaucetState faucetState = FaucetState.OFF;
-  /** If true, redstone told this faucet to stop, so stop when ready */
+  /**
+   * If true, redstone told this faucet to stop, so stop when ready
+   */
   private boolean stopPouring = false;
-  /** Current fluid in the faucet */
+  /**
+   * Current fluid in the faucet
+   */
   private FluidStack drained = FluidStack.EMPTY;
-  /** Fluid for rendering, used to reduce the number of packets. There is a brief moment where {@link this#drained} is empty but we should be rendering something */
+  /**
+   * Fluid for rendering, used to reduce the number of packets. There is a brief moment where {@link this#drained} is empty but we should be rendering something
+   */
   @Getter
   private FluidStack renderFluid = FluidStack.EMPTY;
-  /** Used for pulse detection */
+  /**
+   * Used for pulse detection
+   */
   private boolean lastRedstoneState = false;
 
-  /** Fluid handler of the input to the faucet */
+  /**
+   * Fluid handler of the input to the faucet
+   */
   private StorageProvider<FluidVariant> inputHandler;
-  /** Fluid handler of the output from the faucet */
+  /**
+   * Fluid handler of the output from the faucet
+   */
   private StorageProvider<FluidVariant> outputHandler;
 
   public FaucetBlockEntity(BlockPos pos, BlockState state) {
@@ -78,50 +93,54 @@ public class FaucetBlockEntity extends MantleBlockEntity implements CustomRender
 
   /**
    * Finds the fluid handler on the given side
-   * @param side  Side to check
-   * @return  Fluid handler
+   *
+   * @param side Side to check
+   * @return Fluid handler
    */
   @Nullable
   private StorageProvider<FluidVariant> findFluidHandler(Direction side) {
-    assert level != null;
-    return StorageProvider.createForFluids(level, worldPosition.relative(side));
+    assert this.level != null;
+    return StorageProvider.createForFluids(this.level, this.worldPosition.relative(side));
   }
 
   /**
    * Gets the input fluid handler
-   * @return  Input fluid handler
+   *
+   * @return Input fluid handler
    */
   @Nullable
   private Storage<FluidVariant> getInputHandler() {
-    if (inputHandler == null) {
-      inputHandler = findFluidHandler(getBlockState().getValue(FACING).getOpposite());
+    if (this.inputHandler == null) {
+      this.inputHandler = this.findFluidHandler(this.getBlockState().getValue(FACING).getOpposite());
     }
-    return inputHandler.get(getBlockState().getValue(FACING));
+    return this.inputHandler.get(this.getBlockState().getValue(FACING));
   }
 
   /**
    * Gets the output fluid handler
-   * @return  Output fluid handler
+   *
+   * @return Output fluid handler
    */
   @Nullable
   private Storage<FluidVariant> getOutputHandler() {
-    if (outputHandler == null) {
-      outputHandler = findFluidHandler(Direction.DOWN);
+    if (this.outputHandler == null) {
+      this.outputHandler = this.findFluidHandler(Direction.DOWN);
     }
-    return outputHandler.get(Direction.UP);
+    return this.outputHandler.get(Direction.UP);
   }
 
   /**
    * Called when a neighbor changes to invalidate the cached fluid handler
-   * @param neighbor  Neighbor position that changed
+   *
+   * @param neighbor Neighbor position that changed
    */
   public void neighborChanged(BlockPos neighbor) {
     // if the neighbor was below us, remove output
-    if (worldPosition.equals(neighbor.above())) {
-      outputHandler = null;
+    if (this.worldPosition.equals(neighbor.above())) {
+      this.outputHandler = null;
       // neighbor behind us
-    } else if (worldPosition.equals(neighbor.relative(getBlockState().getValue(FACING)))) {
-      inputHandler = null;
+    } else if (this.worldPosition.equals(neighbor.relative(this.getBlockState().getValue(FACING)))) {
+      this.inputHandler = null;
     }
   }
 
@@ -130,10 +149,11 @@ public class FaucetBlockEntity extends MantleBlockEntity implements CustomRender
 
   /**
    * Gets whether the faucet is pouring
+   *
    * @return True if pouring
    */
   public boolean isPouring() {
-    return faucetState != FaucetState.OFF;
+    return this.faucetState != FaucetState.OFF;
   }
 
   /* Activation */
@@ -143,40 +163,41 @@ public class FaucetBlockEntity extends MantleBlockEntity implements CustomRender
    */
   public void activate() {
     // don't run on client
-    if (level == null || level.isClientSide) {
+    if (this.level == null || this.level.isClientSide) {
       return;
     }
     // already pouring? we want to start
-    switch (faucetState) {
+    switch (this.faucetState) {
       // off activates the faucet
       case OFF -> {
-        stopPouring = false;
-        doTransfer(true);
+        this.stopPouring = false;
+        this.doTransfer(true);
       }
       // powered deactivates the faucet, sync to client
       case POWERED -> {
-        faucetState = FaucetState.OFF;
-        syncToClient(FluidStack.EMPTY, false);
+        this.faucetState = FaucetState.OFF;
+        this.syncToClient(FluidStack.EMPTY, false);
       }
       // pouring means we stop pouring as soon as possible
-      case POURING -> stopPouring = true;
+      case POURING -> this.stopPouring = true;
     }
   }
 
   /**
    * Flips hasSignal and schedules a tick if appropriate.
-   * @param hasSignal  New signal state
+   *
+   * @param hasSignal New signal state
    */
   public void handleRedstone(boolean hasSignal) {
-    if (hasSignal != lastRedstoneState) {
-      lastRedstoneState = hasSignal;
+    if (hasSignal != this.lastRedstoneState) {
+      this.lastRedstoneState = hasSignal;
       if (hasSignal) {
-        if (level != null){
-          level.scheduleTick(worldPosition, this.getBlockState().getBlock(), 2);
+        if (this.level != null) {
+          this.level.scheduleTick(this.worldPosition, this.getBlockState().getBlock(), 2);
         }
-      } else if (faucetState == FaucetState.POWERED) {
-        faucetState = FaucetState.OFF;
-        syncToClient(FluidStack.EMPTY, false);
+      } else if (this.faucetState == FaucetState.POWERED) {
+        this.faucetState = FaucetState.OFF;
+        this.syncToClient(FluidStack.EMPTY, false);
       }
     }
   }
@@ -184,26 +205,28 @@ public class FaucetBlockEntity extends MantleBlockEntity implements CustomRender
 
   /* Pouring */
 
-  /** Handles server ticks */
+  /**
+   * Handles server ticks
+   */
   private void tick() {
     // nothing to do if not pouring
-    if (faucetState == FaucetState.OFF) {
+    if (this.faucetState == FaucetState.OFF) {
       return;
       // if powered and we can transfer, schedule transfer for next tick
-    } else if (faucetState == FaucetState.POWERED && doTransfer(false)) {
-      faucetState = FaucetState.POURING;
+    } else if (this.faucetState == FaucetState.POWERED && this.doTransfer(false)) {
+      this.faucetState = FaucetState.POURING;
       return;
     }
 
     // continue current stack
-    if (!drained.isEmpty()) {
-      pour();
+    if (!this.drained.isEmpty()) {
+      this.pour();
       // stop if told to stop once done
-    } else if (stopPouring) {
-      reset();
+    } else if (this.stopPouring) {
+      this.reset();
       // otherwise keep going
     } else {
-      doTransfer(true);
+      this.doTransfer(true);
     }
   }
 
@@ -212,8 +235,8 @@ public class FaucetBlockEntity extends MantleBlockEntity implements CustomRender
    */
   private boolean doTransfer(boolean execute) {
     // still got content left
-    Storage<FluidVariant> input = getInputHandler();
-    Storage<FluidVariant> output = getOutputHandler();
+    Storage<FluidVariant> input = this.getInputHandler();
+    Storage<FluidVariant> output = this.getOutputHandler();
     if (input != null && output != null) {
       // can we drain?
       FluidStack drained;
@@ -235,30 +258,30 @@ public class FaucetBlockEntity extends MantleBlockEntity implements CustomRender
             }
 
             // sync to clients if we have changes
-            if (faucetState == FaucetState.OFF || !renderFluid.isFluidEqual(drained)) {
-              syncToClient(this.drained, true);
+            if (this.faucetState == FaucetState.OFF || !this.renderFluid.isFluidEqual(drained)) {
+              this.syncToClient(this.drained, true);
             }
-            faucetState = FaucetState.POURING;
+            this.faucetState = FaucetState.POURING;
             // pour after initial packet, in case we end up resetting later
-            pour();
+            this.pour();
           }
           return true;
         }
       }
 
       // if powered, keep faucet running
-      if (lastRedstoneState) {
+      if (this.lastRedstoneState) {
         // sync if either we were not pouring before (particle effects), or if the client thinks we have fluid
-        if (execute && (faucetState == FaucetState.OFF || !renderFluid.isFluidEqual(FluidStack.EMPTY))) {
-          syncToClient(FluidStack.EMPTY, true);
+        if (execute && (this.faucetState == FaucetState.OFF || !this.renderFluid.isFluidEqual(FluidStack.EMPTY))) {
+          this.syncToClient(FluidStack.EMPTY, true);
         }
-        faucetState = FaucetState.POWERED;
+        this.faucetState = FaucetState.POWERED;
         return false;
       }
     }
     // reset if not powered, or if nothing to do
     if (execute) {
-      reset();
+      this.reset();
     }
     return false;
   }
@@ -267,15 +290,15 @@ public class FaucetBlockEntity extends MantleBlockEntity implements CustomRender
    * Takes the liquid inside and executes one pouring step.
    */
   private void pour() {
-    if (drained.isEmpty()) {
+    if (this.drained.isEmpty()) {
       return;
     }
 
     // ensure we have an output
-    Storage<FluidVariant> output = getOutputHandler();
+    Storage<FluidVariant> output = this.getOutputHandler();
     if (output != null) {
-      FluidStack fillStack = drained.copy();
-      fillStack.setAmount(Math.min(drained.getAmount(), DROPLETS_PER_TICK));
+      FluidStack fillStack = this.drained.copy();
+      fillStack.setAmount(Math.min(this.drained.getAmount(), DROPLETS_PER_TICK));
 
       // can we fill?
       Transaction sim = TransferUtil.getTransaction();
@@ -283,8 +306,8 @@ public class FaucetBlockEntity extends MantleBlockEntity implements CustomRender
       sim.close();
       if (filled > 0) {
         // update client if they do not think we have fluid
-        if (!renderFluid.isFluidEqual(drained)) {
-          syncToClient(drained, true);
+        if (!this.renderFluid.isFluidEqual(this.drained)) {
+          this.syncToClient(this.drained, true);
         }
 
         // transfer it
@@ -295,10 +318,9 @@ public class FaucetBlockEntity extends MantleBlockEntity implements CustomRender
           tx.commit();
         }
       }
-    }
-    else {
+    } else {
       // output got lost. all liquid buffered is lost.
-      reset();
+      this.reset();
     }
   }
 
@@ -306,17 +328,17 @@ public class FaucetBlockEntity extends MantleBlockEntity implements CustomRender
    * Resets TE to default state.
    */
   private void reset() {
-    stopPouring = false;
-    drained = FluidStack.EMPTY;
-    if (faucetState != FaucetState.OFF || !renderFluid.isFluidEqual(drained)) {
-      faucetState = FaucetState.OFF;
-      syncToClient(FluidStack.EMPTY, false);
+    this.stopPouring = false;
+    this.drained = FluidStack.EMPTY;
+    if (this.faucetState != FaucetState.OFF || !this.renderFluid.isFluidEqual(this.drained)) {
+      this.faucetState = FaucetState.OFF;
+      this.syncToClient(FluidStack.EMPTY, false);
     }
   }
 
   @Override
   public AABB getRenderBoundingBox() {
-    return new AABB(worldPosition.getX(), worldPosition.getY() - 1, worldPosition.getZ(), worldPosition.getX() + 1, worldPosition.getY() + 1, worldPosition.getZ() + 1);
+    return new AABB(this.worldPosition.getX(), this.worldPosition.getY() - 1, this.worldPosition.getZ(), this.worldPosition.getX() + 1, this.worldPosition.getY() + 1, this.worldPosition.getZ() + 1);
   }
 
 
@@ -324,18 +346,20 @@ public class FaucetBlockEntity extends MantleBlockEntity implements CustomRender
 
   /**
    * Sends an update to the client with the most recent
-   * @param fluid       New fluid
-   * @param isPouring   New isPouring status
+   *
+   * @param fluid     New fluid
+   * @param isPouring New isPouring status
    */
   private void syncToClient(FluidStack fluid, boolean isPouring) {
-    renderFluid = fluid.copy();
-    if (level instanceof ServerLevel) {
-      TinkerNetwork.getInstance().sendToClientsAround(new FaucetActivationPacket(worldPosition, fluid, isPouring), (ServerLevel) level, getBlockPos());
+    this.renderFluid = fluid.copy();
+    if (this.level instanceof ServerLevel) {
+      TinkerNetwork.getInstance().sendToClientsAround(new FaucetActivationPacket(this.worldPosition, fluid, isPouring), (ServerLevel) this.level, this.getBlockPos());
     }
   }
 
   /**
    * Sets draining fluid to specified stack.
+   *
    * @param fluid new FluidStack
    */
   public void onActivationPacket(FluidStack fluid, boolean isPouring) {
@@ -352,19 +376,19 @@ public class FaucetBlockEntity extends MantleBlockEntity implements CustomRender
   @Override
   protected void saveSynced(CompoundTag compound) {
     super.saveSynced(compound);
-    compound.putByte(TAG_STATE, (byte)faucetState.ordinal());
-    if (!renderFluid.isEmpty()) {
-      compound.put(TAG_RENDER_FLUID, renderFluid.writeToNBT(new CompoundTag()));
+    compound.putByte(TAG_STATE, (byte) this.faucetState.ordinal());
+    if (!this.renderFluid.isEmpty()) {
+      compound.put(TAG_RENDER_FLUID, this.renderFluid.writeToNBT(new CompoundTag()));
     }
   }
 
   @Override
   public void saveAdditional(CompoundTag compound) {
     super.saveAdditional(compound);
-    compound.putBoolean(TAG_STOP, stopPouring);
-    compound.putBoolean(TAG_LAST_REDSTONE, lastRedstoneState);
-    if (!drained.isEmpty()) {
-      compound.put(TAG_DRAINED, drained.writeToNBT(new CompoundTag()));
+    compound.putBoolean(TAG_STOP, this.stopPouring);
+    compound.putBoolean(TAG_LAST_REDSTONE, this.lastRedstoneState);
+    if (!this.drained.isEmpty()) {
+      compound.put(TAG_DRAINED, this.drained.writeToNBT(new CompoundTag()));
     }
   }
 
@@ -372,19 +396,19 @@ public class FaucetBlockEntity extends MantleBlockEntity implements CustomRender
   public void load(CompoundTag compound) {
     super.load(compound);
 
-    faucetState = FaucetState.fromIndex(compound.getByte(TAG_STATE));
-    stopPouring = compound.getBoolean(TAG_STOP);
-    lastRedstoneState = compound.getBoolean(TAG_LAST_REDSTONE);
+    this.faucetState = FaucetState.fromIndex(compound.getByte(TAG_STATE));
+    this.stopPouring = compound.getBoolean(TAG_STOP);
+    this.lastRedstoneState = compound.getBoolean(TAG_LAST_REDSTONE);
     // fluids
     if (compound.contains(TAG_DRAINED, Tag.TAG_COMPOUND)) {
-      drained = FluidStack.loadFluidStackFromNBT(compound.getCompound(TAG_DRAINED));
+      this.drained = FluidStack.loadFluidStackFromNBT(compound.getCompound(TAG_DRAINED));
     } else {
-      drained = FluidStack.EMPTY;
+      this.drained = FluidStack.EMPTY;
     }
     if (compound.contains(TAG_RENDER_FLUID, Tag.TAG_COMPOUND)) {
-      renderFluid = FluidStack.loadFluidStackFromNBT(compound.getCompound(TAG_RENDER_FLUID));
+      this.renderFluid = FluidStack.loadFluidStackFromNBT(compound.getCompound(TAG_RENDER_FLUID));
     } else {
-      renderFluid = FluidStack.EMPTY;
+      this.renderFluid = FluidStack.EMPTY;
     }
   }
 
@@ -393,11 +417,15 @@ public class FaucetBlockEntity extends MantleBlockEntity implements CustomRender
     POURING,
     POWERED;
 
-    /** Gets the state for the given index */
+    /**
+     * Gets the state for the given index
+     */
     public static FaucetState fromIndex(int index) {
       switch (index) {
-        case 1: return POURING;
-        case 2: return POWERED;
+        case 1:
+          return POURING;
+        case 2:
+          return POWERED;
       }
       return OFF;
     }

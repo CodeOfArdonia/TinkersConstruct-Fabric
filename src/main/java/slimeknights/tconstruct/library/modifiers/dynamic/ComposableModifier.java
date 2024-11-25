@@ -36,12 +36,16 @@ import java.util.stream.Collectors;
  * Modifier consisting of many composed hooks
  */
 public class ComposableModifier extends Modifier {
+
   private final ModifierLevelDisplay levelDisplay;
   private final TooltipDisplay tooltipDisplay;
-  /** If the priority is {@link Integer#MIN_VALUE}, assumed unset for datagen */
+  /**
+   * If the priority is {@link Integer#MIN_VALUE}, assumed unset for datagen
+   */
   @Getter
   private final int priority;
   private final List<ModuleWithHooks> modules;
+
   protected ComposableModifier(ModifierLevelDisplay levelDisplay, TooltipDisplay tooltipDisplay, int priority, List<ModuleWithHooks> modules) {
     super(ModifierModule.createMap(modules));
     this.levelDisplay = levelDisplay;
@@ -50,7 +54,9 @@ public class ComposableModifier extends Modifier {
     this.modules = modules;
   }
 
-  /** Creates a builder instance for datagen */
+  /**
+   * Creates a builder instance for datagen
+   */
   public static Builder builder() {
     return new Builder();
   }
@@ -60,35 +66,41 @@ public class ComposableModifier extends Modifier {
     return LOADER;
   }
 
-  /** This method is final to prevent overrides as the constructor no longer calls it */
+  /**
+   * This method is final to prevent overrides as the constructor no longer calls it
+   */
   @Override
   protected final void registerHooks(ModifierHookMap.Builder hookBuilder) {}
 
   @Override
   public Component getDisplayName(int level) {
-    return levelDisplay.nameForLevel(this, level);
+    return this.levelDisplay.nameForLevel(this, level);
   }
 
   @Override
   public Component getDisplayName(IToolStackView tool, int level) {
-    return getHook(TinkerHooks.DISPLAY_NAME).getDisplayName(tool, this, level, getDisplayName(level));
+    return this.getHook(TinkerHooks.DISPLAY_NAME).getDisplayName(tool, this, level, this.getDisplayName(level));
   }
 
   @Override
   public float getEffectiveLevel(IToolContext tool, int level) {
-    return getHook(TinkerHooks.EFFECTIVE_LEVEL).getEffectiveLevel(tool, this, level);
+    return this.getHook(TinkerHooks.EFFECTIVE_LEVEL).getEffectiveLevel(tool, this, level);
   }
 
   @Override
   public boolean shouldDisplay(boolean advanced) {
-    return advanced ? tooltipDisplay != TooltipDisplay.NEVER
-                    : tooltipDisplay == TooltipDisplay.ALWAYS;
+    return advanced ? this.tooltipDisplay != TooltipDisplay.NEVER
+      : this.tooltipDisplay == TooltipDisplay.ALWAYS;
   }
 
-  /** Determines when this modifier shows in tooltips */
-  public enum TooltipDisplay { ALWAYS, TINKER_STATION, NEVER }
+  /**
+   * Determines when this modifier shows in tooltips
+   */
+  public enum TooltipDisplay {ALWAYS, TINKER_STATION, NEVER}
 
-  /** Computes the recommended priority for a set of modifier modules */
+  /**
+   * Computes the recommended priority for a set of modifier modules
+   */
   private static int computePriority(List<ModuleWithHooks> modules) {
     // poll all modules to find who has a priority preference
     List<ModifierModule> priorityModules = new ArrayList<>();
@@ -106,9 +118,9 @@ public class ComposableModifier extends Modifier {
         //noinspection ConstantConditions  validated nonnull above
         if (priorityModules.get(i).getPriority() != firstPriority) {
           TConstruct.LOG.warn("Multiple modules disagree on the preferred priority for composable modifier, choosing priority {}. Set the priority manually to silence this warning. All opinions: \n{}", firstPriority,
-                              priorityModules.stream()
-                                             .map(module -> "* " + module + ": " + module.getPriority())
-                                             .collect(Collectors.joining("\n")));
+            priorityModules.stream()
+              .map(module -> "* " + module + ": " + module.getPriority())
+              .collect(Collectors.joining("\n")));
           break;
         }
       }
@@ -184,41 +196,52 @@ public class ComposableModifier extends Modifier {
     }
   };
 
-  /** Builder for a composable modifier instance */
+  /**
+   * Builder for a composable modifier instance
+   */
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
   @Accessors(fluent = true)
   public static class Builder {
+
     @Setter
     private ModifierLevelDisplay levelDisplay = ModifierLevelDisplay.DEFAULT;
     @Setter
     private TooltipDisplay tooltipDisplay = TooltipDisplay.ALWAYS;
-    /** {@link Integer#MIN_VALUE} is an internal value used to represent unset for datagen, to distinguish unset from {@link Modifier#DEFAULT_PRIORITY} */
+    /**
+     * {@link Integer#MIN_VALUE} is an internal value used to represent unset for datagen, to distinguish unset from {@link Modifier#DEFAULT_PRIORITY}
+     */
     @Setter
     private int priority = Integer.MIN_VALUE;
     private final ImmutableList.Builder<ModuleWithHooks> modules = ImmutableList.builder();
 
-    /** Adds a module to the builder */
+    /**
+     * Adds a module to the builder
+     */
     public final <T extends ModifierModule> Builder addModule(T object) {
-      modules.add(new ModuleWithHooks(object, Collections.emptyList()));
+      this.modules.add(new ModuleWithHooks(object, Collections.emptyList()));
       return this;
     }
 
-    /** Adds a module to the builder */
+    /**
+     * Adds a module to the builder
+     */
     @SuppressWarnings("UnusedReturnValue")
     @SafeVarargs
     public final <T extends ModifierModule> Builder addModule(T object, ModifierHook<? super T>... hooks) {
-      modules.add(new ModuleWithHooks(object, List.of(hooks)));
+      this.modules.add(new ModuleWithHooks(object, List.of(hooks)));
       return this;
     }
 
-    /** Builds the final instance */
+    /**
+     * Builds the final instance
+     */
     public ComposableModifier build() {
       List<ModuleWithHooks> modules = this.modules.build();
-      if (priority == Integer.MIN_VALUE) {
+      if (this.priority == Integer.MIN_VALUE) {
         // call computePriority if we did not set one so we get the warning if multiple modules wish to set the priority
         computePriority(modules);
       }
-      return new ComposableModifier(levelDisplay, tooltipDisplay, priority, modules);
+      return new ComposableModifier(this.levelDisplay, this.tooltipDisplay, this.priority, modules);
     }
   }
 }

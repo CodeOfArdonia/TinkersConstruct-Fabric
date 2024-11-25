@@ -17,7 +17,9 @@ import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 import javax.annotation.Nullable;
 
 public class BoonOfSssssModifier extends TotalArmorLevelModifier {
+
   private static final TinkerDataKey<Integer> POTENT_POTIONS = TConstruct.createKey("boon_of_sssss");
+
   public BoonOfSssssModifier() {
     super(POTENT_POTIONS, true);
     PotionEvents.POTION_ADDED.register(BoonOfSssssModifier::onPotionStart);
@@ -35,7 +37,9 @@ public class BoonOfSssssModifier extends TotalArmorLevelModifier {
     }
   }
 
-  /** Called when the potion effects start to apply this effect */
+  /**
+   * Called when the potion effects start to apply this effect
+   */
   private static void onPotionStart(LivingEntity living, MobEffectInstance newEffect, MobEffectInstance oldEffect, @Nullable Entity source) {
     if (newEffect.getEffect().isBeneficial()) {
       if (ModifierUtil.getTotalModifierLevel(living, POTENT_POTIONS) > 0) {

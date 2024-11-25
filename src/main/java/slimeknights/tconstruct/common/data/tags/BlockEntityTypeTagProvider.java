@@ -12,6 +12,7 @@ import slimeknights.tconstruct.tables.TinkerTables;
 import java.util.concurrent.CompletableFuture;
 
 public class BlockEntityTypeTagProvider extends FabricTagProvider<BlockEntityType<?>> {
+
   @SuppressWarnings("deprecation")
   public BlockEntityTypeTagProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
     super(output, Registries.BLOCK_ENTITY_TYPE, registriesFuture);
@@ -20,9 +21,9 @@ public class BlockEntityTypeTagProvider extends FabricTagProvider<BlockEntityTyp
   @Override
   protected void addTags(HolderLookup.Provider provider) {
     this.getOrCreateTagBuilder(TinkerTags.TileEntityTypes.CRAFTING_STATION_BLACKLIST)
-        .add(TinkerTables.craftingStationTile.get(), TinkerTables.tinkerStationTile.get(), TinkerTables.partBuilderTile.get(),
-						 TinkerTables.partChestTile.get(), TinkerTables.tinkersChestTile.get(), TinkerTables.castChestTile.get(),
-						 TinkerSmeltery.basin.get(), TinkerSmeltery.table.get(), TinkerSmeltery.smeltery.get());
+      .add(TinkerTables.craftingStationTile.get(), TinkerTables.tinkerStationTile.get(), TinkerTables.partBuilderTile.get(),
+        TinkerTables.partChestTile.get(), TinkerTables.tinkersChestTile.get(), TinkerTables.castChestTile.get(),
+        TinkerSmeltery.basin.get(), TinkerSmeltery.table.get(), TinkerSmeltery.smeltery.get());
 
   }
 

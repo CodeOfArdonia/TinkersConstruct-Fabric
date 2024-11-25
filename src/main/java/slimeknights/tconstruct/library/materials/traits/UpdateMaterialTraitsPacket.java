@@ -13,22 +13,23 @@ import java.util.Map;
 @Getter
 @AllArgsConstructor
 public class UpdateMaterialTraitsPacket implements IThreadsafePacket {
-  protected final Map<MaterialId,MaterialTraits> materialToTraits;
+
+  protected final Map<MaterialId, MaterialTraits> materialToTraits;
 
   public UpdateMaterialTraitsPacket(FriendlyByteBuf buffer) {
     int materialCount = buffer.readInt();
-    materialToTraits = new HashMap<>(materialCount);
+    this.materialToTraits = new HashMap<>(materialCount);
     for (int i = 0; i < materialCount; i++) {
       MaterialId id = new MaterialId(buffer.readResourceLocation());
       MaterialTraits traits = MaterialTraits.read(buffer);
-      materialToTraits.put(id, traits);
+      this.materialToTraits.put(id, traits);
     }
   }
 
   @Override
   public void encode(FriendlyByteBuf buffer) {
-    buffer.writeInt(materialToTraits.size());
-    materialToTraits.forEach((materialId, traits) -> {
+    buffer.writeInt(this.materialToTraits.size());
+    this.materialToTraits.forEach((materialId, traits) -> {
       buffer.writeResourceLocation(materialId);
       traits.write(buffer);
     });

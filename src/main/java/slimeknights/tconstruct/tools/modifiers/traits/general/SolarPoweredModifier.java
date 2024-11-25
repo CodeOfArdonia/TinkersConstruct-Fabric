@@ -9,6 +9,7 @@ import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 import javax.annotation.Nullable;
 
 public class SolarPoweredModifier extends NoLevelsModifier {
+
   @Override
   public int getPriority() {
     return 185; // after tanned, before stoneshield

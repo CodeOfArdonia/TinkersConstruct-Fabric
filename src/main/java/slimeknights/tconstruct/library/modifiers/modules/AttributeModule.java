@@ -21,6 +21,7 @@ import java.util.function.BiConsumer;
  * Module to add an attribute to a tool
  */
 public record AttributeModule(ModifierAttribute attribute) implements AttributesModifierHook, ModifierModule {
+
   private static final List<ModifierHook<?>> DEFAULT_HOOKS = List.of(TinkerHooks.ATTRIBUTES);
 
   public AttributeModule(String name, Attribute attribute, Operation operation, float amount, List<EquipmentSlot> slots) {
@@ -32,8 +33,8 @@ public record AttributeModule(ModifierAttribute attribute) implements Attributes
   }
 
   @Override
-  public void addAttributes(IToolStackView tool, ModifierEntry modifier, EquipmentSlot slot, BiConsumer<Attribute,AttributeModifier> consumer) {
-    attribute.apply(tool, modifier.getEffectiveLevel(tool), slot, consumer);
+  public void addAttributes(IToolStackView tool, ModifierEntry modifier, EquipmentSlot slot, BiConsumer<Attribute, AttributeModifier> consumer) {
+    this.attribute.apply(tool, modifier.getEffectiveLevel(tool), slot, consumer);
   }
 
   @Override

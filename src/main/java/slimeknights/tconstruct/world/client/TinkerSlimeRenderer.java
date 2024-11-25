@@ -10,24 +10,28 @@ import net.minecraft.world.entity.monster.Slime;
 import slimeknights.tconstruct.TConstruct;
 
 public class TinkerSlimeRenderer extends SlimeRenderer {
+
   public static final Factory EARTH_SLIME_FACTORY = new Factory(new ResourceLocation("textures/entity/slime/slime.png"));
   public static final Factory SKY_SLIME_FACTORY = new Factory(TConstruct.getResource("textures/entity/sky_slime.png"));
   public static final Factory ENDER_SLIME_FACTORY = new Factory(TConstruct.getResource("textures/entity/ender_slime.png"));
 
   private final ResourceLocation texture;
+
   public TinkerSlimeRenderer(EntityRendererProvider.Context context, ResourceLocation texture) {
     super(context);
     this.texture = texture;
-    addLayer(new SlimeArmorLayer<>(this, new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER_OUTER_ARMOR)), context.getModelSet()));
+    this.addLayer(new SlimeArmorLayer<>(this, new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER_OUTER_ARMOR)), context.getModelSet()));
   }
 
   @Override
   public ResourceLocation getTextureLocation(Slime entity) {
-    return texture;
+    return this.texture;
   }
 
   private static class Factory implements EntityRendererProvider<Slime> {
+
     private final ResourceLocation texture;
+
     public Factory(ResourceLocation texture) {
       this.texture = texture;
     }

@@ -22,17 +22,25 @@ import slimeknights.tconstruct.smeltery.TinkerSmeltery;
 import javax.annotation.Nullable;
 import java.util.List;
 
-/** Recipe defining casting and composite fluids for a given input */
+/**
+ * Recipe defining casting and composite fluids for a given input
+ */
 public class MaterialFluidRecipe implements ICustomOutputRecipe<ICastingContainer> {
+
   @Getter
   private final ResourceLocation id;
   private final FluidIngredient fluid;
   @Getter
   private final int temperature;
-  /** Material base for composite */
-  @Nullable @Getter
+  /**
+   * Material base for composite
+   */
+  @Nullable
+  @Getter
   private final MaterialVariant input;
-  /** Output material ID */
+  /**
+   * Output material ID
+   */
   @Getter
   private final MaterialVariant output;
 
@@ -45,35 +53,41 @@ public class MaterialFluidRecipe implements ICustomOutputRecipe<ICastingContaine
     MaterialCastingLookup.registerFluid(this);
   }
 
-  /** Checks if the recipe matches the given inventory */
+  /**
+   * Checks if the recipe matches the given inventory
+   */
   public boolean matches(ICastingContainer inv) {
-    if (output.isUnknown() || !fluid.test(inv.getFluid())) {
+    if (this.output.isUnknown() || !this.fluid.test(inv.getFluid())) {
       return false;
     }
-    if (input != null) {
+    if (this.input != null) {
       // if the input ID is null, want to avoid checking this
       // not null means we should have a material and it failed to find
-      if (input.isUnknown()) {
+      if (this.input.isUnknown()) {
         return false;
       }
-      return input.matchesVariant(inv.getStack());
+      return this.input.matchesVariant(inv.getStack());
     }
     return true;
   }
 
-  /** Gets the amount of fluid to cast this recipe */
+  /**
+   * Gets the amount of fluid to cast this recipe
+   */
   public long getFluidAmount(Fluid fluid) {
     return this.fluid.getAmount(fluid);
   }
 
-  /** Gets a list of fluids for display */
+  /**
+   * Gets a list of fluids for display
+   */
   public List<FluidStack> getFluids() {
-    return fluid.getFluids();
+    return this.fluid.getFluids();
   }
 
   @Override
   public final boolean matches(ICastingContainer inv, Level worldIn) {
-    return matches(inv);
+    return this.matches(inv);
   }
 
   @Override
@@ -87,6 +101,7 @@ public class MaterialFluidRecipe implements ICustomOutputRecipe<ICastingContaine
   }
 
   public static class Serializer extends LoggingRecipeSerializer<MaterialFluidRecipe> {
+
     @Override
     public MaterialFluidRecipe fromJson(ResourceLocation id, JsonObject json) {
       FluidIngredient fluid = FluidIngredient.deserialize(json, "fluid");

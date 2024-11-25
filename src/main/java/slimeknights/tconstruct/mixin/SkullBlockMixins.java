@@ -17,6 +17,7 @@ import slimeknights.tconstruct.world.TinkerHeadType;
 
 @Mixin(SkullBlock.class)
 public class SkullBlockMixins extends AbstractSkullBlock {
+
   @Shadow
   @Final
   protected static VoxelShape PIGLIN_SHAPE;

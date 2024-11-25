@@ -51,9 +51,12 @@ import java.util.function.Function;
  * This class handles interaction based event hooks
  */
 public class InteractionHandler {
+
   public static final EquipmentSlot[] HAND_SLOTS = {EquipmentSlot.MAINHAND, EquipmentSlot.OFFHAND};
 
-  /** Implements {@link EntityInteractionModifierHook#beforeEntityUse(IToolStackView, ModifierEntry, Player, Entity, InteractionHand, InteractionSource)} */
+  /**
+   * Implements {@link EntityInteractionModifierHook#beforeEntityUse(IToolStackView, ModifierEntry, Player, Entity, InteractionHand, InteractionSource)}
+   */
   static InteractionResult beforeEntityInteract(Player player, Level world, InteractionHand hand, Entity target, @Nullable EntityHitResult hitResult) {
     ItemStack stack = player.getItemInHand(hand);
     InteractionSource source = InteractionSource.RIGHT_CLICK;
@@ -74,17 +77,19 @@ public class InteractionHandler {
       // actual interaction hook
       ToolStack tool = ToolStack.from(stack);
       for (ModifierEntry entry : tool.getModifierList()) {
-      // exit on first successful result
-      InteractionResult result = entry.getHook(TinkerHooks.ENTITY_INTERACT).beforeEntityUse(tool, entry, player, target, hand, source);
-      if (result.consumesAction()) {
-        return result;
+        // exit on first successful result
+        InteractionResult result = entry.getHook(TinkerHooks.ENTITY_INTERACT).beforeEntityUse(tool, entry, player, target, hand, source);
+        if (result.consumesAction()) {
+          return result;
         }
       }
     }
     return InteractionResult.PASS;
   }
 
-  /** Implements {@link EntityInteractionModifierHook#afterEntityUse(IToolStackView, ModifierEntry, Player, LivingEntity, InteractionHand, InteractionSource)} for chestplates */
+  /**
+   * Implements {@link EntityInteractionModifierHook#afterEntityUse(IToolStackView, ModifierEntry, Player, LivingEntity, InteractionHand, InteractionSource)} for chestplates
+   */
   static InteractionResult afterEntityInteract(Player player, Level world, InteractionHand hand, Entity target, @Nullable EntityHitResult hitResult) {
     if (player.getItemInHand(hand).isEmpty() && !player.isSpectator()) {
       ItemStack chestplate = player.getItemBySlot(EquipmentSlot.CHEST);
@@ -120,7 +125,9 @@ public class InteractionHandler {
     return InteractionResult.PASS;
   }
 
-  /** Runs one of the two blockUse hooks for a chestplate */
+  /**
+   * Runs one of the two blockUse hooks for a chestplate
+   */
   private static InteractionResult onBlockUse(UseOnContext context, IToolStackView tool, ItemStack stack, Function<ModifierEntry, InteractionResult> callback) {
     Player player = context.getPlayer();
     Level world = context.getLevel();
@@ -142,7 +149,9 @@ public class InteractionHandler {
     return InteractionResult.PASS;
   }
 
-  /** Implements modifier hooks for a chestplate right clicking a block with an empty hand */
+  /**
+   * Implements modifier hooks for a chestplate right clicking a block with an empty hand
+   */
   static InteractionResult chestplateInteractWithBlock(Player player, Level world, InteractionHand hand, BlockHitResult trace) {
     // only handle chestplate interacts if the current hand is empty
     if (player.getItemInHand(hand).isEmpty() && !player.isSpectator()) {
@@ -156,7 +165,8 @@ public class InteractionHandler {
         UseOnContext context = new UseOnContext(player, hand, trace);
 
         // first, before block use (in forge, onItemUseFirst)
-        /*if (event.getUseItem() != Result.DENY)*/ {
+        /*if (event.getUseItem() != Result.DENY)*/
+        {
           InteractionResult result = onBlockUse(context, tool, chestplate, entry -> entry.getHook(TinkerHooks.BLOCK_INTERACT).beforeBlockUse(tool, entry, context, InteractionSource.ARMOR));
           if (result.consumesAction()) {
             return result;
@@ -200,7 +210,9 @@ public class InteractionHandler {
     return InteractionResult.PASS;
   }
 
-  /** Implements {@link GeneralInteractionModifierHook#onToolUse(IToolStackView, ModifierEntry, Player, InteractionHand, InteractionSource)}, called differently on client and server */
+  /**
+   * Implements {@link GeneralInteractionModifierHook#onToolUse(IToolStackView, ModifierEntry, Player, InteractionHand, InteractionSource)}, called differently on client and server
+   */
   public static InteractionResult onChestplateUse(Player player, ItemStack chestplate, InteractionHand hand) {
     if (player.getCooldowns().isOnCooldown(chestplate.getItem())) {
       return InteractionResult.PASS;
@@ -217,7 +229,9 @@ public class InteractionHandler {
     return InteractionResult.PASS;
   }
 
-  /** Handles attacking using the chestplate */
+  /**
+   * Handles attacking using the chestplate
+   */
   static InteractionResult onChestplateAttack(Player attacker, Level world, InteractionHand hand, Entity target, @Nullable EntityHitResult hitResult) {
     // Carry On is dumb and fires the attack entity event when they are not attacking entities, causing us to punch instead
     // they should not be doing that, but the author has not done anything to fix it, so just use a hacky check
@@ -236,7 +250,8 @@ public class InteractionHandler {
 
   /**
    * Handles interaction from a helmet
-   * @param player  Player instance
+   *
+   * @param player Player instance
    * @return true if the player has a modifiable helmet
    */
   public static boolean startArmorInteract(Player player, EquipmentSlot slotType, TooltipKey modifierKey) {
@@ -257,7 +272,8 @@ public class InteractionHandler {
 
   /**
    * Notifies modifiers the helmet keybind was released
-   * @param player  Player instance
+   *
+   * @param player Player instance
    * @return true if the player has a modifiable helmet
    */
   public static boolean stopArmorInteract(Player player, EquipmentSlot slotType) {
@@ -274,7 +290,9 @@ public class InteractionHandler {
     return false;
   }
 
-  /** Runs the left click interaction for left click */
+  /**
+   * Runs the left click interaction for left click
+   */
   private static InteractionResult onLeftClickInteraction(IToolStackView tool, Player player, InteractionHand hand) {
     for (ModifierEntry entry : tool.getModifierList()) {
       InteractionResult result = entry.getHook(TinkerHooks.CHARGEABLE_INTERACT).onToolUse(tool, entry, player, hand, InteractionSource.LEFT_CLICK);
@@ -285,7 +303,9 @@ public class InteractionHandler {
     return InteractionResult.PASS;
   }
 
-  /** Runs the left click interaction for left click */
+  /**
+   * Runs the left click interaction for left click
+   */
   public static InteractionResult onLeftClickInteraction(Player player, ItemStack held, InteractionHand hand) {
     if (player.getCooldowns().isOnCooldown(held.getItem())) {
       return InteractionResult.PASS;
@@ -293,7 +313,9 @@ public class InteractionHandler {
     return onLeftClickInteraction(ToolStack.from(held), player, hand);
   }
 
-  /** Sets the event result and swings the hand */
+  /**
+   * Sets the event result and swings the hand
+   */
   private static void setLeftClickEventResult(PlayerInteractionEvents event, InteractionResult result) {
     if (result.consumesAction()) {
       // success means swing hand
@@ -309,26 +331,35 @@ public class InteractionHandler {
     }
   }
 
-  /** Simple class to track the last tick */
+  /**
+   * Simple class to track the last tick
+   */
   private static class LastTick {
+
     private long lastTick = 0;
 
     /**
      * Attempts to update the given player
-     * @return  True if we are ready to interact again
+     *
+     * @return True if we are ready to interact again
      */
     private boolean update(Player player) {
-      if (player.tickCount >= lastTick + 4) {
-        lastTick = player.tickCount;
+      if (player.tickCount >= this.lastTick + 4) {
+        this.lastTick = player.tickCount;
         return true;
       }
       return false;
     }
   }
-  /** Key for the tick tracker instance */
+
+  /**
+   * Key for the tick tracker instance
+   */
   private static final ComputableDataKey<LastTick> LAST_TICK = TConstruct.createKey("last_tick", LastTick::new);
 
-  /** Implements {@link slimeknights.tconstruct.library.modifiers.hook.interaction.BlockInteractionModifierHook} for weapons with left click */
+  /**
+   * Implements {@link slimeknights.tconstruct.library.modifiers.hook.interaction.BlockInteractionModifierHook} for weapons with left click
+   */
   static void leftClickBlock(PlayerInteractionEvents.LeftClickBlock event) {
     // ensure we have not fired this tick
     Player player = event.getPlayer();
@@ -390,7 +421,9 @@ public class InteractionHandler {
     ShieldBlockEvent.EVENT.register(InteractionHandler::onBlock);
   }
 
-  /** Checks if the shield block angle allows blocking this attack */
+  /**
+   * Checks if the shield block angle allows blocking this attack
+   */
   public static boolean canBlock(LivingEntity holder, @Nullable Vec3 sourcePosition, IToolStackView tool) {
     // source position should never be null (checked by livingentity) but safety as its marked nullable
     if (sourcePosition == null) {
@@ -415,7 +448,9 @@ public class InteractionHandler {
     return blockAngle >= angle;
   }
 
-  /** Implements shield stats */
+  /**
+   * Implements shield stats
+   */
   static void onBlock(ShieldBlockEvent event) {
     LivingEntity entity = event.getEntity();
     ItemStack activeStack = entity.getUseItem();

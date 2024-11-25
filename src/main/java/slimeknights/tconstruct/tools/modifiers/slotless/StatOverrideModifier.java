@@ -28,15 +28,26 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-/** Modifier to directly modify a tool's stats */
+/**
+ * Modifier to directly modify a tool's stats
+ */
 public class StatOverrideModifier extends NoLevelsModifier {
-  /** Key of all stats added to the tool */
+
+  /**
+   * Key of all stats added to the tool
+   */
   private static final ResourceLocation KEY_BONUS = TConstruct.getResource("override_bonus");
-  /** Key of all stats multiplied by the tool */
+  /**
+   * Key of all stats multiplied by the tool
+   */
   private static final ResourceLocation KEY_MULTIPLY = TConstruct.getResource("override_multiplier");
-  /** Prefix for adding bonuses to the tooltip */
+  /**
+   * Prefix for adding bonuses to the tooltip
+   */
   private static final Component LANG_BONUS = TConstruct.makeTranslation("modifier", "stat_override.bonuses").withStyle(ChatFormatting.UNDERLINE);
-  /** Prefix for adding multipliers to the tooltip */
+  /**
+   * Prefix for adding multipliers to the tooltip
+   */
   private static final Component LANG_MULTIPLY = TConstruct.makeTranslation("modifier", "stat_override.multipliers").withStyle(ChatFormatting.UNDERLINE);
 
   @Override
@@ -50,7 +61,9 @@ public class StatOverrideModifier extends NoLevelsModifier {
     tool.getPersistentData().remove(KEY_MULTIPLY);
   }
 
-  /** Processes the stats from Tag into the consumer */
+  /**
+   * Processes the stats from Tag into the consumer
+   */
   private static void processStats(IModDataView persistentData, ResourceLocation key, StatConsumer consumer) {
     if (persistentData.contains(key, Tag.TAG_COMPOUND)) {
       CompoundTag nbt = persistentData.getCompound(key);
@@ -66,7 +79,9 @@ public class StatOverrideModifier extends NoLevelsModifier {
     }
   }
 
-  /** Generic friendly update method for stats */
+  /**
+   * Generic friendly update method for stats
+   */
   private static <T> void update(ModifierStatsBuilder builder, IToolStat<T> stat, Tag tag) {
     T value = stat.read(tag);
     if (value != null) {
@@ -80,7 +95,7 @@ public class StatOverrideModifier extends NoLevelsModifier {
     processStats(persistentData, KEY_BONUS, (stat, tag) -> update(builder, stat, tag));
     processStats(persistentData, KEY_MULTIPLY, (stat, tag) -> {
       if (stat instanceof INumericToolStat<?> numeric && TagUtil.isNumeric(tag)) {
-        numeric.multiply(builder, ((NumericTag)tag).getAsFloat());
+        numeric.multiply(builder, ((NumericTag) tag).getAsFloat());
       }
     });
   }
@@ -91,7 +106,9 @@ public class StatOverrideModifier extends NoLevelsModifier {
     return value == null ? null : stat.formatValue(value);
   }
 
-  /** Helper to get descriptions for one of the groups */
+  /**
+   * Helper to get descriptions for one of the groups
+   */
   private static void addToTooltip(IModDataView persistentData, ResourceLocation groupKey, Component listStart, DecimalFormat format, Consumer<Component> consumer) {
     if (persistentData.contains(groupKey, Tag.TAG_COMPOUND)) {
       CompoundTag stats = persistentData.getCompound(groupKey);
@@ -126,7 +143,7 @@ public class StatOverrideModifier extends NoLevelsModifier {
 
   @Override
   public List<Component> getDescriptionList(IToolStackView tool, int level) {
-    List<Component> defaultList = getDescriptionList(level);
+    List<Component> defaultList = this.getDescriptionList(level);
 
     // create the list when we first try to add text
     MutableObject<List<Component>> resultList = new MutableObject<>();
@@ -141,7 +158,7 @@ public class StatOverrideModifier extends NoLevelsModifier {
 
     // run all groups
     IModDataView persistentData = tool.getPersistentData();
-    addToTooltip(persistentData, KEY_BONUS,    LANG_BONUS,    Util.BONUS_FORMAT,      consumer);
+    addToTooltip(persistentData, KEY_BONUS, LANG_BONUS, Util.BONUS_FORMAT, consumer);
     addToTooltip(persistentData, KEY_MULTIPLY, LANG_MULTIPLY, Util.MULTIPLIER_FORMAT, consumer);
 
     // if anything changed, return the new list
@@ -156,10 +173,11 @@ public class StatOverrideModifier extends NoLevelsModifier {
 
   /**
    * Gets the tag for the given group key, creating if it needed
-   * @param tool       Tool instance
-   * @param groupKey   Group key
-   * @param createTag  If true, creates the tag if missing
-   * @return  Tag, or null if missing and {@code createTag} is false
+   *
+   * @param tool      Tool instance
+   * @param groupKey  Group key
+   * @param createTag If true, creates the tag if missing
+   * @return Tag, or null if missing and {@code createTag} is false
    */
   @Nullable
   private static CompoundTag getTag(IToolStackView tool, ResourceLocation groupKey, boolean createTag) {
@@ -178,7 +196,9 @@ public class StatOverrideModifier extends NoLevelsModifier {
     }
   }
 
-  /** Gets the given stat from Tag */
+  /**
+   * Gets the given stat from Tag
+   */
   private static float getStat(IToolStackView tool, ResourceLocation groupKey, INumericToolStat<?> stat, float defaultValue) {
     ModDataNBT data = tool.getPersistentData();
     if (data.contains(groupKey, Tag.TAG_COMPOUND)) {
@@ -193,11 +213,12 @@ public class StatOverrideModifier extends NoLevelsModifier {
 
   /**
    * Shared logic to set the given stat in Tag
-   * @param tool      Tool to set
-   * @param groupKey  Stat group key
-   * @param stat      Stat to set
-   * @param value     New stat value
-   * @return  True if the modifier is required to represent this change
+   *
+   * @param tool     Tool to set
+   * @param groupKey Stat group key
+   * @param stat     Stat to set
+   * @param value    New stat value
+   * @return True if the modifier is required to represent this change
    */
   private static boolean setStat(IToolStackView tool, ResourceLocation groupKey, INumericToolStat<?> stat, float value, float neutralValue) {
     CompoundTag nbt = getTag(tool, groupKey, value != neutralValue);
@@ -221,16 +242,17 @@ public class StatOverrideModifier extends NoLevelsModifier {
 
   /**
    * Sets the bonus for the stat to the given value
-   * @param tool   Tool
-   * @param stat   Stat to set
-   * @param value  New value
+   *
+   * @param tool  Tool
+   * @param stat  Stat to set
+   * @param value New value
    */
   public <T> boolean set(IToolStackView tool, IToolStat<T> stat, T value) {
     // first, find the proper tag, create if missing
     ModDataNBT data = tool.getPersistentData();
     boolean storeValue;
     if (stat instanceof INumericToolStat) {
-      storeValue = ((Number)value).intValue() != 0;
+      storeValue = ((Number) value).intValue() != 0;
     } else {
       storeValue = value != stat.getDefaultValue();
     }
@@ -259,9 +281,10 @@ public class StatOverrideModifier extends NoLevelsModifier {
 
   /**
    * Adds the given value to the current stat bonus
-   * @param tool   Tool
-   * @param stat   Stat to update
-   * @param bonus  Value to add to current bonus
+   *
+   * @param tool  Tool
+   * @param stat  Stat to update
+   * @param bonus Value to add to current bonus
    */
   public boolean addBonus(IToolStackView tool, INumericToolStat<?> stat, float bonus) {
     if (bonus != 0) {
@@ -272,9 +295,10 @@ public class StatOverrideModifier extends NoLevelsModifier {
 
   /**
    * Sets the bonus for the modifier to the given value
-   * @param tool        Tool
-   * @param stat        Stat to set
-   * @param multiplier  New multiplier
+   *
+   * @param tool       Tool
+   * @param stat       Stat to set
+   * @param multiplier New multiplier
    */
   public boolean setMultiplier(IToolStackView tool, INumericToolStat<?> stat, float multiplier) {
     return setStat(tool, KEY_MULTIPLY, stat, multiplier, 1);
@@ -282,18 +306,21 @@ public class StatOverrideModifier extends NoLevelsModifier {
 
   /**
    * Multiplies the tool's multiplier by the given value
-   * @param tool   Tool
-   * @param stat   Stat to set
-   * @param value  New multiplier
+   *
+   * @param tool  Tool
+   * @param stat  Stat to set
+   * @param value New multiplier
    */
   public boolean multiply(IToolStackView tool, INumericToolStat<?> stat, float value) {
     if (value != 1) {
-      return setMultiplier(tool, stat, getStat(tool, KEY_MULTIPLY, stat, 1) * value);
+      return this.setMultiplier(tool, stat, getStat(tool, KEY_MULTIPLY, stat, 1) * value);
     }
     return false;
   }
 
-  /** Removes the given stat from the bonuses */
+  /**
+   * Removes the given stat from the bonuses
+   */
   public <T> boolean remove(IToolStackView tool, IToolStat<T> stat) {
     // create tag if needed
     CompoundTag nbt = getTag(tool, KEY_BONUS, false);
@@ -311,6 +338,7 @@ public class StatOverrideModifier extends NoLevelsModifier {
 
   @FunctionalInterface
   private interface StatConsumer {
+
     void handle(IToolStat<?> stat, Tag value);
   }
 }

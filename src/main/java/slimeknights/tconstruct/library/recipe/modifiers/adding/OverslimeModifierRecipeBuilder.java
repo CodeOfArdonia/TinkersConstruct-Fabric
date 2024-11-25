@@ -13,7 +13,6 @@ import slimeknights.mantle.recipe.data.AbstractRecipeBuilder;
 import slimeknights.tconstruct.tools.TinkerModifiers;
 
 import javax.annotation.Nullable;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -21,41 +20,45 @@ import java.util.function.Consumer;
  */
 @RequiredArgsConstructor(staticName = "modifier")
 public class OverslimeModifierRecipeBuilder extends AbstractRecipeBuilder<OverslimeModifierRecipeBuilder> {
+
   private final Ingredient ingredient;
   private final int restoreAmount;
 
-  /** Creates a new builder for the given item */
+  /**
+   * Creates a new builder for the given item
+   */
   public static OverslimeModifierRecipeBuilder modifier(ItemLike item, int restoreAmount) {
     return modifier(Ingredient.of(item), restoreAmount);
   }
 
   @Override
   public void save(Consumer<FinishedRecipe> consumer) {
-    ItemStack[] stacks = ingredient.getItems();
+    ItemStack[] stacks = this.ingredient.getItems();
     if (stacks.length == 0) {
       throw new IllegalStateException("Empty ingredient not allowed");
     }
-    save(consumer, BuiltInRegistries.ITEM.getKey(stacks[0].getItem()));
+    this.save(consumer, BuiltInRegistries.ITEM.getKey(stacks[0].getItem()));
   }
 
   @Override
   public void save(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
-    if (ingredient == Ingredient.EMPTY) {
+    if (this.ingredient == Ingredient.EMPTY) {
       throw new IllegalStateException("Empty ingredient not allowed");
     }
-    ResourceLocation advancementId = buildOptionalAdvancement(id, "modifiers");
+    ResourceLocation advancementId = this.buildOptionalAdvancement(id, "modifiers");
     consumer.accept(new Finished(id, advancementId));
   }
 
   private class Finished extends AbstractFinishedRecipe {
+
     public Finished(ResourceLocation ID, @Nullable ResourceLocation advancementID) {
       super(ID, advancementID);
     }
 
     @Override
     public void serializeRecipeData(JsonObject json) {
-      json.add("ingredient", ingredient.toJson());
-      json.addProperty("restore_amount", restoreAmount);
+      json.add("ingredient", OverslimeModifierRecipeBuilder.this.ingredient.toJson());
+      json.addProperty("restore_amount", OverslimeModifierRecipeBuilder.this.restoreAmount);
     }
 
     @Override

@@ -17,10 +17,11 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class ProtectionModifier extends IncrementalModifier {
+
   @Override
   public float getProtectionModifier(IToolStackView tool, int level, EquipmentContext context, EquipmentSlot slotType, DamageSource source, float modifierValue) {
     if (!source.is(DamageTypeTags.BYPASSES_EFFECTS) && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
-      modifierValue += getEffectiveLevel(tool, level) * 1.25f;
+      modifierValue += this.getEffectiveLevel(tool, level) * 1.25f;
     }
     return modifierValue;
   }
@@ -28,9 +29,9 @@ public class ProtectionModifier extends IncrementalModifier {
   @Override
   public void addInformation(IToolStackView tool, int level, @Nullable Player player, List<Component> tooltip, TooltipKey tooltipKey, TooltipFlag tooltipFlag) {
     if (tool.hasTag(TinkerTags.Items.ARMOR)) {
-      tooltip.add(applyStyle(Component.literal(Util.PERCENT_BOOST_FORMAT.format(getEffectiveLevel(tool, level) * 1.25f / 25f))
-                               .append(" ")
-                               .append(Component.translatable(getTranslationKey() + ".resistance"))));
+      tooltip.add(this.applyStyle(Component.literal(Util.PERCENT_BOOST_FORMAT.format(this.getEffectiveLevel(tool, level) * 1.25f / 25f))
+        .append(" ")
+        .append(Component.translatable(this.getTranslationKey() + ".resistance"))));
     }
   }
 }

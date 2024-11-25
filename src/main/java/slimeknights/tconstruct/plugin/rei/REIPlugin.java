@@ -252,30 +252,36 @@ public class REIPlugin implements REIClientPlugin {
 
   /**
    * Removes a fluid from JEI
-   * @param manager  Manager
-   * @param fluid    Fluid to remove
-   * @param bucket   Fluid bucket to remove
+   *
+   * @param manager Manager
+   * @param fluid   Fluid to remove
+   * @param bucket  Fluid bucket to remove
    */
   private static void removeFluid(EntryRegistry manager, Fluid fluid, Item bucket) {
     manager.removeEntry(EntryStacks.of(FluidStack.create(fluid, FluidConstants.BUCKET)));
     manager.removeEntry(EntryStacks.of(bucket));
   }
 
-  /** Helper to get an item tag */
+  /**
+   * Helper to get an item tag
+   */
   private static Iterable<Holder<Item>> getTag(ResourceLocation name) {
     return getTag(TagKey.create(Registries.ITEM, name));
   }
 
-  /** Helper to get an item tag */
+  /**
+   * Helper to get an item tag
+   */
   private static Iterable<Holder<Item>> getTag(TagKey<Item> name) {
     return Objects.requireNonNull(BuiltInRegistries.ITEM.getTagOrEmpty(name));
   }
 
   /**
    * Hides an item if the related tag is empty
-   * @param manager  Ingredient manager
-   * @param item     Cast instance
-   * @param tagName  Tag to check
+   *
+   * @param manager Ingredient manager
+   * @param item    Cast instance
+   * @param tagName Tag to check
    */
   @SuppressWarnings("SameParameterValue")
   private static void optionalItem(EntryRegistry manager, ItemLike item, String tagName) {
@@ -287,8 +293,9 @@ public class REIPlugin implements REIClientPlugin {
 
   /**
    * Hides casts if the related tag is empty
-   * @param manager  Ingredient manager
-   * @param cast     Cast instance
+   *
+   * @param manager Ingredient manager
+   * @param cast    Cast instance
    */
   private static void optionalCast(EntryRegistry manager, CastItemObject cast) {
     Iterable<Holder<Item>> tag = getTag(new ResourceLocation("c", cast.getName().getPath() + "_blocks"));
@@ -299,21 +306,22 @@ public class REIPlugin implements REIClientPlugin {
 
   /**
    * Adds an item as a casting catalyst, and as a molding catalyst if it has molding recipes
-   * @param registry     Catalyst regisry
-   * @param item         Item to add
-   * @param ownCategory  Category to always add
-   * @param type         Molding recipe type
+   *
+   * @param registry    Catalyst regisry
+   * @param item        Item to add
+   * @param ownCategory Category to always add
+   * @param type        Molding recipe type
    */
   private static <T extends Recipe<C>, C extends Container> void addCastingCatalyst(CategoryRegistry registry, ItemLike item, CategoryIdentifier<?> ownCategory, RecipeType<MoldingRecipe> type) {
     EntryStack<ItemStack> stack = EntryStacks.of(item);
     registry.addWorkstations(ownCategory, stack);
     assert Minecraft.getInstance().level != null;
-    if (!((RecipeManagerAccessor)Minecraft.getInstance().level.getRecipeManager()).port_lib$byType(type).isEmpty()) {
+    if (!((RecipeManagerAccessor) Minecraft.getInstance().level.getRecipeManager()).port_lib$byType(type).isEmpty()) {
       registry.addWorkstations(TConstructREIConstants.MOLDING, stack);
     }
   }
 
-  private static void addCatalysts(CategoryRegistry registry, EntryStack<ItemStack> entryStack, CategoryIdentifier<?> ...categoryIdentifiers) {
+  private static void addCatalysts(CategoryRegistry registry, EntryStack<ItemStack> entryStack, CategoryIdentifier<?>... categoryIdentifiers) {
     for (CategoryIdentifier<?> categoryIdentifier : categoryIdentifiers)
       registry.addWorkstations(categoryIdentifier, entryStack);
   }

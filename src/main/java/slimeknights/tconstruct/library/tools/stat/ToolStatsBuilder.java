@@ -24,13 +24,17 @@ import java.util.function.Function;
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class ToolStatsBuilder {
-  /** Tool base stats, primarily for bonuses. The stat builder is responsible for using the bonuses */
+
+  /**
+   * Tool base stats, primarily for bonuses. The stat builder is responsible for using the bonuses
+   */
   protected final ToolDefinitionData toolData;
 
   /**
    * Gets the stat builder for no tool parts
-   * @param definition  Tool definition
-   * @return  Stats builder
+   *
+   * @param definition Tool definition
+   * @return Stats builder
    */
   public static ToolStatsBuilder noParts(ToolDefinition definition) {
     return new ToolStatsBuilder(definition.getData());
@@ -39,44 +43,53 @@ public class ToolStatsBuilder {
   /**
    * Called after bonuses are processed to set the unique stats for this builder.
    * Any stats added to the builder here need to return true in {@link #handles(IToolStat)} to prevent errors on tool building with tool definitions setting those stats
-   * @param builder  Stats builder
+   *
+   * @param builder Stats builder
    */
   protected void setStats(StatsNBT.Builder builder) {}
 
   /**
    * Checks if the given stat type is handled by this builder and should be skipped in the bonuses
-   * @param stat  Stat type
-   * @return  True if handled
+   *
+   * @param stat Stat type
+   * @return True if handled
    */
   protected boolean handles(IToolStat<?> stat) {
     return false;
   }
 
-  /** Gets the given stat, returning a default if its missing instead of the stat's default */
-  @SuppressWarnings("SameParameterValue") // seriously IDEA, what do you expect me to do? there is no way to dynamically box a number
+  /**
+   * Gets the given stat, returning a default if its missing instead of the stat's default
+   */
+  @SuppressWarnings("SameParameterValue")
+  // seriously IDEA, what do you expect me to do? there is no way to dynamically box a number
   protected <T extends Number> T getStatOrDefault(IToolStat<T> stat, T defaultValue) {
-    if (toolData.hasBaseStat(stat)) {
-      return toolData.getBaseStat(stat);
+    if (this.toolData.hasBaseStat(stat)) {
+      return this.toolData.getBaseStat(stat);
     }
     return defaultValue;
   }
 
-  /** Sets the given stat into the builder from the tool's base stat */
+  /**
+   * Sets the given stat into the builder from the tool's base stat
+   */
   private <T> void setToBase(StatsNBT.Builder builder, IToolStat<T> stat) {
-    builder.set(stat, toolData.getBaseStat(stat));
+    builder.set(stat, this.toolData.getBaseStat(stat));
   }
 
-  /** Builds default stats */
+  /**
+   * Builds default stats
+   */
   public StatsNBT buildStats() {
     StatsNBT.Builder builder = StatsNBT.builder();
     // start by adding in all relevant bonuses that are not handled elsewhere.
     // the handled check is needed becuase the immutable map builder does not like duplicate keys
-    for (IToolStat<?> stat : toolData.getAllBaseStats()) {
-      if (!handles(stat)) {
-        setToBase(builder, stat);
+    for (IToolStat<?> stat : this.toolData.getAllBaseStats()) {
+      if (!this.handles(stat)) {
+        this.setToBase(builder, stat);
       }
     }
-    setStats(builder);
+    this.setStats(builder);
     return builder.build();
   }
 
@@ -85,24 +98,26 @@ public class ToolStatsBuilder {
 
   /**
    * Fetches the given stat from the material, getting the default stats if missing
-   * @param material   Material type
-   * @param statsId    Stat type
-   * @param <T>  Stat type
-   * @return  Stat, or default if the part type accepts it, null if the part type does not
+   *
+   * @param material Material type
+   * @param statsId  Stat type
+   * @param <T>      Stat type
+   * @return Stat, or default if the part type accepts it, null if the part type does not
    */
   @Nullable
   public static <T extends IMaterialStats> T fetchStatsOrDefault(MaterialId material, MaterialStatsId statsId) {
-      return MaterialRegistry.getInstance().<T>getMaterialStats(material, statsId)
-        .orElseGet(() -> MaterialRegistry.getInstance().getDefaultStats(statsId));
+    return MaterialRegistry.getInstance().<T>getMaterialStats(material, statsId)
+      .orElseGet(() -> MaterialRegistry.getInstance().getDefaultStats(statsId));
   }
 
   /**
    * Gets a list of all stats for the given part type
-   * @param statsId             Stat type
-   * @param materials           Materials list
-   * @param parts  List of required components, filters stat types
-   * @param <T>  Type of stats
-   * @return  List of stats
+   *
+   * @param statsId   Stat type
+   * @param materials Materials list
+   * @param parts     List of required components, filters stat types
+   * @param <T>       Type of stats
+   * @return List of stats
    */
   public static <T extends IMaterialStats> List<T> listOfCompatibleWith(MaterialStatsId statsId, MaterialNBT materials, List<PartRequirement> parts) {
     ImmutableList.Builder<T> builder = ImmutableList.builder();
@@ -126,10 +141,11 @@ public class ToolStatsBuilder {
 
   /**
    * Gets the average value from a list of stat types
-   * @param stats       Stat list
-   * @param statGetter  Function to get the value
-   * @param <T>  Material type
-   * @return  Average value
+   *
+   * @param stats      Stat list
+   * @param statGetter Function to get the value
+   * @param <T>        Material type
+   * @return Average value
    */
   public static <T extends IMaterialStats> double getAverageValue(List<T> stats, Function<T, ? extends Number> statGetter) {
     return getAverageValue(stats, statGetter, 0);
@@ -137,30 +153,32 @@ public class ToolStatsBuilder {
 
   /**
    * Gets the average value from a list of stat types
-   * @param stats         Stat list
-   * @param statGetter    Function to get the value
-   * @param missingValue  Default value to use for missing stats
-   * @param <T>  Material type
-   * @return  Average value
+   *
+   * @param stats        Stat list
+   * @param statGetter   Function to get the value
+   * @param missingValue Default value to use for missing stats
+   * @param <T>          Material type
+   * @return Average value
    */
   public static <T extends IMaterialStats, N extends Number> double getAverageValue(List<T> stats, Function<T, N> statGetter, double missingValue) {
     return stats.stream()
-                .mapToDouble(value -> statGetter.apply(value).doubleValue())
-                .average()
-                .orElse(missingValue);
+      .mapToDouble(value -> statGetter.apply(value).doubleValue())
+      .average()
+      .orElse(missingValue);
   }
 
   /**
    * Gets the average value from a list of stat types
-   * @param stats         Stat list
-   * @param statGetter    Function to get the value
-   * @param missingValue  Default value to use for missing stats
-   * @param <T>  Material type
-   * @return  Average value
+   *
+   * @param stats        Stat list
+   * @param statGetter   Function to get the value
+   * @param missingValue Default value to use for missing stats
+   * @param <T>          Material type
+   * @return Average value
    */
   public static <T extends IMaterialStats, N extends Number> double getTotalValue(List<T> stats, Function<T, N> statGetter) {
     return stats.stream()
-                .mapToDouble(value -> statGetter.apply(value).doubleValue())
-                .sum();
+      .mapToDouble(value -> statGetter.apply(value).doubleValue())
+      .sum();
   }
 }

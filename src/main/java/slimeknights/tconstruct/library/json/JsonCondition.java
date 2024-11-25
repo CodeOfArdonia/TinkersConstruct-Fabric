@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import javax.annotation.Nullable;
 
 public class JsonCondition {
+
   @Getter
   private final ConditionJsonProvider conditionJsonProvider;
   @Getter

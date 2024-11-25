@@ -30,10 +30,10 @@ public class CrystalshotModifier extends NoLevelsModifier implements BowAmmoModi
   @Override
   public Component getDisplayName(IToolStackView tool, int level) {
     // color the display name for the variant
-    String variant = tool.getPersistentData().getString(getId());
+    String variant = tool.getPersistentData().getString(this.getId());
     if (!variant.isEmpty()) {
-      String key = getTranslationKey();
-      return Component.translatable(getTranslationKey())
+      String key = this.getTranslationKey();
+      return Component.translatable(this.getTranslationKey())
         .withStyle(style -> style.withColor(ResourceColorManager.getTextColor(key + "." + variant)));
     }
     return super.getDisplayName();
@@ -41,7 +41,7 @@ public class CrystalshotModifier extends NoLevelsModifier implements BowAmmoModi
 
   @Override
   public ItemStack findAmmo(IToolStackView tool, ModifierEntry modifier, LivingEntity shooter, ItemStack standardAmmo, Predicate<ItemStack> ammoPredicate) {
-    return CrystalshotItem.withVariant(tool.getPersistentData().getString(getId()), 64);
+    return CrystalshotItem.withVariant(tool.getPersistentData().getString(this.getId()), 64);
   }
 
   @Override

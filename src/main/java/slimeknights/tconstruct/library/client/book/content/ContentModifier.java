@@ -34,23 +34,24 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ContentModifier extends PageContent {
-  public static final transient ResourceLocation ID = TConstruct.getResource("modifier");
-  public static final transient int TEX_SIZE = 256;
+
+  public static final ResourceLocation ID = TConstruct.getResource("modifier");
+  public static final int TEX_SIZE = 256;
   public static final ResourceLocation BOOK_MODIFY = TConstruct.getResource("textures/gui/book/modify.png");
-  private static final transient String KEY_EFFECTS = TConstruct.makeTranslationKey("book", "modifiers.effect");
+  private static final String KEY_EFFECTS = TConstruct.makeTranslationKey("book", "modifiers.effect");
 
-  public static final transient ImageData IMG_SLOT_1 = new ImageData(BOOK_MODIFY, 0, 75, 22, 22, TEX_SIZE, TEX_SIZE);
-  public static final transient ImageData IMG_SLOT_2 = new ImageData(BOOK_MODIFY, 0, 97, 40, 22, TEX_SIZE, TEX_SIZE);
-  public static final transient ImageData IMG_SLOT_3 = new ImageData(BOOK_MODIFY, 0, 119, 58, 22, TEX_SIZE, TEX_SIZE);
-  public static final transient ImageData IMG_SLOT_4 = new ImageData(BOOK_MODIFY, 0, 141, 40, 40, TEX_SIZE, TEX_SIZE);
-  public static final transient ImageData IMG_SLOT_5 = new ImageData(BOOK_MODIFY, 0, 181, 58, 41, TEX_SIZE, TEX_SIZE);
-  public static final transient ImageData IMG_TABLE = new ImageData(BOOK_MODIFY, 214, 0, 42, 46, TEX_SIZE, TEX_SIZE);
-  public static final transient ImageData[] IMG_SLOTS = new ImageData[]{IMG_SLOT_1, IMG_SLOT_2, IMG_SLOT_3, IMG_SLOT_4, IMG_SLOT_5};
+  public static final ImageData IMG_SLOT_1 = new ImageData(BOOK_MODIFY, 0, 75, 22, 22, TEX_SIZE, TEX_SIZE);
+  public static final ImageData IMG_SLOT_2 = new ImageData(BOOK_MODIFY, 0, 97, 40, 22, TEX_SIZE, TEX_SIZE);
+  public static final ImageData IMG_SLOT_3 = new ImageData(BOOK_MODIFY, 0, 119, 58, 22, TEX_SIZE, TEX_SIZE);
+  public static final ImageData IMG_SLOT_4 = new ImageData(BOOK_MODIFY, 0, 141, 40, 40, TEX_SIZE, TEX_SIZE);
+  public static final ImageData IMG_SLOT_5 = new ImageData(BOOK_MODIFY, 0, 181, 58, 41, TEX_SIZE, TEX_SIZE);
+  public static final ImageData IMG_TABLE = new ImageData(BOOK_MODIFY, 214, 0, 42, 46, TEX_SIZE, TEX_SIZE);
+  public static final ImageData[] IMG_SLOTS = new ImageData[]{IMG_SLOT_1, IMG_SLOT_2, IMG_SLOT_3, IMG_SLOT_4, IMG_SLOT_5};
 
-  public static final transient int[] SLOTS_X = new int[]{3, 21, 39, 12, 30};
-  public static final transient int[] SLOTS_Y = new int[]{3, 3, 3, 22, 22};
-  public static final transient int[] SLOTS_X_4 = new int[]{3, 21, 3, 21};
-  public static final transient int[] SLOTS_Y_4 = new int[]{3, 3, 22, 22};
+  public static final int[] SLOTS_X = new int[]{3, 21, 39, 12, 30};
+  public static final int[] SLOTS_Y = new int[]{3, 3, 3, 22, 22};
+  public static final int[] SLOTS_X_4 = new int[]{3, 21, 3, 21};
+  public static final int[] SLOTS_Y_4 = new int[]{3, 3, 22, 22};
 
   @Nullable
   private transient Modifier modifier;
@@ -76,7 +77,8 @@ public class ContentModifier extends PageContent {
     return this.modifier;
   }
 
-  @Override @Nonnull
+  @Override
+  @Nonnull
   public String getTitle() {
     return this.getModifier().getDisplayName().getString();
   }
@@ -85,7 +87,7 @@ public class ContentModifier extends PageContent {
   public void load() {
     if (this.recipes == null) {
       assert Minecraft.getInstance().level != null;
-      Modifier modifier = getModifier();
+      Modifier modifier = this.getModifier();
       if (modifier == ModifierManager.INSTANCE.getDefaultValue()) {
         this.recipes = Collections.emptyList();
       } else {
@@ -96,18 +98,18 @@ public class ContentModifier extends PageContent {
 
   @Override
   public void build(BookData book, ArrayList<BookElement> list, boolean brightSide) {
-    Modifier modifier = getModifier();
+    Modifier modifier = this.getModifier();
     if (modifier == ModifierManager.INSTANCE.getDefaultValue() || this.recipes.isEmpty()) {
       list.add(new ImageElement(0, 0, 32, 32, ImageData.MISSING));
-      System.out.println("Modifier with id " + modifierID + " not found");
+      System.out.println("Modifier with id " + this.modifierID + " not found");
       return;
     }
-    this.addTitle(list, getTitle(), true, modifier.getColor());
+    this.addTitle(list, this.getTitle(), true, modifier.getColor());
 
     // description
-    int y = getTitleHeight();
-    int h = more_text_space ? BookScreen.PAGE_HEIGHT * 2 / 5 : BookScreen.PAGE_HEIGHT * 2 / 7;
-    list.add(new TextElement(5, y, BookScreen.PAGE_WIDTH - 10, h, text));
+    int y = this.getTitleHeight();
+    int h = this.more_text_space ? BookScreen.PAGE_HEIGHT * 2 / 5 : BookScreen.PAGE_HEIGHT * 2 / 7;
+    list.add(new TextElement(5, y, BookScreen.PAGE_WIDTH - 10, h, this.text));
 
     if (this.effects.length > 0) {
       TextData head = new TextData(I18n.get(KEY_EFFECTS));
@@ -126,7 +128,7 @@ public class ContentModifier extends PageContent {
       list.add(new TextElement(5, y + 14 + h, BookScreen.PAGE_WIDTH / 2 + 5, BookScreen.PAGE_HEIGHT - h - 20, effectData));
     }
 
-    if (recipes.size() > 1) {
+    if (this.recipes.size() > 1) {
       int col = book.appearance.structureButtonColor;
       int colHover = book.appearance.structureButtonColorHovered;
       list.add(new CycleRecipeElement(BookScreen.PAGE_WIDTH - ArrowButton.ArrowType.RIGHT.w - 32, 160,
@@ -181,7 +183,7 @@ public class ContentModifier extends PageContent {
       this.parts.add(slot);
       list.add(slot);
 
-      ItemStackList demo = getDemoTools(recipe.getToolWithModifier());
+      ItemStackList demo = this.getDemoTools(recipe.getToolWithModifier());
 
       TinkerItemElement demoTools = new TinkerItemElement(imgX + (img.width - 16) / 2, imgY - 24, 1f, demo);
 

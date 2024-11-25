@@ -37,6 +37,7 @@ import java.util.function.Supplier;
  * Contains base helpers for all Tinker modules. Should not be extended by other mods, this is only for internal usage.
  */
 public abstract class TinkerModule {
+
   protected TinkerModule() {
     TConstruct.sealTinkersClass(this, "TinkerModule", "This is a bug with the mod containing that class, they should create their own deferred registers.");
   }
@@ -65,12 +66,14 @@ public abstract class TinkerModule {
   // base item properties
   protected static final Item.Properties HIDDEN_PROPS = new Item.Properties();
   protected static final Item.Properties GENERAL_PROPS = new Item.Properties()/*.tab(TAB_GENERAL)*/;
-  protected static final Function<Block,? extends BlockItem> HIDDEN_BLOCK_ITEM = (b) -> new BlockItem(b, HIDDEN_PROPS);
-  protected static final Function<Block,? extends BlockItem> GENERAL_BLOCK_ITEM = (b) -> new BlockItem(b, GENERAL_PROPS);
-  protected static final Function<Block,? extends BlockItem> GENERAL_TOOLTIP_BLOCK_ITEM = (b) -> new BlockTooltipItem(b, GENERAL_PROPS);
+  protected static final Function<Block, ? extends BlockItem> HIDDEN_BLOCK_ITEM = (b) -> new BlockItem(b, HIDDEN_PROPS);
+  protected static final Function<Block, ? extends BlockItem> GENERAL_BLOCK_ITEM = (b) -> new BlockItem(b, GENERAL_PROPS);
+  protected static final Function<Block, ? extends BlockItem> GENERAL_TOOLTIP_BLOCK_ITEM = (b) -> new BlockTooltipItem(b, GENERAL_PROPS);
   protected static final Supplier<Item> TOOLTIP_ITEM = () -> new TooltipItem(GENERAL_PROPS);
 
-  /** Called during construction to initialize the registers for this mod */
+  /**
+   * Called during construction to initialize the registers for this mod
+   */
   public static void initRegisters() {
     // gameplay singleton
     BLOCKS.register();
@@ -103,32 +106,41 @@ public abstract class TinkerModule {
     return Block.Properties.of().sound(soundType);
   }
 
-  /** Same as above, but with a color */
+  /**
+   * Same as above, but with a color
+   */
   protected static BlockBehaviour.Properties builder(MapColor color, SoundType soundType) {
     return Block.Properties.of().mapColor(color).sound(soundType);
   }
 
-  /** Builder that pre-supplies metal properties */
+  /**
+   * Builder that pre-supplies metal properties
+   */
   protected static BlockBehaviour.Properties metalBuilder(MapColor color) {
     return builder(color, SoundType.METAL).requiresCorrectToolForDrops().strength(5.0f);
   }
 
-  /** Builder that pre-supplies glass properties */
+  /**
+   * Builder that pre-supplies glass properties
+   */
   protected static BlockBehaviour.Properties glassBuilder(MapColor color) {
     return builder(color, SoundType.GLASS)
       .strength(0.3F).noOcclusion().isValidSpawn(Blocks::never)
       .isRedstoneConductor(Blocks::never).isSuffocating(Blocks::never).isViewBlocking(Blocks::never);
   }
 
-  /** Builder that pre-supplies glass properties */
+  /**
+   * Builder that pre-supplies glass properties
+   */
   protected static BlockBehaviour.Properties woodBuilder(MapColor color) {
     return builder(color, SoundType.WOOD).requiresCorrectToolForDrops().strength(2.0F, 7.0F).ignitedByLava();
   }
 
   /**
    * Creates a Tinkers Construct resource location
-   * @param path  Resource path
-   * @return  Tinkers Construct resource location
+   *
+   * @param path Resource path
+   * @return Tinkers Construct resource location
    */
   protected static ResourceLocation resource(String path) {
     return TConstruct.getResource(path);

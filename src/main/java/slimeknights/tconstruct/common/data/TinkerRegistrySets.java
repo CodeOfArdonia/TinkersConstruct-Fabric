@@ -14,10 +14,10 @@ import slimeknights.tconstruct.world.TinkerStructures;
 import slimeknights.tconstruct.world.TinkerWorld;
 
 import java.util.Collections;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public class TinkerRegistrySets extends DatapackBuiltinEntriesProvider {
+
   public static final RegistrySetBuilder BUILDER = new RegistrySetBuilder()
     .add(Registries.STRUCTURE, TinkerStructures::bootstrap)
     .add(Registries.CONFIGURED_FEATURE, TinkerWorld::bootstrapConfigured)

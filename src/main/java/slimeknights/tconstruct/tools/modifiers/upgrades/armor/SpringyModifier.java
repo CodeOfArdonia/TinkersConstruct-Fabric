@@ -21,6 +21,7 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 
 public class SpringyModifier extends Modifier {
+
   private static final TinkerDataKey<SlotInCharge> SLOT_IN_CHARGE = TConstruct.createKey("springy");
 
   @Override
@@ -48,7 +49,7 @@ public class SpringyModifier extends Modifier {
           }
           // did we end up with any bonus?
           if (bestBonus > 0) {
-            float angle = attacker.getYRot() * (float)Math.PI / 180F;
+            float angle = attacker.getYRot() * (float) Math.PI / 180F;
             livingAttacker.knockback(bestBonus, -Mth.sin(angle), Mth.cos(angle));
           }
         }
@@ -56,7 +57,9 @@ public class SpringyModifier extends Modifier {
     }
   }
 
-  /** Checks if the given tool cares about this modifier */
+  /**
+   * Checks if the given tool cares about this modifier
+   */
   private static boolean toolValid(IToolStackView tool, EquipmentSlot slot, EquipmentChangeContext context) {
     if (!tool.isBroken() && !context.getEntity().level().isClientSide) {
       return ModifierUtil.validArmorSlot(tool, slot);
@@ -92,45 +95,53 @@ public class SpringyModifier extends Modifier {
       });
     }
   }
+
   @Override
   public float beforeEntityHit(IToolStackView tool, int level, ToolAttackContext context, float damage, float baseKnockback, float knockback) {
     // unarmed bonus
     return knockback + level * 0.5f;
   }
 
-  /** Tracker to determine which slot should be in charge */
+  /**
+   * Tracker to determine which slot should be in charge
+   */
   private static class SlotInCharge {
+
     private final boolean[] active = new boolean[6];
     @Nullable
     EquipmentSlot inCharge = null;
 
-    /** Adds the given slot to the tracker */
+    /**
+     * Adds the given slot to the tracker
+     */
     void addSlot(EquipmentSlot slotType) {
-      active[slotType.getFilterFlag()] = true;
+      this.active[slotType.getFilterFlag()] = true;
       // prefer armor in charge as hand only runs when blocking, prefer mainhand over offhand
-      if (inCharge == null || (inCharge.getType() == Type.HAND && slotType != EquipmentSlot.OFFHAND)) {
-        inCharge = slotType;
+      if (this.inCharge == null || (this.inCharge.getType() == Type.HAND && slotType != EquipmentSlot.OFFHAND)) {
+        this.inCharge = slotType;
       }
     }
 
-    /** Removes the given slot from the tracker */
+    /**
+     * Removes the given slot from the tracker
+     */
     void removeSlot(EquipmentSlot slotType) {
-      active[slotType.getFilterFlag()] = false;
+      this.active[slotType.getFilterFlag()] = false;
       // prioritize armor slots
       for (EquipmentSlot armorSlot : ModifiableArmorMaterial.ARMOR_SLOTS) {
-        if (active[slotType.getFilterFlag()]) {
-          inCharge = armorSlot;
+        if (this.active[slotType.getFilterFlag()]) {
+          this.inCharge = armorSlot;
           return;
         }
       }
       // if none, find a hand slot
       for (EquipmentSlot hand : InteractionHandler.HAND_SLOTS) {
-        if (active[slotType.getFilterFlag()]) {
-          inCharge = hand;
+        if (this.active[slotType.getFilterFlag()]) {
+          this.inCharge = hand;
           return;
         }
       }
-      inCharge = null;
+      this.inCharge = null;
     }
   }
 }

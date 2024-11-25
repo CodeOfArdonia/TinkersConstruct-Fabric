@@ -8,19 +8,31 @@ import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 
 import javax.annotation.Nullable;
 
-/** Context for equipment change modifier hooks */
+/**
+ * Context for equipment change modifier hooks
+ */
 public class EquipmentChangeContext extends EquipmentContext {
-  /** Slot that changed */
+
+  /**
+   * Slot that changed
+   */
   @Getter
   private final EquipmentSlot changedSlot;
-  /** Original stack in the slot */
+  /**
+   * Original stack in the slot
+   */
   @Getter
   private final ItemStack original;
-  /** Replacement stack in the slot */
+  /**
+   * Replacement stack in the slot
+   */
   @Getter
   private final ItemStack replacement;
-  /** Original tool in the slot, null if the slot does not contain a modifiable item */
-  @Nullable @Getter
+  /**
+   * Original tool in the slot, null if the slot does not contain a modifiable item
+   */
+  @Nullable
+  @Getter
   private final IToolStackView originalTool;
 
   public EquipmentChangeContext(LivingEntity entity, EquipmentSlot changedSlot, ItemStack original, ItemStack replacement) {
@@ -30,16 +42,17 @@ public class EquipmentChangeContext extends EquipmentContext {
     this.replacement = replacement;
     this.originalTool = getToolStackIfModifiable(original);
     int replacementIndex = changedSlot.getFilterFlag();
-    toolsInSlots[replacementIndex] = getToolStackIfModifiable(replacement);
-    fetchedTool[replacementIndex] = true;
+    this.toolsInSlots[replacementIndex] = getToolStackIfModifiable(replacement);
+    this.fetchedTool[replacementIndex] = true;
   }
 
   /**
    * Gets the tool stack for the stack replacing the original
-   * @return  Tool stack replacing, or null if the slot is not modifable
+   *
+   * @return Tool stack replacing, or null if the slot is not modifable
    */
   @Nullable
   public IToolStackView getReplacementTool() {
-    return getToolInSlot(changedSlot);
+    return this.getToolInSlot(this.changedSlot);
   }
 }

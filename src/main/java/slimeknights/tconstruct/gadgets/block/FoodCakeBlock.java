@@ -18,7 +18,9 @@ import net.minecraft.world.phys.BlockHitResult;
  * Extension of cake that utilizes a food instance for properties
  */
 public class FoodCakeBlock extends CakeBlock {
+
   private final FoodProperties food;
+
   public FoodCakeBlock(Properties properties, FoodProperties food) {
     super(properties);
     this.food = food;
@@ -36,9 +38,11 @@ public class FoodCakeBlock extends CakeBlock {
     return InteractionResult.PASS;
   }
 
-  /** Checks if the given player has all potion effects from the food */
+  /**
+   * Checks if the given player has all potion effects from the food
+   */
   private boolean hasAllEffects(Player player) {
-    for (Pair<MobEffectInstance,Float> pair : food.getEffects()) {
+    for (Pair<MobEffectInstance, Float> pair : this.food.getEffects()) {
       if (pair.getFirst() != null && !player.hasEffect(pair.getFirst().getEffect())) {
         return false;
       }
@@ -46,19 +50,21 @@ public class FoodCakeBlock extends CakeBlock {
     return true;
   }
 
-  /** Eats a single slice of cake if possible */
+  /**
+   * Eats a single slice of cake if possible
+   */
   private InteractionResult eatSlice(LevelAccessor world, BlockPos pos, BlockState state, Player player) {
-    if (!player.canEat(false) && !food.canAlwaysEat()) {
+    if (!player.canEat(false) && !this.food.canAlwaysEat()) {
       return InteractionResult.PASS;
     }
     // repurpose fast eating, will mean no eating if we have the effect
-    if (!food.isFastFood() && hasAllEffects(player)) {
+    if (!this.food.isFastFood() && this.hasAllEffects(player)) {
       return InteractionResult.PASS;
     }
     player.awardStat(Stats.EAT_CAKE_SLICE);
     // apply food stats
-    player.getFoodData().eat(food.getNutrition(), food.getSaturationModifier());
-    for (Pair<MobEffectInstance,Float> pair : food.getEffects()) {
+    player.getFoodData().eat(this.food.getNutrition(), this.food.getSaturationModifier());
+    for (Pair<MobEffectInstance, Float> pair : this.food.getEffects()) {
       if (!world.isClientSide() && pair.getFirst() != null && world.getRandom().nextFloat() < pair.getSecond()) {
         player.addEffect(new MobEffectInstance(pair.getFirst()));
       }

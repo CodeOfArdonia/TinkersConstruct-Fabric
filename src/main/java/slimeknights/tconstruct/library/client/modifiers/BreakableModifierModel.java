@@ -1,11 +1,9 @@
 package slimeknights.tconstruct.library.client.modifiers;
 
-import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonObject;
 import com.mojang.math.Transformation;
 import lombok.RequiredArgsConstructor;
 import net.fabricmc.fabric.api.renderer.v1.mesh.Mesh;
-import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.util.GsonHelper;
@@ -22,20 +20,29 @@ import java.util.function.Function;
  * Modifier model for a modifier that changes its texture when broken
  */
 public class BreakableModifierModel implements IBakedModifierModel {
-  /** Constant unbaked model instance, as they are all the same */
+
+  /**
+   * Constant unbaked model instance, as they are all the same
+   */
   public static final IUnbakedModifierModel UNBAKED_INSTANCE = new Unbaked(-1, 0);
 
-  /** Textures for this model */
+  /**
+   * Textures for this model
+   */
   private final Material[] sprites;
-  /** Color to apply to the texture */
+  /**
+   * Color to apply to the texture
+   */
   private final int color;
-  /** Luminosity to apply to the texture */
+  /**
+   * Luminosity to apply to the texture
+   */
   private final int luminosity;
 
   public BreakableModifierModel(@Nullable Material normalSmall, @Nullable Material brokenSmall, @Nullable Material normalLarge, @Nullable Material brokenLarge, int color, int luminosity) {
     this.color = color;
     this.luminosity = luminosity;
-    this.sprites = new Material[] {normalSmall, brokenSmall, normalLarge, brokenLarge};
+    this.sprites = new Material[]{normalSmall, brokenSmall, normalLarge, brokenLarge};
   }
 
   public BreakableModifierModel(@Nullable Material normalSmall, @Nullable Material brokenSmall, @Nullable Material normalLarge, @Nullable Material brokenLarge) {
@@ -43,28 +50,29 @@ public class BreakableModifierModel implements IBakedModifierModel {
   }
 
   @Override
-  public Mesh getQuads(IToolStackView tool, ModifierEntry entry, Function<Material,TextureAtlasSprite> spriteGetter, Transformation transforms, boolean isLarge, int startTintIndex, @Nullable ItemLayerPixels pixels) {
+  public Mesh getQuads(IToolStackView tool, ModifierEntry entry, Function<Material, TextureAtlasSprite> spriteGetter, Transformation transforms, boolean isLarge, int startTintIndex, @Nullable ItemLayerPixels pixels) {
     // first get the cache index
     int index = (isLarge ? 2 : 0) | (tool.isBroken() ? 1 : 0);
     // then return the quads
-    return MantleItemLayerModel.getQuadsForSprite(color, -1, spriteGetter.apply(sprites[index]), transforms, luminosity, pixels);
+    return MantleItemLayerModel.getQuadsForSprite(this.color, -1, spriteGetter.apply(this.sprites[index]), transforms, this.luminosity, pixels);
   }
 
   @RequiredArgsConstructor
   private static class Unbaked implements IUnbakedModifierModel {
+
     private final int color;
     private final int luminosity;
 
     @Nullable
     @Override
-    public IBakedModifierModel forTool(Function<String,Material> smallGetter, Function<String,Material> largeGetter) {
+    public IBakedModifierModel forTool(Function<String, Material> smallGetter, Function<String, Material> largeGetter) {
       Material normalSmall = smallGetter.apply("");
       Material brokenSmall = smallGetter.apply("_broken");
       Material normalLarge = smallGetter.apply("");
       Material brokenLarge = smallGetter.apply("_broken");
       // we need both to exist for this to work
       if (normalSmall != null || brokenSmall != null || normalLarge != null || brokenLarge != null) {
-        return new BreakableModifierModel(normalSmall, brokenSmall, normalLarge, brokenLarge, color, luminosity);
+        return new BreakableModifierModel(normalSmall, brokenSmall, normalLarge, brokenLarge, this.color, this.luminosity);
       }
       return null;
     }

@@ -17,9 +17,12 @@ import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 
 import java.util.Objects;
 
-/** Weapon attack that just spawns an extra particle */
+/**
+ * Weapon attack that just spawns an extra particle
+ */
 @RequiredArgsConstructor
 public class ParticleWeaponAttack implements IWeaponAttack {
+
   public static final Loader LOADER = new Loader();
 
   private final SimpleParticleType particle;
@@ -28,7 +31,7 @@ public class ParticleWeaponAttack implements IWeaponAttack {
   public boolean dealDamage(IToolStackView tool, ToolAttackContext context, float damage) {
     boolean hit = ToolAttackUtil.dealDefaultDamage(context.getAttacker(), context.getTarget(), damage);
     if (hit && context.isFullyCharged()) {
-      ToolAttackUtil.spawnAttackParticle(particle, context.getAttacker(), 0.8d);
+      ToolAttackUtil.spawnAttackParticle(this.particle, context.getAttacker(), 0.8d);
     }
     return hit;
   }
@@ -39,6 +42,7 @@ public class ParticleWeaponAttack implements IWeaponAttack {
   }
 
   private static class Loader implements IGenericLoader<ParticleWeaponAttack> {
+
     @Override
     public ParticleWeaponAttack deserialize(JsonObject json) {
       ResourceLocation location = JsonHelper.getResourceLocation(json, "particle");

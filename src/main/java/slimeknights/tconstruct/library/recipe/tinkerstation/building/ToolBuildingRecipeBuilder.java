@@ -25,14 +25,17 @@ import java.util.function.Consumer;
 @RequiredArgsConstructor(staticName = "toolBuildingRecipe")
 @Accessors(fluent = true)
 public class ToolBuildingRecipeBuilder extends AbstractRecipeBuilder<ToolBuildingRecipeBuilder> {
+
   private final IModifiable output;
   @Setter
   private int outputSize = 1;
   private final List<Ingredient> extraRequirements = new ArrayList<>();
 
-  /** Adds an extra ingredient requirement */
+  /**
+   * Adds an extra ingredient requirement
+   */
   public ToolBuildingRecipeBuilder addExtraRequirement(Ingredient ingredient) {
-    extraRequirements.add(ingredient);
+    this.extraRequirements.add(ingredient);
     return this;
   }
 
@@ -48,20 +51,21 @@ public class ToolBuildingRecipeBuilder extends AbstractRecipeBuilder<ToolBuildin
   }
 
   private class Result extends AbstractFinishedRecipe {
+
     public Result(ResourceLocation ID, @Nullable ResourceLocation advancementID) {
       super(ID, advancementID);
     }
 
     @Override
     public void serializeRecipeData(JsonObject json) {
-      if (!group.isEmpty()) {
-        json.addProperty("group", group);
+      if (!ToolBuildingRecipeBuilder.this.group.isEmpty()) {
+        json.addProperty("group", ToolBuildingRecipeBuilder.this.group);
       }
-      json.addProperty("result", BuiltInRegistries.ITEM.getKey(output.asItem()).toString());
-      json.addProperty("result_count", outputSize);
-      if (!extraRequirements.isEmpty()) {
+      json.addProperty("result", BuiltInRegistries.ITEM.getKey(ToolBuildingRecipeBuilder.this.output.asItem()).toString());
+      json.addProperty("result_count", ToolBuildingRecipeBuilder.this.outputSize);
+      if (!ToolBuildingRecipeBuilder.this.extraRequirements.isEmpty()) {
         JsonArray array = new JsonArray();
-        for (Ingredient ingredient : extraRequirements) {
+        for (Ingredient ingredient : ToolBuildingRecipeBuilder.this.extraRequirements) {
           array.add(ingredient.toJson());
         }
         json.add("extra_requirements", array);

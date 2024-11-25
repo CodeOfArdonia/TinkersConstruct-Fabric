@@ -23,15 +23,17 @@ import java.util.Collections;
 import java.util.List;
 
 public class TinkerStationContainerMenu extends TabbedContainerMenu<TinkerStationBlockEntity> {
+
   @Getter
   private final List<Slot> inputSlots;
   private final LazyResultSlot resultSlot;
 
   /**
    * Standard constructor
-   * @param id    Window ID
-   * @param inv   Player inventory
-   * @param tile  Relevant tile entity
+   *
+   * @param id   Window ID
+   * @param inv  Player inventory
+   * @param tile Relevant tile entity
    */
   public TinkerStationContainerMenu(int id, Inventory inv, @Nullable TinkerStationBlockEntity tile) {
     super(TinkerTables.tinkerStationContainer.get(), id, inv, tile);
@@ -42,19 +44,18 @@ public class TinkerStationContainerMenu extends TabbedContainerMenu<TinkerStatio
       // send the player the current recipe, as we only sync to open containers
       tile.syncRecipe(inv.player);
 
-      inputSlots = new ArrayList<>();
+      this.inputSlots = new ArrayList<>();
       this.addSlot(new TinkerStationSlot(tile, TinkerStationBlockEntity.TINKER_SLOT, 0, 0));
 
       for (int index = 0; index < tile.getContainerSize() - 1; index++) {
-        inputSlots.add(this.addSlot(new TinkerStationSlot(tile, index + TinkerStationBlockEntity.INPUT_SLOT, 0, 0)));
+        this.inputSlots.add(this.addSlot(new TinkerStationSlot(tile, index + TinkerStationBlockEntity.INPUT_SLOT, 0, 0)));
       }
 
       // add result slot, will fetch result cache
       this.addSlot(this.resultSlot = new LazyResultSlot(tile.getCraftingResult(), 114, 38));
       // set initial slot filters and activations
-      setToolSelection(StationSlotLayoutLoader.getInstance().get(BuiltInRegistries.BLOCK.getKey(tile.getBlockState().getBlock())));
-    }
-    else {
+      this.setToolSelection(StationSlotLayoutLoader.getInstance().get(BuiltInRegistries.BLOCK.getKey(tile.getBlockState().getBlock())));
+    } else {
       // requirement for final variable
       this.resultSlot = null;
       this.inputSlots = Collections.emptyList();
@@ -72,9 +73,10 @@ public class TinkerStationContainerMenu extends TabbedContainerMenu<TinkerStatio
 
   /**
    * Factory constructor
-   * @param id   Window ID
-   * @param inv  Player inventory
-   * @param buf  Buffer for fetching tile
+   *
+   * @param id  Window ID
+   * @param inv Player inventory
+   * @param buf Buffer for fetching tile
    */
   public TinkerStationContainerMenu(int id, Inventory inv, FriendlyByteBuf buf) {
     this(id, inv, getTileEntityFromBuf(buf, TinkerStationBlockEntity.class));
@@ -92,11 +94,12 @@ public class TinkerStationContainerMenu extends TabbedContainerMenu<TinkerStatio
 
   /**
    * Updates the active slots from the screen
-   * @param layout     New layout
+   *
+   * @param layout New layout
    */
   public void setToolSelection(StationSlotLayout layout) {
     assert this.tile != null;
-    int maxSize = tile.getContainerSize();
+    int maxSize = this.tile.getContainerSize();
     for (int i = 0; i < maxSize; i++) {
       Slot slot = this.slots.get(i);
       if (slot instanceof TinkerStationSlot slotToolPart) {
@@ -104,8 +107,7 @@ public class TinkerStationContainerMenu extends TabbedContainerMenu<TinkerStatio
         LayoutSlot layoutSlot = layout.getSlot(i);
         if (layoutSlot.isHidden()) {
           slotToolPart.deactivate();
-        }
-        else {
+        } else {
           slotToolPart.activate(layoutSlot);
         }
       }

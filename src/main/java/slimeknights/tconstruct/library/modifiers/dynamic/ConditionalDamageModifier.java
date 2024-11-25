@@ -27,18 +27,29 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Objects;
 
-/** @deprecated use {@link slimeknights.tconstruct.library.modifiers.modules.ConditionalDamageModule} */
+/**
+ * @deprecated use {@link slimeknights.tconstruct.library.modifiers.modules.ConditionalDamageModule}
+ */
 @Deprecated
 @RequiredArgsConstructor
 public class ConditionalDamageModifier extends IncrementalModifier {
-  /** Requirement for entities to match */
+
+  /**
+   * Requirement for entities to match
+   */
   private final IJsonPredicate<LivingEntity> predicate;
-  /** Damage bonus */
+  /**
+   * Damage bonus
+   */
   private final float damageBonus;
-  /** Optional effect to add */
+  /**
+   * Optional effect to add
+   */
   @Nullable
   private final MobEffect effect;
-  /** Optional effect level */
+  /**
+   * Optional effect level
+   */
   private final int effectLevel;
 
   public ConditionalDamageModifier(IJsonPredicate<LivingEntity> predicate, float damageBonus) {
@@ -48,28 +59,28 @@ public class ConditionalDamageModifier extends IncrementalModifier {
   @Override
   public float getEntityDamage(IToolStackView tool, int level, ToolAttackContext context, float baseDamage, float damage) {
     LivingEntity target = context.getLivingTarget();
-    if (target != null && predicate.matches(target)) {
-      damage += getScaledLevel(tool, level) * this.damageBonus * tool.getMultiplier(ToolStats.ATTACK_DAMAGE);
+    if (target != null && this.predicate.matches(target)) {
+      damage += this.getScaledLevel(tool, level) * this.damageBonus * tool.getMultiplier(ToolStats.ATTACK_DAMAGE);
     }
     return damage;
   }
 
   @Override
   public void addInformation(IToolStackView tool, int level, @Nullable Player player, List<Component> tooltip, TooltipKey tooltipKey, TooltipFlag tooltipFlag) {
-    addDamageTooltip(tool, level, damageBonus, tooltip);
+    this.addDamageTooltip(tool, level, this.damageBonus, tooltip);
   }
 
   @Override
   public int afterEntityHit(IToolStackView tool, int level, ToolAttackContext context, float damageDealt) {
-    if (effect != null) {
+    if (this.effect != null) {
       LivingEntity target = context.getLivingTarget();
-      if (target != null && predicate.matches(target)) {
+      if (target != null && this.predicate.matches(target)) {
         int duration = 20;
-        int maxBonus = (int)(10 * getScaledLevel(tool, level));
+        int maxBonus = (int) (10 * this.getScaledLevel(tool, level));
         if (maxBonus > 0) {
           duration += context.getAttacker().getRandom().nextInt(maxBonus);
         }
-        target.addEffect(new MobEffectInstance(effect, duration, effectLevel - 1));
+        target.addEffect(new MobEffectInstance(this.effect, duration, this.effectLevel - 1));
       }
     }
     return 0;
@@ -80,7 +91,9 @@ public class ConditionalDamageModifier extends IncrementalModifier {
     return LOADER;
   }
 
-  /** Loader for this modifier */
+  /**
+   * Loader for this modifier
+   */
   public static final IGenericLoader<ConditionalDamageModifier> LOADER = new IGenericLoader<>() {
     @Override
     public ConditionalDamageModifier deserialize(JsonObject json) {

@@ -13,6 +13,7 @@ import slimeknights.tconstruct.library.recipe.molding.MoldingRecipe;
 import java.util.List;
 
 public class MoldingRecipeDisplay implements Display {
+
   @Getter
   private final MoldingRecipe recipe;
   @Getter
@@ -30,14 +31,14 @@ public class MoldingRecipeDisplay implements Display {
   }
 
   public RecipeType<?> getType() {
-    return recipe.getType();
+    return this.recipe.getType();
   }
 
   public Ingredient getPattern() {
-    return recipe.getPattern();
+    return this.recipe.getPattern();
   }
 
   public boolean isPatternConsumed() {
-    return recipe.isPatternConsumed();
+    return this.recipe.isPatternConsumed();
   }
 }

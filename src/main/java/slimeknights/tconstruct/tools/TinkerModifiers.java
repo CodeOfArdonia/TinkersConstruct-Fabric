@@ -1,6 +1,7 @@
 package slimeknights.tconstruct.tools;
 
 import com.mojang.serialization.Codec;
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import io.github.fabricators_of_create.porting_lib.tool.ToolAction;
 import io.github.fabricators_of_create.porting_lib.tool.ToolActions;
 import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
@@ -15,7 +16,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
-import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import slimeknights.mantle.registration.object.ItemObject;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.common.TinkerEffect;
@@ -256,6 +256,7 @@ import java.util.function.Supplier;
  */
 @SuppressWarnings({"unused", "removal"})
 public final class TinkerModifiers extends TinkerModule {
+
   private static final ModifierDeferredRegister MODIFIERS = ModifierDeferredRegister.create(TConstruct.MOD_ID);
 
   @SuppressWarnings("deprecation")
@@ -264,8 +265,8 @@ public final class TinkerModifiers extends TinkerModule {
     DynamicModifier.init();
     SpillingFluidManager.INSTANCE.init();
     MODIFIERS.register();
-    commonSetup();
-    registerSerializers();
+    this.commonSetup();
+    this.registerSerializers();
   }
 
   /*
@@ -363,7 +364,9 @@ public final class TinkerModifiers extends TinkerModule {
   public static final StaticModifier<TotalArmorLevelModifier> aquaAffinity = MODIFIERS.register("aqua_affinity", () -> new TotalArmorLevelModifier(TinkerDataKeys.AQUA_AFFINITY, true));
   // chestplate
   public static final StaticModifier<UnarmedModifier> ambidextrous = MODIFIERS.register("ambidextrous", UnarmedModifier::new);
-  /** Renaming this but some addon is probably using it. You might want {@link #ambidextrous}, but you might simply want to update your logic */
+  /**
+   * Renaming this but some addon is probably using it. You might want {@link #ambidextrous}, but you might simply want to update your logic
+   */
   @Deprecated
   public static final StaticModifier<UnarmedModifier> unarmed = ambidextrous;
   // leggings
@@ -399,7 +402,7 @@ public final class TinkerModifiers extends TinkerModule {
   public static final StaticModifier<TankModifier> tank = MODIFIERS.register("tank", () -> new TankModifier(FluidConstants.BUCKET));
   public static final StaticModifier<BucketingModifier> bucketing = MODIFIERS.register("bucketing", BucketingModifier::new);
   public static final StaticModifier<SpillingModifier> spilling = MODIFIERS.register("spilling", SpillingModifier::new);
-  
+
   // right click abilities
   public static final StaticModifier<GlowingModifier> glowing = MODIFIERS.register("glowing", GlowingModifier::new);
   public static final StaticModifier<BlockTransformModifier> pathing = MODIFIERS.register("pathing", () -> new PathingModifier(75));
@@ -520,8 +523,8 @@ public final class TinkerModifiers extends TinkerModule {
   public static final RegistryObject<ModifierMaterialRepairSerializer<?>> modifierMaterialRepair = RECIPE_SERIALIZERS.register("modifier_material_repair", () -> new ModifierMaterialRepairSerializer<>(ModifierMaterialRepairRecipe::new));
   public static final RegistryObject<ModifierMaterialRepairSerializer<?>> craftingModifierMaterialRepair = RECIPE_SERIALIZERS.register("crafting_modifier_material_repair", () -> new ModifierMaterialRepairSerializer<>(ModifierMaterialRepairKitRecipe::new));
   // worktable
-  public static final RegistryObject<ModifierRemovalRecipe.Serializer> removeModifierSerializer = RECIPE_SERIALIZERS.register("remove_modifier", () -> new ModifierRemovalRecipe.Serializer((ModifierRemovalRecipe.Factory)ModifierRemovalRecipe::new));
-  public static final RegistryObject<ModifierRemovalRecipe.Serializer> extractModifierSerializer = RECIPE_SERIALIZERS.register("extract_modifier", () -> new ModifierRemovalRecipe.Serializer((ModifierRemovalRecipe.Factory)ExtractModifierRecipe::new));
+  public static final RegistryObject<ModifierRemovalRecipe.Serializer> removeModifierSerializer = RECIPE_SERIALIZERS.register("remove_modifier", () -> new ModifierRemovalRecipe.Serializer((ModifierRemovalRecipe.Factory) ModifierRemovalRecipe::new));
+  public static final RegistryObject<ModifierRemovalRecipe.Serializer> extractModifierSerializer = RECIPE_SERIALIZERS.register("extract_modifier", () -> new ModifierRemovalRecipe.Serializer((ModifierRemovalRecipe.Factory) ExtractModifierRecipe::new));
   public static final RegistryObject<ModifierSortingRecipe.Serializer> modifierSortingSerializer = RECIPE_SERIALIZERS.register("modifier_sorting", ModifierSortingRecipe.Serializer::new);
   public static final RegistryObject<ModifierSetWorktableRecipe.Serializer> modifierSetWorktableSerializer = RECIPE_SERIALIZERS.register("modifier_set_worktable", ModifierSetWorktableRecipe.Serializer::new);
   public static final RegistryObject<EnchantmentConvertingRecipe.Serializer> enchantmentConvertingSerializer = RECIPE_SERIALIZERS.register("enchantment_converting", EnchantmentConvertingRecipe.Serializer::new);
@@ -549,18 +552,18 @@ public final class TinkerModifiers extends TinkerModule {
    */
 
   void registerSerializers() {
-    ISpillingEffect.LOADER.registerDeserializer(ConditionalSpillingEffect.ID,   ConditionalSpillingEffect.LOADER);
-    ISpillingEffect.LOADER.registerDeserializer(CureEffectsSpillingEffect.ID,   CureEffectsSpillingEffect.LOADER);
-    ISpillingEffect.LOADER.registerDeserializer(RemoveEffectSpillingEffect.ID,  RemoveEffectSpillingEffect.LOADER);
-    ISpillingEffect.LOADER.registerDeserializer(DamageSpillingEffect.ID,        DamageSpillingEffect.LOADER);
-    ISpillingEffect.LOADER.registerDeserializer(EffectSpillingEffect.ID,        EffectSpillingEffect.LOADER);
-    ISpillingEffect.LOADER.registerDeserializer(ExtinguishSpillingEffect.ID,    ExtinguishSpillingEffect.LOADER);
-    ISpillingEffect.LOADER.registerDeserializer(PotionFluidEffect.ID,           PotionFluidEffect.LOADER);
+    ISpillingEffect.LOADER.registerDeserializer(ConditionalSpillingEffect.ID, ConditionalSpillingEffect.LOADER);
+    ISpillingEffect.LOADER.registerDeserializer(CureEffectsSpillingEffect.ID, CureEffectsSpillingEffect.LOADER);
+    ISpillingEffect.LOADER.registerDeserializer(RemoveEffectSpillingEffect.ID, RemoveEffectSpillingEffect.LOADER);
+    ISpillingEffect.LOADER.registerDeserializer(DamageSpillingEffect.ID, DamageSpillingEffect.LOADER);
+    ISpillingEffect.LOADER.registerDeserializer(EffectSpillingEffect.ID, EffectSpillingEffect.LOADER);
+    ISpillingEffect.LOADER.registerDeserializer(ExtinguishSpillingEffect.ID, ExtinguishSpillingEffect.LOADER);
+    ISpillingEffect.LOADER.registerDeserializer(PotionFluidEffect.ID, PotionFluidEffect.LOADER);
     ISpillingEffect.LOADER.registerDeserializer(RestoreHungerSpillingEffect.ID, RestoreHungerSpillingEffect.LOADER);
-    ISpillingEffect.LOADER.registerDeserializer(SetFireSpillingEffect.ID,       SetFireSpillingEffect.LOADER);
-    ISpillingEffect.LOADER.registerDeserializer(TeleportSpillingEffect.ID,      TeleportSpillingEffect.LOADER);
-    ISpillingEffect.LOADER.registerDeserializer(AddInsomniaSpillingEffect.ID,   AddInsomniaSpillingEffect.LOADER);
-    ISpillingEffect.LOADER.registerDeserializer(AddBreathSpillingEffect.ID,     AddBreathSpillingEffect.LOADER);
+    ISpillingEffect.LOADER.registerDeserializer(SetFireSpillingEffect.ID, SetFireSpillingEffect.LOADER);
+    ISpillingEffect.LOADER.registerDeserializer(TeleportSpillingEffect.ID, TeleportSpillingEffect.LOADER);
+    ISpillingEffect.LOADER.registerDeserializer(AddInsomniaSpillingEffect.ID, AddInsomniaSpillingEffect.LOADER);
+    ISpillingEffect.LOADER.registerDeserializer(AddBreathSpillingEffect.ID, AddBreathSpillingEffect.LOADER);
     ISpillingEffect.LOADER.registerDeserializer(StrongBonesModifier.SPILLING_EFFECT_ID, StrongBonesModifier.SPILLING_EFFECT_LOADER);
     // modifier loaders
     ModifierManager.MODIFIER_LOADERS.register(TConstruct.getResource("default"), Modifier.DEFAULT_LOADER);

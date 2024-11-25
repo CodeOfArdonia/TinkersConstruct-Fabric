@@ -17,6 +17,7 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class ServantTileEntity extends MantleBlockEntity implements IServantLogic {
+
   private static final String TAG_MASTER_POS = "masterPos";
   private static final String TAG_MASTER_BLOCK = "masterBlock";
 
@@ -30,45 +31,49 @@ public class ServantTileEntity extends MantleBlockEntity implements IServantLogi
     super(type, pos, state);
   }
 
-  /** Checks if this servant has a master */
+  /**
+   * Checks if this servant has a master
+   */
   public boolean hasMaster() {
-    return masterPos != null;
+    return this.masterPos != null;
   }
 
   /**
    * Called to change the master
-   * @param master  New master
-   * @param block   New master block
+   *
+   * @param master New master
+   * @param block  New master block
    */
   protected void setMaster(@Nullable BlockPos master, @Nullable Block block) {
-    masterPos = master;
-    masterBlock = block;
+    this.masterPos = master;
+    this.masterBlock = block;
     this.setChangedFast();
   }
 
   /**
    * Checks that this servant has a valid master. Clears the master if invalid
-   * @return  True if this servant has a valid master
+   *
+   * @return True if this servant has a valid master
    */
   protected boolean validateMaster() {
-    if (masterPos == null) {
+    if (this.masterPos == null) {
       return false;
     }
 
     // ensure the master block is correct
-    assert level != null;
-    if (level.getBlockState(masterPos).getBlock() == masterBlock) {
+    assert this.level != null;
+    if (this.level.getBlockState(this.masterPos).getBlock() == this.masterBlock) {
       return true;
     }
     // master invalid, so clear
-    setMaster(null, null);
+    this.setMaster(null, null);
     return false;
   }
 
   @Override
   public boolean isValidMaster(IMasterLogic master) {
     // if we have a valid master, the passed master is only valid if its our current master
-    if (validateMaster()) {
+    if (this.validateMaster()) {
       return master.getMasterPos().equals(this.masterPos);
     }
     // otherwise, we are happy with any master
@@ -77,9 +82,9 @@ public class ServantTileEntity extends MantleBlockEntity implements IServantLogi
 
   @Override
   public void notifyMasterOfChange(BlockPos pos, BlockState state) {
-    if (validateMaster()) {
-      assert masterPos != null;
-      BlockEntityHelper.get(IMasterLogic.class, level, masterPos).ifPresent(te -> te.notifyChange(this, pos, state));
+    if (this.validateMaster()) {
+      assert this.masterPos != null;
+      BlockEntityHelper.get(IMasterLogic.class, this.level, this.masterPos).ifPresent(te -> te.notifyChange(this, pos, state));
     }
   }
 
@@ -88,18 +93,18 @@ public class ServantTileEntity extends MantleBlockEntity implements IServantLogi
     BlockPos newMaster = master.getMasterPos();
     // if this is our current master, simply update the master block
     if (newMaster.equals(this.masterPos)) {
-      masterBlock = master.getMasterBlock().getBlock();
+      this.masterBlock = master.getMasterBlock().getBlock();
       this.setChangedFast();
-    // otherwise, only set if we don't have a master
-    } else if (!validateMaster()) {
-      setMaster(newMaster, master.getMasterBlock().getBlock());
+      // otherwise, only set if we don't have a master
+    } else if (!this.validateMaster()) {
+      this.setMaster(newMaster, master.getMasterBlock().getBlock());
     }
   }
 
   @Override
   public void removeMaster(IMasterLogic master) {
-    if (masterPos != null && masterPos.equals(master.getMasterPos())) {
-      setMaster(null, null);
+    if (this.masterPos != null && this.masterPos.equals(master.getMasterPos())) {
+      this.setMaster(null, null);
     }
   }
 
@@ -108,7 +113,8 @@ public class ServantTileEntity extends MantleBlockEntity implements IServantLogi
 
   /**
    * Reads the master from NBT
-   * @param tags  NBT to read
+   *
+   * @param tags NBT to read
    */
   protected void readMaster(CompoundTag tags) {
     BlockPos masterPos = TagUtil.readPos(tags, TAG_MASTER_POS);
@@ -130,17 +136,18 @@ public class ServantTileEntity extends MantleBlockEntity implements IServantLogi
   @Override
   public void load(CompoundTag tags) {
     super.load(tags);
-    readMaster(tags);
+    this.readMaster(tags);
   }
 
   /**
    * Writes the master position and master block to the given compound
-   * @param tags  Tags
+   *
+   * @param tags Tags
    */
   protected CompoundTag writeMaster(CompoundTag tags) {
-    if (masterPos != null && masterBlock != null) {
-      tags.put(TAG_MASTER_POS, TagUtil.writePos(masterPos));
-      tags.putString(TAG_MASTER_BLOCK, Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(masterBlock)).toString());
+    if (this.masterPos != null && this.masterBlock != null) {
+      tags.put(TAG_MASTER_POS, TagUtil.writePos(this.masterPos));
+      tags.putString(TAG_MASTER_BLOCK, Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(this.masterBlock)).toString());
     }
     return tags;
   }
@@ -148,6 +155,6 @@ public class ServantTileEntity extends MantleBlockEntity implements IServantLogi
   @Override
   public void saveAdditional(CompoundTag tags) {
     super.saveAdditional(tags);
-    writeMaster(tags);
+    this.writeMaster(tags);
   }
 }

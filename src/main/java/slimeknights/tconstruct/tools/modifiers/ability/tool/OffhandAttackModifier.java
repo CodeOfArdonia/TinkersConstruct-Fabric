@@ -23,6 +23,7 @@ import slimeknights.tconstruct.library.tools.nbt.ModDataNBT;
 import slimeknights.tconstruct.library.tools.stat.ToolStats;
 
 public class OffhandAttackModifier extends NoLevelsModifier implements EntityInteractionModifierHook, GeneralInteractionModifierHook {
+
   public static final ResourceLocation DUEL_WIELDING = TConstruct.getResource("duel_wielding");
 
   @Override
@@ -46,14 +47,16 @@ public class OffhandAttackModifier extends NoLevelsModifier implements EntityInt
     volatileData.putBoolean(DUEL_WIELDING, true);
   }
 
-  /** If true, we can use the attack */
+  /**
+   * If true, we can use the attack
+   */
   protected boolean canAttack(IToolStackView tool, Player player, InteractionHand hand) {
     return !tool.isBroken() && hand == InteractionHand.OFF_HAND && OffhandCooldownTracker.isAttackReady(player);
   }
 
   @Override
   public InteractionResult beforeEntityUse(IToolStackView tool, ModifierEntry modifier, Player player, Entity target, InteractionHand hand, InteractionSource source) {
-    if (canAttack(tool, player, hand)) {
+    if (this.canAttack(tool, player, hand)) {
       if (!player.level().isClientSide()) {
         ToolAttackUtil.attackEntity(tool, player, InteractionHand.OFF_HAND, target, ToolAttackUtil.getCooldownFunction(player, InteractionHand.OFF_HAND), false, source.getSlot(hand));
       }
@@ -67,7 +70,7 @@ public class OffhandAttackModifier extends NoLevelsModifier implements EntityInt
 
   @Override
   public InteractionResult onToolUse(IToolStackView tool, ModifierEntry modifier, Player player, InteractionHand hand, InteractionSource source) {
-    if (canAttack(tool, player, hand)) {
+    if (this.canAttack(tool, player, hand)) {
       // target done in onEntityInteract, this is just for cooldown cause you missed
       OffhandCooldownTracker.applyCooldown(player, tool.getStats().get(ToolStats.ATTACK_SPEED), 20);
       // we handle swinging the arm, return consume to prevent resetting cooldown

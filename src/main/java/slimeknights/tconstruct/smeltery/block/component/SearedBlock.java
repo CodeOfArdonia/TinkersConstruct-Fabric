@@ -18,6 +18,7 @@ import slimeknights.tconstruct.smeltery.block.entity.component.SmelteryComponent
 import javax.annotation.Nullable;
 
 public class SearedBlock extends Block implements EntityBlock, LandPathNodeTypesRegistry.StaticPathNodeTypeProvider {
+
   public static final BooleanProperty IN_STRUCTURE = BooleanProperty.create("in_structure");
 
   public SearedBlock(Properties properties) {
@@ -27,7 +28,7 @@ public class SearedBlock extends Block implements EntityBlock, LandPathNodeTypes
   }
 
   @Override
-  protected void createBlockStateDefinition(Builder<Block,BlockState> builder) {
+  protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
     builder.add(IN_STRUCTURE);
   }
 

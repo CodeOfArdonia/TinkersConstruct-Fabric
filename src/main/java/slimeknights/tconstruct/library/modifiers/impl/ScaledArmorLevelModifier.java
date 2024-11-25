@@ -8,16 +8,19 @@ import slimeknights.tconstruct.library.tools.context.EquipmentChangeContext;
 import slimeknights.tconstruct.library.tools.helper.ModifierUtil;
 import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 
-/** Modifier that keeps track of the total level as a scale */
+/**
+ * Modifier that keeps track of the total level as a scale
+ */
 @RequiredArgsConstructor
 public class ScaledArmorLevelModifier extends Modifier {
+
   private final TinkerDataKey<Float> key;
   private final float scale;
   private final boolean singleUse;
 
   @Override
   public Component getDisplayName(int level) {
-    if (singleUse) {
+    if (this.singleUse) {
       return super.getDisplayName();
     }
     return super.getDisplayName(level);
@@ -25,11 +28,11 @@ public class ScaledArmorLevelModifier extends Modifier {
 
   @Override
   public void onEquip(IToolStackView tool, int level, EquipmentChangeContext context) {
-    ModifierUtil.addTotalArmorModifierFloat(tool, context, key, level * scale);
+    ModifierUtil.addTotalArmorModifierFloat(tool, context, this.key, level * this.scale);
   }
 
   @Override
   public void onUnequip(IToolStackView tool, int level, EquipmentChangeContext context) {
-    ModifierUtil.addTotalArmorModifierFloat(tool, context, key, -level * scale);
+    ModifierUtil.addTotalArmorModifierFloat(tool, context, this.key, -level * this.scale);
   }
 }

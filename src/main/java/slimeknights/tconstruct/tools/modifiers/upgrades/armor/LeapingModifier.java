@@ -1,8 +1,8 @@
 package slimeknights.tconstruct.tools.modifiers.upgrades.armor;
 
 import io.github.fabricators_of_create.porting_lib.entity.events.LivingEntityEvents;
-import io.github.fabricators_of_create.porting_lib.entity.events.LivingEntityEvents.LivingJumpEvent;
 import io.github.fabricators_of_create.porting_lib.entity.events.LivingEntityEvents.Fall.FallEvent;
+import io.github.fabricators_of_create.porting_lib.entity.events.LivingEntityEvents.LivingJumpEvent;
 import net.minecraft.world.entity.LivingEntity;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.modifiers.impl.IncrementalArmorLevelModifier;
@@ -10,14 +10,18 @@ import slimeknights.tconstruct.library.tools.capability.TinkerDataCapability.Tin
 import slimeknights.tconstruct.library.tools.helper.ModifierUtil;
 
 public class LeapingModifier extends IncrementalArmorLevelModifier {
+
   private static final TinkerDataKey<Float> LEAPING = TConstruct.createKey("leaping");
+
   public LeapingModifier() {
     super(LEAPING);
     LivingEntityEvents.FALL.register(LeapingModifier::onLivingFall);
     LivingJumpEvent.JUMP.register(LeapingModifier::onLivingJump);
   }
 
-  /** Reduce fall distance for fall damage */
+  /**
+   * Reduce fall distance for fall damage
+   */
   private static void onLivingFall(FallEvent event) {
     LivingEntity entity = (LivingEntity) event.getEntity();
     float boost = ModifierUtil.getTotalModifierFloat(entity, LEAPING);
@@ -26,7 +30,9 @@ public class LeapingModifier extends IncrementalArmorLevelModifier {
     }
   }
 
-  /** Called on jumping to boost the jump height of the entity */
+  /**
+   * Called on jumping to boost the jump height of the entity
+   */
   private static void onLivingJump(LivingJumpEvent event) {
     LivingEntity entity = event.getEntity();
     float boost = ModifierUtil.getTotalModifierFloat(entity, LEAPING);

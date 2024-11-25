@@ -9,26 +9,29 @@ import slimeknights.tconstruct.library.client.model.DynamicTextureLoader;
 
 import java.io.IOException;
 
-/** Sprite reader pulling from a datapack resource manager */
+/**
+ * Sprite reader pulling from a datapack resource manager
+ */
 @RequiredArgsConstructor
 public class ResourceManagerSpriteReader extends AbstractSpriteReader {
+
   private final ResourceManager manager;
   private final String folder;
 
   private ResourceLocation getLocation(ResourceLocation base) {
-    return new ResourceLocation(base.getNamespace(), folder + "/" + base.getPath() + ".png");
+    return new ResourceLocation(base.getNamespace(), this.folder + "/" + base.getPath() + ".png");
   }
 
   @Override
   public boolean exists(ResourceLocation path) {
-    return DynamicTextureLoader.textureExists(manager, path);
+    return DynamicTextureLoader.textureExists(this.manager, path);
   }
 
   @Override
   public NativeImage read(ResourceLocation path) throws IOException {
-    Resource resource = manager.getResourceOrThrow(getLocation(path));
+    Resource resource = this.manager.getResourceOrThrow(this.getLocation(path));
     NativeImage image = NativeImage.read(resource.open());
-    openedImages.add(image);
+    this.openedImages.add(image);
     return image;
   }
 }

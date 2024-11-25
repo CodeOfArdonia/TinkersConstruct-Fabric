@@ -19,6 +19,7 @@ import javax.annotation.Nullable;
  */
 @RequiredArgsConstructor
 public class ModifierRepairRecipeSerializer<T extends Recipe<?> & IModifierRepairRecipe> extends LoggingRecipeSerializer<T> {
+
   private final IFactory<T> factory;
 
   @Override
@@ -26,7 +27,7 @@ public class ModifierRepairRecipeSerializer<T extends Recipe<?> & IModifierRepai
     ModifierId modifier = ModifierId.getFromJson(json, "modifier");
     Ingredient ingredient = Ingredient.fromJson(JsonHelper.getElement(json, "ingredient"));
     int repairAmount = GsonHelper.getAsInt(json, "repair_amount");
-    return factory.create(id, modifier, ingredient, repairAmount);
+    return this.factory.create(id, modifier, ingredient, repairAmount);
   }
 
   @Nullable
@@ -35,7 +36,7 @@ public class ModifierRepairRecipeSerializer<T extends Recipe<?> & IModifierRepai
     ModifierId modifier = ModifierId.fromNetwork(buffer);
     Ingredient ingredient = Ingredient.fromNetwork(buffer);
     int repairAmount = buffer.readVarInt();
-    return factory.create(id, modifier, ingredient, repairAmount);
+    return this.factory.create(id, modifier, ingredient, repairAmount);
   }
 
   @Override
@@ -45,19 +46,33 @@ public class ModifierRepairRecipeSerializer<T extends Recipe<?> & IModifierRepai
     buffer.writeVarInt(recipe.getRepairAmount());
   }
 
-  /** Interface for serializing the recipe */
+  /**
+   * Interface for serializing the recipe
+   */
   public interface IModifierRepairRecipe {
-    /** Gets the modifier needed to perform this recipe */
+
+    /**
+     * Gets the modifier needed to perform this recipe
+     */
     ModifierId getModifier();
-    /** Gets the ingredient used to repair this item */
+
+    /**
+     * Gets the ingredient used to repair this item
+     */
     Ingredient getIngredient();
-    /** Gets the amount repaired per item */
+
+    /**
+     * Gets the amount repaired per item
+     */
     int getRepairAmount();
   }
 
-  /** Factory constructor for this serializer */
+  /**
+   * Factory constructor for this serializer
+   */
   @FunctionalInterface
   public interface IFactory<T extends Recipe<?> & IModifierRepairRecipe> {
+
     T create(ResourceLocation id, ModifierId modifier, Ingredient ingredient, int repairAmount);
   }
 }

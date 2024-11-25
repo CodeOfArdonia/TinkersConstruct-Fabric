@@ -17,14 +17,14 @@ public class FluidTankBase<T extends MantleBlockEntity> extends FluidTank {
 
   @Override
   protected void onContentsChanged() {
-    if (parent instanceof IFluidTankUpdater) {
-      ((IFluidTankUpdater) parent).onTankContentsChanged();
+    if (this.parent instanceof IFluidTankUpdater) {
+      ((IFluidTankUpdater) this.parent).onTankContentsChanged();
     }
 
-    parent.setChanged();
-    Level level = parent.getLevel();
-    if(level != null && !level.isClientSide) {
-      TinkerNetwork.getInstance().sendToClientsAround(new FluidUpdatePacket(parent.getBlockPos(), this.getFluid()), level, parent.getBlockPos());
+    this.parent.setChanged();
+    Level level = this.parent.getLevel();
+    if (level != null && !level.isClientSide) {
+      TinkerNetwork.getInstance().sendToClientsAround(new FluidUpdatePacket(this.parent.getBlockPos(), this.getFluid()), level, this.parent.getBlockPos());
     }
   }
 }

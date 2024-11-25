@@ -29,39 +29,46 @@ import java.util.stream.Collectors;
  * Standard recipe to add a modifier
  */
 public class SwappableModifierRecipe extends ModifierRecipe {
-  /** Value of the modifier being swapped, distinguishing this recipe from others for the same modifier */
+
+  /**
+   * Value of the modifier being swapped, distinguishing this recipe from others for the same modifier
+   */
   private final String value;
+
   public SwappableModifierRecipe(ResourceLocation id, List<SizedIngredient> inputs, Ingredient toolRequirement, int maxToolSize, ModifierMatch requirements, String requirementsError, ModifierId result, String value, @Nullable SlotCount slots, boolean allowCrystal) {
     super(id, inputs, toolRequirement, maxToolSize, requirements, requirementsError, new ModifierEntry(result, 1), 1, slots, allowCrystal);
     this.value = value;
   }
 
-  /** @deprecated use {@link SwappableModifierRecipe(ResourceLocation, List, Ingredient, int, ModifierMatch, String, ModifierId, String, SlotCount, boolean)} */
+  /**
+   * @deprecated use {@link SwappableModifierRecipe(ResourceLocation, List, Ingredient, int, ModifierMatch, String, ModifierId, String, SlotCount, boolean)}
+   */
   @Deprecated
   public SwappableModifierRecipe(ResourceLocation id, List<SizedIngredient> inputs, Ingredient toolRequirement, int maxToolSize, ModifierMatch requirements, String requirementsError, ModifierId result, String value, @Nullable SlotCount slots) {
     this(id, inputs, toolRequirement, maxToolSize, requirements, requirementsError, result, value, slots, false);
   }
 
-    /**
-     * Gets the recipe result, or an object containing an error message if the recipe matches but cannot be applied.
-     * @return Validated result
-     */
+  /**
+   * Gets the recipe result, or an object containing an error message if the recipe matches but cannot be applied.
+   *
+   * @return Validated result
+   */
   @Override
   public ValidatedResult getValidatedResult(ITinkerStationContainer inv, RegistryAccess registryAccess) {
     ItemStack tinkerable = inv.getTinkerableStack();
     ToolStack tool = ToolStack.from(tinkerable);
 
     // if the tool has the modifier already, can skip most requirements
-    ModifierId modifier = result.getId();
+    ModifierId modifier = this.result.getId();
 
     ValidatedResult commonError;
     boolean needsModifier;
     if (tool.getUpgrades().getLevel(modifier) == 0) {
       needsModifier = true;
-      commonError = validatePrerequisites(tool);
+      commonError = this.validatePrerequisites(tool);
     } else {
       needsModifier = false;
-      commonError = validateRequirements(tool);
+      commonError = this.validateRequirements(tool);
     }
     if (commonError.hasError()) {
       return commonError;
@@ -71,18 +78,18 @@ public class SwappableModifierRecipe extends ModifierRecipe {
     tool = tool.copy();
     ModDataNBT persistentData = tool.getPersistentData();
     if (needsModifier) {
-      SlotCount slots = getSlots();
+      SlotCount slots = this.getSlots();
       if (slots != null) {
         persistentData.addSlots(slots.getType(), -slots.getCount());
       }
     }
 
     // set the new value to the modifier
-    persistentData.putString(modifier, value);
+    persistentData.putString(modifier, this.value);
 
     // add modifier if needed
     if (needsModifier) {
-      tool.addModifier(result.getId(), 1);
+      tool.addModifier(this.result.getId(), 1);
     } else {
       tool.rebuildStats();
     }
@@ -93,7 +100,7 @@ public class SwappableModifierRecipe extends ModifierRecipe {
       return toolValidation;
     }
 
-    return ValidatedResult.success(tool.createStack(Math.min(tinkerable.getCount(), shrinkToolSlotBy())));
+    return ValidatedResult.success(tool.createStack(Math.min(tinkerable.getCount(), this.shrinkToolSlotBy())));
   }
 
   @Override
@@ -106,12 +113,12 @@ public class SwappableModifierRecipe extends ModifierRecipe {
 
   @Override
   public List<ItemStack> getToolWithModifier() {
-    if (toolWithModifier == null) {
-      ResourceLocation id = result.getId();
-      toolWithModifier = getToolInputs().stream().map(stack -> IDisplayModifierRecipe.withModifiers(stack, requirements, result, data -> data.putString(id, value))).collect(Collectors.toList());
-      toolWithModifier = getToolInputs().stream().map(stack -> IDisplayModifierRecipe.withModifiers(stack, requirements, result, data -> data.putString(id, value))).collect(Collectors.toList());
+    if (this.toolWithModifier == null) {
+      ResourceLocation id = this.result.getId();
+      this.toolWithModifier = this.getToolInputs().stream().map(stack -> IDisplayModifierRecipe.withModifiers(stack, this.requirements, this.result, data -> data.putString(id, this.value))).collect(Collectors.toList());
+      this.toolWithModifier = this.getToolInputs().stream().map(stack -> IDisplayModifierRecipe.withModifiers(stack, this.requirements, this.result, data -> data.putString(id, this.value))).collect(Collectors.toList());
     }
-    return toolWithModifier;
+    return this.toolWithModifier;
   }
 
   public static class Serializer extends AbstractModifierRecipe.Serializer<SwappableModifierRecipe> {
@@ -124,7 +131,7 @@ public class SwappableModifierRecipe extends ModifierRecipe {
 
     @Override
     public SwappableModifierRecipe fromJson(ResourceLocation id, JsonObject json, Ingredient toolRequirement, int maxToolSize, ModifierMatch requirements,
-																				String requirementsError, ModifierEntry result, int maxLevel, @Nullable SlotCount slots) {
+                                            String requirementsError, ModifierEntry result, int maxLevel, @Nullable SlotCount slots) {
       List<SizedIngredient> ingredients = JsonHelper.parseList(json, "inputs", SizedIngredient::deserialize);
       String value = GsonHelper.getAsString(GsonHelper.getAsJsonObject(json, "result"), "value");
       boolean allowCrystal = GsonHelper.getAsBoolean(json, "allow_crystal", false);
@@ -133,7 +140,7 @@ public class SwappableModifierRecipe extends ModifierRecipe {
 
     @Override
     public SwappableModifierRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buffer, Ingredient toolRequirement, int maxToolSize, ModifierMatch requirements,
-																				String requirementsError, ModifierEntry result, int maxLevel, @Nullable SlotCount slots) {
+                                               String requirementsError, ModifierEntry result, int maxLevel, @Nullable SlotCount slots) {
       int size = buffer.readVarInt();
       ImmutableList.Builder<SizedIngredient> builder = ImmutableList.builder();
       for (int i = 0; i < size; i++) {

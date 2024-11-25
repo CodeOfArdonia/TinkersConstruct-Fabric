@@ -50,8 +50,8 @@ public abstract class HeatingStructureMultiblock<T extends MantleBlockEntity & I
   public StructureData create(BlockPos min, BlockPos max, Set<BlockPos> extraPos) {
     // remove any tanks that are out of bounds, possible one got added in a layer later declared invalid
     // this might cause problems if we ever add a roof to the smeltery, possibly switch to a frame check?
-    tanks.removeIf(pos -> !MultiblockStructureData.isWithin(pos, min, max));
-    return new StructureData(min, max, extraPos, hasFloor, hasFrame, hasCeiling, ImmutableList.copyOf(tanks));
+    this.tanks.removeIf(pos -> !MultiblockStructureData.isWithin(pos, min, max));
+    return new StructureData(min, max, extraPos, this.hasFloor, this.hasFrame, this.hasCeiling, ImmutableList.copyOf(this.tanks));
   }
 
   /**
@@ -62,13 +62,13 @@ public abstract class HeatingStructureMultiblock<T extends MantleBlockEntity & I
    * @return Structure data
    */
   public StructureData createClient(BlockPos min, BlockPos max, List<BlockPos> tanks) {
-    return new StructureData(min, max, Collections.emptySet(), hasFloor, hasFrame, hasCeiling, tanks);
+    return new StructureData(min, max, Collections.emptySet(), this.hasFloor, this.hasFrame, this.hasCeiling, tanks);
   }
 
   @Override
   public StructureData detectMultiblock(Level world, BlockPos master, Direction facing) {
     // clear tanks from last check before calling
-    tanks.clear();
+    this.tanks.clear();
     return super.detectMultiblock(world, master, facing);
   }
 
@@ -82,8 +82,8 @@ public abstract class HeatingStructureMultiblock<T extends MantleBlockEntity & I
   @Nullable
   public StructureData readFromTag(CompoundTag nbt) {
     // add all tanks from Tag, will be picked up in the create call
-    tanks.clear();
-    tanks.addAll(readPosList(nbt, TAG_TANKS));
+    this.tanks.clear();
+    this.tanks.addAll(readPosList(nbt, TAG_TANKS));
     return super.readFromTag(nbt);
   }
 
@@ -98,7 +98,7 @@ public abstract class HeatingStructureMultiblock<T extends MantleBlockEntity & I
     BlockPos min = data.getMinPos();
     BlockPos max = data.getMaxPos();
     BlockPos from, to;
-    if (hasFloor) {
+    if (this.hasFloor) {
       to = max.above();
       from = new BlockPos(min.getX(), to.getY(), min.getZ());
     } else {
@@ -106,8 +106,8 @@ public abstract class HeatingStructureMultiblock<T extends MantleBlockEntity & I
       to = new BlockPos(max.getX(), from.getY(), max.getZ());
     }
     // want two positions one layer above the structure
-    MultiblockResult result = detectLayer(world, from, to, pos -> {});
-    setLastResult(result);
+    MultiblockResult result = this.detectLayer(world, from, to, pos -> {});
+    this.setLastResult(result);
     return result.isSuccess();
   }
 
@@ -137,7 +137,7 @@ public abstract class HeatingStructureMultiblock<T extends MantleBlockEntity & I
   @Override
   protected boolean isValidBlock(Level world, BlockPos pos, CuboidSide side, boolean isFrame) {
     // controller always is valid
-    if (pos.equals(parent.getBlockPos())) {
+    if (pos.equals(this.parent.getBlockPos())) {
       return true;
     }
 
@@ -145,15 +145,15 @@ public abstract class HeatingStructureMultiblock<T extends MantleBlockEntity & I
     BlockState state = world.getBlockState(pos);
     // treat frame blocks as walls, its more natural
     if (side == CuboidSide.FLOOR && !isFrame) {
-      return isValidFloor(state.getBlock());
+      return this.isValidFloor(state.getBlock());
     }
 
     // add tanks to the internal lists
-    if (isValidTank(state.getBlock())) {
-      tanks.add(pos.immutable());
+    if (this.isValidTank(state.getBlock())) {
+      this.tanks.add(pos.immutable());
       return true;
     }
-    return isValidWall(state.getBlock());
+    return this.isValidWall(state.getBlock());
   }
 
   @Override
@@ -161,7 +161,7 @@ public abstract class HeatingStructureMultiblock<T extends MantleBlockEntity & I
     if (structure.withinBounds(pos)) {
       // if its a part of the structure, need to update if its not a valid smeltery block
       if (structure.contains(pos)) {
-        return !isValidBlock(state.getBlock());
+        return !this.isValidBlock(state.getBlock());
       }
       // if not part of the actual structure, we only care if its a block that's not air in the inner section
       // in other words, ignore blocks added into the frame
@@ -170,7 +170,7 @@ public abstract class HeatingStructureMultiblock<T extends MantleBlockEntity & I
     }
 
     // if its one block above, might be trying to expand upwards
-    return structure.isDirectlyAbove(pos) && isValidWall(state.getBlock());
+    return structure.isDirectlyAbove(pos) && this.isValidWall(state.getBlock());
   }
 
   /**
@@ -199,7 +199,7 @@ public abstract class HeatingStructureMultiblock<T extends MantleBlockEntity & I
      * @return True if there are tanks
      */
     public boolean hasTanks() {
-      return !tanks.isEmpty();
+      return !this.tanks.isEmpty();
     }
 
     /**
@@ -209,7 +209,7 @@ public abstract class HeatingStructureMultiblock<T extends MantleBlockEntity & I
      * @return Next inside position based on the previous one
      */
     private BlockPos getNextInsideCheck(@Nullable BlockPos prev) {
-      BlockPos min = getMinInside();
+      BlockPos min = this.getMinInside();
       if (prev == null) {
         return min;
       }
@@ -218,7 +218,7 @@ public abstract class HeatingStructureMultiblock<T extends MantleBlockEntity & I
         return min;
       }
 
-      BlockPos max = getMaxInside();
+      BlockPos max = this.getMaxInside();
       // end of row
       if (prev.getZ() >= max.getZ()) {
         // end of layer
@@ -243,8 +243,8 @@ public abstract class HeatingStructureMultiblock<T extends MantleBlockEntity & I
      * @return Next inside position based on the previous one
      */
     public BlockPos getNextInsideCheck() {
-      insideCheck = getNextInsideCheck(insideCheck);
-      return insideCheck;
+      this.insideCheck = this.getNextInsideCheck(this.insideCheck);
+      return this.insideCheck;
     }
 
     /**
@@ -253,8 +253,8 @@ public abstract class HeatingStructureMultiblock<T extends MantleBlockEntity & I
      * @return Blocks in walls and floor
      */
     public int getPerimeterCount() {
-      BlockPos min = getMinInside();
-      BlockPos max = getMaxInside();
+      BlockPos min = this.getMinInside();
+      BlockPos max = this.getMaxInside();
       int dx = max.getX() - min.getX();
       int dy = max.getY() - min.getY();
       int dz = max.getZ() - min.getZ();
@@ -265,7 +265,7 @@ public abstract class HeatingStructureMultiblock<T extends MantleBlockEntity & I
     @Override
     public CompoundTag writeClientTag() {
       CompoundTag nbt = super.writeClientTag();
-      nbt.put(TAG_TANKS, writePosList(tanks));
+      nbt.put(TAG_TANKS, writePosList(this.tanks));
       return nbt;
     }
 
@@ -277,8 +277,8 @@ public abstract class HeatingStructureMultiblock<T extends MantleBlockEntity & I
     @Override
     public CompoundTag writeToTag() {
       CompoundTag nbt = super.writeToTag();
-      if (insideCheck != null) {
-        nbt.put(TAG_INSIDE_CHECK, NbtUtils.writeBlockPos(insideCheck));
+      if (this.insideCheck != null) {
+        nbt.put(TAG_INSIDE_CHECK, NbtUtils.writeBlockPos(this.insideCheck));
       }
       return nbt;
     }

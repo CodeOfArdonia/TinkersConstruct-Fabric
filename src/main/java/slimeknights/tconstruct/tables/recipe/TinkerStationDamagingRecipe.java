@@ -28,11 +28,11 @@ import slimeknights.tconstruct.library.tools.nbt.ToolStack;
 import slimeknights.tconstruct.tables.TinkerTables;
 
 import javax.annotation.Nullable;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 @RequiredArgsConstructor
 public class TinkerStationDamagingRecipe implements ITinkerStationRecipe {
+
   private static final ValidatedResult BROKEN = ValidatedResult.failure(TConstruct.makeTranslationKey("recipe", "damaging.broken"));
 
   @Getter
@@ -46,7 +46,7 @@ public class TinkerStationDamagingRecipe implements ITinkerStationRecipe {
       return false;
     }
     // must find at least one input, but multiple is fine, as is empty slots
-    return IncrementalModifierRecipe.containsOnlyIngredient(inv, ingredient);
+    return IncrementalModifierRecipe.containsOnlyIngredient(inv, this.ingredient);
   }
 
   @Override
@@ -56,7 +56,7 @@ public class TinkerStationDamagingRecipe implements ITinkerStationRecipe {
     }
     // simply damage the tool directly
     ToolStack tool = ToolStack.copyFrom(inv.getTinkerableStack());
-    int maxDamage = IncrementalModifierRecipe.getAvailableAmount(inv, ingredient, damageAmount);
+    int maxDamage = IncrementalModifierRecipe.getAvailableAmount(inv, this.ingredient, this.damageAmount);
     ToolDamageUtil.directDamage(tool, maxDamage, null, inv.getTinkerableStack());
     return ValidatedResult.success(tool.createStack());
   }
@@ -70,10 +70,12 @@ public class TinkerStationDamagingRecipe implements ITinkerStationRecipe {
   public void updateInputs(ItemStack result, IMutableTinkerStationContainer inv, boolean isServer) {
     // how much did we actually consume?
     int damageTaken = ToolStack.from(result).getDamage() - ToolStack.from(inv.getTinkerableStack()).getDamage();
-    IncrementalModifierRecipe.updateInputs(inv, ingredient, damageTaken, damageAmount, ItemStack.EMPTY);
+    IncrementalModifierRecipe.updateInputs(inv, this.ingredient, damageTaken, this.damageAmount, ItemStack.EMPTY);
   }
 
-  /** @deprecated Use {@link #getValidatedResult(ITinkerStationContainer)} */
+  /**
+   * @deprecated Use {@link #getValidatedResult(ITinkerStationContainer)}
+   */
   @Deprecated
   @Override
   public ItemStack getResultItem(RegistryAccess registryAccess) {
@@ -85,8 +87,11 @@ public class TinkerStationDamagingRecipe implements ITinkerStationRecipe {
     return TinkerTables.tinkerStationDamagingSerializer.get();
   }
 
-  /** Serializer logic */
+  /**
+   * Serializer logic
+   */
   public static class Serializer extends AbstractRecipeSerializer<TinkerStationDamagingRecipe> {
+
     @Override
     public TinkerStationDamagingRecipe fromJson(ResourceLocation id, JsonObject json) {
       Ingredient ingredient = Ingredient.fromJson(JsonHelper.getElement(json, "ingredient"));
@@ -109,39 +114,43 @@ public class TinkerStationDamagingRecipe implements ITinkerStationRecipe {
     }
   }
 
-  /** Builder for datagen */
+  /**
+   * Builder for datagen
+   */
   @RequiredArgsConstructor(staticName = "damage")
   public static class Builder extends AbstractRecipeBuilder<Builder> {
+
     private final Ingredient ingredient;
     private final int damageAmount;
 
     @Override
     public void save(Consumer<FinishedRecipe> consumer) {
-      ItemStack[] stacks = ingredient.getItems();
+      ItemStack[] stacks = this.ingredient.getItems();
       if (stacks.length == 0) {
         throw new IllegalStateException("Empty ingredient not allowed");
       }
-      save(consumer, BuiltInRegistries.ITEM.getKey(stacks[0].getItem()));
+      this.save(consumer, BuiltInRegistries.ITEM.getKey(stacks[0].getItem()));
     }
 
     @Override
     public void save(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
-      if (ingredient == Ingredient.EMPTY) {
+      if (this.ingredient == Ingredient.EMPTY) {
         throw new IllegalStateException("Empty ingredient not allowed");
       }
-      ResourceLocation advancementId = buildOptionalAdvancement(id, "tinker_station");
+      ResourceLocation advancementId = this.buildOptionalAdvancement(id, "tinker_station");
       consumer.accept(new Finished(id, advancementId));
     }
 
     private class Finished extends AbstractFinishedRecipe {
+
       public Finished(ResourceLocation ID, @Nullable ResourceLocation advancementID) {
         super(ID, advancementID);
       }
 
       @Override
       public void serializeRecipeData(JsonObject json) {
-        json.add("ingredient", ingredient.toJson());
-        json.addProperty("damage_amount", damageAmount);
+        json.add("ingredient", Builder.this.ingredient.toJson());
+        json.addProperty("damage_amount", Builder.this.damageAmount);
       }
 
       @Override

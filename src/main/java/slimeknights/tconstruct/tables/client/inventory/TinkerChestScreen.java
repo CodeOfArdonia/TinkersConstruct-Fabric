@@ -9,7 +9,7 @@ import slimeknights.tconstruct.tables.client.inventory.module.ScalingChestScreen
 import slimeknights.tconstruct.tables.menu.TabbedContainerMenu;
 import slimeknights.tconstruct.tables.menu.TinkerChestContainerMenu;
 
-public class TinkerChestScreen extends BaseTabbedScreen<AbstractChestBlockEntity,TabbedContainerMenu<AbstractChestBlockEntity>> {
+public class TinkerChestScreen extends BaseTabbedScreen<AbstractChestBlockEntity, TabbedContainerMenu<AbstractChestBlockEntity>> {
 
   protected static final ScalableElementScreen BACKGROUND = new ScalableElementScreen(7 + 18, 7, 18, 18);
   public ScalingChestScreen<AbstractChestBlockEntity> scalingChestScreen;
@@ -19,7 +19,7 @@ public class TinkerChestScreen extends BaseTabbedScreen<AbstractChestBlockEntity
     TinkerChestContainerMenu.DynamicChestInventory chestContainer = container.getSubContainer(TinkerChestContainerMenu.DynamicChestInventory.class);
     if (chestContainer != null) {
       this.scalingChestScreen = new ScalingChestScreen<>(this, chestContainer, playerInventory, title);
-      this.addModule(scalingChestScreen);
+      this.addModule(this.scalingChestScreen);
     }
   }
 

@@ -32,7 +32,10 @@ import java.util.stream.Stream;
  * TODO: abstract ingredient
  */
 public class MaterialIngredient extends Ingredient {
-  /** Material ID meaning any material matches */
+
+  /**
+   * Material ID meaning any material matches
+   */
   private static final MaterialId WILDCARD = IMaterial.UNKNOWN.getIdentifier();
 
   private final MaterialVariantId material;
@@ -40,6 +43,7 @@ public class MaterialIngredient extends Ingredient {
   private Value[] values;
   @Nullable
   private ItemStack[] materialStacks;
+
   protected MaterialIngredient(Stream<? extends Ingredient.Value> itemLists, MaterialVariantId material) {
     super(itemLists);
     this.material = material;
@@ -47,9 +51,10 @@ public class MaterialIngredient extends Ingredient {
 
   /**
    * Creates a new instance from a set of items
-   * @param item      Material item
-   * @param material  Material ID
-   * @return  Material ingredient instance
+   *
+   * @param item     Material item
+   * @param material Material ID
+   * @return Material ingredient instance
    */
   public static MaterialIngredient fromItem(IMaterialItem item, MaterialId material) {
     return new MaterialIngredient(Stream.of(new ItemValue(new ItemStack(item))), material);
@@ -57,8 +62,9 @@ public class MaterialIngredient extends Ingredient {
 
   /**
    * Creates a new ingredient matching any material from items
-   * @param item  Material item
-   * @return  Material ingredient instance
+   *
+   * @param item Material item
+   * @return Material ingredient instance
    */
   public static MaterialIngredient fromItem(IMaterialItem item) {
     return fromItem(item, WILDCARD);
@@ -66,9 +72,10 @@ public class MaterialIngredient extends Ingredient {
 
   /**
    * Creates a new ingredient from a tag
-   * @param tag       Tag instance
-   * @param material  Material value
-   * @return  Material with tag
+   *
+   * @param tag      Tag instance
+   * @param material Material value
+   * @return Material with tag
    */
   public static MaterialIngredient fromTag(TagKey<Item> tag, MaterialId material) {
     return new MaterialIngredient(Stream.of(new TagValue(tag)), material);
@@ -76,8 +83,9 @@ public class MaterialIngredient extends Ingredient {
 
   /**
    * Creates a new ingredient matching any material from a tag
-   * @param tag       Tag instance
-   * @return  Material with tag
+   *
+   * @param tag Tag instance
+   * @return Material with tag
    */
   public static MaterialIngredient fromTag(TagKey<Item> tag) {
     return fromTag(tag, WILDCARD);
@@ -89,7 +97,7 @@ public class MaterialIngredient extends Ingredient {
       return false;
     }
     // if material is not wildcard, must match materials
-    if (!WILDCARD.equals(material) && !material.matchesVariant(stack)) {
+    if (!WILDCARD.equals(this.material) && !this.material.matchesVariant(stack)) {
       return false;
     }
     // otherwise fallback to base logic
@@ -98,13 +106,13 @@ public class MaterialIngredient extends Ingredient {
 
   @Override
   public ItemStack[] getItems() {
-    if (materialStacks == null) {
+    if (this.materialStacks == null) {
       if (!MaterialRegistry.isFullyLoaded()) {
-        return getPlainMatchingStacks();
+        return this.getPlainMatchingStacks();
       }
       // no material? apply all materials for variants
-      Stream<ItemStack> items = Arrays.stream(getPlainMatchingStacks());
-      if (material.equals(WILDCARD)) {
+      Stream<ItemStack> items = Arrays.stream(this.getPlainMatchingStacks());
+      if (this.material.equals(WILDCARD)) {
         items = items.flatMap(stack -> MaterialRegistry.getMaterials().stream()
           .map(mat -> IMaterialItem.withMaterial(stack, mat.getIdentifier()))
           .filter(ItemStack::hasTag));
@@ -112,14 +120,15 @@ public class MaterialIngredient extends Ingredient {
         // specific material? apply to all stacks
         items = items.map(stack -> IMaterialItem.withMaterial(stack, this.material)).filter(ItemStack::hasTag);
       }
-      materialStacks = items.distinct().toArray(ItemStack[]::new);
+      this.materialStacks = items.distinct().toArray(ItemStack[]::new);
     }
-    return materialStacks;
+    return this.materialStacks;
   }
 
   /**
    * Gets the matching stacks without materials, used for syncing mainly
-   * @return  Matching stacks with no materials
+   *
+   * @return Matching stacks with no materials
    */
   private ItemStack[] getPlainMatchingStacks() {
     return super.getItems();
@@ -133,8 +142,8 @@ public class MaterialIngredient extends Ingredient {
     }
     JsonObject object = parent.getAsJsonObject();
     object.addProperty("fabric:type", Serializer.ID.toString());
-    if (material != WILDCARD) {
-      object.addProperty("material", material.toString());
+    if (this.material != WILDCARD) {
+      object.addProperty("material", this.material.toString());
     }
     return object;
   }
@@ -145,6 +154,7 @@ public class MaterialIngredient extends Ingredient {
   }
 
   public static class FabricMaterialIngredient implements CustomIngredient {
+
     private final MaterialIngredient ingredient;
 
     public FabricMaterialIngredient(Stream<? extends Ingredient.Value> itemLists, MaterialVariantId material) {
@@ -157,12 +167,12 @@ public class MaterialIngredient extends Ingredient {
 
     @Override
     public boolean test(ItemStack stack) {
-      return ingredient.test(stack);
+      return this.ingredient.test(stack);
     }
 
     @Override
     public List<ItemStack> getMatchingStacks() {
-      return List.of(ingredient.getItems());
+      return List.of(this.ingredient.getItems());
     }
 
     @Override
@@ -177,7 +187,7 @@ public class MaterialIngredient extends Ingredient {
 
     @Override
     public MaterialIngredient toVanilla() {
-      return ingredient;
+      return this.ingredient;
     }
   }
 
@@ -186,6 +196,7 @@ public class MaterialIngredient extends Ingredient {
    */
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   public static class Serializer implements CustomIngredientSerializer<FabricMaterialIngredient> {
+
     public static final ResourceLocation ID = TConstruct.getResource("material");
     public static final Serializer INSTANCE = new Serializer();
 

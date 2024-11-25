@@ -25,7 +25,10 @@ import java.util.function.Function;
 
 @AllArgsConstructor
 public class TableModel implements IUnbakedGeometry<TableModel> {
-  /** Shared loader instance */
+
+  /**
+   * Shared loader instance
+   */
   public static final Loader LOADER = new Loader();
 
   private final SimpleBlockModel model;
@@ -38,23 +41,30 @@ public class TableModel implements IUnbakedGeometry<TableModel> {
   }
 
   @Override
-  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location, boolean isGui3d) {
+  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location, boolean isGui3d) {
     BakedModel baked = this.model.bakeModel(owner, transform, overrides, spriteGetter, location);
-    return new Baked(baked, owner, this.model, transform, RetexturedModel.getAllRetextured(owner, model, retextured), items);
+    return new Baked(baked, owner, this.model, transform, RetexturedModel.getAllRetextured(owner, this.model, this.retextured), this.items);
   }
 
-  /** Baked model instance */
+  /**
+   * Baked model instance
+   */
   public static class Baked extends RetexturedModel.Baked {
+
     @Getter
     private final List<ModelItem> items;
+
     protected Baked(BakedModel baked, BlockModel owner, SimpleBlockModel model, ModelState transform, Set<String> retextured, List<ModelItem> items) {
       super(baked, owner, model, transform, retextured);
       this.items = items;
     }
   }
 
-  /** Model loader class */
+  /**
+   * Model loader class
+   */
   public static class Loader implements IGeometryLoader<TableModel> {
+
     @Override
     public TableModel read(JsonObject json, JsonDeserializationContext context) {
       SimpleBlockModel model = SimpleBlockModel.deserialize(context, json);

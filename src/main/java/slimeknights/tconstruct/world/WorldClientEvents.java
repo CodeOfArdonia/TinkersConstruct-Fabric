@@ -43,6 +43,7 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
 public class WorldClientEvents extends ClientEventBase {
+
   static void addResourceListener() {
     for (SlimeType type : SlimeType.values()) {
       ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SlimeColorReloadListener(type));
@@ -129,30 +130,30 @@ public class WorldClientEvents extends ClientEventBase {
     // geodes
     for (BudSize size : BudSize.values()) {
       BlockRenderLayerMap.INSTANCE.putBlock(TinkerWorld.earthGeode.getBud(size), cutout);
-      BlockRenderLayerMap.INSTANCE.putBlock(TinkerWorld.skyGeode.getBud(size),   cutout);
+      BlockRenderLayerMap.INSTANCE.putBlock(TinkerWorld.skyGeode.getBud(size), cutout);
       BlockRenderLayerMap.INSTANCE.putBlock(TinkerWorld.ichorGeode.getBud(size), cutout);
       BlockRenderLayerMap.INSTANCE.putBlock(TinkerWorld.enderGeode.getBud(size), cutout);
     }
 
     // skull textures
 //    event.enqueueWork(() -> {
-      registerHeadModel(TinkerHeadType.BLAZE, MaterialIds.blazingBone, new ResourceLocation("textures/entity/blaze.png"));
-      registerHeadModel(TinkerHeadType.ENDERMAN, MaterialIds.enderPearl, TConstruct.getResource("textures/entity/skull/enderman.png"));
-      SlimeskullArmorModel.registerHeadModel(MaterialIds.glass, ModelLayers.CREEPER_HEAD, new ResourceLocation("textures/entity/creeper/creeper.png"));
-      // skeleton
-      SlimeskullArmorModel.registerHeadModel(MaterialIds.bone, ModelLayers.SKELETON_SKULL, new ResourceLocation("textures/entity/skeleton/skeleton.png"));
-      SlimeskullArmorModel.registerHeadModel(MaterialIds.necroticBone, ModelLayers.WITHER_SKELETON_SKULL, new ResourceLocation("textures/entity/skeleton/wither_skeleton.png"));
-      registerHeadModel(TinkerHeadType.STRAY, MaterialIds.bloodbone, TConstruct.getResource("textures/entity/skull/stray.png"));
-      // zombies
-      SlimeskullArmorModel.registerHeadModel(MaterialIds.rottenFlesh, ModelLayers.ZOMBIE_HEAD, new ResourceLocation("textures/entity/zombie/zombie.png"));
-      registerHeadModel(TinkerHeadType.HUSK, MaterialIds.iron, new ResourceLocation("textures/entity/zombie/husk.png"));
-      registerHeadModel(TinkerHeadType.DROWNED, MaterialIds.copper, TConstruct.getResource("textures/entity/skull/drowned.png"));
-      // spider
-      registerHeadModel(TinkerHeadType.SPIDER, MaterialIds.string, new ResourceLocation("textures/entity/spider/spider.png"));
-      registerHeadModel(TinkerHeadType.CAVE_SPIDER, MaterialIds.darkthread, new ResourceLocation("textures/entity/spider/cave_spider.png"));
-      // piglins
-      registerHeadModel(TinkerHeadType.PIGLIN_BRUTE, MaterialIds.roseGold, new ResourceLocation("textures/entity/piglin/piglin_brute.png"));
-      registerHeadModel(TinkerHeadType.ZOMBIFIED_PIGLIN, MaterialIds.pigIron, new ResourceLocation("textures/entity/piglin/zombified_piglin.png"));
+    registerHeadModel(TinkerHeadType.BLAZE, MaterialIds.blazingBone, new ResourceLocation("textures/entity/blaze.png"));
+    registerHeadModel(TinkerHeadType.ENDERMAN, MaterialIds.enderPearl, TConstruct.getResource("textures/entity/skull/enderman.png"));
+    SlimeskullArmorModel.registerHeadModel(MaterialIds.glass, ModelLayers.CREEPER_HEAD, new ResourceLocation("textures/entity/creeper/creeper.png"));
+    // skeleton
+    SlimeskullArmorModel.registerHeadModel(MaterialIds.bone, ModelLayers.SKELETON_SKULL, new ResourceLocation("textures/entity/skeleton/skeleton.png"));
+    SlimeskullArmorModel.registerHeadModel(MaterialIds.necroticBone, ModelLayers.WITHER_SKELETON_SKULL, new ResourceLocation("textures/entity/skeleton/wither_skeleton.png"));
+    registerHeadModel(TinkerHeadType.STRAY, MaterialIds.bloodbone, TConstruct.getResource("textures/entity/skull/stray.png"));
+    // zombies
+    SlimeskullArmorModel.registerHeadModel(MaterialIds.rottenFlesh, ModelLayers.ZOMBIE_HEAD, new ResourceLocation("textures/entity/zombie/zombie.png"));
+    registerHeadModel(TinkerHeadType.HUSK, MaterialIds.iron, new ResourceLocation("textures/entity/zombie/husk.png"));
+    registerHeadModel(TinkerHeadType.DROWNED, MaterialIds.copper, TConstruct.getResource("textures/entity/skull/drowned.png"));
+    // spider
+    registerHeadModel(TinkerHeadType.SPIDER, MaterialIds.string, new ResourceLocation("textures/entity/spider/spider.png"));
+    registerHeadModel(TinkerHeadType.CAVE_SPIDER, MaterialIds.darkthread, new ResourceLocation("textures/entity/spider/cave_spider.png"));
+    // piglins
+    registerHeadModel(TinkerHeadType.PIGLIN_BRUTE, MaterialIds.roseGold, new ResourceLocation("textures/entity/piglin/piglin_brute.png"));
+    registerHeadModel(TinkerHeadType.ZOMBIFIED_PIGLIN, MaterialIds.pigIron, new ResourceLocation("textures/entity/piglin/zombified_piglin.png"));
 //    });
 
     addResourceListener();
@@ -206,10 +207,11 @@ public class WorldClientEvents extends ClientEventBase {
 
   /**
    * Block colors for a slime type
-   * @param pos   Block position
-   * @param type  Slime foilage color
-   * @param add   Offset position
-   * @return  Color for the given position, or the default if position is null
+   *
+   * @param pos  Block position
+   * @param type Slime foilage color
+   * @param add  Offset position
+   * @return Color for the given position, or the default if position is null
    */
   private static int getSlimeColorByPos(@Nullable BlockPos pos, SlimeType type, @Nullable BlockPos add) {
     if (pos == null) {
@@ -222,13 +224,17 @@ public class WorldClientEvents extends ClientEventBase {
     return SlimeColorizer.getColorForPos(pos, type);
   }
 
-  /** Registers a skull with the entity renderer and the slimeskull renderer */
+  /**
+   * Registers a skull with the entity renderer and the slimeskull renderer
+   */
   private static void registerHeadModel(TinkerHeadType skull, MaterialId materialId, ResourceLocation texture) {
     SkullBlockRenderer.SKIN_BY_TYPE.put(skull, texture);
     SlimeskullArmorModel.registerHeadModel(materialId, SkullModelHelper.HEAD_LAYERS.get(skull), texture);
   }
 
-  /** Register a layer without being under the minecraft domain. TODO: is this needed? */
+  /**
+   * Register a layer without being under the minecraft domain. TODO: is this needed?
+   */
   private static ModelLayerLocation registerLayer(String name) {
     ModelLayerLocation location = new ModelLayerLocation(TConstruct.getResource(name), "main");
     if (!ModelLayers.ALL_MODELS.add(location)) {
@@ -238,7 +244,9 @@ public class WorldClientEvents extends ClientEventBase {
     }
   }
 
-  /** Register a head layer definition with forge */
+  /**
+   * Register a head layer definition with forge
+   */
   private static void registerLayerDefinition(TinkerHeadType head, Supplier<LayerDefinition> supplier) {
     EntityModelLayerRegistry.registerModelLayer(SkullModelHelper.HEAD_LAYERS.get(head), supplier::get);
   }

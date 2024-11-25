@@ -9,6 +9,7 @@ import slimeknights.tconstruct.gadgets.client.RenderShuriken;
 
 @SuppressWarnings("unused")
 public class GadgetClientEvents extends ClientEventBase {
+
   static void registerModels() {
     ModelLoadingPlugin.register(pluginContext -> {
       FancyItemFrameRenderer.LOCATIONS_MODEL.forEach((type, loc) -> pluginContext.addModels(loc));

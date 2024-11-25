@@ -35,7 +35,6 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -43,7 +42,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec2;
 import org.joml.Vector3f;
@@ -77,15 +75,19 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 @Log4j2
 @RequiredArgsConstructor
 public class ToolModel implements IUnbakedGeometry<ToolModel> {
-  /** Shared loader instance */
+
+  /**
+   * Shared loader instance
+   */
   public static final Loader LOADER = new Loader();
 
-  /** Color handler instance for all tools, handles both material and modifier colors */
+  /**
+   * Color handler instance for all tools, handles both material and modifier colors
+   */
   public static final ItemColor COLOR_HANDLER = (stack, index) -> {
     // TODO: reconsider material item colors, is there a usecase for dynamic colors as opposed to just an animated texture?
     if (index >= 0) {
@@ -118,38 +120,54 @@ public class ToolModel implements IUnbakedGeometry<ToolModel> {
 
   /**
    * Registers an item color handler for a part item
-   * @param item    Material item
+   *
+   * @param item Material item
    */
   public static void registerItemColors(Supplier<? extends IModifiable> item) {
     ColorProviderRegistry.ITEM.register(ToolModel.COLOR_HANDLER, item.get());
   }
 
-  /** List of tool parts in this model */
+  /**
+   * List of tool parts in this model
+   */
   private final List<ToolPart> toolParts;
-  /** If true, this is a large tool and uses double resolution textures in hand */
+  /**
+   * If true, this is a large tool and uses double resolution textures in hand
+   */
   private final boolean isLarge;
-  /** Transform matrix to apply to child parts */
+  /**
+   * Transform matrix to apply to child parts
+   */
   private final Vec2 offset;
-  /** Location to fetch modifier textures for small variant */
+  /**
+   * Location to fetch modifier textures for small variant
+   */
   private final List<ResourceLocation> smallModifierRoots;
-  /** Location to fetch modifier textures for large variant */
+  /**
+   * Location to fetch modifier textures for large variant
+   */
   private final List<ResourceLocation> largeModifierRoots;
-  /** Modifiers that show first on tools, bypassing normal sort order */
+  /**
+   * Modifiers that show first on tools, bypassing normal sort order
+   */
   private final List<ModifierId> firstModifiers;
 
-  /** Models for the relevant modifiers */
-  private Map<ModifierId,IBakedModifierModel> modifierModels = Collections.emptyMap();
+  /**
+   * Models for the relevant modifiers
+   */
+  private Map<ModifierId, IBakedModifierModel> modifierModels = Collections.emptyMap();
 
   /**
    * adds quads for relevant modifiers
-   * @param spriteGetter    Sprite getter instance
-   * @param modifierModels  Map of modifier models
-   * @param tool            Tool instance
-   * @param quadConsumer    Consumer for finished quads
-   * @param transforms      Transforms to apply
-   * @param isLarge         If true, the quads are for a large tool
+   *
+   * @param spriteGetter   Sprite getter instance
+   * @param modifierModels Map of modifier models
+   * @param tool           Tool instance
+   * @param quadConsumer   Consumer for finished quads
+   * @param transforms     Transforms to apply
+   * @param isLarge        If true, the quads are for a large tool
    */
-  private static void addModifierQuads(Function<Material, TextureAtlasSprite> spriteGetter, Map<ModifierId,IBakedModifierModel> modifierModels, List<ModifierId> firstModifiers, IToolStackView tool, Consumer<Mesh> quadConsumer, ItemLayerPixels pixels, Transformation transforms, boolean isLarge) {
+  private static void addModifierQuads(Function<Material, TextureAtlasSprite> spriteGetter, Map<ModifierId, IBakedModifierModel> modifierModels, List<ModifierId> firstModifiers, IToolStackView tool, Consumer<Mesh> quadConsumer, ItemLayerPixels pixels, Transformation transforms, boolean isLarge) {
     if (!modifierModels.isEmpty()) {
       // keep a running tint index so models know where they should start, currently starts at 0 as the main model does not use tint indexes
       int modelIndex = 0;
@@ -187,11 +205,14 @@ public class ToolModel implements IUnbakedGeometry<ToolModel> {
     }
   }
 
-  /** Record for a first modifier in the model */
+  /**
+   * Record for a first modifier in the model
+   */
   private record FirstModifier(ModifierEntry entry, IBakedModifierModel model, int modelIndex) {}
 
   /**
    * Same as {@link #bake(BlockModel, ModelBaker, Function, ModelState, ItemOverrides, ResourceLocation, boolean)}, but uses fewer arguments and does not require an instance
+   *
    * @param owner           Model configuration
    * @param spriteGetter    Sprite getter function
    * @param largeTransforms Transform to apply to the large parts. If null, only generates small parts
@@ -200,10 +221,10 @@ public class ToolModel implements IUnbakedGeometry<ToolModel> {
    * @param materials       Materials to use for the parts
    * @param tool            Tool instance for modifier parsing
    * @param overrides       Override instance to use, will either be empty or {@link MaterialOverrideHandler}
-   * @return  Baked model
+   * @return Baked model
    */
   private static BakedModel bakeInternal(BlockModel owner, Function<Material, TextureAtlasSprite> spriteGetter, @Nullable Transformation largeTransforms,
-                                         List<ToolPart> parts, Map<ModifierId,IBakedModifierModel> modifierModels, List<ModifierId> firstModifiers,
+                                         List<ToolPart> parts, Map<ModifierId, IBakedModifierModel> modifierModels, List<ModifierId> firstModifiers,
                                          List<MaterialVariantId> materials, @Nullable IToolStackView tool, ItemOverrides overrides) {
     boolean isBroken = tool != null && tool.isBroken();
     TextureAtlasSprite particle = null;
@@ -275,29 +296,29 @@ public class ToolModel implements IUnbakedGeometry<ToolModel> {
   }
 
   @Override
-  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation, boolean isGui3d) {
+  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation, boolean isGui3d) {
     // load in modifiers
     Set<Material> allTextures = Sets.newHashSet();
-    if (toolParts.isEmpty()) {
+    if (this.toolParts.isEmpty()) {
       allTextures.add(owner.getMaterial("tool"));
       if (owner.hasTexture("broken")) {
         allTextures.add(owner.getMaterial("broken"));
       }
-      if (isLarge) {
+      if (this.isLarge) {
         allTextures.add(owner.getMaterial("tool_large"));
         if (owner.hasTexture("broken_large")) {
           allTextures.add(owner.getMaterial("broken_large"));
         }
       }
     } else {
-      for (ToolPart part : toolParts) {
+      for (ToolPart part : this.toolParts) {
         // if material variants, fetch textures from the material model
         if (part.hasMaterials()) {
           MaterialModel.getMaterialTextures(allTextures, owner, part.getName(false, false), null);
           if (part.hasBroken()) {
             MaterialModel.getMaterialTextures(allTextures, owner, part.getName(true, false), null);
           }
-          if (isLarge) {
+          if (this.isLarge) {
             MaterialModel.getMaterialTextures(allTextures, owner, part.getName(false, true), null);
             if (part.hasBroken()) {
               MaterialModel.getMaterialTextures(allTextures, owner, part.getName(true, true), null);
@@ -309,7 +330,7 @@ public class ToolModel implements IUnbakedGeometry<ToolModel> {
           if (part.hasBroken()) {
             allTextures.add(owner.getMaterial(part.getName(true, false)));
           }
-          if (isLarge) {
+          if (this.isLarge) {
             allTextures.add(owner.getMaterial(part.getName(false, true)));
             if (part.hasBroken()) {
               allTextures.add(owner.getMaterial(part.getName(true, true)));
@@ -319,42 +340,44 @@ public class ToolModel implements IUnbakedGeometry<ToolModel> {
       }
     }
     // load modifier models
-    modifierModels = ModifierModelManager.getModelsForTool(smallModifierRoots, isLarge ? largeModifierRoots : Collections.emptyList(), allTextures);
+    this.modifierModels = ModifierModelManager.getModelsForTool(this.smallModifierRoots, this.isLarge ? this.largeModifierRoots : Collections.emptyList(), allTextures);
 
-    Transformation largeTransforms = isLarge ? new Transformation(new Vector3f((offset.x - 8) / 32, (-offset.y - 8) / 32, 0), null, new Vector3f(2, 2, 1), null) : null;
-    overrides = new MaterialOverrideHandler(owner, toolParts, firstModifiers, largeTransforms, modifierModels, overrides); // TODO: nest original overrides?
+    Transformation largeTransforms = this.isLarge ? new Transformation(new Vector3f((this.offset.x - 8) / 32, (-this.offset.y - 8) / 32, 0), null, new Vector3f(2, 2, 1), null) : null;
+    overrides = new MaterialOverrideHandler(owner, this.toolParts, this.firstModifiers, largeTransforms, this.modifierModels, overrides); // TODO: nest original overrides?
     // bake the original with no modifiers or materials
-    return bakeInternal(owner, spriteGetter, largeTransforms, toolParts, modifierModels, firstModifiers, Collections.emptyList(), null, overrides);
+    return bakeInternal(owner, spriteGetter, largeTransforms, this.toolParts, this.modifierModels, this.firstModifiers, Collections.emptyList(), null, overrides);
   }
 
   /**
    * Data class for a single tool part
    */
   private record ToolPart(String name, int index, @Nullable String broken) {
+
     /**
      * If true, this part has a broken texture
      */
     public boolean hasBroken() {
-      return broken != null;
+      return this.broken != null;
     }
 
     /**
      * If true, this part has material variants
      */
     public boolean hasMaterials() {
-      return index >= 0;
+      return this.index >= 0;
     }
 
     /**
      * Gets the name for this part
+     *
      * @param isBroken If true, this part is broken
      * @param isLarge  If true, rendering a large tool
      * @return Texture name for this part
      */
     public String getName(boolean isBroken, boolean isLarge) {
       String name = this.name;
-      if (isBroken && broken != null) {
-        name = broken;
+      if (isBroken && this.broken != null) {
+        name = this.broken;
       }
       if (isLarge) {
         name = "large_" + name;
@@ -380,7 +403,10 @@ public class ToolModel implements IUnbakedGeometry<ToolModel> {
    * Dynamic override handler to swap in the material texture
    */
   public static final class MaterialOverrideHandler extends ItemOverrides {
-    /** If true, we are currently resolving a nested model and should ignore further nesting */
+
+    /**
+     * If true, we are currently resolving a nested model and should ignore further nesting
+     */
     private static boolean ignoreNested = false;
 
     // contains all the baked models since they'll never change, cleared automatically as the baked model is discarded
@@ -396,10 +422,10 @@ public class ToolModel implements IUnbakedGeometry<ToolModel> {
     private final List<ModifierId> firstModifiers;
     @Nullable
     private final Transformation largeTransforms;
-    private final Map<ModifierId,IBakedModifierModel> modifierModels;
+    private final Map<ModifierId, IBakedModifierModel> modifierModels;
     private final ItemOverrides nested;
 
-    private MaterialOverrideHandler(BlockModel owner, List<ToolPart> toolParts, List<ModifierId> firstModifiers, @Nullable Transformation largeTransforms, Map<ModifierId,IBakedModifierModel> modifierModels, ItemOverrides nested) {
+    private MaterialOverrideHandler(BlockModel owner, List<ToolPart> toolParts, List<ModifierId> firstModifiers, @Nullable Transformation largeTransforms, Map<ModifierId, IBakedModifierModel> modifierModels, ItemOverrides nested) {
       this.owner = owner;
       this.toolParts = toolParts;
       this.firstModifiers = firstModifiers;
@@ -410,23 +436,25 @@ public class ToolModel implements IUnbakedGeometry<ToolModel> {
 
     /**
      * Gets the modifier model for this instance
-     * @param modifier  Modifier
-     * @return  Model for the modifier
+     *
+     * @param modifier Modifier
+     * @return Model for the modifier
      */
     @Nullable
     public IBakedModifierModel getModifierModel(Modifier modifier) {
-      return modifierModels.get(modifier.getId());
+      return this.modifierModels.get(modifier.getId());
     }
 
     /**
      * Bakes a copy of this model using the given material
-     * @param materials  New materials for the model
-     * @return  Baked model
+     *
+     * @param materials New materials for the model
+     * @return Baked model
      */
     private BakedModel bakeDynamic(List<MaterialVariantId> materials, IToolStackView tool) {
       // bake internal does not require an instance to bake, we can pass in whatever material we want
       // use empty override list as the sub model never calls overrides, and already has a material
-      return bakeInternal(owner, Material::sprite, largeTransforms, toolParts, modifierModels, firstModifiers, materials, tool, ItemOverrides.EMPTY);
+      return bakeInternal(this.owner, Material::sprite, this.largeTransforms, this.toolParts, this.modifierModels, this.firstModifiers, materials, tool, ItemOverrides.EMPTY);
     }
 
     @Override
@@ -434,7 +462,7 @@ public class ToolModel implements IUnbakedGeometry<ToolModel> {
       // first, resolve the overrides
       // hack: we set a boolean flag to prevent that model from resolving its nested overrides, no nesting multiple deep
       if (!ignoreNested) {
-        BakedModel overridden = nested.resolve(originalModel, stack, world, entity, seed);
+        BakedModel overridden = this.nested.resolve(originalModel, stack, world, entity, seed);
         if (overridden != null && overridden != originalModel) {
           ignoreNested = true;
           // if the override does have a new model, make sure to fetch its overrides to handle the nested texture as its most likely a tool model
@@ -459,7 +487,7 @@ public class ToolModel implements IUnbakedGeometry<ToolModel> {
       for (ModifierEntry entry : tool.getUpgrades().getModifiers()) {
         Set<ModifierId> hidden = ModifierSetWorktableRecipe.getModifierSet(tool.getPersistentData(), TConstruct.getResource("invisible_modifiers"));
         if (!hidden.contains(entry.getId())) {
-          IBakedModifierModel model = getModifierModel(entry.getModifier());
+          IBakedModifierModel model = this.getModifierModel(entry.getModifier());
           if (model != null) {
             Object cacheKey = model.getCacheKey(tool, entry);
             if (cacheKey != null) {
@@ -471,7 +499,7 @@ public class ToolModel implements IUnbakedGeometry<ToolModel> {
 
       // render special model
       try {
-        return cache.get(new ToolCacheKey(materialIds, builder.build(), broken), () -> bakeDynamic(materialIds, tool));
+        return this.cache.get(new ToolCacheKey(materialIds, builder.build(), broken), () -> this.bakeDynamic(materialIds, tool));
       } catch (ExecutionException e) {
         log.error(e);
         return originalModel;
@@ -479,15 +507,19 @@ public class ToolModel implements IUnbakedGeometry<ToolModel> {
     }
   }
 
-  /** Baked model for large tools, has separate quads in GUIs */
+  /**
+   * Baked model for large tools, has separate quads in GUIs
+   */
   private static class BakedLargeToolModel implements BakedModel, TransformTypeDependentItemBakedModel {
+
     private final Mesh largeQuads;
     @Getter
     private final TextureAtlasSprite particleIcon;
     private final ItemTransforms transforms;
     @Getter
     private final ItemOverrides overrides;
-    @Getter @Accessors(fluent = true)
+    @Getter
+    @Accessors(fluent = true)
     private final boolean usesBlockLight;
     private final BakedModel guiModel;
 
@@ -519,7 +551,7 @@ public class ToolModel implements IUnbakedGeometry<ToolModel> {
     @Override
     public BakedModel applyTransform(ItemDisplayContext type, PoseStack mat, boolean leftHanded, DefaultTransform defaultTransform) {
       if (type == ItemDisplayContext.GUI) {
-        return ((TransformTypeDependentItemBakedModel)this.guiModel).applyTransform(type, mat, leftHanded, defaultTransform);
+        return ((TransformTypeDependentItemBakedModel) this.guiModel).applyTransform(type, mat, leftHanded, defaultTransform);
       }
       defaultTransform.apply(this);
       return this;
@@ -548,11 +580,15 @@ public class ToolModel implements IUnbakedGeometry<ToolModel> {
     }
   }
 
-  /** Baked model for large tools in the GUI, small quads */
+  /**
+   * Baked model for large tools in the GUI, small quads
+   */
   private static class BakedLargeToolGui extends ForwardingBakedModel implements TransformTypeDependentItemBakedModel {
+
     private final Mesh guiQuads;
+
     public BakedLargeToolGui(BakedLargeToolModel model, Mesh guiQuads) {
-      wrapped = model;
+      this.wrapped = model;
       this.guiQuads = guiQuads;
     }
 
@@ -560,6 +596,7 @@ public class ToolModel implements IUnbakedGeometry<ToolModel> {
     public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource rand) {
       return ImmutableList.of();
     }
+
     @Override
     public void emitItemQuads(ItemStack stack, Supplier<RandomSource> randomSupplier, RenderContext context) {
       // these quads are only shown in handle perspective for GUI
@@ -570,7 +607,7 @@ public class ToolModel implements IUnbakedGeometry<ToolModel> {
 
     @Override
     public BakedModel applyTransform(ItemDisplayContext transform, PoseStack mat, boolean leftHanded, DefaultTransform defaultTransform) {
-      ((BakedLargeToolModel)wrapped).transforms.getTransform(transform).apply(leftHanded, mat);
+      ((BakedLargeToolModel) this.wrapped).transforms.getTransform(transform).apply(leftHanded, mat);
       return this;
     }
   }
@@ -579,6 +616,7 @@ public class ToolModel implements IUnbakedGeometry<ToolModel> {
    * Model loader logic, use {@link #LOADER} to access instance
    */
   private static class Loader implements IGeometryLoader<ToolModel> {
+
     @Override
     public ToolModel read(JsonObject modelContents, JsonDeserializationContext deserializationContext) {
       List<ToolPart> parts = Collections.emptyList();
@@ -597,7 +635,7 @@ public class ToolModel implements IUnbakedGeometry<ToolModel> {
         // large model requires an object
         if (isLarge) {
           JsonObject modifierRoots = GsonHelper.getAsJsonObject(modelContents, "modifier_roots");
-          BiFunction<JsonElement,String,ResourceLocation> parser = (element, string) -> new ResourceLocation(GsonHelper.convertToString(element, string));
+          BiFunction<JsonElement, String, ResourceLocation> parser = (element, string) -> new ResourceLocation(GsonHelper.convertToString(element, string));
           smallModifierRoots = JsonHelper.parseList(modifierRoots, "small", parser);
           largeModifierRoots = JsonHelper.parseList(modifierRoots, "large", parser);
         } else {
@@ -614,6 +652,8 @@ public class ToolModel implements IUnbakedGeometry<ToolModel> {
     }
   }
 
-  /** Simple data class to cache built tool modifiers, contains everything unique in the textures */
+  /**
+   * Simple data class to cache built tool modifiers, contains everything unique in the textures
+   */
   private record ToolCacheKey(List<MaterialVariantId> materials, List<Object> modifierData, boolean broken) {}
 }

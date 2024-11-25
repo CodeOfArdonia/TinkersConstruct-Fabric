@@ -17,23 +17,24 @@ import java.util.List;
  */
 @AllArgsConstructor
 public class SmelteryTankUpdatePacket implements IThreadsafePacket {
+
   private final BlockPos pos;
   private final List<FluidStack> fluids;
 
   public SmelteryTankUpdatePacket(FriendlyByteBuf buffer) {
-    pos = buffer.readBlockPos();
+    this.pos = buffer.readBlockPos();
     int size = buffer.readVarInt();
-    fluids = new ArrayList<>(size);
+    this.fluids = new ArrayList<>(size);
     for (int i = 0; i < size; i++) {
-      fluids.add(FluidStack.readFromPacket(buffer));
+      this.fluids.add(FluidStack.readFromPacket(buffer));
     }
   }
 
   @Override
   public void encode(FriendlyByteBuf buffer) {
-    buffer.writeBlockPos(pos);
-    buffer.writeVarInt(fluids.size());
-    for (FluidStack fluid : fluids) {
+    buffer.writeBlockPos(this.pos);
+    buffer.writeVarInt(this.fluids.size());
+    for (FluidStack fluid : this.fluids) {
       fluid.writeToPacket(buffer);
     }
   }
@@ -44,6 +45,7 @@ public class SmelteryTankUpdatePacket implements IThreadsafePacket {
   }
 
   private static class HandleClient {
+
     private static void handle(SmelteryTankUpdatePacket packet) {
       BlockEntityHelper.get(ISmelteryTankHandler.class, Minecraft.getInstance().level, packet.pos).ifPresent(te -> te.updateFluidsFromPacket(packet.fluids));
     }

@@ -24,41 +24,56 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-/** Common interface for modifier recipes that can show in JEI */
+/**
+ * Common interface for modifier recipes that can show in JEI
+ */
 public interface IDisplayModifierRecipe extends IModifierRecipe {
-  /** Gets the number of inputs for this recipe */
+
+  /**
+   * Gets the number of inputs for this recipe
+   */
   int getInputCount();
 
   /**
    * Gets an ingredients to display in JEI.
-   * @param  slot  Slot index to display
-   * @return  Display item list
+   *
+   * @param slot Slot index to display
+   * @return Display item list
    */
   List<ItemStack> getDisplayItems(int slot);
 
-  /** Gets the result tool before adding the modifier */
+  /**
+   * Gets the result tool before adding the modifier
+   */
   List<ItemStack> getToolWithoutModifier();
 
-  /** Gets the result tool with this modifier added */
+  /**
+   * Gets the result tool with this modifier added
+   */
   List<ItemStack> getToolWithModifier();
 
-  /** Gets the modifier output of this recipe */
+  /**
+   * Gets the modifier output of this recipe
+   */
   ModifierEntry getDisplayResult();
 
   @Override
   default Modifier getModifier() {
-    return getDisplayResult().getModifier();
+    return this.getDisplayResult().getModifier();
   }
 
   /**
    * Gets the max level of this modifier
+   *
    * @return modifier max level, 0 if no max level
    */
   default int getMaxLevel() {
     return 0;
   }
 
-  /** Gets the slot type used by this modifier */
+  /**
+   * Gets the slot type used by this modifier
+   */
   @Nullable
   default SlotCount getSlots() {
     return null;
@@ -67,24 +82,30 @@ public interface IDisplayModifierRecipe extends IModifierRecipe {
   @Nullable
   @Override
   default SlotType getSlotType() {
-    SlotCount count = getSlots();
+    SlotCount count = this.getSlots();
     if (count == null) {
       return null;
     }
     return count.getType();
   }
 
-  /** If true, this recipe has additional requirements */
+  /**
+   * If true, this recipe has additional requirements
+   */
   default boolean hasRequirements() {
     return false;
   }
 
-  /** Gets the message to display when requirements do not match, or empty if no requirements */
+  /**
+   * Gets the message to display when requirements do not match, or empty if no requirements
+   */
   default String getRequirementsError() {
     return "";
   }
 
-  /** If true, this recipe can be applied incrementally */
+  /**
+   * If true, this recipe can be applied incrementally
+   */
   default boolean isIncremental() {
     return false;
   }
@@ -92,8 +113,10 @@ public interface IDisplayModifierRecipe extends IModifierRecipe {
 
   /* Helpers */
 
-  /** Maps the stream from tool items to applicable tool stacks */
-  Function<Item,ItemStack> MAP_TOOL_FOR_RENDERING = IModifiableDisplay::getDisplayStack;
+  /**
+   * Maps the stream from tool items to applicable tool stacks
+   */
+  Function<Item, ItemStack> MAP_TOOL_FOR_RENDERING = IModifiableDisplay::getDisplayStack;
 
   /* Gets a copy of the stack with the given modifiers */
   static ItemStack withModifiers(ItemStack stack, @Nullable ModifierMatch match, @Nullable ModifierEntry newModifier) {

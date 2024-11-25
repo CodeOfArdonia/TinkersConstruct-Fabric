@@ -13,8 +13,11 @@ import slimeknights.tconstruct.library.modifiers.spilling.ISpillingEffect;
 import slimeknights.tconstruct.library.tools.context.ToolAttackContext;
 import slimeknights.tconstruct.library.utils.JsonUtils;
 
-/** Effect to restore hunger to the target */
+/**
+ * Effect to restore hunger to the target
+ */
 public record RestoreHungerSpillingEffect(int hunger, float saturation) implements ISpillingEffect {
+
   public static final ResourceLocation ID = TConstruct.getResource("restore_hunger");
 
   @Override
@@ -22,7 +25,7 @@ public record RestoreHungerSpillingEffect(int hunger, float saturation) implemen
     LivingEntity target = context.getLivingTarget();
     if (target instanceof Player player) {
       if (player.canEat(false)) {
-        player.getFoodData().eat((int)(hunger * scale), saturation * scale);
+        player.getFoodData().eat((int) (this.hunger * scale), this.saturation * scale);
       }
     }
   }
@@ -30,8 +33,8 @@ public record RestoreHungerSpillingEffect(int hunger, float saturation) implemen
   @Override
   public JsonObject serialize(JsonSerializationContext context) {
     JsonObject json = JsonUtils.withType(ID);
-    json.addProperty("hunger", hunger);
-    json.addProperty("saturation", saturation);
+    json.addProperty("hunger", this.hunger);
+    json.addProperty("saturation", this.saturation);
     return json;
   }
 

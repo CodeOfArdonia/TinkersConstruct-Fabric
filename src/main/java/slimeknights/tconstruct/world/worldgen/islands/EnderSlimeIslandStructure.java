@@ -7,7 +7,9 @@ import slimeknights.tconstruct.world.TinkerStructures;
 import slimeknights.tconstruct.world.worldgen.islands.variants.IslandVariants;
 
 public class EnderSlimeIslandStructure extends AbstractIslandStructure {
+
   public static final Codec<EnderSlimeIslandStructure> CODEC = simpleCodec(EnderSlimeIslandStructure::new);
+
   public EnderSlimeIslandStructure(Structure.StructureSettings structureSettings) {
     super(structureSettings, rand -> IslandVariants.ENDER);
   }

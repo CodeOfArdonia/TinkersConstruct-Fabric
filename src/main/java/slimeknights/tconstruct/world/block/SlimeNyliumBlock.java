@@ -17,7 +17,9 @@ import slimeknights.tconstruct.shared.block.SlimeType;
  * Slimy variant of nylium, mostly changes the way it bonemeals
  */
 public class SlimeNyliumBlock extends Block implements BonemealableBlock {
+
   private final SlimeType foliageType;
+
   public SlimeNyliumBlock(Properties properties, SlimeType foliageType) {
     super(properties);
     this.foliageType = foliageType;
@@ -49,6 +51,6 @@ public class SlimeNyliumBlock extends Block implements BonemealableBlock {
 
   @Override
   public void performBonemeal(ServerLevel world, RandomSource rand, BlockPos pos, BlockState state) {
-    SlimeGrassBlock.growGrass(world, rand, pos, TinkerTags.Blocks.SLIMY_NYLIUM, foliageType, true, true);
+    SlimeGrassBlock.growGrass(world, rand, pos, TinkerTags.Blocks.SLIMY_NYLIUM, this.foliageType, true, true);
   }
 }

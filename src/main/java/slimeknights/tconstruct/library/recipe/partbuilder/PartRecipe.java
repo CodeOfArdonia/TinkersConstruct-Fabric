@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
  */
 @RequiredArgsConstructor
 public class PartRecipe implements IPartBuilderRecipe, IMultiRecipe<ItemPartRecipe> {
+
   @Getter
   protected final ResourceLocation id;
   @Getter
@@ -40,12 +41,18 @@ public class PartRecipe implements IPartBuilderRecipe, IMultiRecipe<ItemPartReci
   @Getter
   protected final Pattern pattern;
   protected final Ingredient patternItem;
-  /** Recipe material cost */
+  /**
+   * Recipe material cost
+   */
   @Getter
   protected final int cost;
-  /** Recipe result, used to fetch a material */
+  /**
+   * Recipe result, used to fetch a material
+   */
   protected final IMaterialItem output;
-  /** Count for the recipe output */
+  /**
+   * Count for the recipe output
+   */
   protected final int outputCount;
 
   @Override
@@ -56,14 +63,14 @@ public class PartRecipe implements IPartBuilderRecipe, IMultiRecipe<ItemPartReci
   @Override
   public boolean partialMatch(IPartBuilderContainer inv) {
     // first, must have a pattern
-    if (!patternItem.test(inv.getPatternStack())) {
+    if (!this.patternItem.test(inv.getPatternStack())) {
       return false;
     }
     // if there is a material item, it must have a valid material and be craftable
     ItemStack stack = inv.getStack();
     if (!stack.isEmpty()) {
       // no sense allowing if there is no change
-      if (stack.getItem() == output) {
+      if (stack.getItem() == this.output) {
         return false;
       }
       IMaterialValue materialRecipe = inv.getMaterial();
@@ -71,7 +78,7 @@ public class PartRecipe implements IPartBuilderRecipe, IMultiRecipe<ItemPartReci
         return false;
       }
       MaterialVariant material = materialRecipe.getMaterial();
-      return material.get().isCraftable() && output.canUseMaterial(material.getId());
+      return material.get().isCraftable() && this.output.canUseMaterial(material.getId());
     }
     // no material item? return match in case we get one later
     return true;
@@ -79,9 +86,10 @@ public class PartRecipe implements IPartBuilderRecipe, IMultiRecipe<ItemPartReci
 
   /**
    * Checks if the recipe is valid for the given input. Assumes {@link #partialMatch(IPartBuilderContainer)} is true
-   * @param inv    Inventory instance
-   * @param world  World instance
-   * @return  True if this recipe matches
+   *
+   * @param inv   Inventory instance
+   * @param world World instance
+   * @return True if this recipe matches
    */
   @Override
   public boolean matches(IPartBuilderContainer inv, Level world) {
@@ -90,28 +98,31 @@ public class PartRecipe implements IPartBuilderRecipe, IMultiRecipe<ItemPartReci
     if (materialRecipe != null) {
       // material must be craftable, usable in the item, and have a cost we can afford
       MaterialVariant material = materialRecipe.getMaterial();
-      return material.get().isCraftable() && output.canUseMaterial(material.getId())
-             && inv.getStack().getCount() >= materialRecipe.getItemsUsed(cost);
+      return material.get().isCraftable() && this.output.canUseMaterial(material.getId())
+        && inv.getStack().getCount() >= materialRecipe.getItemsUsed(this.cost);
     }
     return false;
   }
 
-  /** @deprecated use {@link #getRecipeOutput(MaterialVariantId)} */
+  /**
+   * @deprecated use {@link #getRecipeOutput(MaterialVariantId)}
+   */
   @Deprecated
   @Override
   public ItemStack getResultItem(RegistryAccess registryAccess) {
-    return new ItemStack(output);
+    return new ItemStack(this.output);
   }
 
   /**
    * Gets the output of the recipe for display
-   * @param material  Material to use
-   * @return  Output of the recipe
+   *
+   * @param material Material to use
+   * @return Output of the recipe
    */
   @SuppressWarnings("WeakerAccess")
   public ItemStack getRecipeOutput(MaterialVariantId material) {
-    ItemStack stack = output.withMaterial(material);
-    stack.setCount(outputCount);
+    ItemStack stack = this.output.withMaterial(material);
+    stack.setCount(this.outputCount);
     return stack;
   }
 
@@ -125,27 +136,30 @@ public class PartRecipe implements IPartBuilderRecipe, IMultiRecipe<ItemPartReci
     return this.getRecipeOutput(material.getVariant());
   }
 
-  /** Cache of recipes for display in JEI */
+  /**
+   * Cache of recipes for display in JEI
+   */
   @Nullable
   private List<ItemPartRecipe> multiRecipes;
 
   @Override
   public List<ItemPartRecipe> getRecipes() {
-    if (multiRecipes == null) {
+    if (this.multiRecipes == null) {
       // TODO: recipe per variant instead of per material?
-      multiRecipes = MaterialRegistry
+      this.multiRecipes = MaterialRegistry
         .getMaterials().stream()
-        .filter(mat -> mat.isCraftable() && output.canUseMaterial(mat))
+        .filter(mat -> mat.isCraftable() && this.output.canUseMaterial(mat))
         .map(mat -> {
           MaterialId materialId = mat.getIdentifier();
-          return new ItemPartRecipe(materialId, mat.getIdentifier(), pattern, patternItem, getCost(), ItemOutput.fromStack(output.withMaterial(materialId)));
+          return new ItemPartRecipe(materialId, mat.getIdentifier(), this.pattern, this.patternItem, this.getCost(), ItemOutput.fromStack(this.output.withMaterial(materialId)));
         })
         .collect(Collectors.toList());
     }
-    return multiRecipes;
+    return this.multiRecipes;
   }
 
   public static class Serializer extends LoggingRecipeSerializer<PartRecipe> {
+
     @Override
     public PartRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
       String group = GsonHelper.getAsString(json, "group", "");

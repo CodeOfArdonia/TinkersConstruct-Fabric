@@ -7,12 +7,13 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.FungusBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
-import net.minecraft.world.level.levelgen.feature.HugeFungusConfiguration;
 import slimeknights.tconstruct.common.TinkerTags;
-import slimeknights.tconstruct.world.worldgen.trees.feature.SlimeFungusFeature;
 
-/** Update of fungus that grows on slime soil instead */
+/**
+ * Update of fungus that grows on slime soil instead
+ */
 public class SlimeFungusBlock extends FungusBlock {
+
   public SlimeFungusBlock(Properties properties, ResourceKey<ConfiguredFeature<?, ?>> fungusFeature) {
     super(properties, fungusFeature, null);
   }

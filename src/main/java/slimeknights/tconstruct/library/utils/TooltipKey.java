@@ -1,20 +1,34 @@
 package slimeknights.tconstruct.library.utils;
 
-/** @deprecated use {@link slimeknights.mantle.client.TooltipKey} */
+/**
+ * @deprecated use {@link slimeknights.mantle.client.TooltipKey}
+ */
 @Deprecated
 public enum TooltipKey {
-  /** Tooltip with neither shift nor control */
+  /**
+   * Tooltip with neither shift nor control
+   */
   NORMAL,
-  /** Tooltip with shift held */
+  /**
+   * Tooltip with shift held
+   */
   SHIFT,
-  /** Tooltip with control held */
+  /**
+   * Tooltip with control held
+   */
   CONTROL,
-  /** Tooltip with alt held */
+  /**
+   * Tooltip with alt held
+   */
   ALT,
-  /** Tooltip key cannot be determined, typically caused by being on a server */
+  /**
+   * Tooltip key cannot be determined, typically caused by being on a server
+   */
   UNKNOWN;
 
-  /** Converts this to the mantle tooltip key */
+  /**
+   * Converts this to the mantle tooltip key
+   */
   public slimeknights.mantle.client.TooltipKey asMantle() {
     return switch (this) {
       case NORMAL -> slimeknights.mantle.client.TooltipKey.NORMAL;
@@ -25,7 +39,9 @@ public enum TooltipKey {
     };
   }
 
-  /** Gets the tooltip key from the mantle enum */
+  /**
+   * Gets the tooltip key from the mantle enum
+   */
   public static TooltipKey fromMantle(slimeknights.mantle.client.TooltipKey key) {
     return switch (key) {
       case NORMAL -> NORMAL;
@@ -36,7 +52,9 @@ public enum TooltipKey {
     };
   }
 
-  /** Common operation is wanting to cancel when shift or unknown */
+  /**
+   * Common operation is wanting to cancel when shift or unknown
+   */
   public boolean isShiftOrUnknown() {
     return this == SHIFT || this == UNKNOWN;
   }

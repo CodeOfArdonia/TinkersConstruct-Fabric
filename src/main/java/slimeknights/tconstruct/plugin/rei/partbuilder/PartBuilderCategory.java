@@ -1,6 +1,5 @@
 package slimeknights.tconstruct.plugin.rei.partbuilder;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import lombok.Getter;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
@@ -30,6 +29,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class PartBuilderCategory implements TinkersCategory<PartBuilderDisplay> {
+
   private static final ResourceLocation BACKGROUND_LOC = TConstruct.getResource("textures/gui/jei/tinker_station.png");
   private static final Component TITLE = TConstruct.makeTranslation("jei", "part_builder.title");
   private static final String KEY_COST = TConstruct.makeTranslationKey("jei", "part_builder.cost");
@@ -38,6 +38,7 @@ public class PartBuilderCategory implements TinkersCategory<PartBuilderDisplay> 
   private final WidgetHolder background;
   @Getter
   private final Renderer icon;
+
   public PartBuilderCategory() {
     this.background = new WidgetHolder(BACKGROUND_LOC, 0, 117, 121, 46);
     this.icon = EntryStacks.of(TinkerTables.partBuilder);
@@ -65,13 +66,13 @@ public class PartBuilderCategory implements TinkersCategory<PartBuilderDisplay> 
   @Override
   public void addWidgets(PartBuilderDisplay display, List<Widget> ingredients, Point origin, Rectangle bounds) {
     // items
-    ingredients.add(slot(25, 16, origin).markInput().entries(EntryIngredients.ofItemStacks(MaterialItemList.getItems(display.getMaterial().getVariant()))));
-    ingredients.add(slot(4, 16, origin).markInput().entries(EntryIngredients.ofItemStacks(display.getPatternItems())));
+    ingredients.add(this.slot(25, 16, origin).markInput().entries(EntryIngredients.ofItemStacks(MaterialItemList.getItems(display.getMaterial().getVariant()))));
+    ingredients.add(this.slot(4, 16, origin).markInput().entries(EntryIngredients.ofItemStacks(display.getPatternItems())));
     // patterns
-    ingredients.add(slot(46, 16, origin).markInput().entry(EntryStack.of(TConstructREIConstants.PATTERN_TYPE, display.getPattern())));
+    ingredients.add(this.slot(46, 16, origin).markInput().entry(EntryStack.of(TConstructREIConstants.PATTERN_TYPE, display.getPattern())));
     // TODO: material input?
 
     // output
-    ingredients.add(slot(96, 15, origin).markOutput().entries(display.getOutputEntries().get(0)));
+    ingredients.add(this.slot(96, 15, origin).markOutput().entries(display.getOutputEntries().get(0)));
   }
 }

@@ -9,6 +9,7 @@ import slimeknights.tconstruct.library.utils.SlimeBounceHandler;
 import slimeknights.tconstruct.shared.block.SlimeType;
 
 public class SkySlimeSlingItem extends BaseSlimeSlingItem {
+
   private static final float DEGREE_TO_RAD = (float) Math.PI / 180.0F;
 
   public SkySlimeSlingItem(Properties props) {
@@ -28,14 +29,14 @@ public class SkySlimeSlingItem extends BaseSlimeSlingItem {
     return f;
   }
 
-  /** Called when the player stops using an Item (stops holding the right mouse button). */
+  /**
+   * Called when the player stops using an Item (stops holding the right mouse button).
+   */
   @Override
   public void releaseUsing(ItemStack stack, Level worldIn, LivingEntity entityLiving, int timeLeft) {
-    if (!(entityLiving instanceof Player)) {
+    if (!(entityLiving instanceof Player player)) {
       return;
     }
-
-    Player player = (Player) entityLiving;
 
     // don't allow free flight when using an elytra, should use fireworks
     if (player.isFallFlying()) {
@@ -45,7 +46,7 @@ public class SkySlimeSlingItem extends BaseSlimeSlingItem {
     player.causeFoodExhaustion(0.2F);
     player.setSprinting(true);
 
-    float f = getForce(stack, timeLeft);
+    float f = this.getForce(stack, timeLeft);
     float speed = f / 3F;
     Vec3 look = player.getLookAngle();
     player.push(
@@ -53,11 +54,11 @@ public class SkySlimeSlingItem extends BaseSlimeSlingItem {
       (1 + look.y) * speed / 2f,
       (look.z * speed));
 
-    onSuccess(player, stack);
+    this.onSuccess(player, stack);
     SlimeBounceHandler.addBounceHandler(player);
     if (!worldIn.isClientSide) {
       player.getCooldowns().addCooldown(stack.getItem(), 3);
-      onSuccess(player, stack);
+      this.onSuccess(player, stack);
     }
   }
 }

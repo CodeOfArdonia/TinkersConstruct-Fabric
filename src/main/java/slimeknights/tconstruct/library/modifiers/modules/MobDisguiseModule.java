@@ -22,6 +22,7 @@ import java.util.List;
  * Module for armor modifiers that makes this entity appear to be another entity from afar
  */
 public record MobDisguiseModule(EntityType<?> entity) implements EquipmentChangeModifierHook, ModifierModule {
+
   private static final List<ModifierHook<?>> DEFAULT_HOOKS = List.of(TinkerHooks.EQUIPMENT_CHANGE);
   public static final IGenericLoader<MobDisguiseModule> LOADER = new GenericRegistryEntrySerializer<>("entity", BuiltInRegistries.ENTITY_TYPE, MobDisguiseModule::new, MobDisguiseModule::entity);
 
@@ -33,7 +34,7 @@ public record MobDisguiseModule(EntityType<?> entity) implements EquipmentChange
   @Override
   public void onEquip(IToolStackView tool, ModifierEntry modifier, EquipmentChangeContext context) {
     if (context.getChangedSlot().getType() == Type.ARMOR) {
-      context.getTinkerData().ifPresent(data -> data.computeIfAbsent(DISGUISES).add(entity));
+      context.getTinkerData().ifPresent(data -> data.computeIfAbsent(DISGUISES).add(this.entity));
     }
   }
 
@@ -43,7 +44,7 @@ public record MobDisguiseModule(EntityType<?> entity) implements EquipmentChange
       context.getTinkerData().ifPresent(data -> {
         Multiset<EntityType<?>> disguises = data.get(DISGUISES);
         if (disguises != null) {
-          disguises.remove(entity);
+          disguises.remove(this.entity);
         }
       });
     }

@@ -15,36 +15,44 @@ import slimeknights.tconstruct.tables.TinkerTables;
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
 
-/** Builds a recipe to repair a tool in the tinker station */
+/**
+ * Builds a recipe to repair a tool in the tinker station
+ */
 @RequiredArgsConstructor(staticName = "repair")
 public class SpecializedRepairRecipeBuilder extends AbstractRecipeBuilder<SpecializedRepairRecipeBuilder> {
+
   private final Ingredient tool;
   private final MaterialId repairMaterial;
 
-  /** Creates a builder from the given item and material */
+  /**
+   * Creates a builder from the given item and material
+   */
   public static SpecializedRepairRecipeBuilder repair(ItemLike item, MaterialId repairMaterial) {
     return repair(Ingredient.of(item), repairMaterial);
   }
 
   @Override
   public void save(Consumer<FinishedRecipe> consumer) {
-    save(consumer, repairMaterial);
+    this.save(consumer, this.repairMaterial);
   }
 
-  /** Builds the recipe for the crafting table using a repair kit */
+  /**
+   * Builds the recipe for the crafting table using a repair kit
+   */
   public SpecializedRepairRecipeBuilder buildRepairKit(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
-    ResourceLocation advancementId = buildOptionalAdvancement(id, "tinker_station");
+    ResourceLocation advancementId = this.buildOptionalAdvancement(id, "tinker_station");
     consumer.accept(new Finished(id, advancementId, TinkerTables.specializedRepairKitSerializer.get()));
     return this;
   }
 
   @Override
   public void save(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
-    ResourceLocation advancementId = buildOptionalAdvancement(id, "tinker_station");
+    ResourceLocation advancementId = this.buildOptionalAdvancement(id, "tinker_station");
     consumer.accept(new Finished(id, advancementId, TinkerTables.specializedRepairSerializer.get()));
   }
 
   private class Finished extends AbstractFinishedRecipe {
+
     @Getter
     private final RecipeSerializer<?> type;
 
@@ -55,8 +63,8 @@ public class SpecializedRepairRecipeBuilder extends AbstractRecipeBuilder<Specia
 
     @Override
     public void serializeRecipeData(JsonObject json) {
-      json.add("tool", tool.toJson());
-      json.addProperty("repair_material", repairMaterial.toString());
+      json.add("tool", SpecializedRepairRecipeBuilder.this.tool.toJson());
+      json.addProperty("repair_material", SpecializedRepairRecipeBuilder.this.repairMaterial.toString());
     }
   }
 }

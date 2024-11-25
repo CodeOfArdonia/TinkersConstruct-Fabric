@@ -26,6 +26,7 @@ import java.util.List;
  */
 @Getter(AccessLevel.PROTECTED)
 public final class MeleeHarvestToolStatsBuilder extends ToolStatsBuilder {
+
   private final List<HeadMaterialStats> heads;
   private final List<HandleMaterialStats> handles;
   private final List<ExtraMaterialStats> extras;
@@ -38,7 +39,9 @@ public final class MeleeHarvestToolStatsBuilder extends ToolStatsBuilder {
     this.extras = extras;
   }
 
-  /** Creates a builder from the definition and materials */
+  /**
+   * Creates a builder from the definition and materials
+   */
   public static ToolStatsBuilder from(ToolDefinition toolDefinition, MaterialNBT materials) {
     ToolDefinitionData data = toolDefinition.getData();
     List<PartRequirement> requiredComponents = data.getParts();
@@ -47,64 +50,74 @@ public final class MeleeHarvestToolStatsBuilder extends ToolStatsBuilder {
       return ToolStatsBuilder.noParts(toolDefinition);
     }
     return new MeleeHarvestToolStatsBuilder(data,
-                                            listOfCompatibleWith(HeadMaterialStats.ID, materials, requiredComponents),
-                                            listOfCompatibleWith(HandleMaterialStats.ID, materials, requiredComponents),
-                                            listOfCompatibleWith(ExtraMaterialStats.ID, materials, requiredComponents)
+      listOfCompatibleWith(HeadMaterialStats.ID, materials, requiredComponents),
+      listOfCompatibleWith(HandleMaterialStats.ID, materials, requiredComponents),
+      listOfCompatibleWith(ExtraMaterialStats.ID, materials, requiredComponents)
     );
   }
 
   @Override
   protected void setStats(StatsNBT.Builder builder) {
     // add in specific stat types handled by our materials
-    builder.set(ToolStats.DURABILITY, buildDurability());
-    builder.set(ToolStats.HARVEST_TIER, buildHarvestLevel());
-    builder.set(ToolStats.ATTACK_DAMAGE, buildAttackDamage());
-    builder.set(ToolStats.ATTACK_SPEED, buildAttackSpeed());
-    builder.set(ToolStats.MINING_SPEED, buildMiningSpeed());
+    builder.set(ToolStats.DURABILITY, this.buildDurability());
+    builder.set(ToolStats.HARVEST_TIER, this.buildHarvestLevel());
+    builder.set(ToolStats.ATTACK_DAMAGE, this.buildAttackDamage());
+    builder.set(ToolStats.ATTACK_SPEED, this.buildAttackSpeed());
+    builder.set(ToolStats.MINING_SPEED, this.buildMiningSpeed());
   }
 
   @Override
   protected boolean handles(IToolStat<?> stat) {
     return stat == ToolStats.DURABILITY || stat == ToolStats.HARVEST_TIER
-           || stat == ToolStats.ATTACK_DAMAGE || stat == ToolStats.ATTACK_SPEED || stat == ToolStats.MINING_SPEED;
+      || stat == ToolStats.ATTACK_DAMAGE || stat == ToolStats.ATTACK_SPEED || stat == ToolStats.MINING_SPEED;
   }
 
-  /** Builds durability for the tool */
+  /**
+   * Builds durability for the tool
+   */
   public float buildDurability() {
-    double averageHeadDurability = getAverageValue(heads, HeadMaterialStats::getDurability) + getStatOrDefault(ToolStats.DURABILITY, 0f);
-    double averageHandleModifier = getAverageValue(handles, HandleMaterialStats::getDurability, 1);
+    double averageHeadDurability = getAverageValue(this.heads, HeadMaterialStats::getDurability) + this.getStatOrDefault(ToolStats.DURABILITY, 0f);
+    double averageHandleModifier = getAverageValue(this.handles, HandleMaterialStats::getDurability, 1);
     // durability should never be below 1
-    return Math.max(1, (int)(averageHeadDurability * averageHandleModifier));
+    return Math.max(1, (int) (averageHeadDurability * averageHandleModifier));
   }
 
-  /** Builds mining speed for the tool */
+  /**
+   * Builds mining speed for the tool
+   */
   public float buildMiningSpeed() {
-    double averageHeadSpeed = getAverageValue(heads, HeadMaterialStats::getMiningSpeed) + getStatOrDefault(ToolStats.MINING_SPEED, 0f);
-    double averageHandleModifier = getAverageValue(handles, HandleMaterialStats::getMiningSpeed, 1);
+    double averageHeadSpeed = getAverageValue(this.heads, HeadMaterialStats::getMiningSpeed) + this.getStatOrDefault(ToolStats.MINING_SPEED, 0f);
+    double averageHandleModifier = getAverageValue(this.handles, HandleMaterialStats::getMiningSpeed, 1);
 
-    return (float)Math.max(0.1d, averageHeadSpeed * averageHandleModifier);
+    return (float) Math.max(0.1d, averageHeadSpeed * averageHandleModifier);
   }
 
-  /** Builds attack speed for the tool */
+  /**
+   * Builds attack speed for the tool
+   */
   public float buildAttackSpeed() {
-    float baseSpeed = toolData.getBaseStat(ToolStats.ATTACK_SPEED);
-    double averageHandleModifier = getAverageValue(handles, HandleMaterialStats::getAttackSpeed, 1);
-    return (float)Math.max(0, baseSpeed * averageHandleModifier);
+    float baseSpeed = this.toolData.getBaseStat(ToolStats.ATTACK_SPEED);
+    double averageHandleModifier = getAverageValue(this.handles, HandleMaterialStats::getAttackSpeed, 1);
+    return (float) Math.max(0, baseSpeed * averageHandleModifier);
   }
 
-  /** Builds the harvest level for the tool */
+  /**
+   * Builds the harvest level for the tool
+   */
   public Tier buildHarvestLevel() {
     List<Tier> sortedTiers = TierSortingRegistry.getSortedTiers();
-    return heads.stream()
+    return this.heads.stream()
       .map(HeadMaterialStats::getTier)
       .max(Comparator.comparingInt(sortedTiers::indexOf))
       .orElse(HarvestTiers.minTier());
   }
 
-  /** Builds attack damage for the tool */
+  /**
+   * Builds attack damage for the tool
+   */
   public float buildAttackDamage() {
-    double averageHeadAttack = getAverageValue(heads, HeadMaterialStats::getAttack) + getStatOrDefault(ToolStats.ATTACK_DAMAGE, 0f);
-    double averageHandle = getAverageValue(handles, HandleMaterialStats::getAttackDamage, 1.0f);
-    return (float)Math.max(0.0d, averageHeadAttack * averageHandle);
+    double averageHeadAttack = getAverageValue(this.heads, HeadMaterialStats::getAttack) + this.getStatOrDefault(ToolStats.ATTACK_DAMAGE, 0f);
+    double averageHandle = getAverageValue(this.handles, HandleMaterialStats::getAttackDamage, 1.0f);
+    return (float) Math.max(0.0d, averageHeadAttack * averageHandle);
   }
 }

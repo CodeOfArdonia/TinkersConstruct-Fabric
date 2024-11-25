@@ -22,11 +22,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-/** Datagen for dynamic modifiers */
+/**
+ * Datagen for dynamic modifiers
+ */
 @SuppressWarnings("SameParameterValue")
 public abstract class AbstractModifierProvider extends GenericDataProvider {
-  private final Map<ModifierId,Result> allModifiers = new HashMap<>();
-  private final Map<ModifierId,Composable> composableModifiers = new HashMap<>();
+
+  private final Map<ModifierId, Result> allModifiers = new HashMap<>();
+  private final Map<ModifierId, Composable> composableModifiers = new HashMap<>();
 
   public AbstractModifierProvider(FabricDataOutput output) {
     super(output, PackType.SERVER_DATA, ModifierManager.FOLDER, ModifierManager.GSON);
@@ -37,88 +40,112 @@ public abstract class AbstractModifierProvider extends GenericDataProvider {
    */
   protected abstract void addModifiers();
 
-  /** Adds a modifier to be saved */
+  /**
+   * Adds a modifier to be saved
+   */
   protected void addModifier(ModifierId id, @Nullable ConditionJsonProvider condition, @Nullable Modifier result, JsonRedirect... redirects) {
     if (result == null && redirects.length == 0) {
       throw new IllegalArgumentException("Must have either a modifier or a redirect");
     }
-    Result previous = allModifiers.putIfAbsent(id, new Result(result, condition, redirects));
-    if (previous != null || composableModifiers.containsKey(id)) {
+    Result previous = this.allModifiers.putIfAbsent(id, new Result(result, condition, redirects));
+    if (previous != null || this.composableModifiers.containsKey(id)) {
       throw new IllegalArgumentException("Duplicate modifier " + id);
     }
   }
 
-  /** Adds a modifier to be saved */
+  /**
+   * Adds a modifier to be saved
+   */
   protected void addModifier(ModifierId id, @Nullable Modifier result, JsonRedirect... redirects) {
-    addModifier(id, null, result, redirects);
+    this.addModifier(id, null, result, redirects);
   }
 
-  /** Adds a modifier to be saved */
+  /**
+   * Adds a modifier to be saved
+   */
   protected void addModifier(DynamicModifier<?> id, @Nullable ConditionJsonProvider condition, @Nullable Modifier result, JsonRedirect... redirects) {
-    addModifier(id.getId(), condition, result, redirects);
+    this.addModifier(id.getId(), condition, result, redirects);
   }
 
-  /** Adds a modifier to be saved */
+  /**
+   * Adds a modifier to be saved
+   */
   protected void addModifier(DynamicModifier<?> id, @Nullable Modifier result, JsonRedirect... redirects) {
-    addModifier(id, null, result, redirects);
+    this.addModifier(id, null, result, redirects);
   }
 
 
   /* Composable helpers */
 
-  /** Sets up a builder for a composable modifier */
+  /**
+   * Sets up a builder for a composable modifier
+   */
   protected ComposableModifier.Builder buildModifier(ModifierId id, @Nullable ConditionJsonProvider condition, JsonRedirect... redirects) {
     ComposableModifier.Builder builder = ComposableModifier.builder();
-    Composable previous = composableModifiers.putIfAbsent(id, new Composable(builder, condition, redirects));
-    if (previous != null || allModifiers.containsKey(id)) {
+    Composable previous = this.composableModifiers.putIfAbsent(id, new Composable(builder, condition, redirects));
+    if (previous != null || this.allModifiers.containsKey(id)) {
       throw new IllegalArgumentException("Duplicate modifier " + id);
     }
     return builder;
   }
 
-  /** Sets up a builder for a composable modifier */
+  /**
+   * Sets up a builder for a composable modifier
+   */
   protected ComposableModifier.Builder buildModifier(ModifierId id, JsonRedirect... redirects) {
-    return buildModifier(id, null, redirects);
+    return this.buildModifier(id, null, redirects);
   }
 
-  /** Sets up a builder for a composable modifier */
+  /**
+   * Sets up a builder for a composable modifier
+   */
   protected ComposableModifier.Builder buildModifier(DynamicModifier<?> modifier, @Nullable ConditionJsonProvider condition, JsonRedirect... redirects) {
-    return buildModifier(modifier.getId(), condition, redirects);
+    return this.buildModifier(modifier.getId(), condition, redirects);
   }
 
-  /** Sets up a builder for a composable modifier */
+  /**
+   * Sets up a builder for a composable modifier
+   */
   protected ComposableModifier.Builder buildModifier(DynamicModifier<?> modifier, JsonRedirect... redirects) {
-    return buildModifier(modifier, null, redirects);
+    return this.buildModifier(modifier, null, redirects);
   }
 
 
   /* Redirect helpers */
 
-  /** Adds a modifier redirect */
+  /**
+   * Adds a modifier redirect
+   */
   protected void addRedirect(ModifierId id, JsonRedirect... redirects) {
-    addModifier(id, null, null, redirects);
+    this.addModifier(id, null, null, redirects);
   }
 
-  /** Makes a conditional redirect to the given ID */
+  /**
+   * Makes a conditional redirect to the given ID
+   */
   protected JsonRedirect conditionalRedirect(ModifierId id, @Nullable ConditionJsonProvider condition) {
     return new JsonRedirect(id, condition, null);
   }
 
-  /** Makes an unconditional redirect to the given ID */
+  /**
+   * Makes an unconditional redirect to the given ID
+   */
   protected JsonRedirect redirect(ModifierId id) {
-    return conditionalRedirect(id, null);
+    return this.conditionalRedirect(id, null);
   }
 
   @Override
   public CompletableFuture<?> run(CachedOutput cache) {
-    addModifiers();
+    this.addModifiers();
     List<CompletableFuture<?>> futures = new ArrayList<>();
-    allModifiers.forEach((id, data) -> futures.add(saveThing(cache, id, data.serialize())));
-    composableModifiers.forEach((id, data) -> saveThing(cache, id, data.serialize()));
+    this.allModifiers.forEach((id, data) -> futures.add(this.saveThing(cache, id, data.serialize())));
+    this.composableModifiers.forEach((id, data) -> this.saveThing(cache, id, data.serialize()));
     return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
   }
 
-  /** Serializes the given modifier with its condition and redirects */
+  /**
+   * Serializes the given modifier with its condition and redirects
+   */
   private static JsonObject serializeModifier(@Nullable Modifier modifier, @Nullable ConditionJsonProvider condition, JsonRedirect[] redirects) {
     JsonObject json;
     if (modifier != null) {
@@ -139,19 +166,31 @@ public abstract class AbstractModifierProvider extends GenericDataProvider {
     return json;
   }
 
-  /** Result record, as its nicer than a pair */
-  private record Result(@Nullable Modifier modifier, @Nullable ConditionJsonProvider condition, JsonRedirect[] redirects) {
-    /** Writes this result to JSON */
+  /**
+   * Result record, as its nicer than a pair
+   */
+  private record Result(@Nullable Modifier modifier, @Nullable ConditionJsonProvider condition,
+                        JsonRedirect[] redirects) {
+
+    /**
+     * Writes this result to JSON
+     */
     public JsonObject serialize() {
-      return serializeModifier(modifier, condition, redirects);
+      return serializeModifier(this.modifier, this.condition, this.redirects);
     }
   }
 
-  /** Result for composable too */
-  private record Composable(ComposableModifier.Builder builder, @Nullable ConditionJsonProvider condition, JsonRedirect[] redirects) {
-    /** Writes this result to JSON */
+  /**
+   * Result for composable too
+   */
+  private record Composable(ComposableModifier.Builder builder, @Nullable ConditionJsonProvider condition,
+                            JsonRedirect[] redirects) {
+
+    /**
+     * Writes this result to JSON
+     */
     public JsonObject serialize() {
-      return serializeModifier(builder.build(), condition, redirects);
+      return serializeModifier(this.builder.build(), this.condition, this.redirects);
     }
   }
 }

@@ -22,6 +22,7 @@ import java.util.Objects;
  * Fluid IO extension to display controller fluid
  */
 public class DrainBlockEntity extends SmelteryFluidIO implements IDisplayFluidListener, CustomUpdateTagHandlingBlockEntity, CustomDataPacketHandlingBlockEntity {
+
   @Getter
   private FluidStack displayFluid = FluidStack.EMPTY;
 
@@ -35,29 +36,31 @@ public class DrainBlockEntity extends SmelteryFluidIO implements IDisplayFluidLi
 
   @Override
   public void notifyDisplayFluidUpdated(FluidStack fluid) {
-    if (!fluid.isFluidEqual(displayFluid)) {
+    if (!fluid.isFluidEqual(this.displayFluid)) {
       // no need to copy as the fluid was copied by the caller
-      displayFluid = fluid;
-      getModelData().setData(IDisplayFluidListener.PROPERTY, displayFluid);
-      assert level != null;
-      BlockState state = getBlockState();
-      level.sendBlockUpdated(worldPosition, state, state, 48);
+      this.displayFluid = fluid;
+      this.getModelData().setData(IDisplayFluidListener.PROPERTY, this.displayFluid);
+      assert this.level != null;
+      BlockState state = this.getBlockState();
+      this.level.sendBlockUpdated(this.worldPosition, state, state, 48);
     }
   }
 
   @Override
   public BlockPos getListenerPos() {
-    return getBlockPos();
+    return this.getBlockPos();
   }
 
 
   /* Updating */
 
-  /** Attaches this TE to the master as a display fluid listener */
+  /**
+   * Attaches this TE to the master as a display fluid listener
+   */
   private void attachFluidListener() {
-    BlockPos masterPos = getMasterPos();
-    if (masterPos != null && level != null && level.isClientSide) {
-      BlockEntityHelper.get(ISmelteryTankHandler.class, level, masterPos).ifPresent(te -> te.addDisplayListener(this));
+    BlockPos masterPos = this.getMasterPos();
+    if (masterPos != null && this.level != null && this.level.isClientSide) {
+      BlockEntityHelper.get(ISmelteryTankHandler.class, this.level, masterPos).ifPresent(te -> te.addDisplayListener(this));
     }
   }
 
@@ -65,16 +68,16 @@ public class DrainBlockEntity extends SmelteryFluidIO implements IDisplayFluidLi
   @Override
   public CompoundTag getUpdateTag() {
     CompoundTag nbt = super.getUpdateTag();
-    writeMaster(nbt);
+    this.writeMaster(nbt);
     return nbt;
   }
 
   @Override
   public void handleUpdateTag(CompoundTag tag) {
-    BlockPos oldMaster = getMasterPos();
+    BlockPos oldMaster = this.getMasterPos();
     CustomUpdateTagHandlingBlockEntity.super.handleUpdateTag(tag);
-    if (!Objects.equals(oldMaster, getMasterPos())) {
-      attachFluidListener();
+    if (!Objects.equals(oldMaster, this.getMasterPos())) {
+      this.attachFluidListener();
     }
   }
 
@@ -87,10 +90,10 @@ public class DrainBlockEntity extends SmelteryFluidIO implements IDisplayFluidLi
   public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
     CompoundTag tag = pkt.getTag();
     if (tag != null) {
-      BlockPos oldMaster = getMasterPos();
-      load(tag);
-      if (!Objects.equals(oldMaster, getMasterPos())) {
-        attachFluidListener();
+      BlockPos oldMaster = this.getMasterPos();
+      this.load(tag);
+      if (!Objects.equals(oldMaster, this.getMasterPos())) {
+        this.attachFluidListener();
       }
 
     }

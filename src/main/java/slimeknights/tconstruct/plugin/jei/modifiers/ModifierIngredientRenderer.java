@@ -14,22 +14,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public record ModifierIngredientRenderer(int width, int height) implements IIngredientRenderer<ModifierEntry> {
+
   @Override
   public int getWidth() {
-    return width;
+    return this.width;
   }
 
   @Override
   public int getHeight() {
-    return height;
+    return this.height;
   }
 
   @Override
   public void render(GuiGraphics graphics, @Nullable ModifierEntry entry) {
     if (entry != null) {
       Component name = entry.getModifier().getDisplayName(entry.getLevel());
-      Font fontRenderer = getFontRenderer(Minecraft.getInstance(), entry);
-      int x = (width - fontRenderer.width(name)) / 2;
+      Font fontRenderer = this.getFontRenderer(Minecraft.getInstance(), entry);
+      int x = (this.width - fontRenderer.width(name)) / 2;
       graphics.drawString(fontRenderer, name, x, 1, -1);
     }
   }

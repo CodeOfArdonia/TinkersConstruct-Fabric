@@ -17,13 +17,14 @@ import java.util.Map;
 @Getter
 @AllArgsConstructor
 public class UpdateMaterialsPacket implements IThreadsafePacket {
-  private final Map<MaterialId,IMaterial> materials;
-  private final Map<MaterialId,MaterialId> redirects;
+
+  private final Map<MaterialId, IMaterial> materials;
+  private final Map<MaterialId, MaterialId> redirects;
   private final Map<ResourceLocation, Collection<IMaterial>> tags;
 
   public UpdateMaterialsPacket(FriendlyByteBuf buffer) {
     int materialCount = buffer.readInt();
-    ImmutableMap.Builder<MaterialId,IMaterial> materials = ImmutableMap.builder();
+    ImmutableMap.Builder<MaterialId, IMaterial> materials = ImmutableMap.builder();
 
     for (int i = 0; i < materialCount; i++) {
       MaterialId id = new MaterialId(buffer.readResourceLocation());

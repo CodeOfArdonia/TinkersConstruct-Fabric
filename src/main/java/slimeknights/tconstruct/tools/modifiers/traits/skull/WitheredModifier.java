@@ -12,6 +12,7 @@ import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 import slimeknights.tconstruct.tools.TinkerModifiers;
 
 public class WitheredModifier extends TotalArmorLevelModifier {
+
   public WitheredModifier() {
     super(StrongBonesModifier.CALCIFIABLE, true);
   }

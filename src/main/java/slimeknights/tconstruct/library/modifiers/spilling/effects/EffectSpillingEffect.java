@@ -25,20 +25,22 @@ import java.util.Objects;
 
 /**
  * Spilling effect to apply a potion effect
- * @param effect  Effect to apply
- * @param time    Potion time in seconds
- * @param level   Potion level starting at 1
+ *
+ * @param effect Effect to apply
+ * @param time   Potion time in seconds
+ * @param level  Potion level starting at 1
  */
 public record EffectSpillingEffect(MobEffect effect, int time, int level) implements ISpillingEffect {
+
   public static final ResourceLocation ID = TConstruct.getResource("effect");
 
   @Override
   public void applyEffects(FluidStack fluid, float scale, ToolAttackContext context) {
     LivingEntity target = context.getLivingTarget();
     if (target != null) {
-      int time = (int)(this.time * 20 * scale);
+      int time = (int) (this.time * 20 * scale);
       if (time > 0) {
-        MobEffectInstance instance = new MobEffectInstance(effect, time, level - 1);
+        MobEffectInstance instance = new MobEffectInstance(this.effect, time, this.level - 1);
         List<ItemStack> curative = new ArrayList<>();
         curative.add(new ItemStack(Items.MILK_BUCKET));
         instance.setCurativeItems(curative);
@@ -50,9 +52,9 @@ public record EffectSpillingEffect(MobEffect effect, int time, int level) implem
   @Override
   public JsonObject serialize(JsonSerializationContext context) {
     JsonObject json = JsonUtils.withType(ID);
-    json.addProperty("name", Objects.requireNonNull(BuiltInRegistries.MOB_EFFECT.getKey(effect)).toString());
-    json.addProperty("time", time);
-    json.addProperty("level", level);
+    json.addProperty("name", Objects.requireNonNull(BuiltInRegistries.MOB_EFFECT.getKey(this.effect)).toString());
+    json.addProperty("time", this.time);
+    json.addProperty("level", this.level);
     return json;
   }
 

@@ -27,7 +27,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-/** Handler for working with entity types as ingredients */
+/**
+ * Handler for working with entity types as ingredients
+ */
 public class EntityEntryDefinition implements EntryDefinition<EntityType> {
 
   @Override
@@ -103,7 +105,9 @@ public class EntityEntryDefinition implements EntryDefinition<EntityType> {
     return Stream.empty();
   }
 
-  /** Applies the item focuses to the list of entities */
+  /**
+   * Applies the item focuses to the list of entities
+   */
   public static List<EntityType> applyFocus(List<EntityType> displayInputs) {
     List<EntryStack<?>> notice = new ArrayList<>();
     ViewSearchBuilder context = Views.getInstance().getContext();

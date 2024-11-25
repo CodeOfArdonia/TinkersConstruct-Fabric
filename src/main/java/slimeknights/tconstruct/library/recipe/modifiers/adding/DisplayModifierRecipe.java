@@ -11,15 +11,20 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 
-/** Recipe instance to return in JEI from recipes that contain multiple display recipes */
+/**
+ * Recipe instance to return in JEI from recipes that contain multiple display recipes
+ */
 @RequiredArgsConstructor
 public class DisplayModifierRecipe implements IDisplayModifierRecipe {
+
   private final List<SizedIngredient> inputs;
   @Getter
   private final List<ItemStack> toolWithoutModifier;
   @Getter
   private final List<ItemStack> toolWithModifier;
-  /** Error message to display if the requirements do not match */
+  /**
+   * Error message to display if the requirements do not match
+   */
   @Getter
   protected final String requirementsError;
   @Getter
@@ -32,19 +37,19 @@ public class DisplayModifierRecipe implements IDisplayModifierRecipe {
 
   @Override
   public int getInputCount() {
-    return inputs.size();
+    return this.inputs.size();
   }
 
   @Override
   public List<ItemStack> getDisplayItems(int slot) {
-    if (slot >= 0 && slot < inputs.size()) {
-      return inputs.get(slot).getMatchingStacks();
+    if (slot >= 0 && slot < this.inputs.size()) {
+      return this.inputs.get(slot).getMatchingStacks();
     }
     return Collections.emptyList();
   }
 
   @Override
   public boolean hasRequirements() {
-    return !requirementsError.isEmpty();
+    return !this.requirementsError.isEmpty();
   }
 }

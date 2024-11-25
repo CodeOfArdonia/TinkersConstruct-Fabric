@@ -36,10 +36,14 @@ import java.util.stream.Stream;
  * Modifier recipe that changes max level and slot behavior each level. Used for a single input recipe that has multiple slot requirements
  */
 public class MultilevelModifierRecipe extends ModifierRecipe implements IMultiRecipe<IDisplayModifierRecipe> {
-  /** Error for when the tool is below the min level */
+
+  /**
+   * Error for when the tool is below the min level
+   */
   protected static final String KEY_MIN_LEVEL = TConstruct.makeTranslationKey("recipe", "modifier.min_level");
 
   private final List<LevelEntry> levels;
+
   protected MultilevelModifierRecipe(ResourceLocation id, List<SizedIngredient> inputs, Ingredient toolRequirement, int maxToolSize, ModifierMatch requirements, String requirementsError, ModifierId result, boolean allowCrystal, List<LevelEntry> levels) {
     super(id, inputs, toolRequirement, maxToolSize, requirements, requirementsError, new ModifierEntry(result, 1), levels.get(0).maxLevel() + 1, levels.get(0).slots(), allowCrystal);
     this.levels = levels;
@@ -51,15 +55,15 @@ public class MultilevelModifierRecipe extends ModifierRecipe implements IMultiRe
     ToolStack tool = ToolStack.from(tinkerable);
 
     // check requirements first, easy check
-    ValidatedResult requirements = validateRequirements(tool);
+    ValidatedResult requirements = this.validateRequirements(tool);
     if (requirements.hasError()) {
       return requirements;
     }
 
     // next few checks depend on the current level to decide
-    int newLevel = tool.getModifierLevel(result.getModifier()) + 1;
+    int newLevel = tool.getModifierLevel(this.result.getModifier()) + 1;
     LevelEntry levelEntry = null;
-    for (LevelEntry check : levels) {
+    for (LevelEntry check : this.levels) {
       if (check.matches(newLevel)) {
         levelEntry = check;
         break;
@@ -68,10 +72,10 @@ public class MultilevelModifierRecipe extends ModifierRecipe implements IMultiRe
     // no entry means our level is above the max, so done now
     if (levelEntry == null) {
       // if the level is below the minimum, then display a different error
-      if (newLevel < levels.get(0).minLevel()) {
-        return ValidatedResult.failure(KEY_MIN_LEVEL, result.getModifier().getDisplayName(), levels.get(0).minLevel() - 1);
+      if (newLevel < this.levels.get(0).minLevel()) {
+        return ValidatedResult.failure(KEY_MIN_LEVEL, this.result.getModifier().getDisplayName(), this.levels.get(0).minLevel() - 1);
       }
-      return ValidatedResult.failure(KEY_MAX_LEVEL, result.getModifier().getDisplayName(), levels.get(levels.size() - 1).maxLevel());
+      return ValidatedResult.failure(KEY_MAX_LEVEL, this.result.getModifier().getDisplayName(), this.levels.get(this.levels.size() - 1).maxLevel());
     }
 
     // found our level entry, time to validate slots
@@ -89,7 +93,7 @@ public class MultilevelModifierRecipe extends ModifierRecipe implements IMultiRe
     }
 
     // add modifier
-    tool.addModifier(result.getId(), result.getLevel());
+    tool.addModifier(this.result.getId(), this.result.getLevel());
 
     // ensure no modifier problems
     ValidatedResult toolValidation = tool.validate();
@@ -97,7 +101,7 @@ public class MultilevelModifierRecipe extends ModifierRecipe implements IMultiRe
       return toolValidation;
     }
 
-    return ValidatedResult.success(tool.createStack(Math.min(tinkerable.getCount(), shrinkToolSlotBy())));
+    return ValidatedResult.success(tool.createStack(Math.min(tinkerable.getCount(), this.shrinkToolSlotBy())));
   }
 
 
@@ -114,32 +118,39 @@ public class MultilevelModifierRecipe extends ModifierRecipe implements IMultiRe
   @Override
   public List<IDisplayModifierRecipe> getRecipes() {
     // no inputs means this recipe is to handle internal crystal stuff
-    if (inputs.isEmpty()) {
+    if (this.inputs.isEmpty()) {
       return Collections.emptyList();
     }
-    if (displayRecipes == null) {
+    if (this.displayRecipes == null) {
       // this instance is a proper display recipe for the first level entry, for the rest build display instances with unique requirements keys
-      List<ItemStack> toolWithoutModifier = getToolWithoutModifier();
-      List<ItemStack> toolWithModifier = getToolWithModifier();
-      String requirementsError = getRequirementsError();
-      displayRecipes = Streams.concat(
+      List<ItemStack> toolWithoutModifier = this.getToolWithoutModifier();
+      List<ItemStack> toolWithModifier = this.getToolWithModifier();
+      String requirementsError = this.getRequirementsError();
+      this.displayRecipes = Streams.concat(
         Stream.of(this),
-        levels.stream().skip(1).map(levelEntry ->
-          new DisplayModifierRecipe(inputs, toolWithoutModifier, toolWithModifier, requirementsError + ".level_" + levelEntry.minLevel, result, levelEntry.maxLevel, levelEntry.slots))
+        this.levels.stream().skip(1).map(levelEntry ->
+          new DisplayModifierRecipe(this.inputs, toolWithoutModifier, toolWithModifier, requirementsError + ".level_" + levelEntry.minLevel, this.result, levelEntry.maxLevel, levelEntry.slots))
       ).toList();
     }
 
-    return displayRecipes;
+    return this.displayRecipes;
   }
 
-  /** Entry in the levels list */
+  /**
+   * Entry in the levels list
+   */
   record LevelEntry(@Nullable SlotCount slots, int minLevel, int maxLevel) {
-    /** Checks if this entry matches the given level */
+
+    /**
+     * Checks if this entry matches the given level
+     */
     public boolean matches(int level) {
-      return minLevel <= level && level <= maxLevel;
+      return this.minLevel <= level && level <= this.maxLevel;
     }
 
-    /** Parses the object from JSON */
+    /**
+     * Parses the object from JSON
+     */
     public static LevelEntry parse(JsonObject json) {
       int min, max;
       if (json.has("level")) {
@@ -158,26 +169,30 @@ public class MultilevelModifierRecipe extends ModifierRecipe implements IMultiRe
       return new LevelEntry(slots, min, max);
     }
 
-    /** Serializes this object to JSON */
+    /**
+     * Serializes this object to JSON
+     */
     public JsonObject serialize() {
       JsonObject json = new JsonObject();
-      if (slots != null) {
+      if (this.slots != null) {
         JsonObject slotJson = new JsonObject();
-        slotJson.addProperty(slots.getType().getName(), slots.getCount());
+        slotJson.addProperty(this.slots.getType().getName(), this.slots.getCount());
         json.add("slots", slotJson);
       }
-      if (minLevel == maxLevel) {
-        json.addProperty("level", minLevel);
+      if (this.minLevel == this.maxLevel) {
+        json.addProperty("level", this.minLevel);
       } else {
-        json.addProperty("min_level", minLevel);
-        if (maxLevel < Short.MAX_VALUE) {
-          json.addProperty("max_level", maxLevel);
+        json.addProperty("min_level", this.minLevel);
+        if (this.maxLevel < Short.MAX_VALUE) {
+          json.addProperty("max_level", this.maxLevel);
         }
       }
       return json;
     }
 
-    /** Parses the object from the buffer */
+    /**
+     * Parses the object from the buffer
+     */
     public static LevelEntry read(FriendlyByteBuf buffer) {
       SlotCount slots = SlotCount.read(buffer);
       int min = buffer.readVarInt();
@@ -185,15 +200,18 @@ public class MultilevelModifierRecipe extends ModifierRecipe implements IMultiRe
       return new LevelEntry(slots, min, max);
     }
 
-    /** Writes the object to the buffer */
+    /**
+     * Writes the object to the buffer
+     */
     public void write(FriendlyByteBuf buffer) {
-      SlotCount.write(slots, buffer);
-      buffer.writeVarInt(minLevel);
-      buffer.writeVarInt(maxLevel);
+      SlotCount.write(this.slots, buffer);
+      buffer.writeVarInt(this.minLevel);
+      buffer.writeVarInt(this.maxLevel);
     }
   }
 
   public static class Serializer extends LoggingRecipeSerializer<MultilevelModifierRecipe> {
+
     @Override
     public MultilevelModifierRecipe fromJson(ResourceLocation id, JsonObject json) {
       Ingredient toolRequirement = Ingredient.fromJson(json.get("tools"));

@@ -14,6 +14,7 @@ import java.util.Locale;
 public class ClearStainedGlassBlock extends AbstractGlassBlock implements BeaconColorMultiplierBlock {
 
   private final GlassColor glassColor;
+
   public ClearStainedGlassBlock(Properties properties, GlassColor glassColor) {
     super(properties);
     this.glassColor = glassColor;
@@ -25,7 +26,9 @@ public class ClearStainedGlassBlock extends AbstractGlassBlock implements Beacon
     return this.glassColor.getRgb();
   }
 
-  /** Enum used for registration of this and the pane block */
+  /**
+   * Enum used for registration of this and the pane block
+   */
   public enum GlassColor implements StringRepresentable {
     WHITE(0xffffff, DyeColor.WHITE),
     ORANGE(0xd87f33, DyeColor.ORANGE),
@@ -58,8 +61,9 @@ public class ClearStainedGlassBlock extends AbstractGlassBlock implements Beacon
 
     /**
      * Converts the color into an RGB float array
-     * @param color  Color input
-     * @return  Float array
+     *
+     * @param color Color input
+     * @return Float array
      */
     private static float[] calcRGB(int color) {
       float[] out = new float[3];
@@ -71,20 +75,24 @@ public class ClearStainedGlassBlock extends AbstractGlassBlock implements Beacon
 
     /**
      * Variant color to reduce number of models
-     * @return  Variant color for BlockColors and ItemColors
+     *
+     * @return Variant color for BlockColors and ItemColors
      */
     public int getColor() {
       return this.color;
     }
 
-    /** Gets the vanilla dye color associated with this color */
+    /**
+     * Gets the vanilla dye color associated with this color
+     */
     public DyeColor getDye() {
-      return dye;
+      return this.dye;
     }
 
     /**
      * Gets the RGB value for this color as an array
-     * @return  Color RGB for beacon
+     *
+     * @return Color RGB for beacon
      */
     public float[] getRgb() {
       return this.rgb;
@@ -92,12 +100,12 @@ public class ClearStainedGlassBlock extends AbstractGlassBlock implements Beacon
 
     @Override
     public String getSerializedName() {
-      return name;
+      return this.name;
     }
 
     @Override
     public String toString() {
-      return name;
+      return this.name;
     }
   }
 }

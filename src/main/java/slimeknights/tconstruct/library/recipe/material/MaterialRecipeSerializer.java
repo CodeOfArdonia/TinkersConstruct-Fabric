@@ -17,6 +17,7 @@ import javax.annotation.Nullable;
  * Serializer for {@link MaterialRecipe}
  */
 public class MaterialRecipeSerializer extends LoggingRecipeSerializer<MaterialRecipe> {
+
   private static final ItemOutput EMPTY = ItemOutput.fromStack(ItemStack.EMPTY);
 
   @Override

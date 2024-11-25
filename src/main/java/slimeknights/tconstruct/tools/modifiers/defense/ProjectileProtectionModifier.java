@@ -17,8 +17,12 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class ProjectileProtectionModifier extends AbstractProtectionModifier<ModifierMaxLevel> {
-  /** Entity data key for the data associated with this modifier */
+
+  /**
+   * Entity data key for the data associated with this modifier
+   */
   public static final TinkerDataKey<ModifierMaxLevel> PROJECTILE_DATA = TConstruct.createKey("projectile_protection");
+
   public ProjectileProtectionModifier() {
     super(PROJECTILE_DATA);
   }
@@ -31,7 +35,7 @@ public class ProjectileProtectionModifier extends AbstractProtectionModifier<Mod
   @Override
   public float getProtectionModifier(IToolStackView tool, int level, EquipmentContext context, EquipmentSlot slotType, DamageSource source, float modifierValue) {
     if (!source.is(DamageTypeTags.BYPASSES_EFFECTS) && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY) && source.is(DamageTypeTags.IS_PROJECTILE)) {
-      modifierValue += getScaledLevel(tool, level) * 2.5f;
+      modifierValue += this.getScaledLevel(tool, level) * 2.5f;
     }
     return modifierValue;
   }

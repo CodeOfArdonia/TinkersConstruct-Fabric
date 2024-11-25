@@ -37,15 +37,22 @@ import java.util.Map;
 import java.util.function.Function;
 
 public final class MaterialRegistry {
-  /** Internal material stats ID for the sake of adding traits exclusive to melee or harvest materials */
+
+  /**
+   * Internal material stats ID for the sake of adding traits exclusive to melee or harvest materials
+   */
   public static final MaterialStatsId MELEE_HARVEST = new MaterialStatsId(TConstruct.getResource("melee_harvest"));
-  /** Internal material stats ID for the sake of adding traits exclusive to ranged materials */
+  /**
+   * Internal material stats ID for the sake of adding traits exclusive to ranged materials
+   */
   public static final MaterialStatsId RANGED = new MaterialStatsId(TConstruct.getResource("ranged"));
 
   static MaterialRegistry INSTANCE;
 
-  /** Map of each stat type to its first material */
-  private static final Map<MaterialStatsId,IMaterial> FIRST_MATERIALS = new HashMap<>();
+  /**
+   * Map of each stat type to its first material
+   */
+  private static final Map<MaterialStatsId, IMaterial> FIRST_MATERIALS = new HashMap<>();
 
   private final MaterialManager materialManager;
   private final MaterialStatsManager materialStatsManager;
@@ -56,7 +63,9 @@ public final class MaterialRegistry {
   private static boolean materialsLoaded = false;
   private static boolean statsLoaded = false;
   private static boolean traitsLoaded = false;
-  /** True if the material registry is fully loaded on the client */
+  /**
+   * True if the material registry is fully loaded on the client
+   */
   @VisibleForTesting
   static boolean fullyLoaded = false;
 
@@ -78,35 +87,36 @@ public final class MaterialRegistry {
 
   /**
    * Returns true if the material registry is initialized
-   * @return  True when initialized
+   *
+   * @return True when initialized
    */
   public static boolean isFullyLoaded() {
     return INSTANCE != null && fullyLoaded;
   }
 
   public MaterialRegistry() {
-    materialManager = new MaterialManager(() -> {
+    this.materialManager = new MaterialManager(() -> {
       materialsLoaded = true;
       checkAllLoaded();
     });
-    materialStatsManager = new MaterialStatsManager(() -> {
+    this.materialStatsManager = new MaterialStatsManager(() -> {
       statsLoaded = true;
       checkAllLoaded();
     });
-    materialTraitsManager = new MaterialTraitsManager(() -> {
+    this.materialTraitsManager = new MaterialTraitsManager(() -> {
       traitsLoaded = true;
       checkAllLoaded();
     });
-    registry = new MaterialRegistryImpl(materialManager, materialStatsManager, materialTraitsManager);
+    this.registry = new MaterialRegistryImpl(this.materialManager, this.materialStatsManager, this.materialTraitsManager);
 
-    registry.registerStatType(HeadMaterialStats.DEFAULT, HeadMaterialStats.class, HeadMaterialStats::new, MELEE_HARVEST);
-    registry.registerStatType(HandleMaterialStats.DEFAULT, HandleMaterialStats.class, HandleMaterialStats::new, MELEE_HARVEST);
-    registry.registerStatType(ExtraMaterialStats.DEFAULT, ExtraMaterialStats.class, buffer -> ExtraMaterialStats.DEFAULT, MELEE_HARVEST);
-    registry.registerStatType(LimbMaterialStats.DEFAULT, LimbMaterialStats.class, LimbMaterialStats::new, RANGED);
-    registry.registerStatType(GripMaterialStats.DEFAULT, GripMaterialStats.class, GripMaterialStats::new, RANGED);
-    registry.registerStatType(BowstringMaterialStats.DEFAULT, BowstringMaterialStats.class, buffer -> BowstringMaterialStats.DEFAULT, RANGED);
-    registry.registerStatType(RepairKitStats.DEFAULT, RepairKitStats.class, RepairKitStats::new);
-    registry.registerStatType(SkullStats.DEFAULT, SkullStats.class, SkullStats::new);
+    this.registry.registerStatType(HeadMaterialStats.DEFAULT, HeadMaterialStats.class, HeadMaterialStats::new, MELEE_HARVEST);
+    this.registry.registerStatType(HandleMaterialStats.DEFAULT, HandleMaterialStats.class, HandleMaterialStats::new, MELEE_HARVEST);
+    this.registry.registerStatType(ExtraMaterialStats.DEFAULT, ExtraMaterialStats.class, buffer -> ExtraMaterialStats.DEFAULT, MELEE_HARVEST);
+    this.registry.registerStatType(LimbMaterialStats.DEFAULT, LimbMaterialStats.class, LimbMaterialStats::new, RANGED);
+    this.registry.registerStatType(GripMaterialStats.DEFAULT, GripMaterialStats.class, GripMaterialStats::new, RANGED);
+    this.registry.registerStatType(BowstringMaterialStats.DEFAULT, BowstringMaterialStats.class, buffer -> BowstringMaterialStats.DEFAULT, RANGED);
+    this.registry.registerStatType(RepairKitStats.DEFAULT, RepairKitStats.class, RepairKitStats::new);
+    this.registry.registerStatType(SkullStats.DEFAULT, SkullStats.class, SkullStats::new);
   }
 
   @VisibleForTesting
@@ -122,7 +132,8 @@ public final class MaterialRegistry {
 
   /**
    * Updates the material list from the server list. Should only be called client side
-   * @param packet  Materials packet
+   *
+   * @param packet Materials packet
    */
   public static void updateMaterialsFromServer(UpdateMaterialsPacket packet) {
     INSTANCE.materialManager.updateMaterialsFromServer(packet.getMaterials(), packet.getRedirects(), packet.getTags());
@@ -130,7 +141,8 @@ public final class MaterialRegistry {
 
   /**
    * Updates material stats from the server list. Should only be called client side
-   * @param packet  Materials stats packet
+   *
+   * @param packet Materials stats packet
    */
   public static void updateMaterialStatsFromServer(UpdateMaterialStatsPacket packet) {
     INSTANCE.materialStatsManager.updateMaterialStatsFromServer(packet.getMaterialToStats());
@@ -138,7 +150,8 @@ public final class MaterialRegistry {
 
   /**
    * Updates material traits from the server list. Should only be called client side
-   * @param packet  Materials traits packet
+   *
+   * @param packet Materials traits packet
    */
   public static void updateMaterialTraitsFromServer(UpdateMaterialTraitsPacket packet) {
     INSTANCE.materialTraitsManager.updateFromServer(packet.getMaterialToTraits());
@@ -149,8 +162,9 @@ public final class MaterialRegistry {
 
   /**
    * Gets a material by ID
-   * @param id  Material ID
-   * @return  Material, or IMaterial.UNKNOWN if missing
+   *
+   * @param id Material ID
+   * @return Material, or IMaterial.UNKNOWN if missing
    */
   public static IMaterial getMaterial(MaterialId id) {
     return getInstance().getMaterial(id);
@@ -158,7 +172,8 @@ public final class MaterialRegistry {
 
   /**
    * Gets all currently registered materials
-   * @return  Collection of all materials
+   *
+   * @return Collection of all materials
    */
   public static Collection<IMaterial> getMaterials() {
     return INSTANCE.registry.getVisibleMaterials();
@@ -169,8 +184,9 @@ public final class MaterialRegistry {
 
   /**
    * Gets the class for a material stat ID
-   * @param id  Material stat type
-   * @return  Material stat class
+   *
+   * @param id Material stat type
+   * @return Material stat class
    */
   @Nullable
   public static Class<? extends IMaterialStats> getClassForStat(MaterialStatsId id) {
@@ -179,16 +195,19 @@ public final class MaterialRegistry {
 
   /**
    * Gets the class for a material stat ID
-   * @param id  Material stat type
-   * @return  Material stat class
+   *
+   * @param id Material stat type
+   * @return Material stat class
    */
   @Nullable
-  public static Function<FriendlyByteBuf,? extends IMaterialStats> getStatDecoder(MaterialStatsId id) {
+  public static Function<FriendlyByteBuf, ? extends IMaterialStats> getStatDecoder(MaterialStatsId id) {
     return INSTANCE.materialStatsManager.getStatDecoder(id);
   }
 
-  /** Loads the first material of a stat type */
-  private static final Function<MaterialStatsId,IMaterial> FIRST_LOADER = statsId -> {
+  /**
+   * Loads the first material of a stat type
+   */
+  private static final Function<MaterialStatsId, IMaterial> FIRST_LOADER = statsId -> {
     IMaterialRegistry instance = getInstance();
     for (IMaterial material : instance.getVisibleMaterials()) {
       if (instance.getMaterialStats(material.getIdentifier(), statsId).isPresent()) {
@@ -198,7 +217,9 @@ public final class MaterialRegistry {
     return IMaterial.UNKNOWN;
   };
 
-  /** Gets the first material with the given stat type */
+  /**
+   * Gets the first material with the given stat type
+   */
   public static IMaterial firstWithStatType(MaterialStatsId id) {
     return FIRST_MATERIALS.computeIfAbsent(id, FIRST_LOADER);
   }
@@ -207,7 +228,9 @@ public final class MaterialRegistry {
 
   /* Loading */
 
-  /** Checks if all three material types have loaded, running callbacks if they have */
+  /**
+   * Checks if all three material types have loaded, running callbacks if they have
+   */
   private static void checkAllLoaded() {
     if (materialsLoaded && statsLoaded && traitsLoaded) {
       materialsLoaded = false;
@@ -223,14 +246,18 @@ public final class MaterialRegistry {
 
   /* Reloading */
 
-  /** Adds the managers as datapack listeners */
+  /**
+   * Adds the managers as datapack listeners
+   */
   private void addDataPackListeners() {
-    ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(materialManager);
-    ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(materialStatsManager);
-    ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(materialTraitsManager);
+    ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(this.materialManager);
+    ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(this.materialStatsManager);
+    ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(this.materialTraitsManager);
   }
 
-  /** Sends all relevant packets to the given player */
+  /**
+   * Sends all relevant packets to the given player
+   */
   private void sendPackets(ServerPlayer player, ISimplePacket[] packets) {
     // on an integrated server, the material registries have a single instance on both the client and the server thread
     // this means syncing is unneeded, and has the side-effect of recreating all the material instances (which can lead to unexpected behavior)
@@ -251,21 +278,23 @@ public final class MaterialRegistry {
     }
   }
 
-  /** Called when the player logs in to send packets */
+  /**
+   * Called when the player logs in to send packets
+   */
   private void onDatapackSync(PlayerList playerList, @Nullable ServerPlayer targetedPlayer) {
     ISimplePacket[] packets = {
-      materialManager.getUpdatePacket(),
-      materialStatsManager.getUpdatePacket(),
-      materialTraitsManager.getUpdatePacket()
+      this.materialManager.getUpdatePacket(),
+      this.materialStatsManager.getUpdatePacket(),
+      this.materialTraitsManager.getUpdatePacket()
     };
 
     // send to single player
     if (targetedPlayer != null) {
-      sendPackets(targetedPlayer, packets);
+      this.sendPackets(targetedPlayer, packets);
     } else {
       // send to all players
       for (ServerPlayer player : playerList.getPlayers()) {
-        sendPackets(player, packets);
+        this.sendPackets(player, packets);
       }
     }
   }

@@ -11,53 +11,75 @@ import slimeknights.tconstruct.library.tools.part.IMaterialItem;
 
 import javax.annotation.Nullable;
 
-/** Represents a material that possibly has a variant. Variants are simply a different texture with the same material properties */
+/**
+ * Represents a material that possibly has a variant. Variants are simply a different texture with the same material properties
+ */
 public sealed interface MaterialVariantId permits MaterialId, MaterialVariantIdImpl {
-  /** Gets the material ID */
+
+  /**
+   * Gets the material ID
+   */
   MaterialId getId();
 
-  /** Gets the variant */
+  /**
+   * Gets the variant
+   */
   String getVariant();
 
-  /** Returns true if this ID has a variant */
+  /**
+   * Returns true if this ID has a variant
+   */
   boolean hasVariant();
 
   /**
    * Gets the path for this material
-   * @param separator  Variant separator
-   * @return  Resource location path
+   *
+   * @param separator Variant separator
+   * @return Resource location path
    */
   ResourceLocation getLocation(char separator);
 
 
   /* Match methods */
 
-  /** Checks if two material variants match. If this has no variant, matches any variant of the same material */
+  /**
+   * Checks if two material variants match. If this has no variant, matches any variant of the same material
+   */
   boolean matchesVariant(MaterialVariantId other);
 
-  /** Checks if two material variants match. If this has no variant, matches any variant of the same material */
+  /**
+   * Checks if two material variants match. If this has no variant, matches any variant of the same material
+   */
   default boolean matchesVariant(MaterialVariant other) {
-    return matchesVariant(other.getVariant());
+    return this.matchesVariant(other.getVariant());
   }
 
-  /** Checks if two material variants match. If this has no variant, matches any variant of the same material */
+  /**
+   * Checks if two material variants match. If this has no variant, matches any variant of the same material
+   */
   default boolean matchesVariant(ItemStack stack) {
-    return matchesVariant(IMaterialItem.getMaterialFromStack(stack));
+    return this.matchesVariant(IMaterialItem.getMaterialFromStack(stack));
   }
 
-  /** Checks if two material variants match */
+  /**
+   * Checks if two material variants match
+   */
   default boolean sameVariant(MaterialVariantId other) {
     return this.getId().equals(other.getId()) && this.getVariant().equals(other.getVariant());
   }
 
   /* Constructors */
 
-  /** Creates a material variant instance */
+  /**
+   * Creates a material variant instance
+   */
   static MaterialVariantId create(String domain, String path, String variant) {
     return create(new MaterialId(domain, path), variant);
   }
 
-  /** Creates a material variant instance */
+  /**
+   * Creates a material variant instance
+   */
   static MaterialVariantId create(MaterialId id, String variant) {
     if (variant.isEmpty()) {
       return id;
@@ -70,6 +92,7 @@ public sealed interface MaterialVariantId permits MaterialId, MaterialVariantIdI
 
   /**
    * Attempts to parse the variant ID from the given string
+   *
    * @return Variant ID, or null if invalid
    */
   @Nullable
@@ -92,8 +115,9 @@ public sealed interface MaterialVariantId permits MaterialId, MaterialVariantIdI
 
   /**
    * Parses a material variant ID, throwing if invalid
-   * @param text  Text to parse
-   * @return  Variant ID
+   *
+   * @param text Text to parse
+   * @return Variant ID
    */
   static MaterialVariantId parse(String text) {
     MaterialVariantId location = tryParse(text);
@@ -103,7 +127,9 @@ public sealed interface MaterialVariantId permits MaterialId, MaterialVariantIdI
     return location;
   }
 
-  /** Shared logic for {@link #fromJson(JsonObject, String)} and {@link #convertJson(JsonElement, String)} */
+  /**
+   * Shared logic for {@link #fromJson(JsonObject, String)} and {@link #convertJson(JsonElement, String)}
+   */
   private static MaterialVariantId parse(String text, String key) {
     MaterialVariantId location = tryParse(text);
     if (location == null) {
@@ -114,9 +140,10 @@ public sealed interface MaterialVariantId permits MaterialId, MaterialVariantIdI
 
   /**
    * Gets a resource location from JSON, throwing a nice exception if invalid
-   * @param json  JSON object
-   * @param key   Key to fetch
-   * @return  Resource location parsed
+   *
+   * @param json JSON object
+   * @param key  Key to fetch
+   * @return Resource location parsed
    */
   static MaterialVariantId fromJson(JsonObject json, String key) {
     String text = GsonHelper.getAsString(json, key);
@@ -125,9 +152,10 @@ public sealed interface MaterialVariantId permits MaterialId, MaterialVariantIdI
 
   /**
    * Gets a resource location from JSON, throwing a nice exception if invalid
-   * @param json  JSON object
-   * @param key   Key to fetch
-   * @return  Resource location parsed
+   *
+   * @param json JSON object
+   * @param key  Key to fetch
+   * @return Resource location parsed
    */
   static MaterialVariantId convertJson(JsonElement json, String key) {
     String text = GsonHelper.convertToString(json, key);

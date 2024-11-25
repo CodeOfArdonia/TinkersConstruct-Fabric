@@ -39,7 +39,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-/** Modifier event hooks that run client side */
+/**
+ * Modifier event hooks that run client side
+ */
 public class ModifierClientEvents {
 
   public static void init() {
@@ -62,7 +64,9 @@ public class ModifierClientEvents {
     }
   }
 
-  /** Determines whether to render the given hand based on modifiers */
+  /**
+   * Determines whether to render the given hand based on modifiers
+   */
   static void renderHand(RenderHandCallback.RenderHandEvent event) {
     InteractionHand hand = event.getHand();
     Player player = Minecraft.getInstance().player;
@@ -103,7 +107,9 @@ public class ModifierClientEvents {
     }
   }
 
-  /** Handles the zoom modifier zooming */
+  /**
+   * Handles the zoom modifier zooming
+   */
   static float handleZoom(AbstractClientPlayer player, float fov) {
     AtomicReference<Float> newFovRef = new AtomicReference<>(fov);
     TinkerDataCapability.CAPABILITY.maybeGet(player).ifPresent(data -> {
@@ -139,16 +145,22 @@ public class ModifierClientEvents {
 
   /* Renders the next shield strap item above the offhand item */
 
-  /** Cache of the current item to render */
+  /**
+   * Cache of the current item to render
+   */
   private static final int SLOT_BACKGROUND_SIZE = 22;
 
   @Nonnull
   private static ItemStack nextOffhand = ItemStack.EMPTY;
 
-  /** Items to render for the item frame modifier */
+  /**
+   * Items to render for the item frame modifier
+   */
   private static final List<ItemStack> itemFrames = new ArrayList<>();
 
-  /** Update the slot in the first shield slot */
+  /**
+   * Update the slot in the first shield slot
+   */
   static void equipmentChange(ToolEquipmentChangeEvent event) {
     EquipmentChangeContext context = event.getContext();
     if (Config.CLIENT.renderShieldSlotItem.get()) {

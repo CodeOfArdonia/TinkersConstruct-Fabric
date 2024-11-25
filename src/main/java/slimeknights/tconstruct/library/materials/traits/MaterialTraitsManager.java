@@ -44,6 +44,7 @@ import java.util.stream.Collectors;
  */
 @Log4j2
 public class MaterialTraitsManager extends MergingJsonDataLoader<MaterialTraits.Builder> implements IdentifiableResourceReloadListener {
+
   public static final String FOLDER = "tinkering/materials/traits";
   private static final Gson GSON = (new GsonBuilder())
     .registerTypeAdapter(ResourceLocation.class, new ResourceLocation.Serializer())
@@ -52,13 +53,19 @@ public class MaterialTraitsManager extends MergingJsonDataLoader<MaterialTraits.
     .disableHtmlEscaping()
     .create();
 
-  /** Runnable to run after loading traits */
+  /**
+   * Runnable to run after loading traits
+   */
   private final Runnable onLoaded;
 
-  /** Map of fallback stat ID to use if the stat ID lacks traits */
+  /**
+   * Map of fallback stat ID to use if the stat ID lacks traits
+   */
   private final Map<MaterialStatsId, MaterialStatsId> statTypeFallbacks = new HashMap<>();
 
-  /** Map of material ID to all relevant trait data */
+  /**
+   * Map of material ID to all relevant trait data
+   */
   @VisibleForTesting
   protected Map<MaterialId, MaterialTraits> materialTraits = Collections.emptyMap();
 
@@ -77,86 +84,91 @@ public class MaterialTraitsManager extends MergingJsonDataLoader<MaterialTraits.
    * Fallbacks are not recursive, they are intended to be categories.
    */
   public <T extends IMaterialStats> void registerStatTypeFallback(MaterialStatsId statType, MaterialStatsId fallback) {
-    if (statTypeFallbacks.containsKey(statType)) {
+    if (this.statTypeFallbacks.containsKey(statType)) {
       throw TinkerAPIMaterialException.materialStatsTypeRegisteredTwice(statType);
     }
-    statTypeFallbacks.put(statType, fallback);
+    this.statTypeFallbacks.put(statType, fallback);
   }
 
   /**
    * Gets the default traits for the given material
-   * @param materialId  Material
-   * @return  List of default traits
+   *
+   * @param materialId Material
+   * @return List of default traits
    */
   public List<ModifierEntry> getDefaultTraits(MaterialId materialId) {
-    MaterialTraits traits = materialTraits.get(materialId);
+    MaterialTraits traits = this.materialTraits.get(materialId);
     return traits == null ? Collections.emptyList() : traits.getDefaultTraits();
   }
 
   /**
    * Checks if the material has traits for the given stat type
-   * @param materialId  Material ID
-   * @param statId      Stats type
-   * @return  True if the given stat type has traits
+   *
+   * @param materialId Material ID
+   * @param statId     Stats type
+   * @return True if the given stat type has traits
    */
   public boolean hasUniqueTraits(MaterialId materialId, MaterialStatsId statId) {
-    MaterialTraits traits = materialTraits.get(materialId);
+    MaterialTraits traits = this.materialTraits.get(materialId);
     return traits != null && traits.hasUniqueTraits(statId);
   }
 
   /**
    * Gets the traits for the given stat type, or the default if the stat type does not have unique traits
-   * @param materialId  Material ID
-   * @param statId      Stats type
-   * @return  List of traits
+   *
+   * @param materialId Material ID
+   * @param statId     Stats type
+   * @return List of traits
    */
   public List<ModifierEntry> getTraits(MaterialId materialId, MaterialStatsId statId) {
-    MaterialTraits traits = materialTraits.get(materialId);
+    MaterialTraits traits = this.materialTraits.get(materialId);
     return traits == null ? Collections.emptyList() : traits.getTraits(statId);
   }
 
   /**
    * Gets the packet to send on player login
-   * @return  Packet object
+   *
+   * @return Packet object
    */
   public UpdateMaterialTraitsPacket getUpdatePacket() {
-    return new UpdateMaterialTraitsPacket(materialTraits);
+    return new UpdateMaterialTraitsPacket(this.materialTraits);
   }
 
   /**
    * Updates the traits from the server
-   * @param materialToTraits  Traits map
+   *
+   * @param materialToTraits Traits map
    */
-  public void updateFromServer(Map<MaterialId,MaterialTraits> materialToTraits) {
+  public void updateFromServer(Map<MaterialId, MaterialTraits> materialToTraits) {
     this.materialTraits = materialToTraits;
-    onLoaded.run();
+    this.onLoaded.run();
   }
 
   @Override
   protected void parse(MaterialTraits.Builder builder, ResourceLocation id, JsonElement element) throws JsonSyntaxException {
     MaterialTraitsJson json = GSON.fromJson(element, MaterialTraitsJson.class);
     builder.setDefaultTraits(json.getDefaultTraits());
-    for (Entry<MaterialStatsId,List<ModifierEntry>> entry : json.getPerStat().entrySet()) {
+    for (Entry<MaterialStatsId, List<ModifierEntry>> entry : json.getPerStat().entrySet()) {
       builder.setTraits(entry.getKey(), entry.getValue());
     }
     builder.setDefaultTraits(json.getDefaultTraits());
   }
 
   @Override
-  protected void finishLoad(Map<ResourceLocation,MaterialTraits.Builder> map, ResourceManager manager) {
-    ImmutableMap.Builder<MaterialId,MaterialTraits> builder = ImmutableMap.builder();
-    for (Entry<ResourceLocation,MaterialTraits.Builder> entry : map.entrySet()) {
-      MaterialTraits traits = entry.getValue().build(statTypeFallbacks);
+  protected void finishLoad(Map<ResourceLocation, MaterialTraits.Builder> map, ResourceManager manager) {
+    ImmutableMap.Builder<MaterialId, MaterialTraits> builder = ImmutableMap.builder();
+    for (Entry<ResourceLocation, MaterialTraits.Builder> entry : map.entrySet()) {
+      MaterialTraits traits = entry.getValue().build(this.statTypeFallbacks);
       builder.put(new MaterialId(entry.getKey()), traits);
       log.debug("Loaded traits for material '{}': \n\tDefault - {}{}",
-                entry.getKey(),
-                Arrays.toString(traits.getDefaultTraits().toArray()),
-                Util.toIndentedStringList(traits.getTraitsPerStats().entrySet().stream()
-                                                .map(entry2 -> String.format("%s - %s", entry2.getKey(), Arrays.toString(entry2.getValue().toArray())))
-                                                .collect(Collectors.toList())));
+        entry.getKey(),
+        Arrays.toString(traits.getDefaultTraits().toArray()),
+        Util.toIndentedStringList(traits.getTraitsPerStats().entrySet().stream()
+          .map(entry2 -> String.format("%s - %s", entry2.getKey(), Arrays.toString(entry2.getValue().toArray())))
+          .collect(Collectors.toList())));
     }
-    materialTraits = builder.build();
-    onLoaded.run();
+    this.materialTraits = builder.build();
+    this.onLoaded.run();
   }
 
   @Override
@@ -164,8 +176,8 @@ public class MaterialTraitsManager extends MergingJsonDataLoader<MaterialTraits.
     long time = System.nanoTime();
     super.onResourceManagerReload(manager);
     log.info("{} traits loaded for {} materials in {} ms",
-             materialTraits.values().stream().mapToInt(traits -> traits.getTraitsPerStats().size() + (traits.getDefaultTraits().isEmpty() ? 0 : 1)).sum(),
-             materialTraits.size(), (System.nanoTime() - time) / 1000000f);
+      this.materialTraits.values().stream().mapToInt(traits -> traits.getTraitsPerStats().size() + (traits.getDefaultTraits().isEmpty() ? 0 : 1)).sum(),
+      this.materialTraits.size(), (System.nanoTime() - time) / 1000000f);
   }
 
   @Override

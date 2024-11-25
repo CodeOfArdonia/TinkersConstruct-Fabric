@@ -85,7 +85,9 @@ public class CommonsClientEvents extends ClientEventBase {
 
   private static Font unicodeRenderer;
 
-  /** Gets the unicode font renderer */
+  /**
+   * Gets the unicode font renderer
+   */
   public static Font unicodeFontRender() {
     if (unicodeRenderer == null)
       unicodeRenderer = new Font(rl -> {

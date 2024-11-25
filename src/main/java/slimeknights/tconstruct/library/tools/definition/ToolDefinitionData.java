@@ -38,9 +38,12 @@ import static java.util.Objects.requireNonNullElse;
 @SuppressWarnings("ClassCanBeRecord")
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class ToolDefinitionData {
+
   @VisibleForTesting
   protected static final Stats EMPTY_STATS = new Stats(StatsNBT.EMPTY, MultiplierNBT.EMPTY);
-  /** Empty tool data definition instance */
+  /**
+   * Empty tool data definition instance
+   */
   public static final ToolDefinitionData EMPTY = new ToolDefinitionData(Collections.emptyList(), EMPTY_STATS, DefinitionModifierSlots.EMPTY, Collections.emptyList(), Collections.emptySet(), null, null, ModifierHookMap.EMPTY);
 
   @Nullable
@@ -51,7 +54,8 @@ public class ToolDefinitionData {
   private final DefinitionModifierSlots slots;
   @Nullable
   private final List<ModifierEntry> traits;
-  @Nullable @VisibleForTesting
+  @Nullable
+  @VisibleForTesting
   protected final Set<ToolAction> actions;
   @Nullable
   private final Harvest harvest;
@@ -63,75 +67,96 @@ public class ToolDefinitionData {
 
   /* Getters */
 
-  /** Gets a list of all parts in the tool */
+  /**
+   * Gets a list of all parts in the tool
+   */
   public List<PartRequirement> getParts() {
-    return requireNonNullElse(parts, Collections.emptyList());
+    return requireNonNullElse(this.parts, Collections.emptyList());
   }
 
-  /** Gets the stat sub object on the tool */
+  /**
+   * Gets the stat sub object on the tool
+   */
   protected Stats getStats() {
-    return requireNonNullElse(stats, EMPTY_STATS);
+    return requireNonNullElse(this.stats, EMPTY_STATS);
   }
 
-  /** Gets the starting slots on the tool */
+  /**
+   * Gets the starting slots on the tool
+   */
   protected DefinitionModifierSlots getSlots() {
-    return requireNonNullElse(slots, DefinitionModifierSlots.EMPTY);
+    return requireNonNullElse(this.slots, DefinitionModifierSlots.EMPTY);
   }
 
-  /** Gets a list of all traits of the tool */
+  /**
+   * Gets a list of all traits of the tool
+   */
   public List<ModifierEntry> getTraits() {
-    return requireNonNullElse(traits, Collections.emptyList());
+    return requireNonNullElse(this.traits, Collections.emptyList());
   }
 
-  /** Checks if the tool can natively perform the given tool action */
+  /**
+   * Checks if the tool can natively perform the given tool action
+   */
   public boolean canPerformAction(ToolAction action) {
     return this.actions != null && this.actions.contains(action);
   }
 
   /**
    * Gets the default number of slots for the given type
-   * @param type  Type
-   * @return  Number of starting slots on new tools
+   *
+   * @param type Type
+   * @return Number of starting slots on new tools
    */
   public int getStartingSlots(SlotType type) {
-    return getSlots().getSlots(type);
+    return this.getSlots().getSlots(type);
   }
 
-  /** Gets the map of internal module hooks */
+  /**
+   * Gets the map of internal module hooks
+   */
   public ModifierHookMap getModules() {
-    return requireNonNullElse(modules, ModifierHookMap.EMPTY);
+    return requireNonNullElse(this.modules, ModifierHookMap.EMPTY);
   }
 
-  /** Gets the given module from the tool */
+  /**
+   * Gets the given module from the tool
+   */
   public <T> T getModule(ModifierHook<T> hook) {
-    return getModules().getOrDefault(hook);
+    return this.getModules().getOrDefault(hook);
   }
 
 
   /* Stats */
 
-  /** Gets a set of bonuses applied to this tool, for stat building */
+  /**
+   * Gets a set of bonuses applied to this tool, for stat building
+   */
   public Set<IToolStat<?>> getAllBaseStats() {
-    return getStats().getBase().getContainedStats();
+    return this.getStats().getBase().getContainedStats();
   }
 
-  /** Determines if the given stat is defined in this definition, for stat building */
+  /**
+   * Determines if the given stat is defined in this definition, for stat building
+   */
   public boolean hasBaseStat(IToolStat<?> stat) {
-    return getStats().getBase().hasStat(stat);
+    return this.getStats().getBase().hasStat(stat);
   }
 
-  /** Gets the value of a stat in this tool, or the default value if missing */
+  /**
+   * Gets the value of a stat in this tool, or the default value if missing
+   */
   public <T> T getBaseStat(IToolStat<T> toolStat) {
-    return getStats().getBase().get(toolStat);
+    return this.getStats().getBase().get(toolStat);
   }
 
   /**
    * Gets the multiplier for this stat to use for modifiers
-   *
+   * <p>
    * In most cases, its better to use {@link IToolStackView#getMultiplier(INumericToolStat)} as that takes the modifier multiplier into account
    */
   public float getMultiplier(INumericToolStat<?> toolStat) {
-    return getStats().getMultipliers().get(toolStat);
+    return this.getStats().getMultipliers().get(toolStat);
   }
 
 
@@ -139,11 +164,12 @@ public class ToolDefinitionData {
 
   /**
    * Applies the extra tool stats to the tool like a modifier
-   * @param builder  Tool stats builder
+   *
+   * @param builder Tool stats builder
    */
   public void buildStatMultipliers(ModifierStatsBuilder builder) {
-    if (stats != null) {
-      MultiplierNBT multipliers = stats.getMultipliers();
+    if (this.stats != null) {
+      MultiplierNBT multipliers = this.stats.getMultipliers();
       for (INumericToolStat<?> stat : multipliers.getContainedStats()) {
         stat.multiplyAll(builder, multipliers.get(stat));
       }
@@ -152,12 +178,13 @@ public class ToolDefinitionData {
 
   /**
    * Adds the starting slots to the given mod data
-   * @param persistentModData  Mod data
+   *
+   * @param persistentModData Mod data
    */
   public void buildSlots(ModDataNBT persistentModData) {
-    if (slots != null) {
-      for (SlotType type : slots.containedTypes()) {
-        persistentModData.setSlots(type, slots.getSlots(type));
+    if (this.slots != null) {
+      for (SlotType type : this.slots.containedTypes()) {
+        persistentModData.setSlots(type, this.slots.getSlots(type));
       }
     }
   }
@@ -167,18 +194,22 @@ public class ToolDefinitionData {
 
   // TODO: migrate harvest into modules
 
-  /** Gets the tools's harvest logic */
+  /**
+   * Gets the tools's harvest logic
+   */
   public IHarvestLogic getHarvestLogic() {
-    if (harvest != null && harvest.logic != null) {
-      return harvest.logic;
+    if (this.harvest != null && this.harvest.logic != null) {
+      return this.harvest.logic;
     }
     return IHarvestLogic.DEFAULT;
   }
 
-  /** Gets the AOE logic for this tool */
+  /**
+   * Gets the AOE logic for this tool
+   */
   public IAreaOfEffectIterator getAOE() {
-    if (harvest != null && harvest.aoe != null) {
-      return harvest.aoe;
+    if (this.harvest != null && this.harvest.aoe != null) {
+      return this.harvest.aoe;
     }
     return IAreaOfEffectIterator.DEFAULT;
   }
@@ -188,45 +219,51 @@ public class ToolDefinitionData {
 
   // TODO: migrate attack into modules
 
-  /** Gets the tool's attack logic */
+  /**
+   * Gets the tool's attack logic
+   */
   public IWeaponAttack getAttack() {
-    return requireNonNullElse(attack, IWeaponAttack.DEFAULT);
+    return requireNonNullElse(this.attack, IWeaponAttack.DEFAULT);
   }
 
 
   /* Packet buffers */
 
-  /** Writes a tool definition stat object to a packet buffer */
+  /**
+   * Writes a tool definition stat object to a packet buffer
+   */
   public void write(FriendlyByteBuf buffer) {
-    List<PartRequirement> parts = getParts();
+    List<PartRequirement> parts = this.getParts();
     buffer.writeVarInt(parts.size());
     for (PartRequirement part : parts) {
       part.write(buffer);
     }
-    Stats stats = getStats();
+    Stats stats = this.getStats();
     stats.getBase().toNetwork(buffer);
     stats.getMultipliers().toNetwork(buffer);
-    getSlots().write(buffer);
-    List<ModifierEntry> traits = getTraits();
+    this.getSlots().write(buffer);
+    List<ModifierEntry> traits = this.getTraits();
     buffer.writeVarInt(traits.size());
     for (ModifierEntry entry : traits) {
       entry.write(buffer);
     }
-    if (actions == null) {
+    if (this.actions == null) {
       buffer.writeVarInt(0);
     } else {
-      buffer.writeVarInt(actions.size());
-      for (ToolAction action : actions) {
+      buffer.writeVarInt(this.actions.size());
+      for (ToolAction action : this.actions) {
         buffer.writeUtf(action.name());
       }
     }
-    IHarvestLogic.LOADER.toNetwork(getHarvestLogic(), buffer);
-    IAreaOfEffectIterator.LOADER.toNetwork(getAOE(), buffer);
-    IWeaponAttack.LOADER.toNetwork(getAttack(), buffer);
-    IToolModule.write(getModules(), buffer);
+    IHarvestLogic.LOADER.toNetwork(this.getHarvestLogic(), buffer);
+    IAreaOfEffectIterator.LOADER.toNetwork(this.getAOE(), buffer);
+    IWeaponAttack.LOADER.toNetwork(this.getAttack(), buffer);
+    IToolModule.write(this.getModules(), buffer);
   }
 
-  /** Reads a tool definition stat object from a packet buffer */
+  /**
+   * Reads a tool definition stat object from a packet buffer
+   */
   public static ToolDefinitionData read(FriendlyByteBuf buffer) {
     int size = buffer.readVarInt();
     ImmutableList.Builder<PartRequirement> parts = ImmutableList.builder();
@@ -253,28 +290,38 @@ public class ToolDefinitionData {
     return new ToolDefinitionData(parts.build(), new Stats(bonuses, multipliers), slots, traits.build(), actions.build(), new Harvest(harvestLogic, aoe), attack, modules);
   }
 
-  /** Internal stats object */
+  /**
+   * Internal stats object
+   */
   @RequiredArgsConstructor
   public static class Stats {
+
     @Nullable
     private final StatsNBT base;
     @Nullable
     private final MultiplierNBT multipliers;
 
-    /** Bonus to add to each stat on top of the base value */
+    /**
+     * Bonus to add to each stat on top of the base value
+     */
     public StatsNBT getBase() {
-      return requireNonNullElse(base, StatsNBT.EMPTY);
+      return requireNonNullElse(this.base, StatsNBT.EMPTY);
     }
 
-    /** Multipliers to apply after modifiers */
+    /**
+     * Multipliers to apply after modifiers
+     */
     public MultiplierNBT getMultipliers() {
-      return requireNonNullElse(multipliers, MultiplierNBT.EMPTY);
+      return requireNonNullElse(this.multipliers, MultiplierNBT.EMPTY);
     }
   }
 
-  /** Defines harvest properties */
+  /**
+   * Defines harvest properties
+   */
   @Data
   protected static class Harvest {
+
     @Nullable
     private final IHarvestLogic logic;
     @Nullable

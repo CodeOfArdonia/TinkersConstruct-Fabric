@@ -10,24 +10,43 @@ import slimeknights.tconstruct.library.tools.nbt.MaterialNBT;
 import slimeknights.tconstruct.library.tools.nbt.ModifierNBT;
 import slimeknights.tconstruct.library.tools.nbt.StatsNBT;
 
-/** A more limited view of {@link IToolStackView} for use in tool rebuild hooks */
+/**
+ * A more limited view of {@link IToolStackView} for use in tool rebuild hooks
+ */
 @SuppressWarnings("ClassCanBeRecord")
 @Data
 public class ToolRebuildContext implements IToolContext {
-  /** Item being rebuilt */
+
+  /**
+   * Item being rebuilt
+   */
   private final Item item;
-  /** Tool definition of the item being rebuilt */
+  /**
+   * Tool definition of the item being rebuilt
+   */
   private final ToolDefinition definition;
-  /** Materials on the tool being rebuilt */
+  /**
+   * Materials on the tool being rebuilt
+   */
   private final MaterialNBT materials;
-  /** List of recipe modifiers on the tool being rebuilt */
+  /**
+   * List of recipe modifiers on the tool being rebuilt
+   */
   private final ModifierNBT upgrades;
-  /** List of all modifiers on the tool being rebuilt, from recipes and traits */
+  /**
+   * List of all modifiers on the tool being rebuilt, from recipes and traits
+   */
   private final ModifierNBT modifiers;
-  /** Tool stats before modifiers add stats */
+  /**
+   * Tool stats before modifiers add stats
+   */
   private final StatsNBT baseStats;
-  /** Persistent modifier data, intentionally read only */
+  /**
+   * Persistent modifier data, intentionally read only
+   */
   private final IModDataView persistentData;
-  /** Volatile modifier data */
+  /**
+   * Volatile modifier data
+   */
   private final IModDataView volatileData;
 }

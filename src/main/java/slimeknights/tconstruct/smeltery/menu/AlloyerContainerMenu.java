@@ -26,10 +26,12 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 public class AlloyerContainerMenu extends TriggeringBaseContainerMenu<AlloyerBlockEntity> {
+
   public static final ResourceLocation TOOLTIP_FORMAT = TConstruct.getResource("alloyer");
 
   @Getter
   private boolean hasFuelSlot = false;
+
   public AlloyerContainerMenu(int id, @Nullable Inventory inv, @Nullable AlloyerBlockEntity alloyer) {
     super(TinkerSmeltery.alloyerContainer.get(), id, inv, alloyer);
 
@@ -51,7 +53,7 @@ public class AlloyerContainerMenu extends TriggeringBaseContainerMenu<AlloyerBlo
       if (world != null && world.getBlockState(down).is(TinkerTags.Blocks.FUEL_TANKS)) {
         Optional<Storage<ItemVariant>> storage = Optional.ofNullable(ItemStorage.SIDED.find(world, down, null)).filter(view -> view instanceof SlottedStackStorage);
         if (storage.isPresent()) {
-          hasFuelSlot = storage.filter(handler -> {
+          this.hasFuelSlot = storage.filter(handler -> {
             this.addSlot(new SmartItemHandlerSlot((SlottedStackStorage) handler, 0, 151, 32));
             return true;
           }).isPresent();

@@ -22,24 +22,36 @@ import javax.annotation.Nullable;
  * Chest holding 64 slots of 16 items each
  */
 public class TinkersChestBlockEntity extends AbstractChestBlockEntity {
-  /** NBT tag for colors of the chest */
+
+  /**
+   * NBT tag for colors of the chest
+   */
   public static final String TAG_CHEST_COLOR = "color";
-  /** Default color for a chest */
+  /**
+   * Default color for a chest
+   */
   public static final int DEFAULT_COLOR = 0x407686;
   public static final Component NAME = TConstruct.makeTranslation("gui", "tinkers_chest");
 
-  /** Current display color for the chest */
+  /**
+   * Current display color for the chest
+   */
   @Getter
   private int color = DEFAULT_COLOR;
-  /** If true, a custom color was set */
-  @Getter @Accessors(fluent = true)
+  /**
+   * If true, a custom color was set
+   */
+  @Getter
+  @Accessors(fluent = true)
   private boolean hasColor = false;
 
   public TinkersChestBlockEntity(BlockPos pos, BlockState state) {
     super(TinkerTables.tinkersChestTile.get(), pos, state, NAME, new TinkersChestItemHandler());
   }
 
-  /** Sets the color of the chest */
+  /**
+   * Sets the color of the chest
+   */
   public void setColor(int color) {
     this.color = color;
     this.hasColor = true;
@@ -53,8 +65,8 @@ public class TinkersChestBlockEntity extends AbstractChestBlockEntity {
   @Override
   public void saveSynced(CompoundTag tags) {
     super.saveSynced(tags);
-    if (hasColor) {
-      tags.putInt(TAG_CHEST_COLOR, color);
+    if (this.hasColor) {
+      tags.putInt(TAG_CHEST_COLOR, this.color);
     }
   }
 
@@ -62,14 +74,19 @@ public class TinkersChestBlockEntity extends AbstractChestBlockEntity {
   public void load(CompoundTag tags) {
     super.load(tags);
     if (tags.contains(TAG_CHEST_COLOR, Tag.TAG_ANY_NUMERIC)) {
-      setColor(tags.getInt(TAG_CHEST_COLOR));
+      this.setColor(tags.getInt(TAG_CHEST_COLOR));
     }
   }
 
-  /** Item handler for tinkers chests */
+  /**
+   * Item handler for tinkers chests
+   */
   public static class TinkersChestItemHandler extends ItemStackHandler implements IChestItemHandler {
-    @Setter @Nullable
+
+    @Setter
+    @Nullable
     private MantleBlockEntity parent;
+
     public TinkersChestItemHandler() {
       super(64);
     }
@@ -81,13 +98,13 @@ public class TinkersChestBlockEntity extends AbstractChestBlockEntity {
 
     @Override
     public int getVisualSize() {
-      return getSlotCount();
+      return this.getSlotCount();
     }
 
     @Override
     protected void onContentsChanged(int slot) {
-      if (parent != null) {
-        parent.setChangedFast();
+      if (this.parent != null) {
+        this.parent.setChangedFast();
       }
     }
   }

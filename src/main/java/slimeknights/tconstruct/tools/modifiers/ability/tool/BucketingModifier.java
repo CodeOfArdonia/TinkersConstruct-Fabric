@@ -54,6 +54,7 @@ import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 
 @SuppressWarnings("removal")
 public class BucketingModifier extends TankModifier implements BlockInteractionModifierHook, GeneralInteractionModifierHook {
+
   public BucketingModifier() {
     super(FluidConstants.BUCKET);
   }
@@ -90,11 +91,12 @@ public class BucketingModifier extends TankModifier implements BlockInteractionM
 
   /**
    * Checks if the block is unable to contain fluid
-   * @param world  Level
-   * @param pos    Position to try
-   * @param state  State
-   * @param fluid  Fluid to place
-   * @return  True if the block is unable to contain fluid, false if it can contain fluid
+   *
+   * @param world Level
+   * @param pos   Position to try
+   * @param state State
+   * @param fluid Fluid to place
+   * @return True if the block is unable to contain fluid, false if it can contain fluid
    */
   private static boolean cannotContainFluid(Level world, BlockPos pos, BlockState state, Fluid fluid) {
     Block block = state.getBlock();
@@ -119,7 +121,7 @@ public class BucketingModifier extends TankModifier implements BlockInteractionM
     if (!world.isClientSide) {
       Player player = context.getPlayer();
       boolean sneaking = player != null && player.isShiftKeyDown();
-      FluidStack fluidStack = getFluid(tool);
+      FluidStack fluidStack = this.getFluid(tool);
       // sneaking fills, not sneak drains
       SoundEvent sound = null;
       if (sneaking) {
@@ -130,25 +132,25 @@ public class BucketingModifier extends TankModifier implements BlockInteractionM
             if (added > 0) {
               sound = FluidVariantAttributes.getEmptySound(fluidStack.getType());
               fluidStack.shrink(added);
-              setFluid(tool, fluidStack);
+              this.setFluid(tool, fluidStack);
             }
             t.commit();
           }
         }
         // if nothing currently, will drain whatever
       } else if (fluidStack.isEmpty()) {
-        FluidStack drained = TransferUtil.extractAnyFluid(capability, getCapacity(tool));
+        FluidStack drained = TransferUtil.extractAnyFluid(capability, this.getCapacity(tool));
         if (!drained.isEmpty()) {
-          setFluid(tool, drained);
+          this.setFluid(tool, drained);
           sound = FluidVariantAttributes.getFillSound(drained.getType());
         }
       } else {
         // filter drained to be the same as the current fluid
         try (Transaction t = TransferUtil.getTransaction()) {
-          long drained = capability.extract(fluidStack.getType(), getCapacity(tool) - fluidStack.getAmount(), t);
+          long drained = capability.extract(fluidStack.getType(), this.getCapacity(tool) - fluidStack.getAmount(), t);
           if (drained >= 0 && drained == fluidStack.getAmount()) {
             fluidStack.grow(drained);
-            setFluid(tool, fluidStack);
+            this.setFluid(tool, fluidStack);
             sound = FluidVariantAttributes.getFillSound(fluidStack.getType());
           }
           t.commit();
@@ -171,7 +173,7 @@ public class BucketingModifier extends TankModifier implements BlockInteractionM
     if (player == null || !player.isShiftKeyDown()) {
       return InteractionResult.PASS;
     }
-    FluidStack fluidStack = getFluid(tool);
+    FluidStack fluidStack = this.getFluid(tool);
     if (fluidStack.getAmount() < FluidConstants.BUCKET) {
       return InteractionResult.PASS;
     }
@@ -203,7 +205,7 @@ public class BucketingModifier extends TankModifier implements BlockInteractionM
     boolean placed = false;
     if (world.dimensionType().ultraWarm() && fluid.is(FluidTags.WATER)) {
       world.playSound(player, target, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.5F, 2.6F + (world.random.nextFloat() - world.random.nextFloat()) * 0.8F);
-      for(int l = 0; l < 8; ++l) {
+      for (int l = 0; l < 8; ++l) {
         world.addParticle(ParticleTypes.LARGE_SMOKE, target.getX() + Math.random(), target.getY() + Math.random(), target.getZ() + Math.random(), 0.0D, 0.0D, 0.0D);
       }
       placed = true;
@@ -218,14 +220,14 @@ public class BucketingModifier extends TankModifier implements BlockInteractionM
       }
     } else if (existing.getBlock() instanceof LiquidBlockContainer container) {
       // if not replaceable, it must be a liquid container
-      container.placeLiquid(world, target, existing, ((FlowingFluid)fluid).getSource(false));
+      container.placeLiquid(world, target, existing, ((FlowingFluid) fluid).getSource(false));
       world.playSound(null, target, FluidVariantAttributes.getEmptySound(fluidStack.getType()), SoundSource.BLOCKS, 1.0F, 1.0F);
       placed = true;
     }
 
     // if we placed something, consume fluid
     if (placed) {
-      drain(tool, fluidStack, FluidConstants.BUCKET);
+      this.drain(tool, fluidStack, FluidConstants.BUCKET);
       return InteractionResult.SUCCESS;
     }
     return InteractionResult.PASS;
@@ -238,8 +240,8 @@ public class BucketingModifier extends TankModifier implements BlockInteractionM
     }
 
     // need at least a bucket worth of empty space
-    FluidStack fluidStack = getFluid(tool);
-    if (getCapacity(tool) - fluidStack.getAmount() < FluidConstants.BUCKET) {
+    FluidStack fluidStack = this.getFluid(tool);
+    if (this.getCapacity(tool) - fluidStack.getAmount() < FluidConstants.BUCKET) {
       return InteractionResult.PASS;
     }
     // have to trace again to find the fluid, ensure we can edit the position
@@ -267,16 +269,16 @@ public class BucketingModifier extends TankModifier implements BlockInteractionM
       //Fluid pickedUpFluid = bucketPickup.takeLiquid(world, target, state);
       ItemStack bucket = bucketPickup.pickupBlock(world, target, state);
       if (!bucket.isEmpty() && bucket.getItem() instanceof BucketItem bucketItem) {
-        Fluid pickedUpFluid = ((BucketItemAccessor)bucketItem).fabric_getFluid();
+        Fluid pickedUpFluid = ((BucketItemAccessor) bucketItem).fabric_getFluid();
         if (pickedUpFluid != Fluids.EMPTY) {
           player.playSound(FluidVariantAttributes.getFillSound(FluidVariant.of(pickedUpFluid)), 1.0F, 1.0F);
           // set the fluid if empty, increase the fluid if filled
           if (!world.isClientSide) {
             if (fluidStack.isEmpty()) {
-              setFluid(tool, new FluidStack(pickedUpFluid, FluidConstants.BUCKET));
+              this.setFluid(tool, new FluidStack(pickedUpFluid, FluidConstants.BUCKET));
             } else if (pickedUpFluid == currentFluid) {
               fluidStack.grow(FluidConstants.BUCKET);
-              setFluid(tool, fluidStack);
+              this.setFluid(tool, fluidStack);
             } else {
               TConstruct.LOG.error("Picked up a fluid {} that does not match the current fluid state {}, this should not happen", pickedUpFluid, fluidState.getType());
             }

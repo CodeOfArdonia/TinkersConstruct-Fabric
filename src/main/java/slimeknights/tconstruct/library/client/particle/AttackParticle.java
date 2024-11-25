@@ -17,7 +17,7 @@ public abstract class AttackParticle extends TextureSheetParticle {
     this.gCol = f;
     this.bCol = f;
     this.lifetime = 4;
-    this.quadSize = 1.0F - (float)pQuadSizeMultiplier * 0.5F;
+    this.quadSize = 1.0F - (float) pQuadSizeMultiplier * 0.5F;
     this.setSpriteFromAge(spriteList);
   }
 
@@ -39,8 +39,7 @@ public abstract class AttackParticle extends TextureSheetParticle {
 
     if (this.age++ >= this.lifetime) {
       this.remove();
-    }
-    else {
+    } else {
       this.setSpriteFromAge(this.spriteList);
     }
   }

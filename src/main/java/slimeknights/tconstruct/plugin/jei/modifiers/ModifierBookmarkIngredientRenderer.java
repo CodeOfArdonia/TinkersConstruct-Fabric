@@ -1,6 +1,5 @@
 package slimeknights.tconstruct.plugin.jei.modifiers;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import mezz.jei.api.ingredients.IIngredientRenderer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
@@ -13,7 +12,9 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Special modifier ingredient renderer used for ingredients in the bookmark menu */
+/**
+ * Special modifier ingredient renderer used for ingredients in the bookmark menu
+ */
 public enum ModifierBookmarkIngredientRenderer implements IIngredientRenderer<ModifierEntry> {
   INSTANCE;
 

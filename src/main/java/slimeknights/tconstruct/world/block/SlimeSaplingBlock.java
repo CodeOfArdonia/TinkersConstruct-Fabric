@@ -16,6 +16,7 @@ import javax.annotation.Nonnull;
 public class SlimeSaplingBlock extends SaplingBlock {
 
   private final SlimeType foliageType;
+
   public SlimeSaplingBlock(AbstractTreeGrower treeIn, SlimeType foliageType, Properties properties) {
     super(treeIn, properties);
     this.foliageType = foliageType;

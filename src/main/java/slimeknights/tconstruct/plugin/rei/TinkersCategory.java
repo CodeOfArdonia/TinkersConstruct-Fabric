@@ -37,12 +37,12 @@ public interface TinkersCategory<T extends Display> extends DisplayCategory<T> {
 
   @Override
   default int getDisplayHeight() {
-    return getBackground().height() + 8;
+    return this.getBackground().height() + 8;
   }
 
   @Override
   default int getDisplayWidth(T display) {
-    return getBackground().width() + 8;
+    return this.getBackground().width() + 8;
   }
 
   @Override
@@ -50,14 +50,14 @@ public interface TinkersCategory<T extends Display> extends DisplayCategory<T> {
     List<Widget> widgets = new ArrayList<>();
     Point origin = new Point(bounds.getX() + 5, bounds.getY() + 5);
     widgets.add(Widgets.createRecipeBase(bounds));
-    widgets.add(getBackground().build(0, 0, origin));
+    widgets.add(this.getBackground().build(0, 0, origin));
     widgets.add(Widgets.createDrawableWidget((graphics, mouseX, mouseY, partialTick) -> {
       graphics.pose().pushPose();
       graphics.pose().translate(bounds.getX() + 5, bounds.getY() + 5, 0);
-      draw(display, graphics, mouseX, mouseY);
+      this.draw(display, graphics, mouseX, mouseY);
       graphics.pose().popPose();
     }));
-    addWidgets(display, widgets, origin, bounds);
+    this.addWidgets(display, widgets, origin, bounds);
     if (this instanceof IRecipeTooltipReplacement replacement)
       widgets.forEach(widget -> {
         if (widget instanceof Slot slot) {

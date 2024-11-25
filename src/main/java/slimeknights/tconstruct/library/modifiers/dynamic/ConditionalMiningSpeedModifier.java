@@ -26,11 +26,13 @@ import java.util.List;
 
 /**
  * Modifier that conditionally boosts mining speed
+ *
  * @deprecated use {@link ConditionalMiningSpeedModule}
  */
 @Deprecated
 @RequiredArgsConstructor
 public class ConditionalMiningSpeedModifier extends IncrementalModifier {
+
   private final IJsonPredicate<BlockState> predicate;
   private final boolean requireEffective;
   private final float bonus;
@@ -42,14 +44,14 @@ public class ConditionalMiningSpeedModifier extends IncrementalModifier {
 
   @Override
   public void onBreakSpeed(IToolStackView tool, int level, PlayerEvents.BreakSpeed event, Direction sideHit, boolean isEffective, float miningSpeedModifier) {
-    if ((isEffective || !requireEffective) && predicate.matches(event.getState())) {
-      event.setNewSpeed(event.getNewSpeed() + (getScaledLevel(tool, level) * bonus * tool.getMultiplier(ToolStats.MINING_SPEED) * miningSpeedModifier));
+    if ((isEffective || !this.requireEffective) && this.predicate.matches(event.getState())) {
+      event.setNewSpeed(event.getNewSpeed() + (this.getScaledLevel(tool, level) * this.bonus * tool.getMultiplier(ToolStats.MINING_SPEED) * miningSpeedModifier));
     }
   }
 
   @Override
   public void addInformation(IToolStackView tool, int level, @Nullable Player player, List<Component> tooltip, TooltipKey tooltipKey, TooltipFlag tooltipFlag) {
-    addStatTooltip(tool, ToolStats.MINING_SPEED, TinkerTags.Items.HARVEST, bonus * getScaledLevel(tool, level), tooltip);
+    this.addStatTooltip(tool, ToolStats.MINING_SPEED, TinkerTags.Items.HARVEST, this.bonus * this.getScaledLevel(tool, level), tooltip);
   }
 
   @Override
@@ -57,7 +59,9 @@ public class ConditionalMiningSpeedModifier extends IncrementalModifier {
     return LOADER;
   }
 
-  /** Loader instance */
+  /**
+   * Loader instance
+   */
   public static final IGenericLoader<ConditionalMiningSpeedModifier> LOADER = new IGenericLoader<>() {
     @Override
     public ConditionalMiningSpeedModifier deserialize(JsonObject json) {

@@ -27,7 +27,10 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class InsatibleModifier extends Modifier implements ProjectileHitModifierHook, ConditionalStatModifierHook {
-  /** Gets the current bonus for the entity */
+
+  /**
+   * Gets the current bonus for the entity
+   */
   private static float getBonus(LivingEntity attacker, int level, TinkerEffect effect) {
     int effectLevel = effect.getLevel(attacker) + 1;
     return level * effectLevel / 4f;
@@ -79,6 +82,6 @@ public class InsatibleModifier extends Modifier implements ProjectileHitModifier
     if (player != null && key == TooltipKey.SHIFT) {
       bonus = getBonus(player, level, tool.hasTag(TinkerTags.Items.RANGED) ? TinkerModifiers.insatiableRangedEffect.get() : TinkerModifiers.insatiableEffect.get());
     }
-    addDamageTooltip(tool, bonus, tooltip);
+    this.addDamageTooltip(tool, bonus, tooltip);
   }
 }

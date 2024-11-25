@@ -32,11 +32,16 @@ import javax.annotation.Nullable;
 import java.util.function.IntConsumer;
 import java.util.stream.IntStream;
 
-/** Recipe for repairing tools */
+/**
+ * Recipe for repairing tools
+ */
 @RequiredArgsConstructor
 public class TinkerStationRepairRecipe implements ITinkerStationRecipe {
+
   protected static final ValidatedResult FULLY_REPAIRED = ValidatedResult.failure(TConstruct.makeTranslationKey("recipe", "tool_repair.fully_repaired"));
-  /** No action int consumer for recipe result */
+  /**
+   * No action int consumer for recipe result
+   */
   private static final IntConsumer NO_ACTION = i -> {};
 
   @Getter
@@ -44,9 +49,10 @@ public class TinkerStationRepairRecipe implements ITinkerStationRecipe {
 
   /**
    * Checks if the tool can be repaired with the given material
-   * @param tool      Tool to check
-   * @param material  Material to try
-   * @return  Index if can repair, -1 if invalid
+   *
+   * @param tool     Tool to check
+   * @param material Material to try
+   * @return Index if can repair, -1 if invalid
    */
   public static int getRepairIndex(IToolStackView tool, MaterialId material) {
     for (int part : tool.getDefinition().getRepairParts()) {
@@ -59,9 +65,10 @@ public class TinkerStationRepairRecipe implements ITinkerStationRecipe {
 
   /**
    * Gets the material for the given slot
-   * @param inv   Inventory instance
-   * @param slot  Slot
-   * @return  Material amount
+   *
+   * @param inv  Inventory instance
+   * @param slot Slot
+   * @return Material amount
    */
   protected static MaterialId getMaterialFrom(ITinkerStationContainer inv, int slot) {
     // try repair kit first
@@ -77,7 +84,9 @@ public class TinkerStationRepairRecipe implements ITinkerStationRecipe {
     return IMaterial.UNKNOWN_ID;
   }
 
-  /** Gets the default stats ID to use if the item is not a tool part */
+  /**
+   * Gets the default stats ID to use if the item is not a tool part
+   */
   @Nullable
   public static MaterialStatsId getDefaultStatsId(IToolStackView tool, MaterialId repairMaterial) {
     int repairIndex = getRepairIndex(tool, repairMaterial);
@@ -87,7 +96,9 @@ public class TinkerStationRepairRecipe implements ITinkerStationRecipe {
     return tool.getDefinition().getData().getParts().get(repairIndex).getStatType();
   }
 
-  /** Gets the amount to repair per item */
+  /**
+   * Gets the amount to repair per item
+   */
   protected float getRepairPerItem(ToolStack tool, ITinkerStationContainer inv, int slot, MaterialId repairMaterial) {
     ItemStack stack = inv.getInput(slot);
     // repair kit first
@@ -100,7 +111,7 @@ public class TinkerStationRepairRecipe implements ITinkerStationRecipe {
       MaterialRecipe recipe = inv.getInputMaterial(slot);
       if (recipe != null) {
         if (stack.getItem() instanceof IToolPart) {
-          return recipe.getRepairPerItem(toolData, ((IToolPart)stack.getItem()).getStatType());
+          return recipe.getRepairPerItem(toolData, ((IToolPart) stack.getItem()).getStatType());
         }
         return recipe.getRepairPerItem(toolData, getDefaultStatsId(tool, repairMaterial));
       }
@@ -115,8 +126,8 @@ public class TinkerStationRepairRecipe implements ITinkerStationRecipe {
     // must be repairable and multipart to use this recipe
     // if its not multipart, different recipe will be used to repair it (as it has a dedicated repair item)
     if (tinkerable.isEmpty()
-        || !tinkerable.is(TinkerTags.Items.MULTIPART_TOOL)
-        || !tinkerable.is(TinkerTags.Items.DURABILITY)) {
+      || !tinkerable.is(TinkerTags.Items.MULTIPART_TOOL)
+      || !tinkerable.is(TinkerTags.Items.DURABILITY)) {
       return false;
     }
 
@@ -172,13 +183,13 @@ public class TinkerStationRepairRecipe implements ITinkerStationRecipe {
     }
 
     // first, determine how much we can repair
-    MaterialId primaryMaterial = getPrimaryMaterial(tool);
+    MaterialId primaryMaterial = this.getPrimaryMaterial(tool);
     int repairNeeded = tool.getDamage();
     int repairRemaining = repairNeeded;
 
     // iterate stacks, adding up amount we can repair, assumes the material is correct per #matches()
     for (int i = 0; i < inv.getInputCount() && repairRemaining > 0; i++) {
-      repairRemaining -= repairFromSlot(tool, primaryMaterial, inv, repairRemaining, i, NO_ACTION);
+      repairRemaining -= this.repairFromSlot(tool, primaryMaterial, inv, repairRemaining, i, NO_ACTION);
     }
 
     // did we actually repair something?
@@ -194,7 +205,9 @@ public class TinkerStationRepairRecipe implements ITinkerStationRecipe {
     return ValidatedResult.PASS;
   }
 
-  /** Gets the primary material of the given tool */
+  /**
+   * Gets the primary material of the given tool
+   */
   protected MaterialId getPrimaryMaterial(IToolStackView tool) {
     return tool.getMaterial(tool.getDefinition().getRepairParts()[0]).getId();
   }
@@ -206,10 +219,10 @@ public class TinkerStationRepairRecipe implements ITinkerStationRecipe {
 
     // iterate stacks, removing items as we repair
     int repairRemaining = inputTool.getDamage() - resultTool.getDamage();
-    MaterialId primaryMaterial = getPrimaryMaterial(inputTool);
+    MaterialId primaryMaterial = this.getPrimaryMaterial(inputTool);
     for (int i = 0; i < inv.getInputCount() && repairRemaining > 0; i++) {
       final int slot = i;
-      repairRemaining -= repairFromSlot(inputTool, primaryMaterial, inv, repairRemaining, i, count -> inv.shrinkInput(slot, count));
+      repairRemaining -= this.repairFromSlot(inputTool, primaryMaterial, inv, repairRemaining, i, count -> inv.shrinkInput(slot, count));
     }
 
     if (repairRemaining > 0) {
@@ -217,26 +230,29 @@ public class TinkerStationRepairRecipe implements ITinkerStationRecipe {
     }
   }
 
-  /** Gets the repair weight for the given material */
+  /**
+   * Gets the repair weight for the given material
+   */
   public static float getRepairWeight(IToolStackView tool, MaterialId repairMaterial) {
     ToolDefinition definition = tool.getDefinition();
     // return the weight of the largest part matching this material
     return IntStream.of(definition.getRepairParts())
-                    .filter(i -> tool.getMaterial(i).matches(repairMaterial))
-                    .map(i -> definition.getData().getParts().get(i).getWeight())
-                    .max().orElse(1)
-           / (float)definition.getMaxRepairWeight();
+      .filter(i -> tool.getMaterial(i).matches(repairMaterial))
+      .map(i -> definition.getData().getParts().get(i).getWeight())
+      .max().orElse(1)
+      / (float) definition.getMaxRepairWeight();
   }
 
   /**
    * Gets the amount to repair from the given slot
+   *
    * @param tool            Tool instance
    * @param primaryMaterial Material of the primary head
    * @param inv             Inventory instance
    * @param repairNeeded    Amount of remaining repair needed
    * @param slot            Input slot
    * @param amountConsumer  Action to perform on repair, input is the amount consumed
-   * @return  Repair from this slot
+   * @return Repair from this slot
    */
   protected int repairFromSlot(ToolStack tool, MaterialId primaryMaterial, ITinkerStationContainer inv, int repairNeeded, int slot, IntConsumer amountConsumer) {
     ItemStack stack = inv.getInput(slot);
@@ -244,7 +260,7 @@ public class TinkerStationRepairRecipe implements ITinkerStationRecipe {
       // we have a recipe with matching stack, find out how much we can repair
       MaterialId repairMaterial = getMaterialFrom(inv, slot);
       if (!repairMaterial.equals(IMaterial.UNKNOWN_ID)) {
-        float durabilityPerItem = getRepairPerItem(tool, inv, slot, repairMaterial);
+        float durabilityPerItem = this.getRepairPerItem(tool, inv, slot, repairMaterial);
         if (durabilityPerItem > 0) {
           // if not the primary material, reduced effectiveness
           durabilityPerItem *= getRepairWeight(tool, repairMaterial);
@@ -259,9 +275,9 @@ public class TinkerStationRepairRecipe implements ITinkerStationRecipe {
           }
 
           // apply this recipe as many times as we need (if stack has more than enough to repair) or can (if stack will not fully repair)
-          int applied = Math.min(stack.getCount(), (int)Math.ceil(repairNeeded / durabilityPerItem));
+          int applied = Math.min(stack.getCount(), (int) Math.ceil(repairNeeded / durabilityPerItem));
           amountConsumer.accept(applied);
-          return (int)(applied * durabilityPerItem);
+          return (int) (applied * durabilityPerItem);
         }
       }
     }
@@ -274,7 +290,9 @@ public class TinkerStationRepairRecipe implements ITinkerStationRecipe {
     return TinkerTables.tinkerStationRepairSerializer.get();
   }
 
-  /** @deprecated Use {@link #assemble(ITinkerStationContainer, RegistryAccess)} */
+  /**
+   * @deprecated Use {@link #assemble(ITinkerStationContainer, RegistryAccess)}
+   */
   @Deprecated
   @Override
   public ItemStack getResultItem(RegistryAccess registryAccess) {

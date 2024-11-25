@@ -17,12 +17,15 @@ import slimeknights.tconstruct.library.tools.stat.ToolStats;
 
 import java.util.List;
 
-/** Primary stats for a bow */
+/**
+ * Primary stats for a bow
+ */
 @RequiredArgsConstructor
 @Getter
 @EqualsAndHashCode(callSuper = false)
 @ToString
 public class LimbMaterialStats extends BaseMaterialStats implements IRepairableMaterialStats {
+
   public static final MaterialStatsId ID = new MaterialStatsId(TConstruct.getResource("limb"));
   public static final LimbMaterialStats DEFAULT = new LimbMaterialStats(1, 0f, 0f, 0f);
   static final String ACCURACY_PREFIX = makeTooltipKey(TConstruct.getResource("accuracy"));
@@ -45,10 +48,10 @@ public class LimbMaterialStats extends BaseMaterialStats implements IRepairableM
 
   @Override
   public void encode(FriendlyByteBuf buffer) {
-    buffer.writeInt(durability);
-    buffer.writeFloat(drawSpeed);
-    buffer.writeFloat(velocity);
-    buffer.writeFloat(accuracy);
+    buffer.writeInt(this.durability);
+    buffer.writeFloat(this.drawSpeed);
+    buffer.writeFloat(this.velocity);
+    buffer.writeFloat(this.accuracy);
   }
 
   @Override

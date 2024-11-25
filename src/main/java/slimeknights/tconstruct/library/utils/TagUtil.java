@@ -8,16 +8,19 @@ import net.minecraft.nbt.Tag;
 
 import javax.annotation.Nullable;
 
-/** Helpers related to Tag */
+/**
+ * Helpers related to Tag
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TagUtil {
   /* Helper functions */
 
   /**
    * Writes a block position to Tag
-   * @param pos  Position to write
-   * @return  Position in Tag
-   * @deprecated  Use {@link net.minecraft.nbt.NbtUtils#writeBlockPos(BlockPos)}, deprecated due to case difference
+   *
+   * @param pos Position to write
+   * @return Position in Tag
+   * @deprecated Use {@link net.minecraft.nbt.NbtUtils#writeBlockPos(BlockPos)}, deprecated due to case difference
    */
   @Deprecated
   public static CompoundTag writePos(BlockPos pos) {
@@ -30,9 +33,10 @@ public final class TagUtil {
 
   /**
    * Reads a block position from Tag
-   * @param tag  Tag
-   * @return  Block position, or null if invalid
-   * @deprecated  Use {@link net.minecraft.nbt.NbtUtils#readBlockPos(CompoundTag)}, deprecated due to case difference
+   *
+   * @param tag Tag
+   * @return Block position, or null if invalid
+   * @deprecated Use {@link net.minecraft.nbt.NbtUtils#readBlockPos(CompoundTag)}, deprecated due to case difference
    */
   @Deprecated
   @Nullable
@@ -45,9 +49,10 @@ public final class TagUtil {
 
   /**
    * Reads a block position from Tag
-   * @param parent  Parent tag
-   * @param key     Position key
-   * @return  Block position, or null if invalid or missing
+   *
+   * @param parent Parent tag
+   * @param key    Position key
+   * @return Block position, or null if invalid or missing
    */
   @Nullable
   public static BlockPos readPos(CompoundTag parent, String key) {
@@ -59,8 +64,9 @@ public final class TagUtil {
 
   /**
    * Checks if the given tag is a numeric type
-   * @param tag  Tag to check
-   * @return  True if the type matches
+   *
+   * @param tag Tag to check
+   * @return True if the type matches
    */
   public static boolean isNumeric(Tag tag) {
     byte type = tag.getId();

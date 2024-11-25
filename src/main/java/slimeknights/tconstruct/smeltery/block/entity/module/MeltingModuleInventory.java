@@ -30,27 +30,39 @@ import java.util.function.Consumer;
  * Inventory composite made of a set of melting module inventories
  */
 public class MeltingModuleInventory implements SlottedStackStorage, TransactionContext.CloseCallback {
+
   private static final String TAG_SLOT = "slot";
   private static final String TAG_ITEMS = "items";
   private static final String TAG_SIZE = "size";
 
-  /** Parent tile entity */
+  /**
+   * Parent tile entity
+   */
   private final MantleBlockEntity parent;
-  /** Fluid handler for outputs */
+  /**
+   * Fluid handler for outputs
+   */
   protected final SlottedStorage<FluidVariant> fluidHandler;
-  /** Array of modules containing each slot */
+  /**
+   * Array of modules containing each slot
+   */
   private MeltingModule[] modules;
-  /** If true, module cannot be resized */
+  /**
+   * If true, module cannot be resized
+   */
   private final boolean strictSize;
-  /** Number of nuggets to produce when melting an ore */
+  /**
+   * Number of nuggets to produce when melting an ore
+   */
   private final IOreRate oreRate;
 
   /**
    * Creates a new inventory with a fixed size
-   * @param parent         Parent tile
-   * @param fluidHandler   Tank for output
-   * @param oreRate        Ore rate
-   * @param size           Size
+   *
+   * @param parent       Parent tile
+   * @param fluidHandler Tank for output
+   * @param oreRate      Ore rate
+   * @param size         Size
    */
   public MeltingModuleInventory(MantleBlockEntity parent, SlottedStorage<FluidVariant> fluidHandler, IOreRate oreRate, int size) {
     this.parent = parent;
@@ -62,9 +74,10 @@ public class MeltingModuleInventory implements SlottedStackStorage, TransactionC
 
   /**
    * Creates a new inventory with a variable size
-   * @param parent         Parent tile
-   * @param fluidHandler   Tank for output
-   * @param oreRate        Ore rate
+   *
+   * @param parent       Parent tile
+   * @param fluidHandler Tank for output
+   * @param oreRate      Ore rate
    */
   public MeltingModuleInventory(MantleBlockEntity parent, SlottedStorage<FluidVariant> fluidHandler, IOreRate oreRate) {
     this(parent, fluidHandler, oreRate, 0);
@@ -74,16 +87,17 @@ public class MeltingModuleInventory implements SlottedStackStorage, TransactionC
 
   @Override
   public int getSlotCount() {
-    return modules.length;
+    return this.modules.length;
   }
 
   /**
    * Checks if the given slot index is valid
-   * @param slot  Slot index to check
-   * @return  True if valid
+   *
+   * @param slot Slot index to check
+   * @return True if valid
    */
   public boolean validSlot(int slot) {
-    return slot >= 0 && slot < getSlotCount();
+    return slot >= 0 && slot < this.getSlotCount();
   }
 
   @Override
@@ -96,36 +110,41 @@ public class MeltingModuleInventory implements SlottedStackStorage, TransactionC
     return true;
   }
 
-  /** Returns true if a slot is defined in the array */
+  /**
+   * Returns true if a slot is defined in the array
+   */
   private boolean hasModule(int slot) {
-    return validSlot(slot) && modules[slot] != null;
+    return this.validSlot(slot) && this.modules[slot] != null;
   }
 
   /**
    * Gets the current time of a slot
-   * @param slot  Slot index
-   * @return  Slot temperature
+   *
+   * @param slot Slot index
+   * @return Slot temperature
    */
   public int getCurrentTime(int slot) {
-    return hasModule(slot) ? modules[slot].getCurrentTime() : 0;
+    return this.hasModule(slot) ? this.modules[slot].getCurrentTime() : 0;
   }
 
   /**
    * Gets the required time for a slot
-   * @param slot  Slot index
-   * @return  Required time
+   *
+   * @param slot Slot index
+   * @return Required time
    */
   public int getRequiredTime(int slot) {
-    return hasModule(slot) ? modules[slot].getRequiredTime() : 0;
+    return this.hasModule(slot) ? this.modules[slot].getRequiredTime() : 0;
   }
 
   /**
    * Gets the required temperature for a slot
-   * @param slot  Slot index
-   * @return  Required temperature
+   *
+   * @param slot Slot index
+   * @return Required temperature
    */
   public int getRequiredTemp(int slot) {
-    return hasModule(slot) ? modules[slot].getRequiredTemp() : 0;
+    return this.hasModule(slot) ? this.modules[slot].getRequiredTemp() : 0;
   }
 
 
@@ -133,46 +152,48 @@ public class MeltingModuleInventory implements SlottedStackStorage, TransactionC
 
   /**
    * Gets the module for the given index
-   * @param slot  Index
-   * @return  Module for index
-   * @throws IndexOutOfBoundsException  index is invalid
+   *
+   * @param slot Index
+   * @return Module for index
+   * @throws IndexOutOfBoundsException index is invalid
    */
   public MeltingModule getModule(int slot) {
-    if (!validSlot(slot)) {
+    if (!this.validSlot(slot)) {
       throw new IndexOutOfBoundsException();
     }
-    if (modules[slot] == null) {
-      modules[slot] = new MeltingModule(parent, recipe -> tryFillTank(slot, recipe), oreRate, slot);
+    if (this.modules[slot] == null) {
+      this.modules[slot] = new MeltingModule(this.parent, recipe -> this.tryFillTank(slot, recipe), this.oreRate, slot);
     }
-    return modules[slot];
+    return this.modules[slot];
   }
 
   /**
    * Resizes the module to a new size
-   * @param newSize        New size
-   * @param stackConsumer  Consumer for any stacks that no longer fit
-   * @throws IllegalStateException  If this inventory cannot be resized
+   *
+   * @param newSize       New size
+   * @param stackConsumer Consumer for any stacks that no longer fit
+   * @throws IllegalStateException If this inventory cannot be resized
    */
   public void resize(int newSize, Consumer<ItemStack> stackConsumer) {
-    if (strictSize) {
+    if (this.strictSize) {
       throw new IllegalStateException("Cannot resize this melting module inventory");
     }
     // nothing to do
-    if (newSize == modules.length) {
+    if (newSize == this.modules.length) {
       return;
     }
     // if shrinking, drop extra items
-    if (newSize < modules.length) {
-      for (int i = newSize; i < modules.length; i++) {
-        if (modules[i] != null && !modules[i].getStack().isEmpty()) {
-          stackConsumer.accept(modules[i].getStack());
+    if (newSize < this.modules.length) {
+      for (int i = newSize; i < this.modules.length; i++) {
+        if (this.modules[i] != null && !this.modules[i].getStack().isEmpty()) {
+          stackConsumer.accept(this.modules[i].getStack());
         }
       }
     }
 
     // resize the module array
-    modules = Arrays.copyOf(modules, newSize);
-    parent.setChangedFast();
+    this.modules = Arrays.copyOf(this.modules, newSize);
+    this.parent.setChangedFast();
   }
 
 
@@ -181,10 +202,10 @@ public class MeltingModuleInventory implements SlottedStackStorage, TransactionC
   @Nonnull
   @Override
   public ItemStack getStackInSlot(int slot) {
-    if (validSlot(slot)) {
+    if (this.validSlot(slot)) {
       // don't create the slot, just reading
-      if (modules[slot] != null) {
-        return modules[slot].getStack();
+      if (this.modules[slot] != null) {
+        return this.modules[slot].getStack();
       }
     }
     return ItemStack.EMPTY;
@@ -193,17 +214,17 @@ public class MeltingModuleInventory implements SlottedStackStorage, TransactionC
   @Override
   public void setStackInSlot(int slot, ItemStack stack) {
     // actually set the stack
-    if (validSlot(slot)) {
+    if (this.validSlot(slot)) {
       if (stack.isEmpty()) {
-        if (modules[slot] != null) {
-          modules[slot].setStack(ItemStack.EMPTY);
+        if (this.modules[slot] != null) {
+          this.modules[slot].setStack(ItemStack.EMPTY);
         }
       } else {
         // validate size
         if (stack.getCount() > 1) {
           stack.setCount(1);
         }
-        getModule(slot).setStack(stack);
+        this.getModule(slot).setStack(stack);
       }
     }
   }
@@ -213,16 +234,16 @@ public class MeltingModuleInventory implements SlottedStackStorage, TransactionC
     if (resource.isBlank()) {
       return 0;
     }
-    if (slot < 0 || slot >= getSlotCount()) {
+    if (slot < 0 || slot >= this.getSlotCount()) {
       return 0;
     }
 
     // if the slot is empty, we can insert. Ignores stack sizes at this time, assuming always 1
-    MeltingModule module = getModule(slot);
+    MeltingModule module = this.getModule(slot);
     boolean canInsert = module.getStack().isEmpty();
     if (canInsert) {
-      updateSnapshots(slot, transaction);
-      setStackInSlot(slot, resource.toStack((int) amount));
+      this.updateSnapshots(slot, transaction);
+      this.setStackInSlot(slot, resource.toStack((int) amount));
     }
     return canInsert ? amount : 0;
   }
@@ -232,34 +253,35 @@ public class MeltingModuleInventory implements SlottedStackStorage, TransactionC
     if (amount == 0) {
       return 0;
     }
-    if (!validSlot(slot)) {
+    if (!this.validSlot(slot)) {
       return 0;
     }
 
-    ItemStack existing = getStackInSlot(slot);
+    ItemStack existing = this.getStackInSlot(slot);
     if (existing.isEmpty()) {
       return 0;
     }
 
-    updateSnapshots(slot, transaction);
-    setStackInSlot(slot, ItemStack.EMPTY);
+    this.updateSnapshots(slot, transaction);
+    this.setStackInSlot(slot, ItemStack.EMPTY);
     return existing.getCount();
   }
 
   @Override
   public SingleSlotStorage<ItemVariant> getSlot(int slot) {
-    return getModule(slot);
+    return this.getModule(slot);
   }
 
   /* Heating */
 
   /**
    * Checks if any slot can heat
-   * @param temperature  Temperature to try
-   * @return  True if a slot can heat
+   *
+   * @param temperature Temperature to try
+   * @return True if a slot can heat
    */
   public boolean canHeat(int temperature) {
-    for (MeltingModule module : modules) {
+    for (MeltingModule module : this.modules) {
       if (module != null && module.canHeatItem(temperature)) {
         return true;
       }
@@ -269,15 +291,16 @@ public class MeltingModuleInventory implements SlottedStackStorage, TransactionC
 
   /**
    * Tries to fill the fluid handler with the given fluid
-   * @param index   Index of the module being filled
-   * @param recipe  Recipe to add
-   * @return  True if filled, false if not enough space for the whole fluid
+   *
+   * @param index  Index of the module being filled
+   * @param recipe Recipe to add
+   * @return True if filled, false if not enough space for the whole fluid
    */
   protected boolean tryFillTank(int index, IMeltingRecipe recipe) {
-    FluidStack fluid = recipe.getOutput(getModule(index));
-    if (StorageUtil.simulateInsert(fluidHandler, fluid.getType(), fluid.getAmount(), null) == fluid.getAmount()) {
+    FluidStack fluid = recipe.getOutput(this.getModule(index));
+    if (StorageUtil.simulateInsert(this.fluidHandler, fluid.getType(), fluid.getAmount(), null) == fluid.getAmount()) {
       try (Transaction tx = TransferUtil.getTransaction()) {
-        fluidHandler.insert(fluid.getType(), fluid.getAmount(), tx);
+        this.fluidHandler.insert(fluid.getType(), fluid.getAmount(), tx);
         tx.commit();
       }
       return true;
@@ -287,10 +310,11 @@ public class MeltingModuleInventory implements SlottedStackStorage, TransactionC
 
   /**
    * Heats all items in the inventory
-   * @param temperature  Heating structure temperature
+   *
+   * @param temperature Heating structure temperature
    */
   public void heatItems(int temperature) {
-    for (MeltingModule module : modules) {
+    for (MeltingModule module : this.modules) {
       if (module != null) {
         module.heatItem(temperature);
       }
@@ -301,7 +325,7 @@ public class MeltingModuleInventory implements SlottedStackStorage, TransactionC
    * Cools down all items in the inventory, used when there is no fuel
    */
   public void coolItems() {
-    for (MeltingModule module : modules) {
+    for (MeltingModule module : this.modules) {
       if (module != null) {
         module.coolItem();
       }
@@ -310,38 +334,40 @@ public class MeltingModuleInventory implements SlottedStackStorage, TransactionC
 
   /**
    * Writes this module to Tag
-   * @return  Module in Tag
+   *
+   * @return Module in Tag
    */
   public CompoundTag writeToTag() {
     CompoundTag nbt = new CompoundTag();
     ListTag list = new ListTag();
-    for (int i = 0; i < modules.length; i++) {
-      if (modules[i] != null && !modules[i].getStack().isEmpty()) {
-        CompoundTag moduleTag = modules[i].writeToTag();
-        moduleTag.putByte(TAG_SLOT, (byte)i);
+    for (int i = 0; i < this.modules.length; i++) {
+      if (this.modules[i] != null && !this.modules[i].getStack().isEmpty()) {
+        CompoundTag moduleTag = this.modules[i].writeToTag();
+        moduleTag.putByte(TAG_SLOT, (byte) i);
         list.add(moduleTag);
       }
     }
     if (!list.isEmpty()) {
       nbt.put(TAG_ITEMS, list);
     }
-    nbt.putByte(TAG_SIZE, (byte)modules.length);
+    nbt.putByte(TAG_SIZE, (byte) this.modules.length);
     return nbt;
   }
 
   /**
    * Reads this inventory from Tag
-   * @param nbt  Tag compound
+   *
+   * @param nbt Tag compound
    */
   public void readFromTag(CompoundTag nbt) {
-    if (!strictSize) {
+    if (!this.strictSize) {
       int newSize = nbt.getByte(TAG_SIZE) & 255;
-      if (newSize != modules.length) {
-        modules = Arrays.copyOf(modules, newSize);
+      if (newSize != this.modules.length) {
+        this.modules = Arrays.copyOf(this.modules, newSize);
       }
     }
     // remove old data
-    for (MeltingModule module : modules) {
+    for (MeltingModule module : this.modules) {
       if (module != null) {
         module.setStack(ItemStack.EMPTY);
       }
@@ -352,8 +378,8 @@ public class MeltingModuleInventory implements SlottedStackStorage, TransactionC
       CompoundTag item = list.getCompound(i);
       if (item.contains(TAG_SLOT, Tag.TAG_BYTE)) {
         int slot = item.getByte(TAG_SLOT) & 255;
-        if (validSlot(slot)) {
-          getModule(slot).readFromTag(item);
+        if (this.validSlot(slot)) {
+          this.getModule(slot).readFromTag(item);
         }
       }
     }
@@ -364,19 +390,20 @@ public class MeltingModuleInventory implements SlottedStackStorage, TransactionC
 
   /**
    * Sets up all sub slots for tracking
-   * @param consumer  IIntArray consumer
+   *
+   * @param consumer IIntArray consumer
    */
   public void trackInts(Consumer<ContainerData> consumer) {
-    for (int i = 0; i < getSlotCount(); i++) {
-      consumer.accept(getModule(i));
+    for (int i = 0; i < this.getSlotCount(); i++) {
+      consumer.accept(this.getModule(i));
     }
   }
 
   @Override
   public long insert(ItemVariant resource, long maxAmount, TransactionContext transaction) {
     long totalInserted = 0;
-    for (int i = 0; i < getSlotCount(); i++) {
-      long inserted = insertSlot(i, resource, maxAmount, transaction);
+    for (int i = 0; i < this.getSlotCount(); i++) {
+      long inserted = this.insertSlot(i, resource, maxAmount, transaction);
       totalInserted += inserted;
       maxAmount -= inserted;
     }
@@ -386,8 +413,8 @@ public class MeltingModuleInventory implements SlottedStackStorage, TransactionC
   @Override
   public long extract(ItemVariant resource, long maxAmount, TransactionContext transaction) {
     long totalExtracted = 0;
-    for (int i = 0; i < getSlotCount(); i++) {
-      long extracted = extractSlot(i, resource, maxAmount, transaction);
+    for (int i = 0; i < this.getSlotCount(); i++) {
+      long extracted = this.extractSlot(i, resource, maxAmount, transaction);
       totalExtracted += extracted;
       maxAmount -= extracted;
     }
@@ -395,25 +422,25 @@ public class MeltingModuleInventory implements SlottedStackStorage, TransactionC
   }
 
   protected SnapshotData createSnapshot(int slot) {
-    return new SnapshotData(slot, getStackInSlot(slot));
+    return new SnapshotData(slot, this.getStackInSlot(slot));
   }
 
   protected void readSnapshot(SnapshotData snapshot) {
-    setStackInSlot(snapshot.slot(), snapshot.stack());
+    this.setStackInSlot(snapshot.slot(), snapshot.stack());
   }
 
   public void updateSnapshots(int slot, TransactionContext transaction) {
     // Make sure we have enough storage for snapshots
-    while (snapshots.size() <= transaction.nestingDepth()) {
-      snapshots.add(null);
+    while (this.snapshots.size() <= transaction.nestingDepth()) {
+      this.snapshots.add(null);
     }
 
     // If the snapshot is null, we need to create it, and we need to register a callback.
-    if (snapshots.get(transaction.nestingDepth()) == null) {
-      SnapshotData snapshot = createSnapshot(slot);
+    if (this.snapshots.get(transaction.nestingDepth()) == null) {
+      SnapshotData snapshot = this.createSnapshot(slot);
       Objects.requireNonNull(snapshot, "Snapshot may not be null!");
 
-      snapshots.set(transaction.nestingDepth(), snapshot);
+      this.snapshots.set(transaction.nestingDepth(), snapshot);
       transaction.addCloseCallback(this);
     }
   }
@@ -423,15 +450,15 @@ public class MeltingModuleInventory implements SlottedStackStorage, TransactionC
   @Override
   public void onClose(TransactionContext transaction, TransactionContext.Result result) {
     // Get and remove the relevant snapshot.
-    SnapshotData snapshot = snapshots.set(transaction.nestingDepth(), null);
+    SnapshotData snapshot = this.snapshots.set(transaction.nestingDepth(), null);
 
     if (result.wasAborted()) {
       // If the transaction was aborted, we just revert to the state of the snapshot.
-      readSnapshot(snapshot);
+      this.readSnapshot(snapshot);
     } else if (transaction.nestingDepth() > 0) {
-      if (snapshots.get(transaction.nestingDepth() - 1) == null) {
+      if (this.snapshots.get(transaction.nestingDepth() - 1) == null) {
         // No snapshot yet, so move the snapshot one nesting level up.
-        snapshots.set(transaction.nestingDepth() - 1, snapshot);
+        this.snapshots.set(transaction.nestingDepth() - 1, snapshot);
         // This is the first snapshot at this level: we need to call addCloseCallback.
         transaction.getOpenTransaction(transaction.nestingDepth() - 1).addCloseCallback(this);
       }

@@ -36,6 +36,7 @@ import java.util.List;
  * Recipe to add overslime to a tool
  */
 public class OverslimeModifierRecipe implements ITinkerStationRecipe, IDisplayModifierRecipe {
+
   private static final ValidatedResult AT_CAPACITY = ValidatedResult.failure(TConstruct.makeTranslationKey("recipe", "overslime.at_capacity"));
 
   @Getter
@@ -56,7 +57,7 @@ public class OverslimeModifierRecipe implements ITinkerStationRecipe, IDisplayMo
       return false;
     }
     // must find at least one slime, but multiple is fine, as is empty slots
-    return IncrementalModifierRecipe.containsOnlyIngredient(inv, ingredient);
+    return IncrementalModifierRecipe.containsOnlyIngredient(inv, this.ingredient);
   }
 
   @Override
@@ -86,15 +87,16 @@ public class OverslimeModifierRecipe implements ITinkerStationRecipe, IDisplayMo
     }
 
     // see how much value is available, update overslime to the max possible
-    int available = IncrementalModifierRecipe.getAvailableAmount(inv, ingredient, restoreAmount);
+    int available = IncrementalModifierRecipe.getAvailableAmount(inv, this.ingredient, this.restoreAmount);
     overslime.addOverslime(tool, available);
-    return ValidatedResult.success(tool.createStack(Math.min(tinkerable.getCount(), shrinkToolSlotBy())));
+    return ValidatedResult.success(tool.createStack(Math.min(tinkerable.getCount(), this.shrinkToolSlotBy())));
   }
 
   /**
    * Updates the input stacks upon crafting this recipe
-   * @param result  Result from {@link #assemble(ITinkerStationContainer, RegistryAccess)}. Generally should not be modified
-   * @param inv     Inventory instance to modify inputs
+   *
+   * @param result Result from {@link #assemble(ITinkerStationContainer, RegistryAccess)}. Generally should not be modified
+   * @param inv    Inventory instance to modify inputs
    */
   @Override
   public void updateInputs(ItemStack result, IMutableTinkerStationContainer inv, boolean isServer) {
@@ -108,10 +110,12 @@ public class OverslimeModifierRecipe implements ITinkerStationRecipe, IDisplayMo
 
     // how much did we actually consume?
     int maxNeeded = overslime.getOverslime(ToolStack.from(result)) - current;
-    IncrementalModifierRecipe.updateInputs(inv, ingredient, maxNeeded, restoreAmount, ItemStack.EMPTY);
+    IncrementalModifierRecipe.updateInputs(inv, this.ingredient, maxNeeded, this.restoreAmount, ItemStack.EMPTY);
   }
 
-  /** @deprecated use {@link #assemble(ITinkerStationContainer, RegistryAccess)} */
+  /**
+   * @deprecated use {@link #assemble(ITinkerStationContainer, RegistryAccess)}
+   */
   @Deprecated
   @Override
   public ItemStack getResultItem(RegistryAccess registryAccess) {
@@ -124,9 +128,13 @@ public class OverslimeModifierRecipe implements ITinkerStationRecipe, IDisplayMo
   }
 
   /* JEI display */
-  /** Cache of modifier result, same for all overslime */
+  /**
+   * Cache of modifier result, same for all overslime
+   */
   private static final ModifierEntry RESULT = new ModifierEntry(TinkerModifiers.overslime, 1);
-  /** Cache of input and output tools for display */
+  /**
+   * Cache of input and output tools for display
+   */
   private List<ItemStack> toolWithoutModifier, toolWithModifier = null;
 
   @Override
@@ -137,28 +145,29 @@ public class OverslimeModifierRecipe implements ITinkerStationRecipe, IDisplayMo
   @Override
   public List<ItemStack> getDisplayItems(int slot) {
     if (slot == 0) {
-      return Arrays.asList(ingredient.getItems());
+      return Arrays.asList(this.ingredient.getItems());
     }
     return Collections.emptyList();
   }
+
   @Override
   public List<ItemStack> getToolWithoutModifier() {
-    if (toolWithoutModifier == null) {
-      toolWithoutModifier = RegistryHelper.getTagValueStream(BuiltInRegistries.ITEM, TinkerTags.Items.DURABILITY).map(MAP_TOOL_FOR_RENDERING).toList();
+    if (this.toolWithoutModifier == null) {
+      this.toolWithoutModifier = RegistryHelper.getTagValueStream(BuiltInRegistries.ITEM, TinkerTags.Items.DURABILITY).map(MAP_TOOL_FOR_RENDERING).toList();
     }
-    return toolWithoutModifier;
+    return this.toolWithoutModifier;
   }
 
   @Override
   public List<ItemStack> getToolWithModifier() {
-    if (toolWithModifier == null) {
+    if (this.toolWithModifier == null) {
       OverslimeModifier overslime = TinkerModifiers.overslime.get();
-      toolWithModifier = RegistryHelper.getTagValueStream(BuiltInRegistries.ITEM, TinkerTags.Items.DURABILITY)
-                                       .map(MAP_TOOL_FOR_RENDERING)
-                                       .map(stack -> IDisplayModifierRecipe.withModifiers(stack, null, RESULT, data -> overslime.setShield(data, restoreAmount)))
-                                       .toList();
+      this.toolWithModifier = RegistryHelper.getTagValueStream(BuiltInRegistries.ITEM, TinkerTags.Items.DURABILITY)
+        .map(MAP_TOOL_FOR_RENDERING)
+        .map(stack -> IDisplayModifierRecipe.withModifiers(stack, null, RESULT, data -> overslime.setShield(data, this.restoreAmount)))
+        .toList();
     }
-    return toolWithModifier;
+    return this.toolWithModifier;
   }
 
   @Override
@@ -167,6 +176,7 @@ public class OverslimeModifierRecipe implements ITinkerStationRecipe, IDisplayMo
   }
 
   public static class Serializer extends LoggingRecipeSerializer<OverslimeModifierRecipe> {
+
     @Override
     public OverslimeModifierRecipe fromJson(ResourceLocation id, JsonObject json) {
       Ingredient ingredient = Ingredient.fromJson(JsonHelper.getElement(json, "ingredient"));

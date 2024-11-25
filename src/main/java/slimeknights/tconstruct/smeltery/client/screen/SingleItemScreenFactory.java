@@ -15,14 +15,16 @@ import javax.annotation.Nullable;
 /**
  * Screen factory for the single item container, one container for multiple backgrounds
  */
-public class SingleItemScreenFactory implements ScreenRegistry.Factory<SingleItemContainerMenu,BackgroundContainerScreen<SingleItemContainerMenu>> {
+public class SingleItemScreenFactory implements ScreenRegistry.Factory<SingleItemContainerMenu, BackgroundContainerScreen<SingleItemContainerMenu>> {
+
   private static final int HEIGHT = 133;
   private static final ResourceLocation DEFAULT = TConstruct.getResource("textures/gui/blank.png");
 
   /**
    * Gets the background path for the given tile
-   * @param tile  Tile
-   * @return  Background path
+   *
+   * @param tile Tile
+   * @return Background path
    */
   private static ResourceLocation getBackground(@Nullable BlockEntity tile) {
     if (tile != null) {

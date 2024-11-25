@@ -8,6 +8,7 @@ import net.fabricmc.loader.api.VersionParsingException;
 import java.util.List;
 
 public class StarSodiumFixer implements MixinCanceller {
+
   private static final Version SODIUM_VERSION;
 
   static {

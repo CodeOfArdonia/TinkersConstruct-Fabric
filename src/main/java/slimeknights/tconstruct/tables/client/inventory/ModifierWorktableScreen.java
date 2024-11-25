@@ -29,7 +29,8 @@ import slimeknights.tconstruct.tools.item.ModifierCrystalItem;
 import java.util.Collections;
 import java.util.List;
 
-public class ModifierWorktableScreen extends BaseTabbedScreen<ModifierWorktableBlockEntity,ModifierWorktableContainerMenu> {
+public class ModifierWorktableScreen extends BaseTabbedScreen<ModifierWorktableBlockEntity, ModifierWorktableContainerMenu> {
+
   protected static final Component TITLE = TConstruct.makeTranslation("gui", "modifier_worktable.title");
   protected static final Component TABLE_INFO = TConstruct.makeTranslation("gui", "modifier_worktable.info");
 
@@ -40,13 +41,19 @@ public class ModifierWorktableScreen extends BaseTabbedScreen<ModifierWorktableB
     new Pattern(TConstruct.MOD_ID, "quartz")
   };
 
-  /** Side panels, for tools and modifiers */
+  /**
+   * Side panels, for tools and modifiers
+   */
   protected InfoPanelScreen tinkerInfo;
   protected InfoPanelScreen modifierInfo;
 
-  /** Current scrollbar position */
+  /**
+   * Current scrollbar position
+   */
   private float sliderProgress = 0.0F;
-  /** Is {@code true} if the player clicked on the scroll wheel in the GUI */
+  /**
+   * Is {@code true} if the player clicked on the scroll wheel in the GUI
+   */
   private boolean clickedOnScrollBar;
 
   /**
@@ -60,17 +67,17 @@ public class ModifierWorktableScreen extends BaseTabbedScreen<ModifierWorktableB
     super(container, playerInventory, title);
 
     this.tinkerInfo = new InfoPanelScreen(this, container, playerInventory, title);
-    this.tinkerInfo.setTextScale(8/9f);
+    this.tinkerInfo.setTextScale(8 / 9f);
     this.addModule(this.tinkerInfo);
 
     this.modifierInfo = new InfoPanelScreen(this, container, playerInventory, title);
-    this.modifierInfo.setTextScale(7/9f);
+    this.modifierInfo.setTextScale(7 / 9f);
     this.addModule(this.modifierInfo);
 
     this.tinkerInfo.yOffset = 0;
     this.modifierInfo.yOffset = this.tinkerInfo.imageHeight + 4;
 
-    addChestSideInventory(playerInventory);
+    this.addChestSideInventory(playerInventory);
   }
 
   @Override
@@ -95,21 +102,22 @@ public class ModifierWorktableScreen extends BaseTabbedScreen<ModifierWorktableB
 
   /**
    * Gets the button at the given mouse location
-   * @param mouseX  X position of button
-   * @param mouseY  Y position of button
-   * @return  Button index, or -1 if none
+   *
+   * @param mouseX X position of button
+   * @param mouseY Y position of button
+   * @return Button index, or -1 if none
    */
   private int getButtonAt(int mouseX, int mouseY) {
-    if (tile != null) {
-      List<ModifierEntry> buttons = tile.getCurrentButtons();
+    if (this.tile != null) {
+      List<ModifierEntry> buttons = this.tile.getCurrentButtons();
       if (!buttons.isEmpty()) {
         int x = this.cornerX + 28;
         int y = this.cornerY + 15;
         int maxIndex = Math.min((this.modifierIndexOffset + 12), buttons.size());
         for (int l = this.modifierIndexOffset; l < maxIndex; ++l) {
           int relative = l - this.modifierIndexOffset;
-          double buttonX = mouseX - (double)(x + relative % 4 * 18);
-          double buttonY = mouseY - (double)(y + relative / 4 * 18);
+          double buttonX = mouseX - (double) (x + relative % 4 * 18);
+          double buttonY = mouseY - (double) (y + relative / 4 * 18);
           if (buttonX >= 0.0D && buttonY >= 0.0D && buttonX < 18.0D && buttonY < 18.0D) {
             return l;
           }
@@ -124,10 +132,10 @@ public class ModifierWorktableScreen extends BaseTabbedScreen<ModifierWorktableB
     super.renderTooltip(graphics, mouseX, mouseY);
 
     // determime which button we are hovering
-    if (tile != null) {
-      List<ModifierEntry> buttons = tile.getCurrentButtons();
+    if (this.tile != null) {
+      List<ModifierEntry> buttons = this.tile.getCurrentButtons();
       if (!buttons.isEmpty()) {
-        int index = getButtonAt(mouseX, mouseY);
+        int index = this.getButtonAt(mouseX, mouseY);
         if (index >= 0) {
           ModifierEntry modifier = buttons.get(index);
           graphics.renderTooltip(this.font, modifier.getModifier().getDisplayName(modifier.getLevel()), mouseX, mouseY);
@@ -136,9 +144,11 @@ public class ModifierWorktableScreen extends BaseTabbedScreen<ModifierWorktableB
     }
   }
 
-  /** Draw backgrounds for all modifiers */
+  /**
+   * Draw backgrounds for all modifiers
+   */
   private void drawModifierBackgrounds(GuiGraphics graphics, ResourceLocation texture, int mouseX, int mouseY, int left, int top) {
-    if (tile != null) {
+    if (this.tile != null) {
       int selectedIndex = this.tile.getSelectedIndex();
       int max = Math.min(this.modifierIndexOffset + 12, this.getPartRecipeCount());
       for (int i = this.modifierIndexOffset; i < max; ++i) {
@@ -156,10 +166,12 @@ public class ModifierWorktableScreen extends BaseTabbedScreen<ModifierWorktableB
     }
   }
 
-  /** Draw slot icons for all patterns */
+  /**
+   * Draw slot icons for all patterns
+   */
   private void drawModifierIcons(GuiGraphics graphics, int left, int top) {
     // use block texture list
-    if (tile != null) {
+    if (this.tile != null) {
       assert this.minecraft != null;
       RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
       // iterate all recipes
@@ -178,39 +190,39 @@ public class ModifierWorktableScreen extends BaseTabbedScreen<ModifierWorktableB
   public void updateDisplay() {
     // if we can no longer scroll, reset scrollbar progress
     // fixes the case where we added an item and lost recipes
-    if (!canScroll()) {
+    if (!this.canScroll()) {
       this.sliderProgress = 0.0F;
       this.modifierIndexOffset = 0;
     }
 
-    if (tile != null) {
-      Component message = tile.getCurrentMessage();
+    if (this.tile != null) {
+      Component message = this.tile.getCurrentMessage();
       if (!message.getString().isEmpty()) {
-        message(message);
+        this.message(message);
         return;
       }
 
-      ToolStack result = tile.getResult();
+      ToolStack result = this.tile.getResult();
       if (result == null) {
-        message(TABLE_INFO);
+        this.message(TABLE_INFO);
         return;
       }
 
       // reuse logic from tinker station for final result
-      ItemStack resultStack = getMenu().getOutputSlot().getItem();
-      TinkerStationScreen.updateToolPanel(tinkerInfo, result, resultStack);
+      ItemStack resultStack = this.getMenu().getOutputSlot().getItem();
+      TinkerStationScreen.updateToolPanel(this.tinkerInfo, result, resultStack);
 
       this.modifierInfo.setCaption(Component.empty());
       this.modifierInfo.setText(Component.empty());
       if (result.hasTag(TinkerTags.Items.MODIFIABLE)) {
-        TinkerStationScreen.updateModifierPanel(modifierInfo, result);
+        TinkerStationScreen.updateModifierPanel(this.modifierInfo, result);
       } else {
         // modifier crystals can show their modifier, along with anything else with a modifier there
         ModifierId modifierId = ModifierCrystalItem.getModifier(resultStack);
         if (modifierId != null) {
           Modifier modifier = ModifierManager.getValue(modifierId);
-          modifierInfo.setCaption(TConstruct.makeTranslation("gui", "tinker_station.modifiers"));
-          modifierInfo.setText(Collections.singletonList(modifier.getDisplayName()), Collections.singletonList(modifier.getDescription()));
+          this.modifierInfo.setCaption(TConstruct.makeTranslation("gui", "tinker_station.modifiers"));
+          this.modifierInfo.setText(Collections.singletonList(modifier.getDisplayName()), Collections.singletonList(modifier.getDescription()));
         }
       }
     }
@@ -223,13 +235,13 @@ public class ModifierWorktableScreen extends BaseTabbedScreen<ModifierWorktableB
   public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
     this.clickedOnScrollBar = false;
     if (this.tinkerInfo.handleMouseClicked(mouseX, mouseY, mouseButton)
-        || this.modifierInfo.handleMouseClicked(mouseX, mouseY, mouseButton)) {
+      || this.modifierInfo.handleMouseClicked(mouseX, mouseY, mouseButton)) {
       return false;
     }
 
-    if (tile != null && !tile.getCurrentButtons().isEmpty()) {
+    if (this.tile != null && !this.tile.getCurrentButtons().isEmpty()) {
       // handle button click
-      int index = getButtonAt((int)mouseX, (int)mouseY);
+      int index = this.getButtonAt((int) mouseX, (int) mouseY);
       assert this.minecraft != null && this.minecraft.player != null;
       if (index >= 0 && this.getMenu().clickMenuButton(this.minecraft.player, index)) {
         this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_STONECUTTER_SELECT_RECIPE, 1.0F));
@@ -252,7 +264,7 @@ public class ModifierWorktableScreen extends BaseTabbedScreen<ModifierWorktableB
   @Override
   public boolean mouseDragged(double mouseX, double mouseY, int clickedMouseButton, double timeSinceLastClick, double unknown) {
     if (this.tinkerInfo.handleMouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick)
-        || this.modifierInfo.handleMouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick)) {
+      || this.modifierInfo.handleMouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick)) {
       return false;
     }
 
@@ -271,7 +283,7 @@ public class ModifierWorktableScreen extends BaseTabbedScreen<ModifierWorktableB
   @Override
   public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
     if (this.tinkerInfo.handleMouseScrolled(mouseX, mouseY, delta)
-        || this.modifierInfo.handleMouseScrolled(mouseX, mouseY, delta)) {
+      || this.modifierInfo.handleMouseScrolled(mouseX, mouseY, delta)) {
       return false;
     }
     if (super.mouseScrolled(mouseX, mouseY, delta)) {
@@ -290,7 +302,7 @@ public class ModifierWorktableScreen extends BaseTabbedScreen<ModifierWorktableB
   @Override
   public boolean mouseReleased(double mouseX, double mouseY, int state) {
     if (this.tinkerInfo.handleMouseReleased(mouseX, mouseY, state)
-        || this.modifierInfo.handleMouseReleased(mouseX, mouseY, state)) {
+      || this.modifierInfo.handleMouseReleased(mouseX, mouseY, state)) {
       return false;
     }
     return super.mouseReleased(mouseX, mouseY, state);
@@ -316,8 +328,8 @@ public class ModifierWorktableScreen extends BaseTabbedScreen<ModifierWorktableB
   }
 
   private Component getInfoTitle() {
-    if (tile != null) {
-      IModifierWorktableRecipe recipe = tile.getCurrentRecipe();
+    if (this.tile != null) {
+      IModifierWorktableRecipe recipe = this.tile.getCurrentRecipe();
       if (recipe != null) {
         return recipe.getTitle();
       }
@@ -325,9 +337,11 @@ public class ModifierWorktableScreen extends BaseTabbedScreen<ModifierWorktableB
     return TITLE;
   }
 
-  /** Displays a message with the default title */
+  /**
+   * Displays a message with the default title
+   */
   public void message(Component message) {
-    this.tinkerInfo.setCaption(getInfoTitle());
+    this.tinkerInfo.setCaption(this.getInfoTitle());
     this.tinkerInfo.setText(message);
     this.modifierInfo.setCaption(Component.empty());
     this.modifierInfo.setText(Component.empty());
@@ -336,7 +350,7 @@ public class ModifierWorktableScreen extends BaseTabbedScreen<ModifierWorktableB
   @Override
   public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
     if (TinkerStationScreen.needsDisplayUpdate(keyCode)) {
-      updateDisplay();
+      this.updateDisplay();
     }
     return super.keyPressed(keyCode, scanCode, modifiers);
   }
@@ -344,7 +358,7 @@ public class ModifierWorktableScreen extends BaseTabbedScreen<ModifierWorktableB
   @Override
   public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
     if (TinkerStationScreen.needsDisplayUpdate(keyCode)) {
-      updateDisplay();
+      this.updateDisplay();
     }
     return super.keyReleased(keyCode, scanCode, modifiers);
   }
@@ -352,17 +366,23 @@ public class ModifierWorktableScreen extends BaseTabbedScreen<ModifierWorktableB
 
   /* Helpers */
 
-  /** Gets the number of part recipes */
+  /**
+   * Gets the number of part recipes
+   */
   private int getPartRecipeCount() {
-    return tile == null ? 0 : tile.getCurrentButtons().size();
+    return this.tile == null ? 0 : this.tile.getCurrentButtons().size();
   }
 
-  /** If true, we can scroll */
+  /**
+   * If true, we can scroll
+   */
   private boolean canScroll() {
     return this.getPartRecipeCount() > 12;
   }
 
-  /** Gets the number of hidden part recipe rows */
+  /**
+   * Gets the number of hidden part recipe rows
+   */
   private int getHiddenRows() {
     return (this.getPartRecipeCount() + 4 - 1) / 4 - 3;
   }

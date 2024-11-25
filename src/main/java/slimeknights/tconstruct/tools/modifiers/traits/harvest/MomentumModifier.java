@@ -30,6 +30,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class MomentumModifier extends Modifier implements ProjectileLaunchModifierHook, ConditionalStatModifierHook {
+
   private static final Component SPEED = TConstruct.makeTranslation("modifier", "momentum.speed");
 
   @Override
@@ -43,7 +44,9 @@ public class MomentumModifier extends Modifier implements ProjectileLaunchModifi
     return 75;
   }
 
-  /** Gets the bonus for the modifier */
+  /**
+   * Gets the bonus for the modifier
+   */
   private static float getBonus(LivingEntity living, RegistryObject<? extends TinkerEffect> effect, int level, float scale) {
     // 25% boost per level at max
     int effectLevel = effect.get().getLevel(living) + 1;
@@ -101,7 +104,7 @@ public class MomentumModifier extends Modifier implements ProjectileLaunchModifi
         bonus = level * 0.25f;
       }
       if (bonus > 0) {
-        addPercentTooltip(SPEED, bonus, tooltip);
+        this.addPercentTooltip(SPEED, bonus, tooltip);
       }
     }
   }

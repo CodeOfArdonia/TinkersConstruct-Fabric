@@ -21,6 +21,7 @@ import slimeknights.tconstruct.tools.TinkerModifiers;
 import slimeknights.tconstruct.tools.modifiers.effect.NoMilkEffect;
 
 public class SelfDestructiveModifier extends NoLevelsModifier implements KeybindInteractModifierHook {
+
   @Override
   public boolean startInteract(IToolStackView tool, ModifierEntry modifier, Player player, EquipmentSlot slot, TooltipKey keyModifier) {
     if (player.isShiftKeyDown()) {
@@ -47,12 +48,15 @@ public class SelfDestructiveModifier extends NoLevelsModifier implements Keybind
     hookBuilder.addHook(this, TinkerHooks.ARMOR_INTERACT);
   }
 
-  /** Internal potion effect handling the explosion */
+  /**
+   * Internal potion effect handling the explosion
+   */
   public static class SelfDestructiveEffect extends NoMilkEffect {
+
     public SelfDestructiveEffect() {
       super(MobEffectCategory.HARMFUL, 0x59D24A, true);
       // make the player slow
-      addAttributeModifier(Attributes.MOVEMENT_SPEED, "68ee3026-1d50-4eb4-914e-a8b05fbfdb71", -0.9f, Operation.MULTIPLY_TOTAL);
+      this.addAttributeModifier(Attributes.MOVEMENT_SPEED, "68ee3026-1d50-4eb4-914e-a8b05fbfdb71", -0.9f, Operation.MULTIPLY_TOTAL);
     }
 
     @Override

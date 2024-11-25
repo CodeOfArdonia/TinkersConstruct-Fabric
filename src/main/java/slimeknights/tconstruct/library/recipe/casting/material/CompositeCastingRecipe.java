@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
  * Casting recipe taking a part of a material and a fluid and outputting the part with a new material
  */
 public abstract class CompositeCastingRecipe extends MaterialCastingRecipe {
+
   public CompositeCastingRecipe(RecipeType<?> type, ResourceLocation id, String group, IMaterialItem result, int itemCost) {
     super(type, id, group, Ingredient.of(result), itemCost, result, true, false);
   }
@@ -43,29 +44,32 @@ public abstract class CompositeCastingRecipe extends MaterialCastingRecipe {
   /* JEI display */
   @Override
   public List<IDisplayableCastingRecipe> getRecipes() {
-    if (multiRecipes == null) {
-      RecipeType<?> type = getType();
-      multiRecipes = MaterialCastingLookup
+    if (this.multiRecipes == null) {
+      RecipeType<?> type = this.getType();
+      this.multiRecipes = MaterialCastingLookup
         .getAllCompositeFluids().stream()
         .filter(recipe -> {
           MaterialVariant output = recipe.getOutput();
           MaterialVariant input = recipe.getInput();
           return !output.isUnknown() && input != null && !input.isUnknown()
-            && !output.get().isHidden() && !input.get().isHidden() && result.canUseMaterial(output.getId()) && result.canUseMaterial(input.getId());
+            && !output.get().isHidden() && !input.get().isHidden() && this.result.canUseMaterial(output.getId()) && this.result.canUseMaterial(input.getId());
         })
         .map(recipe -> {
-          List<FluidStack> fluids = resizeFluids(recipe.getFluids());
+          List<FluidStack> fluids = this.resizeFluids(recipe.getFluids());
           long fluidAmount = fluids.stream().mapToLong(FluidStack::getAmount).max().orElse(0);
-          return new DisplayCastingRecipe(type, Collections.singletonList(result.withMaterial(Objects.requireNonNull(recipe.getInput()).getVariant())), fluids, result.withMaterial(recipe.getOutput().getVariant()),
-                                          ICastingRecipe.calcCoolingTime(recipe.getTemperature(), itemCost * fluidAmount), consumed);
+          return new DisplayCastingRecipe(type, Collections.singletonList(this.result.withMaterial(Objects.requireNonNull(recipe.getInput()).getVariant())), fluids, this.result.withMaterial(recipe.getOutput().getVariant()),
+            ICastingRecipe.calcCoolingTime(recipe.getTemperature(), this.itemCost * fluidAmount), this.consumed);
         })
         .collect(Collectors.toList());
     }
-    return multiRecipes;
+    return this.multiRecipes;
   }
 
-  /** Basin implementation */
+  /**
+   * Basin implementation
+   */
   public static class Basin extends CompositeCastingRecipe {
+
     public Basin(ResourceLocation id, String group, IMaterialItem result, int itemCost) {
       super(TinkerRecipeTypes.CASTING_BASIN.get(), id, group, result, itemCost);
     }
@@ -76,8 +80,11 @@ public abstract class CompositeCastingRecipe extends MaterialCastingRecipe {
     }
   }
 
-  /** Table implementation */
+  /**
+   * Table implementation
+   */
   public static class Table extends CompositeCastingRecipe {
+
     public Table(ResourceLocation id, String group, IMaterialItem result, int itemCost) {
       super(TinkerRecipeTypes.CASTING_TABLE.get(), id, group, result, itemCost);
     }
@@ -90,15 +97,20 @@ public abstract class CompositeCastingRecipe extends MaterialCastingRecipe {
 
   /**
    * Interface representing a composite casting recipe constructor
-   * @param <T>  Recipe class type
+   *
+   * @param <T> Recipe class type
    */
   public interface IFactory<T extends CompositeCastingRecipe> {
+
     T create(ResourceLocation id, String group, IMaterialItem result, int itemCost);
   }
 
-  /** Shared serializer logic */
+  /**
+   * Shared serializer logic
+   */
   @RequiredArgsConstructor
   public static class Serializer<T extends CompositeCastingRecipe> extends LoggingRecipeSerializer<T> {
+
     private final IFactory<T> factory;
 
     @Override
@@ -106,7 +118,7 @@ public abstract class CompositeCastingRecipe extends MaterialCastingRecipe {
       String group = GsonHelper.getAsString(json, "group", "");
       IMaterialItem result = RecipeHelper.deserializeItem(GsonHelper.getAsString(json, "result"), "result", IMaterialItem.class);
       int itemCost = GsonHelper.getAsInt(json, "item_cost");
-      return factory.create(id, group, result, itemCost);
+      return this.factory.create(id, group, result, itemCost);
     }
 
     @Nullable
@@ -115,7 +127,7 @@ public abstract class CompositeCastingRecipe extends MaterialCastingRecipe {
       String group = buffer.readUtf(Short.MAX_VALUE);
       IMaterialItem result = RecipeHelper.readItem(buffer, IMaterialItem.class);
       int itemCost = buffer.readVarInt();
-      return factory.create(id, group, result, itemCost);
+      return this.factory.create(id, group, result, itemCost);
     }
 
     @Override

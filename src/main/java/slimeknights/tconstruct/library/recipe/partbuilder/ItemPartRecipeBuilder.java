@@ -15,43 +15,45 @@ import slimeknights.tconstruct.library.materials.definition.MaterialId;
 import slimeknights.tconstruct.tables.TinkerTables;
 
 import javax.annotation.Nullable;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 @RequiredArgsConstructor(staticName = "item")
 public class ItemPartRecipeBuilder extends AbstractRecipeBuilder<ItemPartRecipeBuilder> {
+
   private final MaterialId materialId;
   private final ResourceLocation pattern;
   private final int cost;
   private final ItemOutput result;
-  @Setter @Accessors(chain = true)
+  @Setter
+  @Accessors(chain = true)
   private Ingredient patternItem;
 
   @Override
   public void save(Consumer<FinishedRecipe> consumer) {
-    save(consumer, BuiltInRegistries.ITEM.getKey(result.get().getItem()));
+    this.save(consumer, BuiltInRegistries.ITEM.getKey(this.result.get().getItem()));
   }
 
   @Override
   public void save(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
-    ResourceLocation advancementId = buildOptionalAdvancement(id, "parts");
+    ResourceLocation advancementId = this.buildOptionalAdvancement(id, "parts");
     consumer.accept(new Finished(id, advancementId));
   }
 
   private class Finished extends AbstractFinishedRecipe {
+
     public Finished(ResourceLocation ID, @Nullable ResourceLocation advancementID) {
       super(ID, advancementID);
     }
 
     @Override
     public void serializeRecipeData(JsonObject json) {
-      json.addProperty("material", materialId.toString());
-      json.addProperty("pattern", pattern.toString());
-      if (patternItem != null) {
-        json.add("pattern_item", patternItem.toJson());
+      json.addProperty("material", ItemPartRecipeBuilder.this.materialId.toString());
+      json.addProperty("pattern", ItemPartRecipeBuilder.this.pattern.toString());
+      if (ItemPartRecipeBuilder.this.patternItem != null) {
+        json.add("pattern_item", ItemPartRecipeBuilder.this.patternItem.toJson());
       }
-      json.addProperty("cost", cost);
-      json.add("result", result.serialize());
+      json.addProperty("cost", ItemPartRecipeBuilder.this.cost);
+      json.add("result", ItemPartRecipeBuilder.this.result.serialize());
     }
 
     @Override

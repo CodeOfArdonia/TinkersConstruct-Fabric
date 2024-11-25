@@ -7,10 +7,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.crafting.Ingredient;
 
-/** Recipe for transforming a bottle, depending on a vanilla brewing recipe to get the ingredient */
+/**
+ * Recipe for transforming a bottle, depending on a vanilla brewing recipe to get the ingredient
+ */
 public class BottleBrewingRecipe extends BrewingRecipe {
+
   private final Item from;
   private final Item to;
+
   public BottleBrewingRecipe(Ingredient input, Item from, Item to, ItemStack output) {
     super(input, Ingredient.EMPTY, output);
     this.from = from;
@@ -20,7 +24,7 @@ public class BottleBrewingRecipe extends BrewingRecipe {
   @Override
   public boolean isIngredient(ItemStack stack) {
     for (PotionBrewing.Mix<Item> recipe : PotionBrewingAccessor.port_lib$CONTAINER_MIXES()) {
-      if (recipe.from == from && recipe.to == to) {
+      if (recipe.from == this.from && recipe.to == this.to) {
         return recipe.ingredient.test(stack);
       }
     }
@@ -30,7 +34,7 @@ public class BottleBrewingRecipe extends BrewingRecipe {
   @Override
   public Ingredient getIngredient() {
     for (PotionBrewing.Mix<Item> recipe : PotionBrewingAccessor.port_lib$CONTAINER_MIXES()) {
-      if (recipe.from == from && recipe.to == to) {
+      if (recipe.from == this.from && recipe.to == this.to) {
         return recipe.ingredient;
       }
     }

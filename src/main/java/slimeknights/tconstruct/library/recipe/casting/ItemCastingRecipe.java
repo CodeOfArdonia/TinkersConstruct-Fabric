@@ -27,11 +27,13 @@ import java.util.List;
  * Casting recipe that takes a fluid and optional cast and outputs an item
  */
 public abstract class ItemCastingRecipe extends AbstractCastingRecipe implements IDisplayableCastingRecipe {
+
   @Getter
   protected final FluidIngredient fluid;
   protected final ItemOutput result;
   @Getter
   protected final int coolingTime;
+
   public ItemCastingRecipe(RecipeType<?> type, ResourceLocation id, String group, Ingredient cast, FluidIngredient fluid, ItemOutput result, int coolingTime, boolean consumed, boolean switchSlots) {
     super(type, id, group, cast, consumed, switchSlots);
     this.fluid = fluid;
@@ -46,7 +48,7 @@ public abstract class ItemCastingRecipe extends AbstractCastingRecipe implements
 
   @Override
   public boolean matches(ICastingContainer inv, Level worldIn) {
-    return getCast().test(inv.getStack()) && fluid.test(inv.getFluid());
+    return this.getCast().test(inv.getStack()) && this.fluid.test(inv.getFluid());
   }
 
   @Override
@@ -64,12 +66,12 @@ public abstract class ItemCastingRecipe extends AbstractCastingRecipe implements
 
   @Override
   public boolean hasCast() {
-    return cast != Ingredient.EMPTY;
+    return this.cast != Ingredient.EMPTY;
   }
 
   @Override
   public List<ItemStack> getCastItems() {
-    return Arrays.asList(cast.getItems());
+    return Arrays.asList(this.cast.getItems());
   }
 
   @Override
@@ -79,15 +81,19 @@ public abstract class ItemCastingRecipe extends AbstractCastingRecipe implements
 
   /**
    * Gets a list of valid fluid inputs for this recipe, for display in JEI
-   * @return  List of fluids
+   *
+   * @return List of fluids
    */
   @Override
   public List<FluidStack> getFluids() {
     return this.fluid.getFluids();
   }
 
-  /** Subclass for basin recipes */
+  /**
+   * Subclass for basin recipes
+   */
   public static class Basin extends ItemCastingRecipe {
+
     public Basin(ResourceLocation id, String group, Ingredient cast, FluidIngredient fluid, ItemOutput result, int coolingTime, boolean consumed, boolean switchSlots) {
       super(TinkerRecipeTypes.CASTING_BASIN.get(), id, group, cast, fluid, result, coolingTime, consumed, switchSlots);
     }
@@ -98,8 +104,11 @@ public abstract class ItemCastingRecipe extends AbstractCastingRecipe implements
     }
   }
 
-  /** Subclass for table recipes */
+  /**
+   * Subclass for table recipes
+   */
   public static class Table extends ItemCastingRecipe {
+
     public Table(ResourceLocation id, String group, Ingredient cast, FluidIngredient fluid, ItemOutput result, int coolingTime, boolean consumed, boolean switchSlots) {
       super(TinkerRecipeTypes.CASTING_TABLE.get(), id, group, cast, fluid, result, coolingTime, consumed, switchSlots);
     }
@@ -113,6 +122,7 @@ public abstract class ItemCastingRecipe extends AbstractCastingRecipe implements
   // TODO 1.19: migrate serializer to work like PotionCastingRecipe
   @AllArgsConstructor
   public static class Serializer<T extends ItemCastingRecipe> extends AbstractCastingRecipe.Serializer<T> {
+
     private final IFactory<T> factory;
 
     @Override
@@ -120,7 +130,7 @@ public abstract class ItemCastingRecipe extends AbstractCastingRecipe implements
       FluidIngredient fluid = FluidIngredient.deserialize(json, "fluid");
       ItemOutput output = ItemOutput.fromJson(JsonHelper.getElement(json, "result"));
       int coolingTime = GsonHelper.getAsInt(json, "cooling_time");
-      return factory.create(idIn, groupIn, cast, fluid, output, coolingTime, consumed, switchSlots);
+      return this.factory.create(idIn, groupIn, cast, fluid, output, coolingTime, consumed, switchSlots);
     }
 
     @Override
@@ -128,7 +138,7 @@ public abstract class ItemCastingRecipe extends AbstractCastingRecipe implements
       FluidIngredient fluid = FluidIngredient.read(buffer);
       ItemOutput result = ItemOutput.read(buffer);
       int coolingTime = buffer.readInt();
-      return factory.create(idIn, groupIn, cast, fluid, result, coolingTime, consumed, switchSlots);
+      return this.factory.create(idIn, groupIn, cast, fluid, result, coolingTime, consumed, switchSlots);
     }
 
     @Override
@@ -141,10 +151,14 @@ public abstract class ItemCastingRecipe extends AbstractCastingRecipe implements
 
   /**
    * Interface representing a item casting recipe constructor
-   * @param <T>  Recipe class type
+   *
+   * @param <T> Recipe class type
    */
   public interface IFactory<T extends AbstractCastingRecipe> {
-    /** Creates a new instance of this factory */
+
+    /**
+     * Creates a new instance of this factory
+     */
     T create(ResourceLocation idIn, String groupIn, @Nullable Ingredient cast, FluidIngredient fluidIn, ItemOutput output, int coolingTime, boolean consumed, boolean switchSlots);
   }
 }

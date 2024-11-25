@@ -39,7 +39,7 @@ public class SideInventoryContainer<TILE extends BlockEntity> extends BaseContai
     }
 
     // slot properties
-    SlottedStorage<ItemVariant> handler = itemHandler == null ? EmptySlottedStorage.EMPTY : itemHandler;
+    SlottedStorage<ItemVariant> handler = this.itemHandler == null ? EmptySlottedStorage.EMPTY : this.itemHandler;
     this.slotCount = handler.getSlotCount();
     this.columns = columns;
     int rows = this.slotCount / columns;
@@ -55,7 +55,7 @@ public class SideInventoryContainer<TILE extends BlockEntity> extends BaseContai
           break;
         }
 
-        this.addSlot(createSlot(handler, index, x + c * 18, y + r * 18));
+        this.addSlot(this.createSlot(handler, index, x + c * 18, y + r * 18));
         index++;
       }
     }
@@ -63,11 +63,12 @@ public class SideInventoryContainer<TILE extends BlockEntity> extends BaseContai
 
   /**
    * Creates a slot for this inventory
-   * @param itemHandler  Item handler
-   * @param index        Slot index
-   * @param x            Slot X position
-   * @param y            Slot Y position
-   * @return  Inventory slot
+   *
+   * @param itemHandler Item handler
+   * @param index       Slot index
+   * @param x           Slot X position
+   * @param y           Slot Y position
+   * @return Inventory slot
    */
   protected Slot createSlot(SlottedStorage<ItemVariant> itemHandler, int index, int x, int y) {
     return new SmartItemHandlerSlot(itemHandler, index, x, y);

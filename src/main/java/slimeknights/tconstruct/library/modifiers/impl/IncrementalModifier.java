@@ -19,7 +19,10 @@ import java.util.List;
  * TODO: consider removing this class in favor of {@link slimeknights.tconstruct.library.modifiers.modules.IncrementalModule}
  */
 public class IncrementalModifier extends Modifier {
-  /** Gets the display name for an incremental modifier */
+
+  /**
+   * Gets the display name for an incremental modifier
+   */
   public static Component addAmountToName(int amount, int neededPerLevel, Component name) {
     if (amount < neededPerLevel) {
       return name.copy().append(": " + amount + " / " + neededPerLevel);
@@ -30,9 +33,9 @@ public class IncrementalModifier extends Modifier {
   @Override
   public Component getDisplayName(IToolStackView tool, int level) {
     int neededPerLevel = ModifierRecipeLookup.getNeededPerLevel(this.getId());
-    Component name = getDisplayName(level);
+    Component name = this.getDisplayName(level);
     if (neededPerLevel > 0) {
-      return addAmountToName(getAmount(tool), neededPerLevel, getDisplayName(level));
+      return addAmountToName(this.getAmount(tool), neededPerLevel, this.getDisplayName(level));
     }
     return name;
   }
@@ -40,16 +43,17 @@ public class IncrementalModifier extends Modifier {
   @Override
   public void onRemoved(IToolStackView tool) {
     // remove current progress in incremental modifiers
-    tool.getPersistentData().remove(getId());
+    tool.getPersistentData().remove(this.getId());
   }
 
   /* Helpers */
 
   /**
    * Gets the amount of value applied to the tool thus far
-   * @param persistentData  Tool persistent mod NBT
-   * @param modifier        Modifier instance
-   * @return  Amount applied to the tool
+   *
+   * @param persistentData Tool persistent mod NBT
+   * @param modifier       Modifier instance
+   * @return Amount applied to the tool
    */
   public static int getAmount(IModDataView persistentData, ModifierId modifier) {
     if (persistentData.contains(modifier, Tag.TAG_ANY_NUMERIC)) {
@@ -60,9 +64,10 @@ public class IncrementalModifier extends Modifier {
 
   /**
    * Gets the amount of value applied to the tool thus far
-   * @param tool      Tool instance
-   * @param modifier  Modifier instance
-   * @return  Amount applied to the tool
+   *
+   * @param tool     Tool instance
+   * @param modifier Modifier instance
+   * @return Amount applied to the tool
    */
   public static int getAmount(IToolContext tool, ModifierId modifier) {
     return getAmount(tool.getPersistentData(), modifier);
@@ -70,8 +75,9 @@ public class IncrementalModifier extends Modifier {
 
   /**
    * Gets the amount of this modifier on the tool
-   * @param persistentData  Tool persistent mod NBT
-   * @return  Amount
+   *
+   * @param persistentData Tool persistent mod NBT
+   * @return Amount
    */
   public int getAmount(IModDataView persistentData) {
     return getAmount(persistentData, this.getId());
@@ -79,28 +85,32 @@ public class IncrementalModifier extends Modifier {
 
   /**
    * Gets the amount of this modifier on the tool
-   * @param tool  Tool amount
-   * @return  Amount
+   *
+   * @param tool Tool amount
+   * @return Amount
    */
   public int getAmount(IToolContext tool) {
     return getAmount(tool, this.getId());
   }
 
-  /** Scales the level based on the given amount and needed amount per level */
+  /**
+   * Scales the level based on the given amount and needed amount per level
+   */
   public static float scaleLevel(float level, int amount, int neededPerLevel) {
     // if amount == needed per level, returns level
     if (amount < neededPerLevel) {
       // if amount == 0, returns level - 1, otherwise returns some fractional amount
-      return level + (amount - neededPerLevel) / (float)neededPerLevel;
+      return level + (amount - neededPerLevel) / (float) neededPerLevel;
     }
     return level;
-  };
+  }
 
   /**
    * Gets the level scaled based on the current amount into the level
-   * @param persistentData  Tool persistent mod NBT
-   * @param level  Modifier level
-   * @return  Level, possibly reduced by an incomplete level
+   *
+   * @param persistentData Tool persistent mod NBT
+   * @param level          Modifier level
+   * @return Level, possibly reduced by an incomplete level
    */
   public float getScaledLevel(IModDataView persistentData, int level) {
     if (level <= 0) {
@@ -108,41 +118,45 @@ public class IncrementalModifier extends Modifier {
     }
     int neededPerLevel = ModifierRecipeLookup.getNeededPerLevel(this.getId());
     if (neededPerLevel > 0) {
-      return scaleLevel(level, getAmount(persistentData), neededPerLevel);
+      return scaleLevel(level, this.getAmount(persistentData), neededPerLevel);
     }
     return level;
   }
 
   @Override
   public float getEffectiveLevel(IToolContext tool, int level) {
-    return getScaledLevel(tool.getPersistentData(), level);
+    return this.getScaledLevel(tool.getPersistentData(), level);
   }
 
   /**
    * Gets the level scaled based on the current amount into the level
-   * @param tool   Tool instance
-   * @param level  Modifier level
-   * @return  Level, possibly reduced by an incomplete level
+   *
+   * @param tool  Tool instance
+   * @param level Modifier level
+   * @return Level, possibly reduced by an incomplete level
    * @deprecated use {@link #getEffectiveLevel(IToolContext, int)} or {@link ModifierEntry#getEffectiveLevel(IToolContext)}
    */
   @Deprecated
   public float getScaledLevel(IToolContext tool, int level) {
-    return getScaledLevel(tool.getPersistentData(), level);
+    return this.getScaledLevel(tool.getPersistentData(), level);
   }
 
   /**
    * Sets the amount on the tool
-   * @param persistentData  Tool NBT
-   * @param modifier        Modifier to set
-   * @param amount          New amount
+   *
+   * @param persistentData Tool NBT
+   * @param modifier       Modifier to set
+   * @param amount         New amount
    */
   public static void setAmount(ModDataNBT persistentData, ModifierId modifier, int amount) {
     persistentData.putInt(modifier, amount);
   }
 
-  /** @deprecated use {@link slimeknights.tconstruct.library.modifiers.hook.TooltipModifierHook#addDamageBoost(IToolStackView, ModifierEntry, float, List)} */
+  /**
+   * @deprecated use {@link slimeknights.tconstruct.library.modifiers.hook.TooltipModifierHook#addDamageBoost(IToolStackView, ModifierEntry, float, List)}
+   */
   @Deprecated
   protected void addDamageTooltip(IToolStackView tool, int level, float levelAmount, List<Component> tooltip) {
-    addDamageTooltip(tool, getScaledLevel(tool, level) * levelAmount, tooltip);
+    this.addDamageTooltip(tool, this.getScaledLevel(tool, level) * levelAmount, tooltip);
   }
 }

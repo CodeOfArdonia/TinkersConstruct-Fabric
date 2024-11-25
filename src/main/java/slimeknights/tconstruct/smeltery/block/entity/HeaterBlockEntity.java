@@ -22,8 +22,11 @@ import slimeknights.tconstruct.smeltery.menu.SingleItemContainerMenu;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-/** Tile entity for the heater block below the melter */
+/**
+ * Tile entity for the heater block below the melter
+ */
 public class HeaterBlockEntity extends NameableBlockEntity implements SidedStorageBlockEntity {
+
   private static final String TAG_ITEM = "item";
   private static final Component TITLE = TConstruct.makeTranslation("gui", "heater");
 
@@ -49,7 +52,7 @@ public class HeaterBlockEntity extends NameableBlockEntity implements SidedStora
   @Nonnull
   @Override
   public Storage<ItemVariant> getItemStorage(@org.jetbrains.annotations.Nullable Direction direction) {
-    return itemHandler;
+    return this.itemHandler;
   }
 
 
@@ -59,13 +62,13 @@ public class HeaterBlockEntity extends NameableBlockEntity implements SidedStora
   public void load(CompoundTag tags) {
     super.load(tags);
     if (tags.contains(TAG_ITEM, Tag.TAG_COMPOUND)) {
-      itemHandler.readFromNBT(tags.getCompound(TAG_ITEM));
+      this.itemHandler.readFromNBT(tags.getCompound(TAG_ITEM));
     }
   }
 
   @Override
   public void saveAdditional(CompoundTag tags) {
     super.saveAdditional(tags);
-    tags.put(TAG_ITEM, itemHandler.writeToNBT());
+    tags.put(TAG_ITEM, this.itemHandler.writeToNBT());
   }
 }

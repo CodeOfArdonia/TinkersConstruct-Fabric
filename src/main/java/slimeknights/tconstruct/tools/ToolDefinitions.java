@@ -6,6 +6,7 @@ import slimeknights.tconstruct.library.tools.definition.ToolDefinition;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ToolDefinitions {
+
   // rock
   public static final ToolDefinition PICKAXE = ToolDefinition.builder(TinkerTools.pickaxe).meleeHarvest().build();
   public static final ToolDefinition SLEDGE_HAMMER = ToolDefinition.builder(TinkerTools.sledgeHammer).meleeHarvest().build();

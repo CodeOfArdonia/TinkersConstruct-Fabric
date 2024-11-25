@@ -27,7 +27,7 @@ class SetBlockPredicate implements BlockPredicate {
 
   @Override
   public boolean matches(BlockState state) {
-    return blocks.contains(state.getBlock());
+    return this.blocks.contains(state.getBlock());
   }
 
   @Override

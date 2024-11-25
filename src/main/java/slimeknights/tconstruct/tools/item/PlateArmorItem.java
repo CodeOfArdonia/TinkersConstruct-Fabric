@@ -24,6 +24,7 @@ import slimeknights.tconstruct.library.tools.item.ModifiableArmorItem;
 import slimeknights.tconstruct.tools.client.PlateArmorModel;
 
 public class PlateArmorItem extends ModifiableArmorItem {
+
   public PlateArmorItem(ModifiableArmorMaterial material, ArmorSlotType slotType, Properties properties, ResourceKey<CreativeModeTab> tab) {
     super(material, slotType, properties, tab);
     EnvExecutor.runWhenOn(EnvType.CLIENT, () -> this::initializeClient);
@@ -36,6 +37,7 @@ public class PlateArmorItem extends ModifiableArmorItem {
 
   @Environment(EnvType.CLIENT)
   private static final class PlateArmorRenderer implements ArmorRenderer {
+
     @Override
     public void render(PoseStack matrices, MultiBufferSource vertexConsumers, ItemStack itemStack, LivingEntity entity, EquipmentSlot armorSlot, int light, HumanoidModel<LivingEntity> playerModel, HumanoidModel<LivingEntity> baseArmorModel) {
       playerModel.copyPropertiesTo(baseArmorModel);

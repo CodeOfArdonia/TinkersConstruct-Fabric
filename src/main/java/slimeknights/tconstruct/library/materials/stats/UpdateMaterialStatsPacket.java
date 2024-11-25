@@ -20,6 +20,7 @@ import java.util.function.Function;
 @Getter
 @AllArgsConstructor
 public class UpdateMaterialStatsPacket implements IThreadsafePacket {
+
   private static final Logger log = Util.getLogger("NetworkSync");
 
   protected final Map<MaterialId, Collection<IMaterialStats>> materialToStats;
@@ -28,30 +29,31 @@ public class UpdateMaterialStatsPacket implements IThreadsafePacket {
     this(buffer, MaterialRegistry::getStatDecoder);
   }
 
-  public UpdateMaterialStatsPacket(FriendlyByteBuf buffer, Function<MaterialStatsId, Function<FriendlyByteBuf,? extends IMaterialStats>> decoderResolver) {
+  public UpdateMaterialStatsPacket(FriendlyByteBuf buffer, Function<MaterialStatsId, Function<FriendlyByteBuf, ? extends IMaterialStats>> decoderResolver) {
     int materialCount = buffer.readInt();
-    materialToStats = new HashMap<>(materialCount);
+    this.materialToStats = new HashMap<>(materialCount);
     for (int i = 0; i < materialCount; i++) {
       MaterialId id = new MaterialId(buffer.readResourceLocation());
       int statCount = buffer.readInt();
       List<IMaterialStats> statList = new ArrayList<>();
       for (int j = 0; j < statCount; j++) {
-        decodeStat(buffer, decoderResolver).ifPresent(statList::add);
+        this.decodeStat(buffer, decoderResolver).ifPresent(statList::add);
       }
-      materialToStats.put(id, statList);
+      this.materialToStats.put(id, statList);
     }
   }
 
   /**
    * Decodes a single stat
-   * @param buffer           Buffer instance
-   * @param decoderResolver  Logic to decode stats
-   * @return  Optional of the decoded material stats
+   *
+   * @param buffer          Buffer instance
+   * @param decoderResolver Logic to decode stats
+   * @return Optional of the decoded material stats
    */
-  private Optional<IMaterialStats> decodeStat(FriendlyByteBuf buffer, Function<MaterialStatsId,Function<FriendlyByteBuf,? extends IMaterialStats>> decoderResolver) {
+  private Optional<IMaterialStats> decodeStat(FriendlyByteBuf buffer, Function<MaterialStatsId, Function<FriendlyByteBuf, ? extends IMaterialStats>> decoderResolver) {
     MaterialStatsId statsId = new MaterialStatsId(buffer.readResourceLocation());
     try {
-      Function<FriendlyByteBuf,? extends IMaterialStats> decoder = decoderResolver.apply(statsId);
+      Function<FriendlyByteBuf, ? extends IMaterialStats> decoder = decoderResolver.apply(statsId);
       if (decoder == null) {
         log.error("Unknown stat type {}. Are client and server in sync?", statsId);
         return Optional.empty();
@@ -65,18 +67,19 @@ public class UpdateMaterialStatsPacket implements IThreadsafePacket {
 
   @Override
   public void encode(FriendlyByteBuf buffer) {
-    buffer.writeInt(materialToStats.size());
-    materialToStats.forEach((materialId, stats) -> {
+    buffer.writeInt(this.materialToStats.size());
+    this.materialToStats.forEach((materialId, stats) -> {
       buffer.writeResourceLocation(materialId);
       buffer.writeInt(stats.size());
-      stats.forEach(stat -> encodeStat(buffer, stat));
+      stats.forEach(stat -> this.encodeStat(buffer, stat));
     });
   }
 
   /**
    * Encodes a single material stat
-   * @param buffer  Buffer instance
-   * @param stat    Stat to encode
+   *
+   * @param buffer Buffer instance
+   * @param stat   Stat to encode
    */
   private void encodeStat(FriendlyByteBuf buffer, IMaterialStats stat) {
     buffer.writeResourceLocation(stat.getIdentifier());

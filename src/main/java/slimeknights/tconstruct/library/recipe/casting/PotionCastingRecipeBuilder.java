@@ -27,17 +27,20 @@ import java.util.function.Consumer;
 @SuppressWarnings({"WeakerAccess", "unused", "UnusedReturnValue"})
 @RequiredArgsConstructor(staticName = "castingRecipe")
 public class PotionCastingRecipeBuilder extends AbstractRecipeBuilder<PotionCastingRecipeBuilder> {
+
   private final Item result;
   private final PotionCastingRecipe.Serializer recipeSerializer;
   private Ingredient bottle = Ingredient.EMPTY;
   private FluidIngredient fluid = FluidIngredient.EMPTY;
-  @Setter @Accessors(chain = true)
+  @Setter
+  @Accessors(chain = true)
   private int coolingTime = 0;
 
   /**
    * Creates a new casting basin recipe
-   * @param result  Recipe result
-   * @return  Builder instance
+   *
+   * @param result Recipe result
+   * @return Builder instance
    */
   public static PotionCastingRecipeBuilder basinRecipe(ItemLike result) {
     return castingRecipe(result.asItem(), TinkerSmeltery.basinPotionRecipeSerializer.get());
@@ -45,8 +48,9 @@ public class PotionCastingRecipeBuilder extends AbstractRecipeBuilder<PotionCast
 
   /**
    * Creates a new casting table recipe
-   * @param result  Recipe result
-   * @return  Builder instance
+   *
+   * @param result Recipe result
+   * @return Builder instance
    */
   public static PotionCastingRecipeBuilder tableRecipe(ItemLike result) {
     return castingRecipe(result.asItem(), TinkerSmeltery.tablePotionRecipeSerializer.get());
@@ -57,9 +61,10 @@ public class PotionCastingRecipeBuilder extends AbstractRecipeBuilder<PotionCast
 
   /**
    * Sets the fluid for this recipe
-   * @param tagIn   Tag<Fluid> instance
-   * @param amount  amount of fluid
-   * @return  Builder instance
+   *
+   * @param tagIn  Tag<Fluid> instance
+   * @param amount amount of fluid
+   * @return Builder instance
    */
   public PotionCastingRecipeBuilder setFluid(TagKey<Fluid> tagIn, long amount) {
     return this.setFluid(FluidIngredient.of(tagIn, amount));
@@ -67,8 +72,9 @@ public class PotionCastingRecipeBuilder extends AbstractRecipeBuilder<PotionCast
 
   /**
    * Sets the fluid ingredient
-   * @param fluid  Fluid ingredient instance
-   * @return  Builder instance
+   *
+   * @param fluid Fluid ingredient instance
+   * @return Builder instance
    */
   public PotionCastingRecipeBuilder setFluid(FluidIngredient fluid) {
     this.fluid = fluid;
@@ -80,8 +86,9 @@ public class PotionCastingRecipeBuilder extends AbstractRecipeBuilder<PotionCast
 
   /**
    * Sets the cast from a tag, bottles are always consumed
-   * @param tagIn     Cast tag
-   * @return  Builder instance
+   *
+   * @param tagIn Cast tag
+   * @return Builder instance
    */
   public PotionCastingRecipeBuilder setBottle(TagKey<Item> tagIn) {
     return this.setBottle(Ingredient.of(tagIn));
@@ -89,8 +96,9 @@ public class PotionCastingRecipeBuilder extends AbstractRecipeBuilder<PotionCast
 
   /**
    * Sets the bottle from an item, bottles are always consumed
-   * @param itemIn    Cast item
-   * @return  Builder instance
+   *
+   * @param itemIn Cast item
+   * @return Builder instance
    */
   public PotionCastingRecipeBuilder setBottle(ItemLike itemIn) {
     return this.setBottle(Ingredient.of(itemIn));
@@ -98,8 +106,9 @@ public class PotionCastingRecipeBuilder extends AbstractRecipeBuilder<PotionCast
 
   /**
    * Sets the bottle from an ingredient, bottles are always consumed
-   * @param ingredient  Cast ingredient
-   * @return  Builder instance
+   *
+   * @param ingredient Cast ingredient
+   * @return Builder instance
    */
   public PotionCastingRecipeBuilder setBottle(Ingredient ingredient) {
     this.bottle = ingredient;
@@ -108,7 +117,8 @@ public class PotionCastingRecipeBuilder extends AbstractRecipeBuilder<PotionCast
 
   /**
    * Builds a recipe using the registry name as the recipe name
-   * @param consumerIn  Recipe consumer
+   *
+   * @param consumerIn Recipe consumer
    */
   @Override
   public void save(Consumer<FinishedRecipe> consumerIn) {
@@ -128,26 +138,27 @@ public class PotionCastingRecipeBuilder extends AbstractRecipeBuilder<PotionCast
   }
 
   private class Result extends AbstractFinishedRecipe {
+
     public Result(ResourceLocation ID, @Nullable ResourceLocation advancementID) {
       super(ID, advancementID);
     }
 
     @Override
     public RecipeSerializer<?> getType() {
-      return recipeSerializer;
+      return PotionCastingRecipeBuilder.this.recipeSerializer;
     }
 
     @Override
     public void serializeRecipeData(JsonObject json) {
-      if (!group.isEmpty()) {
-        json.addProperty("group", group);
+      if (!PotionCastingRecipeBuilder.this.group.isEmpty()) {
+        json.addProperty("group", PotionCastingRecipeBuilder.this.group);
       }
-      if (bottle != Ingredient.EMPTY) {
-        json.add("bottle", bottle.toJson());
+      if (PotionCastingRecipeBuilder.this.bottle != Ingredient.EMPTY) {
+        json.add("bottle", PotionCastingRecipeBuilder.this.bottle.toJson());
       }
-      json.add("fluid", fluid.serialize());
-      json.addProperty("result", BuiltInRegistries.ITEM.getKey(result).toString());
-      json.addProperty("cooling_time", coolingTime);
+      json.add("fluid", PotionCastingRecipeBuilder.this.fluid.serialize());
+      json.addProperty("result", BuiltInRegistries.ITEM.getKey(PotionCastingRecipeBuilder.this.result).toString());
+      json.addProperty("cooling_time", PotionCastingRecipeBuilder.this.coolingTime);
     }
   }
 }

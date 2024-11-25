@@ -18,12 +18,16 @@ import slimeknights.tconstruct.library.tools.helper.ToolAttackUtil;
 import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 import slimeknights.tconstruct.tools.TinkerModifiers;
 
-/** Attack logic for a sweep attack, similar to a sword */
+/**
+ * Attack logic for a sweep attack, similar to a sword
+ */
 @RequiredArgsConstructor
 public class SweepWeaponAttack implements IWeaponAttack {
+
   public static final Loader LOADER = new Loader();
 
-  @Getter @VisibleForTesting
+  @Getter
+  @VisibleForTesting
   private final float range;
 
   @Override
@@ -44,7 +48,7 @@ public class SweepWeaponAttack implements IWeaponAttack {
       Entity target = context.getTarget();
       for (LivingEntity aoeTarget : attacker.level().getEntitiesOfClass(LivingEntity.class, target.getBoundingBox().inflate(range, 0.25D, range))) {
         if (aoeTarget != attacker && aoeTarget != target && !attacker.isAlliedTo(aoeTarget)
-            && !(aoeTarget instanceof ArmorStand armorStand && armorStand.isMarker()) && attacker.distanceToSqr(aoeTarget) < rangeSq) {
+          && !(aoeTarget instanceof ArmorStand armorStand && armorStand.isMarker()) && attacker.distanceToSqr(aoeTarget) < rangeSq) {
           float angle = attacker.getYRot() * ((float) Math.PI / 180F);
           aoeTarget.knockback(0.4F, Mth.sin(angle), -Mth.cos(angle));
           ToolAttackUtil.dealDefaultDamage(attacker, aoeTarget, sweepDamage);
@@ -66,6 +70,7 @@ public class SweepWeaponAttack implements IWeaponAttack {
   }
 
   private static class Loader implements IGenericLoader<SweepWeaponAttack> {
+
     @Override
     public SweepWeaponAttack deserialize(JsonObject json) {
       return new SweepWeaponAttack(GsonHelper.getAsFloat(json, "range"));

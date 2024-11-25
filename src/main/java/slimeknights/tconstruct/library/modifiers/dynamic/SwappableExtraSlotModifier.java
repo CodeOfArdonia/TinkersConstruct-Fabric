@@ -24,40 +24,53 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 
-/** @deprecated use {@link SwappableSlotModule} */
+/**
+ * @deprecated use {@link SwappableSlotModule}
+ */
 @Deprecated
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class SwappableExtraSlotModifier extends NoLevelsModifier {
-  /** Format key for swappable variant */
+
+  /**
+   * Format key for swappable variant
+   */
   private static final String FORMAT = TConstruct.makeTranslationKey("modifier", "extra_modifier.type_format");
 
-  /** Slots to grant each level */
+  /**
+   * Slots to grant each level
+   */
   private final int slots;
-  /** If false, modifier only shows in the tinker station */
+  /**
+   * If false, modifier only shows in the tinker station
+   */
   private final boolean alwaysShow;
-  /** Map of slot types to penalize */
-  private final Map<SlotType,SlotType> penalize;
+  /**
+   * Map of slot types to penalize
+   */
+  private final Map<SlotType, SlotType> penalize;
 
-  /** Creates a new builder for a swappable modifier */
+  /**
+   * Creates a new builder for a swappable modifier
+   */
   public static Builder swappable() {
     return new Builder();
   }
 
   @Override
   public boolean shouldDisplay(boolean advanced) {
-    return alwaysShow || advanced;
+    return this.alwaysShow || advanced;
   }
 
   @Override
   public int getPriority() {
     // show lower priority so they group together, if it always shows put it a bit higher
-    return alwaysShow ? 60 : 50;
+    return this.alwaysShow ? 60 : 50;
   }
 
   @Override
   public Component getDisplayName(IToolStackView tool, int level) {
     Component name = super.getDisplayName(tool, level);
-    String slotName = tool.getPersistentData().getString(getId());
+    String slotName = tool.getPersistentData().getString(this.getId());
     if (!slotName.isEmpty()) {
       SlotType type = SlotType.getIfPresent(slotName);
       if (type != null) {
@@ -69,14 +82,14 @@ public class SwappableExtraSlotModifier extends NoLevelsModifier {
 
   @Override
   public void addVolatileData(ToolRebuildContext context, int level, ModDataNBT volatileData) {
-    String slotName = context.getPersistentData().getString(getId());
+    String slotName = context.getPersistentData().getString(this.getId());
     if (!slotName.isEmpty()) {
       SlotType type = SlotType.getIfPresent(slotName);
       if (type != null) {
-        volatileData.addSlots(type, slots);
-        SlotType penalty = penalize.get(type);
+        volatileData.addSlots(type, this.slots);
+        SlotType penalty = this.penalize.get(type);
         if (penalty != null) {
-          volatileData.addSlots(penalty, -slots);
+          volatileData.addSlots(penalty, -this.slots);
         }
       }
     }
@@ -84,7 +97,7 @@ public class SwappableExtraSlotModifier extends NoLevelsModifier {
 
   @Override
   public void onRemoved(IToolStackView tool) {
-    tool.getPersistentData().remove(getId());
+    tool.getPersistentData().remove(this.getId());
   }
 
   @Override
@@ -92,42 +105,53 @@ public class SwappableExtraSlotModifier extends NoLevelsModifier {
     return LOADER;
   }
 
-  /** Builder for an extra modifier */
+  /**
+   * Builder for an extra modifier
+   */
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
   @Accessors(fluent = true)
   public static class Builder {
-    private final ImmutableMap.Builder<SlotType,SlotType> penalize = ImmutableMap.builder();
+
+    private final ImmutableMap.Builder<SlotType, SlotType> penalize = ImmutableMap.builder();
     private boolean alwaysShow = false;
     @Setter
     private int slotsPerLevel = 1;
 
-    /** Sets the modifier to always show, by default it only shows when in the tinker station */
+    /**
+     * Sets the modifier to always show, by default it only shows when in the tinker station
+     */
     public Builder alwaysShow() {
       this.alwaysShow = true;
       return this;
     }
 
-    /** Adds the given penalty slot when the given type is added */
+    /**
+     * Adds the given penalty slot when the given type is added
+     */
     public Builder penalize(SlotType added, SlotType penalty) {
-      penalize.put(added, penalty);
+      this.penalize.put(added, penalty);
       return this;
     }
 
-    /** Builds a new modifier */
+    /**
+     * Builds a new modifier
+     */
     public SwappableExtraSlotModifier build() {
-      return new SwappableExtraSlotModifier(slotsPerLevel, alwaysShow, penalize.build());
+      return new SwappableExtraSlotModifier(this.slotsPerLevel, this.alwaysShow, this.penalize.build());
     }
   }
 
-  /** Loader instance */
+  /**
+   * Loader instance
+   */
   public static final IGenericLoader<SwappableExtraSlotModifier> LOADER = new IGenericLoader<>() {
     @Override
     public SwappableExtraSlotModifier deserialize(JsonObject json) {
       int slotCount = GsonHelper.getAsInt(json, "slots");
-      Map<SlotType,SlotType> penalties = Collections.emptyMap();
+      Map<SlotType, SlotType> penalties = Collections.emptyMap();
       if (json.has("penalize")) {
-        ImmutableMap.Builder<SlotType,SlotType> map = ImmutableMap.builder();
-        for (Entry<String,JsonElement> entry : GsonHelper.getAsJsonObject(json, "penalize").entrySet()) {
+        ImmutableMap.Builder<SlotType, SlotType> map = ImmutableMap.builder();
+        for (Entry<String, JsonElement> entry : GsonHelper.getAsJsonObject(json, "penalize").entrySet()) {
           String key = entry.getKey();
           SlotType result = SlotType.getOrCreate(GsonHelper.convertToString(entry.getValue(), "penalize[" + entry.getKey() + ']'));
           map.put(SlotType.getOrCreate(key), result);
@@ -144,7 +168,7 @@ public class SwappableExtraSlotModifier extends NoLevelsModifier {
       json.addProperty("always_show", object.alwaysShow);
       if (!object.penalize.isEmpty()) {
         JsonObject penaltyJson = new JsonObject();
-        for (Entry<SlotType,SlotType> entry : object.penalize.entrySet()) {
+        for (Entry<SlotType, SlotType> entry : object.penalize.entrySet()) {
           penaltyJson.addProperty(entry.getKey().getName(), entry.getValue().getName());
         }
         json.add("penalize", penaltyJson);
@@ -155,7 +179,7 @@ public class SwappableExtraSlotModifier extends NoLevelsModifier {
     public SwappableExtraSlotModifier fromNetwork(FriendlyByteBuf buffer) {
       int slotCount = buffer.readVarInt();
       boolean alwaysShow = buffer.readBoolean();
-      ImmutableMap.Builder<SlotType,SlotType> penalize = ImmutableMap.builder();
+      ImmutableMap.Builder<SlotType, SlotType> penalize = ImmutableMap.builder();
       int size = buffer.readVarInt();
       for (int i = 0; i < size; i++) {
         penalize.put(SlotType.read(buffer), SlotType.read(buffer));
@@ -168,7 +192,7 @@ public class SwappableExtraSlotModifier extends NoLevelsModifier {
       buffer.writeVarInt(object.slots);
       buffer.writeBoolean(object.alwaysShow);
       buffer.writeVarInt(object.penalize.size());
-      for (Entry<SlotType,SlotType> entry : object.penalize.entrySet()) {
+      for (Entry<SlotType, SlotType> entry : object.penalize.entrySet()) {
         entry.getKey().write(buffer);
         entry.getValue().write(buffer);
       }

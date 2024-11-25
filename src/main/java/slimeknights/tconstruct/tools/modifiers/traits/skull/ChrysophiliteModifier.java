@@ -27,7 +27,9 @@ import java.util.Optional;
 import java.util.Random;
 
 public class ChrysophiliteModifier extends NoLevelsModifier {
+
   public static final ComputableDataKey<TotalGold> TOTAL_GOLD = TConstruct.createKey("chrysophilite", TotalGold::new);
+
   public ChrysophiliteModifier() {
     LivingEntityEvents.DROPS.register(ChrysophiliteModifier::onLivingDrops);
   }
@@ -68,7 +70,9 @@ public class ChrysophiliteModifier extends NoLevelsModifier {
     }
   }
 
-  /** Checks if the entity has gold in the given slot */
+  /**
+   * Checks if the entity has gold in the given slot
+   */
   public static boolean hasGold(EquipmentChangeContext context, EquipmentSlot slotType) {
     IToolStackView tool = context.getToolInSlot(slotType);
     if (tool != null) {
@@ -79,16 +83,20 @@ public class ChrysophiliteModifier extends NoLevelsModifier {
     }
   }
 
-  /** Gets the level of the modifier on an entity */
+  /**
+   * Gets the level of the modifier on an entity
+   */
   public static int getTotalGold(@Nullable Entity entity) {
     return Optional.ofNullable(entity)
-                   .flatMap(e -> TinkerDataCapability.CAPABILITY.maybeGet(e))
-                   .map(data -> data.get(ChrysophiliteModifier.TOTAL_GOLD))
-                   .map(TotalGold::getTotalGold)
-                   .orElse(0);
+      .flatMap(e -> TinkerDataCapability.CAPABILITY.maybeGet(e))
+      .map(data -> data.get(ChrysophiliteModifier.TOTAL_GOLD))
+      .map(TotalGold::getTotalGold)
+      .orElse(0);
   }
 
-  /** Causes more gold armor to drop */
+  /**
+   * Causes more gold armor to drop
+   */
   private static boolean onLivingDrops(LivingEntity target, DamageSource source, Collection<ItemEntity> drops, int lootingLevel, boolean recentlyHit) {
     if (source != null) {
       int gold = getTotalGold(source.getEntity());
@@ -115,27 +123,33 @@ public class ChrysophiliteModifier extends NoLevelsModifier {
     return false;
   }
 
-  /** Tracker to count how many slots contain gold */
+  /**
+   * Tracker to count how many slots contain gold
+   */
   public static class TotalGold {
+
     private final boolean[] hasGold = new boolean[4];
-    /** Gold value of the modifier, will be 1 for the modifier, and +1 for each golden armor piece */
+    /**
+     * Gold value of the modifier, will be 1 for the modifier, and +1 for each golden armor piece
+     */
     @Getter
     private int totalGold = 0;
 
     /**
      * Updates the status of gold in a slot on the entity
-     * @param slotType  Slot to update
-     * @param value     New value
+     *
+     * @param slotType Slot to update
+     * @param value    New value
      */
     protected boolean setGold(EquipmentSlot slotType, boolean value) {
       if (slotType.getType() == Type.ARMOR) {
         int index = slotType.getIndex();
-        if (hasGold[index] != value) {
-          hasGold[index] = value;
+        if (this.hasGold[index] != value) {
+          this.hasGold[index] = value;
           if (value) {
-            totalGold++;
+            this.totalGold++;
           } else {
-            totalGold--;
+            this.totalGold--;
           }
           return true;
         }
@@ -143,14 +157,16 @@ public class ChrysophiliteModifier extends NoLevelsModifier {
       return false;
     }
 
-    /** Initializes the gold data */
+    /**
+     * Initializes the gold data
+     */
     public void initialize(EquipmentChangeContext context) {
-      totalGold = 1;
+      this.totalGold = 1;
       for (EquipmentSlot slotType : ModifiableArmorMaterial.ARMOR_SLOTS) {
         boolean gold = hasGold(context, slotType);
-        hasGold[slotType.getIndex()] = gold;
+        this.hasGold[slotType.getIndex()] = gold;
         if (gold) {
-          totalGold++;
+          this.totalGold++;
         }
       }
     }

@@ -18,14 +18,22 @@ import slimeknights.tconstruct.library.tools.part.IMaterialItem;
 import slimeknights.tconstruct.tables.recipe.CraftingTableRepairKitRecipe;
 import slimeknights.tconstruct.tools.TinkerModifiers;
 
-/** Recipe for using a repair kit in a crafting station for a specialized tool */
+/**
+ * Recipe for using a repair kit in a crafting station for a specialized tool
+ */
 public class ModifierMaterialRepairKitRecipe extends CraftingTableRepairKitRecipe implements IModifierMaterialRepairRecipe {
-  /** Tool that can be repaired with this recipe */
+
+  /**
+   * Tool that can be repaired with this recipe
+   */
   @Getter
   private final ModifierId modifier;
-  /** ID of material used in repairing */
+  /**
+   * ID of material used in repairing
+   */
   @Getter
   private final MaterialId repairMaterial;
+
   public ModifierMaterialRepairKitRecipe(ResourceLocation id, ModifierId modifier, MaterialId repairMaterial) {
     super(id);
     this.modifier = modifier;
@@ -34,18 +42,18 @@ public class ModifierMaterialRepairKitRecipe extends CraftingTableRepairKitRecip
 
   @Override
   protected boolean toolMatches(ItemStack stack) {
-    return stack.is(TinkerTags.Items.MODIFIABLE) && ModifierUtil.getModifierLevel(stack, modifier) > 0;
+    return stack.is(TinkerTags.Items.MODIFIABLE) && ModifierUtil.getModifierLevel(stack, this.modifier) > 0;
   }
 
   @Override
   public boolean matches(CraftingContainer inv, Level worldIn) {
-    Pair<ToolStack, ItemStack> inputs = getRelevantInputs(inv);
-    return inputs != null && repairMaterial.equals(IMaterialItem.getMaterialFromStack(inputs.getSecond()).getId());
+    Pair<ToolStack, ItemStack> inputs = this.getRelevantInputs(inv);
+    return inputs != null && this.repairMaterial.equals(IMaterialItem.getMaterialFromStack(inputs.getSecond()).getId());
   }
 
   @Override
   protected float getRepairAmount(IToolStackView tool, ItemStack repairStack) {
-    return super.getRepairAmount(tool, repairStack) * tool.getModifierLevel(modifier);
+    return super.getRepairAmount(tool, repairStack) * tool.getModifierLevel(this.modifier);
   }
 
   @Override

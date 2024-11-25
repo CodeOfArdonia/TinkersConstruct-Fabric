@@ -33,7 +33,7 @@ public class ContentListingCentered extends PageContent {
     int yOff = 0;
     if (this.title != null) {
       this.addTitle(list, this.title, false);
-      yOff = getTitleHeight();
+      yOff = this.getTitleHeight();
     }
 
     int y = yOff;

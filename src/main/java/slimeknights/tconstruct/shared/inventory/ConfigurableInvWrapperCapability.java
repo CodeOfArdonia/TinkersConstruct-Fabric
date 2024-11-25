@@ -51,17 +51,17 @@ public class ConfigurableInvWrapperCapability implements SlottedStackStorage {
 
   @Override
   public ItemStack getStackInSlot(int slot) {
-    return inv.getItem(slot);
+    return this.inv.getItem(slot);
   }
 
   @Override
   public void setStackInSlot(int slot, ItemStack stack) {
-    inv.setItem(slot, stack);
+    this.inv.setItem(slot, stack);
   }
 
   @Override
   public int getSlotLimit(int slot) {
-    return inv.getMaxStackSize();
+    return this.inv.getMaxStackSize();
   }
 
   @Override

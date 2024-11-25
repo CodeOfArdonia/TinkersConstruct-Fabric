@@ -50,16 +50,21 @@ public record MobEffectModule(
   ScalingValue level,
   ScalingValue time
 ) implements DamageTakenModifierHook, MeleeHitModifierHook, ProjectileLaunchModifierHook, ProjectileHitModifierHook, ModifierModule {
+
   private static final List<ModifierHook<?>> DEFAULT_HOOKS = List.of(TinkerHooks.DAMAGE_TAKEN, TinkerHooks.MELEE_HIT, TinkerHooks.PROJECTILE_LAUNCH, TinkerHooks.PROJECTILE_HIT);
 
-  /** Creates a builder instance */
+  /**
+   * Creates a builder instance
+   */
   public static MobEffectModule.Builder builder(MobEffect effect) {
     return new Builder(effect);
   }
 
-  /** Applies the effect for the given level */
+  /**
+   * Applies the effect for the given level
+   */
   private void applyEffect(@Nullable LivingEntity target, float scaledLevel) {
-    if (target == null || !predicate.matches(target)) {
+    if (target == null || !this.predicate.matches(target)) {
       return;
     }
     int level = Math.round(this.level.computeValue(scaledLevel)) - 1;
@@ -68,7 +73,7 @@ public record MobEffectModule(
     }
     float duration = this.time.computeValue(scaledLevel);
     if (duration > 0) {
-      target.addEffect(new MobEffectInstance(effect, (int)duration, level));
+      target.addEffect(new MobEffectInstance(this.effect, (int) duration, level));
     }
   }
 
@@ -79,7 +84,7 @@ public record MobEffectModule(
       // 15% chance of working per level
       float scaledLevel = modifier.getEffectiveLevel(tool);
       if (RANDOM.nextFloat() < (scaledLevel * 0.25f)) {
-        applyEffect(living, scaledLevel);
+        this.applyEffect(living, scaledLevel);
         ToolDamageUtil.damageAnimated(tool, 1, context.getEntity(), slotType);
       }
     }
@@ -87,7 +92,7 @@ public record MobEffectModule(
 
   @Override
   public void afterMeleeHit(IToolStackView tool, ModifierEntry modifier, ToolAttackContext context, float damageDealt) {
-    applyEffect(context.getLivingTarget(), modifier.getEffectiveLevel(tool));
+    this.applyEffect(context.getLivingTarget(), modifier.getEffectiveLevel(tool));
   }
 
   @Override
@@ -97,7 +102,7 @@ public record MobEffectModule(
 
   @Override
   public boolean onProjectileHitEntity(ModifierNBT modifiers, NamespacedNBT persistentData, ModifierEntry modifier, Projectile projectile, EntityHitResult hit, @Nullable LivingEntity attacker, @Nullable LivingEntity target) {
-    applyEffect(target, persistentData.getFloat(modifier.getId()));
+    this.applyEffect(target, persistentData.getFloat(modifier.getId()));
     return false;
   }
 
@@ -111,19 +116,24 @@ public record MobEffectModule(
     return LOADER;
   }
 
-  /** Builder for this modifier in datagen */
+  /**
+   * Builder for this modifier in datagen
+   */
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
   @Accessors(fluent = true)
   @Setter
   public static class Builder {
+
     private final MobEffect effect;
     private IJsonPredicate<LivingEntity> entity = LivingEntityPredicate.ANY;
     private ScalingValue level = ScalingValue.flat(1);
     private ScalingValue time = ScalingValue.flat(0);
 
-    /** Builds the finished modifier */
+    /**
+     * Builds the finished modifier
+     */
     public MobEffectModule build() {
-      return new MobEffectModule(entity, effect, level, time);
+      return new MobEffectModule(this.entity, this.effect, this.level, this.time);
     }
   }
 

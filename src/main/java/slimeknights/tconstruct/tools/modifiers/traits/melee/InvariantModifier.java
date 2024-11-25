@@ -21,12 +21,15 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class InvariantModifier extends Modifier implements ConditionalStatModifierHook {
+
   private static final float BASELINE_TEMPERATURE = 0.75f;
   private static final float MAX_TEMPERATURE = 1.25f;
   private static final float DAMAGE = 2.5f / MAX_TEMPERATURE;
   private static final float ACCURACY = 0.15f / MAX_TEMPERATURE;
 
-  /** Gets the bonus for this modifier */
+  /**
+   * Gets the bonus for this modifier
+   */
   private static float getBonus(LivingEntity living, int level) {
     // temperature ranges from 0 to 1.25. multiplication makes it go from 0 to 2.5
     BlockPos pos = living.blockPosition();
@@ -62,9 +65,9 @@ public class InvariantModifier extends Modifier implements ConditionalStatModifi
     }
     if (bonus > 0.01f) {
       if (tool.hasTag(TinkerTags.Items.RANGED)) {
-        addStatTooltip(tool, ToolStats.ACCURACY, TinkerTags.Items.RANGED, bonus * ACCURACY, tooltip);
+        this.addStatTooltip(tool, ToolStats.ACCURACY, TinkerTags.Items.RANGED, bonus * ACCURACY, tooltip);
       } else {
-        addDamageTooltip(tool, bonus * DAMAGE, tooltip);
+        this.addDamageTooltip(tool, bonus * DAMAGE, tooltip);
       }
     }
   }

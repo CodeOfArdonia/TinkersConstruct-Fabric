@@ -1,6 +1,5 @@
 package slimeknights.tconstruct.tables.client.inventory.module;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -59,20 +58,20 @@ public class DynamicContainerScreen extends ModuleScreen {
 
   @Override
   public void updatePosition(int parentX, int parentY, int parentSizeX, int parentSizeY) {
-    this.leftPos = parentX + xOffset;
-    this.topPos = parentY + yOffset;
+    this.leftPos = parentX + this.xOffset;
+    this.topPos = parentY + this.yOffset;
 
     // calculate rows and columns from space
     this.columns = this.imageWidth / slot.w;
     this.rows = this.imageHeight / slot.h;
 
-    this.sliderActive = slotCount > this.columns * this.rows;
+    this.sliderActive = this.slotCount > this.columns * this.rows;
 
     this.updateSlider();
 
     // recalculate columns with slider
-    if (sliderActive) {
-      this.columns = (imageWidth - slider.width) / slot.w;
+    if (this.sliderActive) {
+      this.columns = (this.imageWidth - this.slider.width) / slot.w;
       this.updateSlider();
     }
 
@@ -86,10 +85,10 @@ public class DynamicContainerScreen extends ModuleScreen {
       this.slider.show();
       max = (this.slotCount - 1) / this.columns - this.rows + 1; // the assumption here is that for an active slider this always is >0
     } else {
-      slider.hide();
+      this.slider.hide();
     }
 
-    this.slider.setPosition(this.leftPos + this.imageWidth - slider.width, this.topPos);
+    this.slider.setPosition(this.leftPos + this.imageWidth - this.slider.width, this.topPos);
     this.slider.setSize(this.imageHeight);
     this.slider.setSliderParameters(0, max, 1);
   }
@@ -166,8 +165,8 @@ public class DynamicContainerScreen extends ModuleScreen {
           int x = (offset % this.columns) * DynamicContainerScreen.slot.w;
           int y = (offset / this.columns) * DynamicContainerScreen.slot.h;
 
-          slot.x = xOffset + x + 1;
-          slot.y = yOffset + y + 1;
+          slot.x = this.xOffset + x + 1;
+          slot.y = this.yOffset + y + 1;
         } else {
           slot.x = 0;
           slot.y = 0;

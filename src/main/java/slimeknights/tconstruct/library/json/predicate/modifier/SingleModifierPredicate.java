@@ -7,11 +7,14 @@ import slimeknights.mantle.data.predicate.IJsonPredicate;
 import slimeknights.mantle.util.JsonHelper;
 import slimeknights.tconstruct.library.modifiers.ModifierId;
 
-/** Predicate matching a single modifier */
+/**
+ * Predicate matching a single modifier
+ */
 public record SingleModifierPredicate(ModifierId modifier) implements ModifierPredicate {
+
   @Override
   public boolean matches(ModifierId input) {
-    return input.equals(modifier);
+    return input.equals(this.modifier);
   }
 
   @Override

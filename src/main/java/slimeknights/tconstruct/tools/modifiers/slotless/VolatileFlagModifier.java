@@ -13,6 +13,7 @@ import slimeknights.tconstruct.library.tools.nbt.ModDataNBT;
  */
 @RequiredArgsConstructor
 public class VolatileFlagModifier extends NoLevelsModifier {
+
   private final ResourceLocation flag;
   private final Rarity rarity;
 
@@ -22,9 +23,9 @@ public class VolatileFlagModifier extends NoLevelsModifier {
 
   @Override
   public void addVolatileData(ToolRebuildContext context, int level, ModDataNBT volatileData) {
-    if (rarity != Rarity.COMMON) {
-      IModifiable.setRarity(volatileData, rarity);
+    if (this.rarity != Rarity.COMMON) {
+      IModifiable.setRarity(volatileData, this.rarity);
     }
-    volatileData.putBoolean(flag, true);
+    volatileData.putBoolean(this.flag, true);
   }
 }

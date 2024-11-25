@@ -14,26 +14,31 @@ import slimeknights.tconstruct.library.modifiers.spilling.ISpillingEffect;
 import slimeknights.tconstruct.library.tools.context.ToolAttackContext;
 import slimeknights.tconstruct.library.utils.JsonUtils;
 
-/** Spilling effect to remove a specific effect */
+/**
+ * Spilling effect to remove a specific effect
+ */
 public record RemoveEffectSpillingEffect(MobEffect effect) implements ISpillingEffect {
+
   public static final ResourceLocation ID = TConstruct.getResource("remove_effect");
 
   @Override
   public void applyEffects(FluidStack fluid, float scale, ToolAttackContext context) {
     LivingEntity living = context.getLivingTarget();
     if (living != null) {
-      living.removeEffect(effect);
+      living.removeEffect(this.effect);
     }
   }
 
   @Override
   public JsonObject serialize(JsonSerializationContext context) {
     JsonObject json = JsonUtils.withType(ID);
-    json.addProperty("effect", BuiltInRegistries.MOB_EFFECT.getKey(effect).toString());
+    json.addProperty("effect", BuiltInRegistries.MOB_EFFECT.getKey(this.effect).toString());
     return json;
   }
 
-  /** Loader instance */
+  /**
+   * Loader instance
+   */
   public static final JsonDeserializer<RemoveEffectSpillingEffect> LOADER = (json, typeOfT, context) ->
     new RemoveEffectSpillingEffect(JsonHelper.getAsEntry(BuiltInRegistries.MOB_EFFECT, json.getAsJsonObject(), "effect"));
 }

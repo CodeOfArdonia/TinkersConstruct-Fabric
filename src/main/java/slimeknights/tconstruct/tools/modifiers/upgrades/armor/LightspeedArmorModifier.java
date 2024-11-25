@@ -27,7 +27,10 @@ import java.util.List;
 import java.util.UUID;
 
 public class LightspeedArmorModifier extends IncrementalModifier implements ArmorWalkModifierHook {
-  /** UUID for speed boost */
+
+  /**
+   * UUID for speed boost
+   */
   private static final UUID ATTRIBUTE_BONUS = UUID.fromString("8790747b-6654-4bd8-83c7-dbe9ae04c0ca");
 
   @Override
@@ -68,7 +71,7 @@ public class LightspeedArmorModifier extends IncrementalModifier implements Armo
     if (context.getChangedSlot() == EquipmentSlot.FEET) {
       IToolStackView newTool = context.getReplacementTool();
       // damaging the tool will trigger this hook, so ensure the new tool has the same level
-      if (newTool == null || newTool.isBroken() || getScaledLevel(newTool, newTool.getModifierLevel(this)) != getScaledLevel(tool, level)) {
+      if (newTool == null || newTool.isBroken() || this.getScaledLevel(newTool, newTool.getModifierLevel(this)) != this.getScaledLevel(tool, level)) {
         AttributeInstance attribute = livingEntity.getAttribute(Attributes.MOVEMENT_SPEED);
         if (attribute != null && attribute.getModifier(ATTRIBUTE_BONUS) != null) {
           attribute.removeModifier(ATTRIBUTE_BONUS);
@@ -90,12 +93,12 @@ public class LightspeedArmorModifier extends IncrementalModifier implements Armo
     float boost;
     if (player != null && key == TooltipKey.SHIFT) {
       int light = player.level().getBrightness(LightLayer.BLOCK, player.blockPosition());
-      boost = 0.015f * (light - 5) * getScaledLevel(tool, level);
+      boost = 0.015f * (light - 5) * this.getScaledLevel(tool, level);
     } else {
-      boost = 0.15f * getScaledLevel(tool, level);
+      boost = 0.15f * this.getScaledLevel(tool, level);
     }
     if (boost > 0) {
-      addPercentTooltip(getDisplayName(), boost, tooltip);
+      this.addPercentTooltip(this.getDisplayName(), boost, tooltip);
     }
   }
 }

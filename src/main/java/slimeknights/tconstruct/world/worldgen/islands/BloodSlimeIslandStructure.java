@@ -14,10 +14,10 @@ import slimeknights.tconstruct.world.TinkerStructures;
 import slimeknights.tconstruct.world.worldgen.islands.variants.IIslandVariant;
 import slimeknights.tconstruct.world.worldgen.islands.variants.IslandVariants;
 
-import java.util.Random;
-
 public class BloodSlimeIslandStructure extends AbstractIslandStructure {
+
   public static final Codec<BloodSlimeIslandStructure> CODEC = simpleCodec(BloodSlimeIslandStructure::new);
+
   public BloodSlimeIslandStructure(Structure.StructureSettings structureSettings) {
     super(structureSettings, new IIslandSettings() {
       @Override

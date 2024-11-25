@@ -46,6 +46,7 @@ import java.util.stream.IntStream;
  */
 @AllArgsConstructor
 public class TinkerStationPartSwapping implements ITinkerStationRecipe {
+
   private static final ValidatedResult TOO_MANY_PARTS = ValidatedResult.failure(TConstruct.makeTranslationKey("recipe", "part_swapping.too_many_parts"));
 
   @Getter
@@ -54,11 +55,11 @@ public class TinkerStationPartSwapping implements ITinkerStationRecipe {
   @Override
   public boolean matches(ITinkerStationContainer inv, Level world) {
     ItemStack tinkerable = inv.getTinkerableStack();
-    if (tinkerable.isEmpty() || !tinkerable.is(TinkerTags.Items.MULTIPART_TOOL)|| !(tinkerable.getItem() instanceof IModifiable)) {
+    if (tinkerable.isEmpty() || !tinkerable.is(TinkerTags.Items.MULTIPART_TOOL) || !(tinkerable.getItem() instanceof IModifiable)) {
       return false;
     }
     // get the list of parts, empty means its not multipart
-    List<PartRequirement> parts = ((IModifiable)tinkerable.getItem()).getToolDefinition().getData().getParts();
+    List<PartRequirement> parts = ((IModifiable) tinkerable.getItem()).getToolDefinition().getData().getParts();
     if (parts.isEmpty()) {
       return false;
     }
@@ -84,7 +85,9 @@ public class TinkerStationPartSwapping implements ITinkerStationRecipe {
     return foundItem;
   }
 
-  /** @deprecated Use {@link #assemble(ITinkerStationContainer, RegistryAccess)}  */
+  /**
+   * @deprecated Use {@link #assemble(ITinkerStationContainer, RegistryAccess)}
+   */
   @Deprecated
   @Override
   public ItemStack getResultItem(RegistryAccess registryAccess) {
@@ -124,8 +127,8 @@ public class TinkerStationPartSwapping implements ITinkerStationRecipe {
         int index = i;
         if (i >= parts.size() || !parts.get(i).matches(item)) {
           index = IntStream.range(0, parts.size())
-                           .filter(pi -> parts.get(pi).matches(item))
-                           .findFirst().orElse(-1);
+            .filter(pi -> parts.get(pi).matches(item))
+            .findFirst().orElse(-1);
           if (index == -1) {
             return ValidatedResult.PASS;
           }
@@ -146,7 +149,7 @@ public class TinkerStationPartSwapping implements ITinkerStationRecipe {
         // determine which modifiers are going to be removed
         List<Modifier> actuallyRemoved = Collections.emptyList();
         if (didChange) {
-          Map<Modifier,Integer> removedTraits = new HashMap<>();
+          Map<Modifier, Integer> removedTraits = new HashMap<>();
           // start with a map of all modifiers on the old part
           // TODO: this logic looks correct, but I feel like it might be more complicated than needed
           // basically, if the new part has the modifier, its not going to be removed no matter how the levels differ, a set should suffice
@@ -167,7 +170,7 @@ public class TinkerStationPartSwapping implements ITinkerStationRecipe {
           }
           // for the remainder, fill a list as we have another hooks to call with them
           actuallyRemoved = new ArrayList<>();
-          for (Entry<Modifier,Integer> entry : removedTraits.entrySet()) {
+          for (Entry<Modifier, Integer> entry : removedTraits.entrySet()) {
             Modifier modifier = entry.getKey();
             if (tool.getModifierLevel(modifier) <= entry.getValue()) {
               modifier.getHook(TinkerHooks.RAW_DATA).removeRawData(tool, modifier, tool.getRestrictedNBT());
@@ -194,14 +197,14 @@ public class TinkerStationPartSwapping implements ITinkerStationRecipe {
               }
             }
             if (factor > 0) {
-              ToolDamageUtil.repair(tool, (int)(repairable.getDurability() * factor));
+              ToolDamageUtil.repair(tool, (int) (repairable.getDurability() * factor));
             }
           }
         }
 
         // ensure no modifier problems after removing
         // first check tool requirements
-        ItemStack result = tool.createStack(Math.min(tinkerable.getCount(), shrinkToolSlotBy()));
+        ItemStack result = tool.createStack(Math.min(tinkerable.getCount(), this.shrinkToolSlotBy()));
         ValidatedResult toolValidation = ModifierRecipeLookup.checkRequirements(result, tool);
         if (toolValidation.hasError()) {
           return toolValidation;

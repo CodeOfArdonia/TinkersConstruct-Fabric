@@ -21,11 +21,17 @@ import slimeknights.tconstruct.tools.TinkerModifiers;
  * Recipe to repair a specialized tool in the tinker station
  */
 public class ModifierMaterialRepairRecipe extends TinkerStationRepairRecipe implements IModifierMaterialRepairRecipe {
-  /** Tool that can be repaired with this recipe */
+
+  /**
+   * Tool that can be repaired with this recipe
+   */
   @Getter
   private final ModifierId modifier;
-  /** ID of material used in repairing */
+  /**
+   * ID of material used in repairing
+   */
   private final LazyMaterial repairMaterial;
+
   public ModifierMaterialRepairRecipe(ResourceLocation id, ModifierId modifier, MaterialId repairMaterialID) {
     super(id);
     this.modifier = modifier;
@@ -34,30 +40,30 @@ public class ModifierMaterialRepairRecipe extends TinkerStationRepairRecipe impl
 
   @Override
   public MaterialId getRepairMaterial() {
-    return repairMaterial.getId();
+    return this.repairMaterial.getId();
   }
 
   @Override
   protected MaterialId getPrimaryMaterial(IToolStackView tool) {
-    return repairMaterial.getId();
+    return this.repairMaterial.getId();
   }
 
   @Override
   public boolean matches(ITinkerStationContainer inv, Level world) {
-    if (repairMaterial.isUnknown()) {
+    if (this.repairMaterial.isUnknown()) {
       return false;
     }
     // must have the modifier
     ItemStack tinkerable = inv.getTinkerableStack();
-    if (!tinkerable.is(TinkerTags.Items.MODIFIABLE) || ModifierUtil.getModifierLevel(tinkerable, modifier) == 0) {
+    if (!tinkerable.is(TinkerTags.Items.MODIFIABLE) || ModifierUtil.getModifierLevel(tinkerable, this.modifier) == 0) {
       return false;
     }
-    return SpecializedRepairRecipe.findMaterialItem(inv, repairMaterial);
+    return SpecializedRepairRecipe.findMaterialItem(inv, this.repairMaterial);
   }
 
   @Override
   protected float getRepairPerItem(ToolStack tool, ITinkerStationContainer inv, int slot, MaterialId repairMaterial) {
-    return super.getRepairPerItem(tool, inv, slot, repairMaterial) * tool.getModifierLevel(modifier);
+    return super.getRepairPerItem(tool, inv, slot, repairMaterial) * tool.getModifierLevel(this.modifier);
   }
 
   @Override

@@ -13,8 +13,11 @@ import slimeknights.mantle.recipe.ingredient.EntityIngredient;
 import slimeknights.tconstruct.library.recipe.modifiers.severing.SeveringRecipe;
 import slimeknights.tconstruct.tools.TinkerModifiers;
 
-/** Beheading recipe to drop pumpkins only if equipped */
+/**
+ * Beheading recipe to drop pumpkins only if equipped
+ */
 public class SnowGolemBeheadingRecipe extends SeveringRecipe {
+
   public SnowGolemBeheadingRecipe(ResourceLocation id) {
     super(id, EntityIngredient.of(EntityType.SNOW_GOLEM), ItemOutput.fromItem(Items.CARVED_PUMPKIN));
   }
@@ -26,9 +29,9 @@ public class SnowGolemBeheadingRecipe extends SeveringRecipe {
 
   @Override
   public ItemStack getOutput(Entity entity) {
-    if (entity instanceof SnowGolem && !((SnowGolem)entity).hasPumpkin()) {
+    if (entity instanceof SnowGolem && !((SnowGolem) entity).hasPumpkin()) {
       return new ItemStack(Blocks.SNOW_BLOCK);
     }
-    return getOutput().copy();
+    return this.getOutput().copy();
   }
 }

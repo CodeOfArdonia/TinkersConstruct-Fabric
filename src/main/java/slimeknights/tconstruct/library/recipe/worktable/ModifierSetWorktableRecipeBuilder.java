@@ -23,71 +23,90 @@ import slimeknights.tconstruct.tools.TinkerModifiers;
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
 
-/** Builder for recipes to add or remove a modifier from a set in persistent data */
+/**
+ * Builder for recipes to add or remove a modifier from a set in persistent data
+ */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ModifierSetWorktableRecipeBuilder extends AbstractSizedIngredientRecipeBuilder<ModifierSetWorktableRecipeBuilder> {
+
   private final ResourceLocation dataKey;
-  @Setter @Accessors(fluent = true)
+  @Setter
+  @Accessors(fluent = true)
   private IJsonPredicate<ModifierId> modifierPredicate = ModifierPredicate.ALWAYS;
   private final boolean addToSet;
   private Ingredient tools = Ingredient.EMPTY;
   private boolean allowTraits = false;
 
-  /** @deprecated use {@link #setAdding(ResourceLocation)} and {@link #modifierPredicate(IJsonPredicate)} */
+  /**
+   * @deprecated use {@link #setAdding(ResourceLocation)} and {@link #modifierPredicate(IJsonPredicate)}
+   */
   @Deprecated
   public static ModifierSetWorktableRecipeBuilder setAdding(ResourceLocation dataKey, TagKey<Modifier> blacklist) {
     return new ModifierSetWorktableRecipeBuilder(dataKey, new TagModifierPredicate(blacklist).inverted(), true, Ingredient.EMPTY, false);
   }
 
-  /** @deprecated use {@link #setRemoving(ResourceLocation)} and {@link #modifierPredicate(IJsonPredicate)} */
+  /**
+   * @deprecated use {@link #setRemoving(ResourceLocation)} and {@link #modifierPredicate(IJsonPredicate)}
+   */
   @Deprecated
   public static ModifierSetWorktableRecipeBuilder setRemoving(ResourceLocation dataKey, TagKey<Modifier> blacklist) {
     return new ModifierSetWorktableRecipeBuilder(dataKey, new TagModifierPredicate(blacklist).inverted(), false, Ingredient.EMPTY, false);
   }
 
-  /** Creates a new recipe for adding to a set */
+  /**
+   * Creates a new recipe for adding to a set
+   */
   public static ModifierSetWorktableRecipeBuilder setAdding(ResourceLocation dataKey) {
     return new ModifierSetWorktableRecipeBuilder(dataKey, true);
   }
 
-  /** Creates a new recipe for removing from a set */
+  /**
+   * Creates a new recipe for removing from a set
+   */
   public static ModifierSetWorktableRecipeBuilder setRemoving(ResourceLocation dataKey) {
     return new ModifierSetWorktableRecipeBuilder(dataKey, false);
   }
 
-  /** Sets the tool requirement for this recipe */
+  /**
+   * Sets the tool requirement for this recipe
+   */
   public ModifierSetWorktableRecipeBuilder setTools(Ingredient ingredient) {
     this.tools = ingredient;
     return this;
   }
 
-  /** Sets the tool requirement for this recipe */
+  /**
+   * Sets the tool requirement for this recipe
+   */
   public ModifierSetWorktableRecipeBuilder setTools(TagKey<Item> tag) {
     return this.setTools(Ingredient.of(tag));
   }
 
-  /** Sets the recipe to allow traits */
+  /**
+   * Sets the recipe to allow traits
+   */
   public ModifierSetWorktableRecipeBuilder allowTraits() {
-    allowTraits = true;
+    this.allowTraits = true;
     return this;
   }
 
   @Override
   public void save(Consumer<FinishedRecipe> consumer) {
-    save(consumer, dataKey);
+    this.save(consumer, this.dataKey);
   }
 
   @Override
   public void save(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
-    if (inputs.isEmpty()) {
+    if (this.inputs.isEmpty()) {
       throw new IllegalStateException("Must have at least one ingredient");
     }
-    ResourceLocation advancementId = buildOptionalAdvancement(id, "modifiers");
+    ResourceLocation advancementId = this.buildOptionalAdvancement(id, "modifiers");
     consumer.accept(new Finished(id, advancementId));
   }
 
   private class Finished extends SizedFinishedRecipe {
+
     public Finished(ResourceLocation id, @Nullable ResourceLocation advancementId) {
       super(id, advancementId);
     }
@@ -95,16 +114,16 @@ public class ModifierSetWorktableRecipeBuilder extends AbstractSizedIngredientRe
 
     @Override
     public void serializeRecipeData(JsonObject json) {
-      json.addProperty("data_key", dataKey.toString());
-      Ingredient ingredient = tools;
+      json.addProperty("data_key", ModifierSetWorktableRecipeBuilder.this.dataKey.toString());
+      Ingredient ingredient = ModifierSetWorktableRecipeBuilder.this.tools;
       if (ingredient == Ingredient.EMPTY) {
         ingredient = Ingredient.of(TinkerTags.Items.MODIFIABLE);
       }
       json.add("tools", ingredient.toJson());
       super.serializeRecipeData(json);
-      json.add("modifier_predicate", ModifierPredicate.LOADER.serialize(modifierPredicate));
-      json.addProperty("add_to_set", addToSet);
-      json.addProperty("allow_traits", allowTraits);
+      json.add("modifier_predicate", ModifierPredicate.LOADER.serialize(ModifierSetWorktableRecipeBuilder.this.modifierPredicate));
+      json.addProperty("add_to_set", ModifierSetWorktableRecipeBuilder.this.addToSet);
+      json.addProperty("allow_traits", ModifierSetWorktableRecipeBuilder.this.allowTraits);
     }
 
     @Override

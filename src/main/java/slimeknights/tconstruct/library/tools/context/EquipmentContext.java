@@ -17,17 +17,28 @@ import static slimeknights.tconstruct.common.TinkerTags.Items.MODIFIABLE;
 
 @RequiredArgsConstructor
 public class EquipmentContext {
-  /** Entity who changed equipment */
+
+  /**
+   * Entity who changed equipment
+   */
   @Getter
   private final LivingEntity entity;
-  /** Determines if the tool in the given slot was fetched */
+  /**
+   * Determines if the tool in the given slot was fetched
+   */
   protected final boolean[] fetchedTool = new boolean[6];
-  /** Array of tools currently on the entity */
+  /**
+   * Array of tools currently on the entity
+   */
   protected final IToolStackView[] toolsInSlots = new IToolStackView[6];
-  /** Cached tinker data capability, saves capability lookup times slightly */
+  /**
+   * Cached tinker data capability, saves capability lookup times slightly
+   */
   private LazyOptional<TinkerDataCapability.Holder> tinkerData = null;
 
-  /** Gets a tool stack if the stack is modifiable, null otherwise */
+  /**
+   * Gets a tool stack if the stack is modifiable, null otherwise
+   */
   @Nullable
   protected static IToolStackView getToolStackIfModifiable(ItemStack stack) {
     if (!stack.isEmpty() && stack.is(MODIFIABLE)) {
@@ -38,34 +49,39 @@ public class EquipmentContext {
 
   /**
    * Gets the tool stack in the given slot
-   * @param slotType  Slot type
-   * @return  Tool stack in the given slot, or null if the slot is not modifiable
+   *
+   * @param slotType Slot type
+   * @return Tool stack in the given slot, or null if the slot is not modifiable
    */
   @Nullable
   public IToolStackView getToolInSlot(EquipmentSlot slotType) {
     int index = slotType.getFilterFlag();
-    if (!fetchedTool[index]) {
-      toolsInSlots[index] = getToolStackIfModifiable(entity.getItemBySlot(slotType));
-      fetchedTool[index] = true;
+    if (!this.fetchedTool[index]) {
+      this.toolsInSlots[index] = getToolStackIfModifiable(this.entity.getItemBySlot(slotType));
+      this.fetchedTool[index] = true;
     }
-    return toolsInSlots[index];
+    return this.toolsInSlots[index];
   }
 
-  /** Checks if any of the armor items are modifiable */
+  /**
+   * Checks if any of the armor items are modifiable
+   */
   public boolean hasModifiableArmor() {
     for (EquipmentSlot slotType : EquipmentSlot.values()) {
-      if (ModifierUtil.validArmorSlot(entity, slotType) && getToolInSlot(slotType) != null) {
+      if (ModifierUtil.validArmorSlot(this.entity, slotType) && this.getToolInSlot(slotType) != null) {
         return true;
       }
     }
     return false;
   }
 
-  /** Gets the tinker data capability */
+  /**
+   * Gets the tinker data capability
+   */
   public LazyOptional<TinkerDataCapability.Holder> getTinkerData() {
-    if (tinkerData == null) {
-      tinkerData = LazyOptional.of(() -> entity.getComponent(TinkerDataCapability.CAPABILITY));
+    if (this.tinkerData == null) {
+      this.tinkerData = LazyOptional.of(() -> this.entity.getComponent(TinkerDataCapability.CAPABILITY));
     }
-    return tinkerData;
+    return this.tinkerData;
   }
 }

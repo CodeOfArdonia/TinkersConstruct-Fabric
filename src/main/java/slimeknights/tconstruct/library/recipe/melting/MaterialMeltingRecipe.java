@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
  * Recipe to melt all castable tool parts of a given material
  */
 public class MaterialMeltingRecipe implements IMeltingRecipe, IMultiRecipe<MeltingRecipe> {
+
   @Getter
   private final ResourceLocation id;
   private final MaterialVariant input;
@@ -43,31 +44,31 @@ public class MaterialMeltingRecipe implements IMeltingRecipe, IMultiRecipe<Melti
 
   @Override
   public boolean matches(IMeltingContainer inv, Level worldIn) {
-    if (input.isUnknown()) {
+    if (this.input.isUnknown()) {
       return false;
     }
     ItemStack stack = inv.getStack();
     if (stack.isEmpty() || MaterialCastingLookup.getItemCost(stack.getItem()) == 0) {
       return false;
     }
-    return input.matchesVariant(stack);
+    return this.input.matchesVariant(stack);
   }
 
   @Override
   public int getTemperature(IMeltingContainer inv) {
-    return temperature;
+    return this.temperature;
   }
 
   @Override
   public int getTime(IMeltingContainer inv) {
     int cost = MaterialCastingLookup.getItemCost(inv.getStack().getItem());
-    return IMeltingRecipe.calcTimeForAmount(temperature, result.getAmount() * cost);
+    return IMeltingRecipe.calcTimeForAmount(this.temperature, this.result.getAmount() * cost);
   }
 
   @Override
   public FluidStack getOutput(IMeltingContainer inv) {
     int cost = MaterialCastingLookup.getItemCost(inv.getStack().getItem());
-    return new FluidStack(result, result.getAmount() * cost);
+    return new FluidStack(this.result, this.result.getAmount() * cost);
   }
 
   @Override
@@ -81,13 +82,13 @@ public class MaterialMeltingRecipe implements IMeltingRecipe, IMultiRecipe<Melti
 
   @Override
   public List<MeltingRecipe> getRecipes() {
-    if (multiRecipes == null) {
-      if (input.get().isHidden()) {
-        multiRecipes = Collections.emptyList();
+    if (this.multiRecipes == null) {
+      if (this.input.get().isHidden()) {
+        this.multiRecipes = Collections.emptyList();
       } else {
         // 1 recipe for each part
-        MaterialId inputId = input.getId();
-        multiRecipes = MaterialCastingLookup
+        MaterialId inputId = this.input.getId();
+        this.multiRecipes = MaterialCastingLookup
           .getAllItemCosts().stream()
           .filter(entry -> entry.getKey().canUseMaterial(inputId))
           .map(entry -> {
@@ -95,15 +96,16 @@ public class MaterialMeltingRecipe implements IMeltingRecipe, IMultiRecipe<Melti
             if (entry.getIntValue() != 1) {
               output = new FluidStack(output, output.getAmount() * entry.getIntValue());
             }
-            return new MeltingRecipe(id, "", MaterialIngredient.fromItem(entry.getKey(), inputId), output, temperature,
-                                     IMeltingRecipe.calcTimeForAmount(temperature, output.getAmount()), Collections.emptyList());
+            return new MeltingRecipe(this.id, "", MaterialIngredient.fromItem(entry.getKey(), inputId), output, this.temperature,
+              IMeltingRecipe.calcTimeForAmount(this.temperature, output.getAmount()), Collections.emptyList());
           }).collect(Collectors.toList());
       }
     }
-    return multiRecipes;
+    return this.multiRecipes;
   }
 
   public static class Serializer extends LoggingRecipeSerializer<MaterialMeltingRecipe> {
+
     @Override
     public MaterialMeltingRecipe fromJson(ResourceLocation id, JsonObject json) {
       MaterialVariantId inputId = MaterialVariantId.fromJson(json, "input");

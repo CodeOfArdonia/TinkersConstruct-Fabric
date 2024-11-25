@@ -42,44 +42,65 @@ import java.util.Collections;
 
 public class MelterBlockEntity extends NameableBlockEntity implements ITankBlockEntity, SidedStorageBlockEntity, ChunkUnloadListeningBlockEntity {
 
-  /** Max capacity for the tank */
+  /**
+   * Max capacity for the tank
+   */
   private static final long TANK_CAPACITY = FluidValues.INGOT * 12;
   /* tags */
   private static final String TAG_INVENTORY = "inventory";
-  /** Name of the GUI */
+  /**
+   * Name of the GUI
+   */
   private static final MutableComponent NAME = TConstruct.makeTranslation("gui", "melter");
 
   public static final BlockEntityTicker<MelterBlockEntity> SERVER_TICKER = (level, pos, state, self) -> self.tick(level, pos, state);
 
   /* Tank */
-  /** Internal fluid tank output */
+  /**
+   * Internal fluid tank output
+   */
   @Getter
   protected final FluidTankAnimated tank = new FluidTankAnimated(TANK_CAPACITY, this);
-  /** Tank data for the model */
+  /**
+   * Tank data for the model
+   */
   @Getter
-  private final SinglePropertyData<FluidTank> modelData = new SinglePropertyData<>(ModelProperties.FLUID_TANK, tank);
-  /** Last comparator strength to reduce block updates */
-  @Getter @Setter
+  private final SinglePropertyData<FluidTank> modelData = new SinglePropertyData<>(ModelProperties.FLUID_TANK, this.tank);
+  /**
+   * Last comparator strength to reduce block updates
+   */
+  @Getter
+  @Setter
   private int lastStrength = -1;
 
-  /** Internal tick counter */
+  /**
+   * Internal tick counter
+   */
   private int tick;
 
   /* Heating */
-  /** Handles all the melting needs */
+  /**
+   * Handles all the melting needs
+   */
   @Getter
-  private final MeltingModuleInventory meltingInventory = new MeltingModuleInventory(this, tank, Config.COMMON.melterOreRate, 3);
+  private final MeltingModuleInventory meltingInventory = new MeltingModuleInventory(this, this.tank, Config.COMMON.melterOreRate, 3);
 
-  /** Fuel handling logic */
+  /**
+   * Fuel handling logic
+   */
   @Getter
   private final FuelModule fuelModule = new FuelModule(this, () -> Collections.singletonList(this.worldPosition.below()));
 
-  /** Main constructor */
+  /**
+   * Main constructor
+   */
   public MelterBlockEntity(BlockPos pos, BlockState state) {
     this(TinkerSmeltery.melter.get(), pos, state);
   }
 
-  /** Extendable constructor */
+  /**
+   * Extendable constructor
+   */
   @SuppressWarnings("WeakerAccess")
   protected MelterBlockEntity(BlockEntityType<? extends MelterBlockEntity> type, BlockPos pos, BlockState state) {
     super(type, pos, state, NAME);
@@ -106,53 +127,57 @@ public class MelterBlockEntity extends NameableBlockEntity implements ITankBlock
 //    }
 //    return super.getCapability(capability, facing);
 //  }
-  
+
   @Nullable
   @Override
   public Storage<FluidVariant> getFluidStorage(@Nullable Direction direction) {
-    return tank;
+    return this.tank;
   }
-  
+
   @Nullable
   @Override
   public Storage<ItemVariant> getItemStorage(@Nullable Direction direction) {
-    return meltingInventory;
+    return this.meltingInventory;
   }
-  
+
   @Override
   public void setRemoved() {
     super.setRemoved();
-    invalidateCaps();
+    this.invalidateCaps();
   }
-  
+
   @Override
   public void onChunkUnloaded() {
-    invalidateCaps();
+    this.invalidateCaps();
   }
 
   /*
    * Melting
    */
 
-  /** Checks if the tile entity is active */
+  /**
+   * Checks if the tile entity is active
+   */
   private boolean isFormed() {
     BlockState state = this.getBlockState();
     return state.hasProperty(MelterBlock.IN_STRUCTURE) && state.getValue(MelterBlock.IN_STRUCTURE);
   }
 
-  /** Ticks the TE on the server */
+  /**
+   * Ticks the TE on the server
+   */
   private void tick(Level level, BlockPos pos, BlockState state) {
     // are we fully formed?
-    if (isFormed()) {
-      switch (tick) {
+    if (this.isFormed()) {
+      switch (this.tick) {
         // tick 0: find fuel
         case 0:
-          if (!fuelModule.hasFuel() && meltingInventory.canHeat(fuelModule.findFuel(false))) {
-            fuelModule.findFuel(true);
+          if (!this.fuelModule.hasFuel() && this.meltingInventory.canHeat(this.fuelModule.findFuel(false))) {
+            this.fuelModule.findFuel(true);
           }
-        // tick 2: heat items and consume fuel
+          // tick 2: heat items and consume fuel
         case 2: {
-          boolean hasFuel = fuelModule.hasFuel();
+          boolean hasFuel = this.fuelModule.hasFuel();
           // update the active state
           if (state.getValue(ControllerBlock.ACTIVE) != hasFuel) {
             level.setBlockAndUpdate(pos, state.setValue(ControllerBlock.ACTIVE, hasFuel));
@@ -165,14 +190,14 @@ public class MelterBlockEntity extends NameableBlockEntity implements ITankBlock
           }
           // heat items
           if (hasFuel) {
-            meltingInventory.heatItems(fuelModule.getTemperature());
-            fuelModule.decreaseFuel(1);
+            this.meltingInventory.heatItems(this.fuelModule.getTemperature());
+            this.fuelModule.decreaseFuel(1);
           } else {
-            meltingInventory.coolItems();
+            this.meltingInventory.coolItems();
           }
         }
       }
-      tick = (tick + 1) % 4;
+      this.tick = (this.tick + 1) % 4;
     }
   }
 
@@ -189,28 +214,28 @@ public class MelterBlockEntity extends NameableBlockEntity implements ITankBlock
   @Override
   public void load(CompoundTag tag) {
     super.load(tag);
-    tank.readFromNBT(tag.getCompound(NBTTags.TANK));
-    fuelModule.readFromTag(tag);
+    this.tank.readFromNBT(tag.getCompound(NBTTags.TANK));
+    this.fuelModule.readFromTag(tag);
     if (tag.contains(TAG_INVENTORY, Tag.TAG_COMPOUND)) {
-      meltingInventory.readFromTag(tag.getCompound(TAG_INVENTORY));
+      this.meltingInventory.readFromTag(tag.getCompound(TAG_INVENTORY));
     }
   }
 
   @Override
   public void saveSynced(CompoundTag tag) {
     super.saveSynced(tag);
-    tag.put(NBTTags.TANK, tank.writeToNBT(new CompoundTag()));
-    tag.put(TAG_INVENTORY, meltingInventory.writeToTag());
+    tag.put(NBTTags.TANK, this.tank.writeToNBT(new CompoundTag()));
+    tag.put(TAG_INVENTORY, this.meltingInventory.writeToTag());
   }
 
   @Override
   public void saveAdditional(CompoundTag tag) {
     super.saveAdditional(tag);
-    fuelModule.writeToTag(tag);
+    this.fuelModule.writeToTag(tag);
   }
 
   @Override
   public Object getRenderData() {
-    return modelData;
+    return this.modelData;
   }
 }

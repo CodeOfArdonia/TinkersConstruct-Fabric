@@ -21,10 +21,13 @@ import slimeknights.tconstruct.tools.TinkerModifiers;
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
 
-/** Recipe that supports not just adding multiple of an item, but also adding a partial amount */
+/**
+ * Recipe that supports not just adding multiple of an item, but also adding a partial amount
+ */
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 @Accessors(chain = true)
 public class IncrementalModifierRecipeBuilder extends AbstractModifierRecipeBuilder<IncrementalModifierRecipeBuilder> {
+
   private Ingredient input = Ingredient.EMPTY;
   private int amountPerItem;
   private int neededPerLevel;
@@ -37,8 +40,9 @@ public class IncrementalModifierRecipeBuilder extends AbstractModifierRecipeBuil
 
   /**
    * Creates a new recipe for multiple levels of a modifier
-   * @param modifier  Modifier
-   * @return  Recipe for multiple levels of the modifier
+   *
+   * @param modifier Modifier
+   * @return Recipe for multiple levels of the modifier
    */
   public static IncrementalModifierRecipeBuilder modifier(ModifierEntry modifier) {
     return new IncrementalModifierRecipeBuilder(modifier);
@@ -46,8 +50,9 @@ public class IncrementalModifierRecipeBuilder extends AbstractModifierRecipeBuil
 
   /**
    * Creates a new recipe for 1 level of a modifier
-   * @param modifier  Modifier
-   * @return  Recipe for 1 level of the modifier
+   *
+   * @param modifier Modifier
+   * @return Recipe for 1 level of the modifier
    */
   public static IncrementalModifierRecipeBuilder modifier(ModifierId modifier) {
     return modifier(new ModifierEntry(modifier, 1));
@@ -55,8 +60,9 @@ public class IncrementalModifierRecipeBuilder extends AbstractModifierRecipeBuil
 
   /**
    * Creates a new recipe for 1 level of a modifier
-   * @param modifier  Modifier
-   * @return  Recipe for 1 level of the modifier
+   *
+   * @param modifier Modifier
+   * @return Recipe for 1 level of the modifier
    */
   public static IncrementalModifierRecipeBuilder modifier(LazyModifier modifier) {
     return modifier(modifier.getId());
@@ -67,10 +73,11 @@ public class IncrementalModifierRecipeBuilder extends AbstractModifierRecipeBuil
 
   /**
    * Adds an input to the recipe
+   *
    * @param input          Input
    * @param amountPerItem  Amount each item matches
    * @param neededPerLevel Total number needed for this modifier
-   * @return  Builder instance
+   * @return Builder instance
    */
   public IncrementalModifierRecipeBuilder setInput(Ingredient input, int amountPerItem, int neededPerLevel) {
     if (amountPerItem < 1) {
@@ -87,24 +94,26 @@ public class IncrementalModifierRecipeBuilder extends AbstractModifierRecipeBuil
 
   /**
    * Adds an input to the recipe
+   *
    * @param item           Item input
    * @param amountPerItem  Amount each item matches
    * @param neededPerLevel Total number needed for this modifier
-   * @return  Builder instance
+   * @return Builder instance
    */
   public IncrementalModifierRecipeBuilder setInput(ItemLike item, int amountPerItem, int neededPerLevel) {
-    return setInput(Ingredient.of(item), amountPerItem, neededPerLevel);
+    return this.setInput(Ingredient.of(item), amountPerItem, neededPerLevel);
   }
 
   /**
    * Adds an input to the recipe
+   *
    * @param tag            Tag input
    * @param amountPerItem  Amount each item matches
    * @param neededPerLevel Total number needed for this modifier
-   * @return  Builder instance
+   * @return Builder instance
    */
   public IncrementalModifierRecipeBuilder setInput(TagKey<Item> tag, int amountPerItem, int neededPerLevel) {
-    return setInput(Ingredient.of(tag), amountPerItem, neededPerLevel);
+    return this.setInput(Ingredient.of(tag), amountPerItem, neededPerLevel);
   }
 
 
@@ -112,41 +121,44 @@ public class IncrementalModifierRecipeBuilder extends AbstractModifierRecipeBuil
 
   @Override
   public void save(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
-    if (input == Ingredient.EMPTY) {
+    if (this.input == Ingredient.EMPTY) {
       throw new IllegalStateException("Must set input");
     }
-    ResourceLocation advancementId = buildOptionalAdvancement(id, "modifiers");
-    consumer.accept(new FinishedAdding(id, advancementId, includeUnarmed));
+    ResourceLocation advancementId = this.buildOptionalAdvancement(id, "modifiers");
+    consumer.accept(new FinishedAdding(id, advancementId, this.includeUnarmed));
   }
 
   @Override
   public IncrementalModifierRecipeBuilder saveSalvage(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
-    if (salvageMaxLevel != 0 && salvageMaxLevel < salvageMinLevel) {
+    if (this.salvageMaxLevel != 0 && this.salvageMaxLevel < this.salvageMinLevel) {
       throw new IllegalStateException("Max level must be greater than min level");
     }
-    ResourceLocation advancementId = buildOptionalAdvancement(id, "modifiers");
+    ResourceLocation advancementId = this.buildOptionalAdvancement(id, "modifiers");
     consumer.accept(new SalvageFinishedRecipe(id, advancementId));
     return this;
   }
 
-  /** @deprecated use {@link JsonUtils#serializeItemStack(ItemStack)} */
+  /**
+   * @deprecated use {@link JsonUtils#serializeItemStack(ItemStack)}
+   */
   @Deprecated
   public static JsonElement serializeResult(ItemStack result) {
     return JsonUtils.serializeItemStack(result);
   }
 
   private class FinishedAdding extends ModifierFinishedRecipe {
+
     public FinishedAdding(ResourceLocation ID, @Nullable ResourceLocation advancementID, boolean withUnarmed) {
       super(ID, advancementID, withUnarmed);
     }
 
     @Override
     public void serializeRecipeData(JsonObject json) {
-      json.add("input", input.toJson());
-      json.addProperty("amount_per_item", amountPerItem);
-      json.addProperty("needed_per_level", neededPerLevel);
-      if (leftover != ItemStack.EMPTY) {
-        json.add("leftover", serializeResult(leftover));
+      json.add("input", IncrementalModifierRecipeBuilder.this.input.toJson());
+      json.addProperty("amount_per_item", IncrementalModifierRecipeBuilder.this.amountPerItem);
+      json.addProperty("needed_per_level", IncrementalModifierRecipeBuilder.this.neededPerLevel);
+      if (IncrementalModifierRecipeBuilder.this.leftover != ItemStack.EMPTY) {
+        json.add("leftover", serializeResult(IncrementalModifierRecipeBuilder.this.leftover));
       }
       super.serializeRecipeData(json);
     }

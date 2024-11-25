@@ -15,9 +15,12 @@ import slimeknights.mantle.util.JsonHelper;
 import slimeknights.mantle.util.RegistryHelper;
 import slimeknights.tconstruct.shared.TinkerCommons;
 
-/** Loot table condition to test if a tag has entries */
+/**
+ * Loot table condition to test if a tag has entries
+ */
 @RequiredArgsConstructor
 public class TagNotEmptyLootCondition<T> implements LootItemCondition {
+
   private final TagKey<T> tag;
 
   @Override
@@ -27,12 +30,15 @@ public class TagNotEmptyLootCondition<T> implements LootItemCondition {
 
   @Override
   public boolean test(LootContext context) {
-    Registry<T> registry = RegistryHelper.getRegistry(tag.registry());
-    return registry != null && registry.getTagOrEmpty(tag).iterator().hasNext();
+    Registry<T> registry = RegistryHelper.getRegistry(this.tag.registry());
+    return registry != null && registry.getTagOrEmpty(this.tag).iterator().hasNext();
   }
 
   public static class ConditionSerializer implements Serializer<TagNotEmptyLootCondition<?>> {
-    /** Helper to deal with generics */
+
+    /**
+     * Helper to deal with generics
+     */
     private static <T> TagKey<T> createKey(JsonObject json) {
       ResourceKey<? extends Registry<T>> registry = ResourceKey.createRegistryKey(JsonHelper.getResourceLocation(json, "registry"));
       return TagKey.create(registry, JsonHelper.getResourceLocation(json, "tag"));

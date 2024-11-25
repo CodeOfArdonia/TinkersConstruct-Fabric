@@ -17,21 +17,27 @@ import java.util.function.Function;
  * TODO 1.19: move into combat package
  */
 public interface ProjectileHitModifierHook {
-  /** Default instance */
+
+  /**
+   * Default instance
+   */
   ProjectileHitModifierHook EMPTY = new ProjectileHitModifierHook() {};
 
-  /** Merger instance */
-  Function<Collection<ProjectileHitModifierHook>,ProjectileHitModifierHook> FIRST_MERGER = AllMerger::new;
+  /**
+   * Merger instance
+   */
+  Function<Collection<ProjectileHitModifierHook>, ProjectileHitModifierHook> FIRST_MERGER = AllMerger::new;
 
   /**
    * Called when a projectile hits an entity
-   * @param modifiers       Modifiers from the tool firing this arrow
-   * @param persistentData  Persistent data on the entity
-   * @param modifier        Modifier triggering this hook
-   * @param projectile      Projectile that hit the entity
-   * @param hit             Hit result
-   * @param attacker        Living entity who fired the projectile, null if non-living or not fired
-   * @param target          Living target, will be null if not living
+   *
+   * @param modifiers      Modifiers from the tool firing this arrow
+   * @param persistentData Persistent data on the entity
+   * @param modifier       Modifier triggering this hook
+   * @param projectile     Projectile that hit the entity
+   * @param hit            Hit result
+   * @param attacker       Living entity who fired the projectile, null if non-living or not fired
+   * @param target         Living target, will be null if not living
    * @return true if the hit should be canceled, preventing vanilla logic
    */
   default boolean onProjectileHitEntity(ModifierNBT modifiers, NamespacedNBT persistentData, ModifierEntry modifier, Projectile projectile, EntityHitResult hit, @Nullable LivingEntity attacker, @Nullable LivingEntity target) {
@@ -40,24 +46,28 @@ public interface ProjectileHitModifierHook {
 
   /**
    * Called when a projectile hits a block
-   * @param modifiers       Modifiers from the tool firing this arrow
-   * @param persistentData  Persistent data on the entity
-   * @param modifier        Modifier triggering this hook
-   * @param projectile      Projectile that hit the entity
-   * @param hit             Hit result
-   * @param attacker        Living entity who fired the projectile, null if non-living or not fired
+   *
+   * @param modifiers      Modifiers from the tool firing this arrow
+   * @param persistentData Persistent data on the entity
+   * @param modifier       Modifier triggering this hook
+   * @param projectile     Projectile that hit the entity
+   * @param hit            Hit result
+   * @param attacker       Living entity who fired the projectile, null if non-living or not fired
    * @return true if the hit should be canceled
    */
   default boolean onProjectileHitBlock(ModifierNBT modifiers, NamespacedNBT persistentData, ModifierEntry modifier, Projectile projectile, BlockHitResult hit, @Nullable LivingEntity attacker) {
     return false;
   }
 
-  /** Merger that runs all hooks and returns true if any did */
+  /**
+   * Merger that runs all hooks and returns true if any did
+   */
   record AllMerger(Collection<ProjectileHitModifierHook> modules) implements ProjectileHitModifierHook {
+
     @Override
     public boolean onProjectileHitEntity(ModifierNBT modifiers, NamespacedNBT persistentData, ModifierEntry modifier, Projectile projectile, EntityHitResult hit, @Nullable LivingEntity attacker, @Nullable LivingEntity target) {
       boolean ret = false;
-      for (ProjectileHitModifierHook module : modules) {
+      for (ProjectileHitModifierHook module : this.modules) {
         ret |= module.onProjectileHitEntity(modifiers, persistentData, modifier, projectile, hit, attacker, target);
       }
       return ret;
@@ -66,7 +76,7 @@ public interface ProjectileHitModifierHook {
     @Override
     public boolean onProjectileHitBlock(ModifierNBT modifiers, NamespacedNBT persistentData, ModifierEntry modifier, Projectile projectile, BlockHitResult hit, @Nullable LivingEntity attacker) {
       boolean ret = false;
-      for (ProjectileHitModifierHook module : modules) {
+      for (ProjectileHitModifierHook module : this.modules) {
         ret |= module.onProjectileHitBlock(modifiers, persistentData, modifier, projectile, hit, attacker);
       }
       return ret;

@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 public class ClearStainedGlassPaneBlock extends ClearGlassPaneBlock implements BeaconColorMultiplierBlock {
 
   private final GlassColor glassColor;
+
   public ClearStainedGlassPaneBlock(Properties builder, GlassColor glassColor) {
     super(builder);
     this.glassColor = glassColor;

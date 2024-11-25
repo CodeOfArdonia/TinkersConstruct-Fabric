@@ -39,6 +39,7 @@ import java.util.function.Supplier;
 @NoArgsConstructor(staticName = "builder")
 @Accessors(fluent = true)
 public class ToolDefinitionDataBuilder {
+
   private final ImmutableList.Builder<PartRequirement> parts = ImmutableList.builder();
   private final StatsNBT.Builder bonuses = StatsNBT.builder();
   private final MultiplierNBT.Builder multipliers = MultiplierNBT.builder();
@@ -47,14 +48,23 @@ public class ToolDefinitionDataBuilder {
   private final ImmutableSet.Builder<ToolAction> actions = ImmutableSet.builder();
   private final ModifierHookMap.Builder hookBuilder = new ModifierHookMap.Builder();
 
-  /** Tool's harvest logic */
-  @Nonnull @Setter
+  /**
+   * Tool's harvest logic
+   */
+  @Nonnull
+  @Setter
   private IHarvestLogic harvestLogic = IHarvestLogic.DEFAULT;
-  /** Tool's AOE logic */
-  @Nonnull @Setter
+  /**
+   * Tool's AOE logic
+   */
+  @Nonnull
+  @Setter
   private IAreaOfEffectIterator aoe = IAreaOfEffectIterator.DEFAULT;
-  /** Tool's attack logic */
-  @Nonnull @Setter
+  /**
+   * Tool's attack logic
+   */
+  @Nonnull
+  @Setter
   private IWeaponAttack attack = IWeaponAttack.DEFAULT;
 
   /* Parts */
@@ -63,7 +73,7 @@ public class ToolDefinitionDataBuilder {
    * Adds a part to the builder
    */
   public ToolDefinitionDataBuilder part(IToolPart part, int weight) {
-    parts.add(PartRequirement.ofPart(part, weight));
+    this.parts.add(PartRequirement.ofPart(part, weight));
     return this;
   }
 
@@ -71,7 +81,7 @@ public class ToolDefinitionDataBuilder {
    * Adds a stat requirement to the builder, for tools that don't have normal tool building recipes
    */
   public ToolDefinitionDataBuilder part(MaterialStatsId stat, int weight) {
-    parts.add(PartRequirement.ofStat(stat, weight));
+    this.parts.add(PartRequirement.ofStat(stat, weight));
     return this;
   }
 
@@ -79,21 +89,21 @@ public class ToolDefinitionDataBuilder {
    * Adds a part to the builder
    */
   public ToolDefinitionDataBuilder part(Supplier<? extends IToolPart> part, int weight) {
-    return part(part.get(), weight);
+    return this.part(part.get(), weight);
   }
 
   /**
    * Adds a part to the builder
    */
   public ToolDefinitionDataBuilder part(IToolPart part) {
-    return part(part, 1);
+    return this.part(part, 1);
   }
 
   /**
    * Adds a part to the builder
    */
   public ToolDefinitionDataBuilder part(Supplier<? extends IToolPart> part) {
-    return part(part, 1);
+    return this.part(part, 1);
   }
 
 
@@ -103,7 +113,7 @@ public class ToolDefinitionDataBuilder {
    * Adds a bonus to the builder
    */
   public <T> ToolDefinitionDataBuilder stat(IToolStat<T> stat, T value) {
-    bonuses.set(stat, value);
+    this.bonuses.set(stat, value);
     return this;
   }
 
@@ -111,7 +121,7 @@ public class ToolDefinitionDataBuilder {
    * Adds a bonus to the builder, overload for floats as they come up pretty often, helps with boxing
    */
   public ToolDefinitionDataBuilder stat(IToolStat<Float> stat, float value) {
-    bonuses.set(stat, value);
+    this.bonuses.set(stat, value);
     return this;
   }
 
@@ -119,7 +129,7 @@ public class ToolDefinitionDataBuilder {
    * Applies a global multiplier
    */
   public ToolDefinitionDataBuilder multiplier(INumericToolStat<?> stat, float value) {
-    multipliers.set(stat, value);
+    this.multipliers.set(stat, value);
     return this;
   }
 
@@ -127,7 +137,7 @@ public class ToolDefinitionDataBuilder {
    * Sets the starting slots for the given type, unspecified defaults to 0
    */
   public ToolDefinitionDataBuilder startingSlots(SlotType slotType, int value) {
-    slots.setSlots(slotType, value);
+    this.slots.setSlots(slotType, value);
     return this;
   }
 
@@ -135,8 +145,8 @@ public class ToolDefinitionDataBuilder {
    * Sets the starting slots to default
    */
   public ToolDefinitionDataBuilder smallToolStartingSlots() {
-    startingSlots(SlotType.UPGRADE, 3);
-    startingSlots(SlotType.ABILITY, 1);
+    this.startingSlots(SlotType.UPGRADE, 3);
+    this.startingSlots(SlotType.ABILITY, 1);
     return this;
   }
 
@@ -144,8 +154,8 @@ public class ToolDefinitionDataBuilder {
    * Sets the starting slots to default
    */
   public ToolDefinitionDataBuilder largeToolStartingSlots() {
-    startingSlots(SlotType.UPGRADE, 2);
-    startingSlots(SlotType.ABILITY, 1);
+    this.startingSlots(SlotType.UPGRADE, 2);
+    this.startingSlots(SlotType.ABILITY, 1);
     return this;
   }
 
@@ -156,7 +166,7 @@ public class ToolDefinitionDataBuilder {
    * Adds a base trait to the tool
    */
   public ToolDefinitionDataBuilder trait(ModifierId modifier, int level) {
-    traits.add(new ModifierEntry(modifier, level));
+    this.traits.add(new ModifierEntry(modifier, level));
     return this;
   }
 
@@ -164,26 +174,27 @@ public class ToolDefinitionDataBuilder {
    * Adds a base trait to the tool
    */
   public ToolDefinitionDataBuilder trait(LazyModifier modifier, int level) {
-    return trait(modifier.getId(), level);
+    return this.trait(modifier.getId(), level);
   }
 
   /**
    * Adds a base trait to the tool
    */
   public ToolDefinitionDataBuilder trait(ModifierId modifier) {
-    return trait(modifier, 1);
+    return this.trait(modifier, 1);
   }
 
   /**
    * Adds a base trait to the tool
    */
   public ToolDefinitionDataBuilder trait(LazyModifier modifier) {
-    return trait(modifier, 1);
+    return this.trait(modifier, 1);
   }
 
   /**
    * Adds a tool action to the tool definition, only has an affect on tools with interaction behaviors
-   * @param action  Action
+   *
+   * @param action Action
    */
   public ToolDefinitionDataBuilder action(ToolAction action) {
     this.actions.add(action);
@@ -193,17 +204,21 @@ public class ToolDefinitionDataBuilder {
 
   /* Harvest */
 
-  /** Makes the tool effective on the given blocks */
+  /**
+   * Makes the tool effective on the given blocks
+   */
   public ToolDefinitionDataBuilder effective(TagKey<Block> tag) {
-    return harvestLogic(new TagHarvestLogic(tag));
+    return this.harvestLogic(new TagHarvestLogic(tag));
   }
 
 
   /* Modules */
 
-  /** Adds a module to the definition */
+  /**
+   * Adds a module to the definition
+   */
   public <T extends IToolModule> ToolDefinitionDataBuilder module(ModifierHook<? super T> hook, T module) {
-    hookBuilder.addHook(module, hook);
+    this.hookBuilder.addHook(module, hook);
     return this;
   }
 
@@ -218,24 +233,24 @@ public class ToolDefinitionDataBuilder {
     Set<ToolAction> actions = this.actions.build();
     // null harvest if empty
     Harvest harvest = null;
-    boolean isDefaultHarvest = harvestLogic == IHarvestLogic.DEFAULT;
-    boolean isDefaultAOE = aoe == IAreaOfEffectIterator.DEFAULT;
+    boolean isDefaultHarvest = this.harvestLogic == IHarvestLogic.DEFAULT;
+    boolean isDefaultAOE = this.aoe == IAreaOfEffectIterator.DEFAULT;
     if (!isDefaultAOE || !isDefaultHarvest) {
       // null properties if defaults
-      harvest = new Harvest(isDefaultHarvest ? null : harvestLogic, isDefaultAOE ? null : aoe);
+      harvest = new Harvest(isDefaultHarvest ? null : this.harvestLogic, isDefaultAOE ? null : this.aoe);
     }
-    ModifierHookMap hooks = hookBuilder.build();
+    ModifierHookMap hooks = this.hookBuilder.build();
     if (hooks.getAllModules().isEmpty()) {
       hooks = null;
     }
     return new ToolDefinitionData(parts.isEmpty() ? null : parts,
-                                  // null multipliers, traits, and actions if empty
-                                  new Stats(bonuses.build(), multipliers == MultiplierNBT.EMPTY ? null : multipliers),
-                                  slots.build(),
-                                  traits.isEmpty() ? null : traits,
-                                  actions.isEmpty() ? null : actions,
-                                  harvest,
-                                  attack == IWeaponAttack.DEFAULT ? null : attack,
-                                  hooks);
+      // null multipliers, traits, and actions if empty
+      new Stats(this.bonuses.build(), multipliers == MultiplierNBT.EMPTY ? null : multipliers),
+      this.slots.build(),
+      traits.isEmpty() ? null : traits,
+      actions.isEmpty() ? null : actions,
+      harvest,
+      this.attack == IWeaponAttack.DEFAULT ? null : this.attack,
+      hooks);
   }
 }

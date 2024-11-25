@@ -14,19 +14,25 @@ import java.util.function.BiFunction;
  */
 @RequiredArgsConstructor
 public class RestrictedCompoundTag {
-  /** Base NBT compound */
+
+  /**
+   * Base NBT compound
+   */
   private final CompoundTag tag;
-  /** List of tags with restricted access */
+  /**
+   * List of tags with restricted access
+   */
   private final Set<String> restrictedKeys;
 
   /**
    * Checks if the data contains the given tag
-   * @param name  Namespaced key
-   * @param type  Tag type, see {@link net.minecraftforge.common.util.Constants.NBT} for values
-   * @return  True if the tag is contained
+   *
+   * @param name Namespaced key
+   * @param type Tag type, see {@link net.minecraftforge.common.util.Constants.NBT} for values
+   * @return True if the tag is contained
    */
   public boolean contains(String name, int type) {
-    return !restrictedKeys.contains(name) && tag.contains(name, type);
+    return !this.restrictedKeys.contains(name) && this.tag.contains(name, type);
   }
 
 
@@ -34,88 +40,96 @@ public class RestrictedCompoundTag {
 
   /**
    * Gets a namespaced key from NBT
-   * @param name      Name
-   * @param function  Function to get data using the key
-   * @param <T>  NBT type of output
-   * @return  Data based on the function
+   *
+   * @param name     Name
+   * @param function Function to get data using the key
+   * @param <T>      NBT type of output
+   * @return Data based on the function
    */
-  protected <T> T get(String name, BiFunction<CompoundTag,String,T> function, T defaultValue) {
-    if (restrictedKeys.contains(name)) {
+  protected <T> T get(String name, BiFunction<CompoundTag, String, T> function, T defaultValue) {
+    if (this.restrictedKeys.contains(name)) {
       return defaultValue;
     }
-    return function.apply(tag, name);
+    return function.apply(this.tag, name);
   }
 
 
   /**
    * Reads an generic NBT value from the mod data
-   * @param name  Name
-   * @return  Integer value
+   *
+   * @param name Name
+   * @return Integer value
    */
   @SuppressWarnings("ConstantConditions")
   @Nullable
   public Tag get(String name) {
-    return get(name, CompoundTag::get, null);
+    return this.get(name, CompoundTag::get, null);
   }
 
   /**
    * Reads an integer from the tag
-   * @param name  Name
-   * @return  Integer value
+   *
+   * @param name Name
+   * @return Integer value
    */
   public int getInt(String name) {
-    return get(name, CompoundTag::getInt, 0);
+    return this.get(name, CompoundTag::getInt, 0);
   }
 
   /**
    * Reads an boolean from the tag
-   * @param name  Name
-   * @return  Boolean value
+   *
+   * @param name Name
+   * @return Boolean value
    */
   public boolean getBoolean(String name) {
-    return get(name, CompoundTag::getBoolean, false);
+    return this.get(name, CompoundTag::getBoolean, false);
   }
 
   /**
    * Reads an float from the tag
-   * @param name  Name
-   * @return  Float value
+   *
+   * @param name Name
+   * @return Float value
    */
   public float getFloat(String name) {
-    return get(name, CompoundTag::getFloat, 0f);
+    return this.get(name, CompoundTag::getFloat, 0f);
   }
 
   /**
    * Reads a string from the tag
-   * @param name  Name
-   * @return  String value
+   *
+   * @param name Name
+   * @return String value
    */
   public String getString(String name) {
-    return get(name, CompoundTag::getString, "");
+    return this.get(name, CompoundTag::getString, "");
   }
 
   /**
    * Reads a compound from the tag
-   * @param name  Name
-   * @return  Compound value
+   *
+   * @param name Name
+   * @return Compound value
    */
   public CompoundTag getCompound(String name) {
-    if (restrictedKeys.contains(name)) {
+    if (this.restrictedKeys.contains(name)) {
       return new CompoundTag();
     }
-    return tag.getCompound(name);
+    return this.tag.getCompound(name);
   }
 
   /**
    * Reads a list from the tag
-   * @param name  Name
-   * @return  Compound value
+   *
+   * @param name Name
+   * @return Compound value
    */
   public ListTag getList(String name, int type) {
-    if (restrictedKeys.contains(name)) {
+    if (this.restrictedKeys.contains(name)) {
       return new ListTag();
     }
-    return tag.getList(name, type);
+    return this.tag.getList(name, type);
   }
 
 
@@ -123,66 +137,72 @@ public class RestrictedCompoundTag {
 
   /**
    * Sets the given NBT into tag
-   * @param name  Key name
-   * @param nbt   NBT value
+   *
+   * @param name Key name
+   * @param nbt  NBT value
    */
   public void put(String name, Tag nbt) {
-    if (!restrictedKeys.contains(name)) {
-      tag.put(name, nbt);
+    if (!this.restrictedKeys.contains(name)) {
+      this.tag.put(name, nbt);
     }
   }
 
   /**
    * Sets an integer from the tag
+   *
    * @param name  Name
-   * @param value  Integer value
+   * @param value Integer value
    */
   public void putInt(String name, int value) {
-    if (!restrictedKeys.contains(name)) {
-      tag.putInt(name, value);
+    if (!this.restrictedKeys.contains(name)) {
+      this.tag.putInt(name, value);
     }
   }
 
   /**
    * Sets an boolean from the tag
+   *
    * @param name  Name
-   * @param value  Boolean value
+   * @param value Boolean value
    */
   public void putBoolean(String name, boolean value) {
-    if (!restrictedKeys.contains(name)) {
-      tag.putBoolean(name, value);
+    if (!this.restrictedKeys.contains(name)) {
+      this.tag.putBoolean(name, value);
     }
   }
 
   /**
    * Sets an float from the tag
+   *
    * @param name  Name
-   * @param value  Float value
+   * @param value Float value
    */
   public void putFloat(String name, float value) {
-    if (!restrictedKeys.contains(name)) {
-      tag.putFloat(name, value);
+    if (!this.restrictedKeys.contains(name)) {
+      this.tag.putFloat(name, value);
     }
   }
 
   /**
    * Reads a string from the tag
+   *
    * @param name  Name
-   * @param value  String value
+   * @param value String value
    */
   public void putString(String name, String value) {
-    if (!restrictedKeys.contains(name)) {
-      tag.putString(name, value);
+    if (!this.restrictedKeys.contains(name)) {
+      this.tag.putString(name, value);
     }
   }
 
   /**
    * Removes the given key from tag
-   * @param name  Key to remove
+   *
+   * @param name Key to remove
    */
   public void remove(String name) {
-    if (!restrictedKeys.contains(name)) {
-      tag.remove(name);
+    if (!this.restrictedKeys.contains(name)) {
+      this.tag.remove(name);
     }
   }
 }

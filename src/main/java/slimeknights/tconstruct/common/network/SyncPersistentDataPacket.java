@@ -8,18 +8,21 @@ import net.minecraft.world.entity.player.Player;
 import slimeknights.mantle.network.packet.IThreadsafePacket;
 import slimeknights.tconstruct.library.tools.capability.PersistentDataCapability;
 
-/** Packet to sync player persistent data to the client */
+/**
+ * Packet to sync player persistent data to the client
+ */
 @RequiredArgsConstructor
 public class SyncPersistentDataPacket implements IThreadsafePacket {
+
   private final CompoundTag data;
 
   public SyncPersistentDataPacket(FriendlyByteBuf buffer) {
-    data = buffer.readNbt();
+    this.data = buffer.readNbt();
   }
 
   @Override
   public void encode(FriendlyByteBuf buffer) {
-    buffer.writeNbt(data);
+    buffer.writeNbt(this.data);
   }
 
   @Override
@@ -27,8 +30,11 @@ public class SyncPersistentDataPacket implements IThreadsafePacket {
     HandleClient.handle(this);
   }
 
-  /** Handles client side only code safely */
+  /**
+   * Handles client side only code safely
+   */
   private static class HandleClient {
+
     private static void handle(SyncPersistentDataPacket packet) {
       Player player = Minecraft.getInstance().player;
       if (player != null) {

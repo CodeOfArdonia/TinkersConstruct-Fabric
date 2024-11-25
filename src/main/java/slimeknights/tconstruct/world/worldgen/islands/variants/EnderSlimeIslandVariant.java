@@ -14,10 +14,12 @@ import slimeknights.tconstruct.world.TinkerWorld;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
-import java.util.Random;
 
-/** Slime island variant for the end */
+/**
+ * Slime island variant for the end
+ */
 public class EnderSlimeIslandVariant extends AbstractSlimeIslandVariant {
+
   public EnderSlimeIslandVariant(int index) {
     super(index, SlimeType.ENDER, SlimeType.ENDER);
   }
@@ -45,7 +47,7 @@ public class EnderSlimeIslandVariant extends AbstractSlimeIslandVariant {
 
   @Nullable
   @Override
-  public ConfiguredFeature<?,?> getTreeFeature(RandomSource random, RegistryAccess registryAccess) {
+  public ConfiguredFeature<?, ?> getTreeFeature(RandomSource random, RegistryAccess registryAccess) {
     return registryAccess.registryOrThrow(Registries.CONFIGURED_FEATURE).get(TinkerStructures.enderSlimeIslandTree);
   }
 }

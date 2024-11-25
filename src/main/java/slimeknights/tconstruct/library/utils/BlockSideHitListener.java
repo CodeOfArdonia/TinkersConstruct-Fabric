@@ -15,10 +15,13 @@ import java.util.UUID;
  * Logic to keep track of the side of the block that was last hit
  */
 public class BlockSideHitListener {
-  private static final Map<UUID,Direction> HIT_FACE = new HashMap<>();
+
+  private static final Map<UUID, Direction> HIT_FACE = new HashMap<>();
   private static boolean init = false;
 
-  /** Initializies this listener */
+  /**
+   * Initializies this listener
+   */
   public static void init() {
     if (init) {
       return;
@@ -28,20 +31,25 @@ public class BlockSideHitListener {
     ServerPlayConnectionEvents.DISCONNECT.register(BlockSideHitListener::onLeaveServer);
   }
 
-  /** Called when the player left clicks a block to store the face */
+  /**
+   * Called when the player left clicks a block to store the face
+   */
   private static void onLeftClickBlock(PlayerInteractionEvents.LeftClickBlock event) {
     HIT_FACE.put(event.getPlayer().getUUID(), event.getFace());
   }
 
-  /** Called when a player leaves the server to clear the face */
+  /**
+   * Called when a player leaves the server to clear the face
+   */
   private static void onLeaveServer(ServerGamePacketListenerImpl handler, MinecraftServer server) {
     HIT_FACE.remove(handler.getPlayer().getUUID());
   }
 
   /**
    * Gets the side this player last hit, should return correct values in most modifier hooks related to block breaking
-   * @param player  Player
-   * @return  Side last hit
+   *
+   * @param player Player
+   * @return Side last hit
    */
   public static Direction getSideHit(Player player) {
     return HIT_FACE.getOrDefault(player.getUUID(), Direction.UP);

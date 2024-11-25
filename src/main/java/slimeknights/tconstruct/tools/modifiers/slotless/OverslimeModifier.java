@@ -17,7 +17,10 @@ import slimeknights.tconstruct.tools.TinkerModifiers;
 import javax.annotation.Nullable;
 
 public class OverslimeModifier extends DurabilityShieldModifier {
-  /** Key for max overslime on a tool */
+
+  /**
+   * Key for max overslime on a tool
+   */
   private static final ResourceLocation KEY_OVERSLIME_CAP = TConstruct.getResource("overslime_cap");
   /**
    * Key marking another modifier as an overslime "friend". If no friends exist, overslime causes some debuffs.
@@ -37,7 +40,7 @@ public class OverslimeModifier extends DurabilityShieldModifier {
   @Override
   public void addVolatileData(ToolRebuildContext context, int level, ModDataNBT volatileData) {
     // base cap
-    addCapacity(volatileData, (int)(50 * context.getDefinition().getData().getMultiplier(ToolStats.DURABILITY)));
+    this.addCapacity(volatileData, (int) (50 * context.getDefinition().getData().getMultiplier(ToolStats.DURABILITY)));
   }
 
   @Override
@@ -74,12 +77,12 @@ public class OverslimeModifier extends DurabilityShieldModifier {
   @Override
   public Boolean showDurabilityBar(IToolStackView tool, int level) {
     // only show as fully repaired if overslime is full
-    return getOverslime(tool) < getCapacity(tool);
+    return this.getOverslime(tool) < this.getCapacity(tool);
   }
 
   @Override
   public int getDurabilityRGB(IToolStackView tool, int level) {
-    if (getOverslime(tool) > 0) {
+    if (this.getOverslime(tool) > 0) {
       // just always display light blue, not much point in color changing really
       return 0x00D0FF;
     }
@@ -91,54 +94,63 @@ public class OverslimeModifier extends DurabilityShieldModifier {
 
   @Override
   protected ResourceLocation getShieldKey() {
-    return getId();
+    return this.getId();
   }
 
-  /** Gets the key for overslime capacity */
+  /**
+   * Gets the key for overslime capacity
+   */
   public ResourceLocation getCapacityKey() {
     return KEY_OVERSLIME_CAP;
   }
 
-  /** Gets the key for overslime friends */
+  /**
+   * Gets the key for overslime friends
+   */
   public ResourceLocation getFriendKey() {
     return KEY_OVERSLIME_FRIEND;
   }
 
-  /** Sets the friend key in this tool */
+  /**
+   * Sets the friend key in this tool
+   */
   public void setFriend(ModDataNBT volatileData) {
-    volatileData.putBoolean(getFriendKey(), true);
+    volatileData.putBoolean(this.getFriendKey(), true);
   }
 
   /* Capacity helpers */
 
   /**
    * Gets the current overslime cap
-   * @param volatileData  Volatile data instance
-   * @return  Current cap
+   *
+   * @param volatileData Volatile data instance
+   * @return Current cap
    */
   public int getCapacity(IModDataView volatileData) {
-    return volatileData.getInt(getCapacityKey());
+    return volatileData.getInt(this.getCapacityKey());
   }
 
   /**
    * Helper to reduce code errors
-   * @param tool  Tool instance
-   * @return  Overslime cap
+   *
+   * @param tool Tool instance
+   * @return Overslime cap
    */
   public int getCapacity(IToolStackView tool) {
-    return getCapacity(tool.getVolatileData());
+    return this.getCapacity(tool.getVolatileData());
   }
 
   @Override
   protected int getShieldCapacity(IToolStackView tool, int level) {
-    return getCapacity(tool);
+    return this.getCapacity(tool);
   }
 
   /**
    * Sets the given amount to the cap, if you are going to use this method, your modifier should be high priority to prevent blocking others
    * In general, {@link #addCapacity(ModDataNBT, int)} or {@link #multiplyCapacity(ModDataNBT, float)} will serve you better
-   * @param volatileData  Volatile data instance
-   * @param amount        Amount to set
+   *
+   * @param volatileData Volatile data instance
+   * @param amount       Amount to set
    */
   public void setCapacity(ModDataNBT volatileData, int amount) {
     volatileData.putInt(KEY_OVERSLIME_CAP, amount);
@@ -146,20 +158,22 @@ public class OverslimeModifier extends DurabilityShieldModifier {
 
   /**
    * Adds the given amount to the cap
-   * @param volatileData  Volatile data instance
-   * @param amount        Amount to add
+   *
+   * @param volatileData Volatile data instance
+   * @param amount       Amount to add
    */
   public void addCapacity(ModDataNBT volatileData, int amount) {
-    setCapacity(volatileData, getCapacity(volatileData) + amount);
+    this.setCapacity(volatileData, this.getCapacity(volatileData) + amount);
   }
 
   /**
    * Adds the given amount to the cap
-   * @param volatileData  Volatile data instance
-   * @param factor        Multiplication factor
+   *
+   * @param volatileData Volatile data instance
+   * @param factor       Multiplication factor
    */
   public void multiplyCapacity(ModDataNBT volatileData, float factor) {
-    volatileData.putInt(KEY_OVERSLIME_CAP, (int)(getCapacity(volatileData) * factor));
+    volatileData.putInt(KEY_OVERSLIME_CAP, (int) (this.getCapacity(volatileData) * factor));
   }
 
 
@@ -167,11 +181,12 @@ public class OverslimeModifier extends DurabilityShieldModifier {
 
   /**
    * Gets the current overslime on the tool
-   * @param tool  Tool stack instance
-   * @return  Default cap
+   *
+   * @param tool Tool stack instance
+   * @return Default cap
    */
   public int getOverslime(IToolStackView tool) {
-    return getShield(tool);
+    return this.getShield(tool);
   }
 
   @Override
@@ -183,7 +198,7 @@ public class OverslimeModifier extends DurabilityShieldModifier {
    * Sets the overslime on a tool
    */
   public void setOverslime(IToolStackView tool, int amount) {
-    setShield(tool, 0, amount); // level is unused for overslime capacity
+    this.setShield(tool, 0, amount); // level is unused for overslime capacity
   }
 
   /**
@@ -193,6 +208,6 @@ public class OverslimeModifier extends DurabilityShieldModifier {
     // yeah, I am hardcoding overworked. If you need something similar, put in an issue request on github
     // grants +100% restoring per level
     int overworked = tool.getModifierLevel(TinkerModifiers.overworked.getId());
-    addShield(tool, 0, amount * (1 + overworked));
+    this.addShield(tool, 0, amount * (1 + overworked));
   }
 }

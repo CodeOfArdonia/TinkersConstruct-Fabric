@@ -13,9 +13,13 @@ import slimeknights.tconstruct.tools.TinkerModifiers;
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
 
-/** Builder for a modifier with a swappable string key */
+/**
+ * Builder for a modifier with a swappable string key
+ */
 public class SwappableModifierRecipeBuilder extends ModifierRecipeBuilder {
+
   private final String value;
+
   protected SwappableModifierRecipeBuilder(ModifierId modifier, String value) {
     super(new ModifierEntry(modifier, 1));
     this.value = value;
@@ -23,12 +27,16 @@ public class SwappableModifierRecipeBuilder extends ModifierRecipeBuilder {
     this.allowCrystal = false;
   }
 
-  /** Creates a new builder */
+  /**
+   * Creates a new builder
+   */
   public static SwappableModifierRecipeBuilder modifier(ModifierId modifier, String value) {
     return new SwappableModifierRecipeBuilder(modifier, value);
   }
 
-  /** Creates a new builder */
+  /**
+   * Creates a new builder
+   */
   public static SwappableModifierRecipeBuilder modifier(LazyModifier modifier, String value) {
     return modifier(modifier.getId(), value);
   }
@@ -42,13 +50,13 @@ public class SwappableModifierRecipeBuilder extends ModifierRecipeBuilder {
 
   @Override
   public void save(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
-    if (inputs.isEmpty()) {
+    if (this.inputs.isEmpty()) {
       throw new IllegalStateException("Must have at least 1 input");
     }
-    ResourceLocation advancementId = buildOptionalAdvancement(id, "modifiers");
+    ResourceLocation advancementId = this.buildOptionalAdvancement(id, "modifiers");
     consumer.accept(new Finished(id, advancementId, false));
-    if (includeUnarmed) {
-      if (requirements != ModifierMatch.ALWAYS) {
+    if (this.includeUnarmed) {
+      if (this.requirements != ModifierMatch.ALWAYS) {
         throw new IllegalStateException("Cannot use includeUnarmed with requirements");
       }
       consumer.accept(new Finished(new ResourceLocation(id.getNamespace(), id.getPath() + "_unarmed"), null, true));
@@ -56,6 +64,7 @@ public class SwappableModifierRecipeBuilder extends ModifierRecipeBuilder {
   }
 
   private class Finished extends ModifierRecipeBuilder.FinishedAdding {
+
     public Finished(ResourceLocation ID, @Nullable ResourceLocation advancementID, boolean withUnarmed) {
       super(ID, advancementID, withUnarmed);
     }
@@ -70,7 +79,7 @@ public class SwappableModifierRecipeBuilder extends ModifierRecipeBuilder {
       super.serializeRecipeData(json);
       JsonObject result = json.getAsJsonObject("result");
       result.remove("level");
-      result.addProperty("value", value);
+      result.addProperty("value", SwappableModifierRecipeBuilder.this.value);
     }
   }
 }

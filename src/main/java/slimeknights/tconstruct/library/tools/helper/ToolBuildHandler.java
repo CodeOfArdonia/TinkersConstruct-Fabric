@@ -32,11 +32,14 @@ import java.util.stream.Collectors;
  * Logic to help in creating new tools
  */
 public final class ToolBuildHandler {
+
   private ToolBuildHandler() {}
 
   private static final MaterialId RENDER_MATERIAL = new MaterialId(TConstruct.MOD_ID, "ui_render");
 
-  /** Materials for use in multipart tool rendering */
+  /**
+   * Materials for use in multipart tool rendering
+   */
   private static final List<MaterialVariantId> RENDER_MATERIALS = Arrays.asList(
     MaterialVariantId.create(RENDER_MATERIAL, "head"),
     MaterialVariantId.create(RENDER_MATERIAL, "handle"),
@@ -46,9 +49,10 @@ public final class ToolBuildHandler {
 
   /**
    * Builds a tool stack from a material list and a given tool definition
-   * @param tool       Tool instance
-   * @param materials  Material list
-   * @return  Item stack with materials
+   *
+   * @param tool      Tool instance
+   * @param materials Material list
+   * @return Item stack with materials
    */
   public static ItemStack buildItemFromMaterials(IModifiable tool, MaterialNBT materials) {
     return ToolStack.createTool(tool.asItem(), tool.getToolDefinition(), materials).createStack();
@@ -56,8 +60,9 @@ public final class ToolBuildHandler {
 
   /**
    * Gets the render material for the given index
-   * @param index  Index
-   * @return  Render material
+   *
+   * @param index Index
+   * @return Render material
    */
   public static MaterialVariantId getRenderMaterial(int index) {
     return RENDER_MATERIALS.get(index % RENDER_MATERIALS.size());
@@ -65,15 +70,16 @@ public final class ToolBuildHandler {
 
   /**
    * Builds a tool using the render materials for the sake of display in UIs
-   * @param item        Tool item
-   * @param definition  Tool definition
-   * @return  Tool for rendering
+   *
+   * @param item       Tool item
+   * @param definition Tool definition
+   * @return Tool for rendering
    */
   public static ItemStack buildToolForRendering(Item item, ToolDefinition definition) {
     // if no parts, just return the item directly with the display tag
     ItemStack stack = new ItemStack(item);
     if (definition.isMultipart()) {
-		// use all 5 render materials for display stacks, having too many materials is not a problem and its easier than making this reload sensitive
+      // use all 5 render materials for display stacks, having too many materials is not a problem and its easier than making this reload sensitive
       stack = new MaterialIdNBT(RENDER_MATERIALS).updateStack(stack);
     }
     stack.getOrCreateTag().putBoolean(TooltipUtil.KEY_DISPLAY, true);
@@ -82,30 +88,31 @@ public final class ToolBuildHandler {
 
   /**
    * Gets a list of random materials consistent with the given tool definition data
-   * @param data         Data, primarily used for part requirements
-   * @param maxTier      Max tier of material allowed
-   * @param allowHidden  If true, hidden materials may be used
-   * @return  List of random materials
+   *
+   * @param data        Data, primarily used for part requirements
+   * @param maxTier     Max tier of material allowed
+   * @param allowHidden If true, hidden materials may be used
+   * @return List of random materials
    */
   public static MaterialNBT randomMaterials(ToolDefinitionData data, int maxTier, boolean allowHidden) {
     // start by getting a list of materials for each stat type we need
     List<PartRequirement> requirements = data.getParts();
     // figure out which stat types we need
-    Map<MaterialStatsId,List<IMaterial>> materialChoices = requirements.stream()
+    Map<MaterialStatsId, List<IMaterial>> materialChoices = requirements.stream()
       .map(PartRequirement::getStatType)
       .distinct()
       .collect(Collectors.toMap(Function.identity(), t -> new ArrayList<>()));
     IMaterialRegistry registry = MaterialRegistry.getInstance();
     registry.getAllMaterials().stream()
-            .filter(mat -> (allowHidden || !mat.isHidden()) && mat.getTier() <= maxTier)
-            .forEach(mat -> {
-              for (IMaterialStats stats : registry.getAllStats(mat.getIdentifier())) {
-                List<IMaterial> list = materialChoices.get(stats.getIdentifier());
-                if (list != null) {
-                  list.add(mat);
-                }
-              }
-            });
+      .filter(mat -> (allowHidden || !mat.isHidden()) && mat.getTier() <= maxTier)
+      .forEach(mat -> {
+        for (IMaterialStats stats : registry.getAllStats(mat.getIdentifier())) {
+          List<IMaterial> list = materialChoices.get(stats.getIdentifier());
+          if (list != null) {
+            list.add(mat);
+          }
+        }
+      });
 
     // then randomly choose a material from the lists for each part
     MaterialNBT.Builder builder = MaterialNBT.builder();
@@ -128,9 +135,10 @@ public final class ToolBuildHandler {
   /**
    * Adds all sub items to a tool
    * TODO 1.19: remove fixed materials
-   * @param item             item being created
-   * @param itemList         List to fill with items
-   * @param fixedMaterials   Materials that should be forced
+   *
+   * @param item           item being created
+   * @param itemList       List to fill with items
+   * @param fixedMaterials Materials that should be forced
    */
   public static void addDefaultSubItems(IModifiable item, FabricItemGroupEntries itemList, MaterialVariantId... fixedMaterials) {
     ToolDefinition definition = item.getToolDefinition();
@@ -166,7 +174,9 @@ public final class ToolBuildHandler {
     }
   }
 
-  /** Makes a single sub item for the given materials */
+  /**
+   * Makes a single sub item for the given materials
+   */
   private static boolean addSubItem(IModifiable item, FabricItemGroupEntries items, IMaterial material, MaterialVariantId[] fixedMaterials) {
     List<PartRequirement> required = item.getToolDefinition().getData().getParts();
     MaterialNBT.Builder materials = MaterialNBT.builder();

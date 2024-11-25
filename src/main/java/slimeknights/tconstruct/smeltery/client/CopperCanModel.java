@@ -23,12 +23,12 @@ import com.google.common.collect.Maps;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.mojang.math.Transformation;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import io.github.fabricators_of_create.porting_lib.models.CompositeModel;
 import io.github.fabricators_of_create.porting_lib.models.DynamicFluidContainerModel;
 import io.github.fabricators_of_create.porting_lib.models.UnbakedGeometryHelper;
 import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
 import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
-import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import io.github.fabricators_of_create.porting_lib.models.geometry.SimpleModelState;
 import lombok.RequiredArgsConstructor;
 import lombok.With;
@@ -66,6 +66,7 @@ import java.util.function.Function;
 @SuppressWarnings("removal")
 @RequiredArgsConstructor
 public final class CopperCanModel implements IUnbakedGeometry<CopperCanModel> {
+
   public static final Loader LOADER = new Loader();
 
   // Depth offsets to prevent Z-fighting
@@ -79,25 +80,24 @@ public final class CopperCanModel implements IUnbakedGeometry<CopperCanModel> {
   private final boolean applyFluidLuminosity;
 
   @Override
-  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation, boolean isGui3d) {
+  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation, boolean isGui3d) {
     Material particleLocation = owner.hasTexture("particle") ? owner.getMaterial("particle") : null;
     Material baseLocation = owner.hasTexture("base") ? owner.getMaterial("base") : null;
     Material fluidMaskLocation = owner.hasTexture("fluid") ? owner.getMaterial("fluid") : null;
     Material coverLocation = owner.hasTexture("cover") ? owner.getMaterial("cover") : null;
 
     TextureAtlasSprite baseSprite = baseLocation != null ? spriteGetter.apply(baseLocation) : null;
-    TextureAtlasSprite fluidSprite = FluidVariantRendering.getSprite(fluid.getType());
-    TextureAtlasSprite coverSprite = (coverLocation != null && (!coverIsMask || baseLocation != null)) ? spriteGetter.apply(coverLocation) : null;
+    TextureAtlasSprite fluidSprite = FluidVariantRendering.getSprite(this.fluid.getType());
+    TextureAtlasSprite coverSprite = (coverLocation != null && (!this.coverIsMask || baseLocation != null)) ? spriteGetter.apply(coverLocation) : null;
 
     TextureAtlasSprite particleSprite = particleLocation != null ? spriteGetter.apply(particleLocation) : null;
 
     if (particleSprite == null) particleSprite = fluidSprite;
     if (particleSprite == null) particleSprite = baseSprite;
-    if (particleSprite == null && !coverIsMask) particleSprite = coverSprite;
+    if (particleSprite == null && !this.coverIsMask) particleSprite = coverSprite;
 
     // If the fluid is lighter than air, rotate 180deg to turn it upside down
-    if (!fluid.isEmpty() && FluidVariantAttributes.isLighterThanAir(fluid.getType()))
-    {
+    if (!this.fluid.isEmpty() && FluidVariantAttributes.isLighterThanAir(this.fluid.getType())) {
       modelTransform = new SimpleModelState(
         modelTransform.getRotation().compose(
           new Transformation(null, new Quaternionf(0, 0, 1, 0), null, null)));
@@ -106,19 +106,16 @@ public final class CopperCanModel implements IUnbakedGeometry<CopperCanModel> {
     // We need to disable GUI 3D and block lighting for this to render properly
     var modelBuilder = CompositeModel.Baked.builder(owner.hasAmbientOcclusion(), false, owner.getGuiLight().lightLikeBlock(), particleSprite, new ContainedFluidOverrideHandler(overrides, baker, owner, this), owner.getTransforms());
 
-    if (baseLocation != null && baseSprite != null)
-    {
+    if (baseLocation != null && baseSprite != null) {
       // Base texture
       var unbaked = UnbakedGeometryHelper.createUnbakedItemElements(0, baseSprite.contents());
       var quads = UnbakedGeometryHelper.bakeElements(unbaked, $ -> baseSprite, modelTransform, modelLocation);
       modelBuilder.addQuads(quads);
     }
 
-    if (fluidMaskLocation != null && fluidSprite != null)
-    {
+    if (fluidMaskLocation != null && fluidSprite != null) {
       TextureAtlasSprite templateSprite = spriteGetter.apply(fluidMaskLocation);
-      if (templateSprite != null)
-      {
+      if (templateSprite != null) {
         // Fluid layer
         var transformedState = new SimpleModelState(modelTransform.getRotation().compose(FLUID_TRANSFORM), modelTransform.isUvLocked());
         var unbaked = UnbakedGeometryHelper.createUnbakedItemMaskElements(1, templateSprite.contents()); // Use template as mask
@@ -128,11 +125,9 @@ public final class CopperCanModel implements IUnbakedGeometry<CopperCanModel> {
       }
     }
 
-    if (coverSprite != null)
-    {
-      var sprite = coverIsMask ? baseSprite : coverSprite;
-      if (sprite != null)
-      {
+    if (coverSprite != null) {
+      var sprite = this.coverIsMask ? baseSprite : coverSprite;
+      if (sprite != null) {
         // Cover/overlay
         var transformedState = new SimpleModelState(modelTransform.getRotation().compose(COVER_TRANSFORM), modelTransform.isUvLocked());
         var unbaked = UnbakedGeometryHelper.createUnbakedItemMaskElements(2, coverSprite.contents()); // Use cover as mask
@@ -147,6 +142,7 @@ public final class CopperCanModel implements IUnbakedGeometry<CopperCanModel> {
   }
 
   private static class Loader implements IGeometryLoader<CopperCanModel> {
+
     @Override
     public CopperCanModel read(JsonObject modelContents, JsonDeserializationContext deserializationContext) {
       boolean coverIsMask = GsonHelper.getAsBoolean(modelContents, "coverIsMask", true);
@@ -156,8 +152,9 @@ public final class CopperCanModel implements IUnbakedGeometry<CopperCanModel> {
   }
 
   private static final class ContainedFluidOverrideHandler extends ItemOverrides {
+
     private static final ResourceLocation BAKE_LOCATION = TConstruct.getResource("copper_can_dynamic");
-    private final Map<FluidStack,BakedModel> cache = Maps.newHashMap(); // contains all the baked models since they'll never change
+    private final Map<FluidStack, BakedModel> cache = Maps.newHashMap(); // contains all the baked models since they'll never change
     private final ItemOverrides nested;
     private final ModelBaker baker;
     private final BlockModel owner;
@@ -170,19 +167,21 @@ public final class CopperCanModel implements IUnbakedGeometry<CopperCanModel> {
       this.parent = parent;
     }
 
-    /** Gets the model directly, for creating the cached models */
+    /**
+     * Gets the model directly, for creating the cached models
+     */
     private BakedModel getUncahcedModel(FluidStack fluid) {
-      return this.parent.withFluid(fluid).bake(owner, baker, Material::sprite, BlockModelRotation.X0_Y0, ItemOverrides.EMPTY, BAKE_LOCATION, false);
+      return this.parent.withFluid(fluid).bake(this.owner, this.baker, Material::sprite, BlockModelRotation.X0_Y0, ItemOverrides.EMPTY, BAKE_LOCATION, false);
     }
 
     @Override
     public BakedModel resolve(BakedModel originalModel, ItemStack stack, @Nullable ClientLevel world, @Nullable LivingEntity entity, int seed) {
-      BakedModel overriden = nested.resolve(originalModel, stack, world, entity, seed);
+      BakedModel overriden = this.nested.resolve(originalModel, stack, world, entity, seed);
       if (overriden != originalModel) return overriden;
       Fluid fluid = CopperCanItem.getFluid(stack.getTag());
       if (fluid != Fluids.EMPTY) {
         FluidStack fluidStack = new FluidStack(fluid, FluidValues.INGOT, CopperCanItem.getFluidTag(stack.getTag()));
-        return cache.computeIfAbsent(fluidStack, this::getUncahcedModel);
+        return this.cache.computeIfAbsent(fluidStack, this::getUncahcedModel);
       }
       return originalModel;
     }

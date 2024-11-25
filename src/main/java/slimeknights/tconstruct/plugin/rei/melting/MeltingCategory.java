@@ -32,8 +32,11 @@ import slimeknights.tconstruct.smeltery.block.entity.module.FuelModule;
 
 import java.util.List;
 
-/** Shared by melter and smeltery */
+/**
+ * Shared by melter and smeltery
+ */
 public class MeltingCategory extends AbstractMeltingCategory {
+
   private static final Component TITLE = TConstruct.makeTranslation("jei", "melting.title");
   private static final String KEY_TEMPERATURE = TConstruct.makeTranslationKey("jei", "temperature");
   private static final String KEY_MULTIPLIER = TConstruct.makeTranslationKey("jei", "melting.multiplier");
@@ -42,13 +45,17 @@ public class MeltingCategory extends AbstractMeltingCategory {
   private static final Component TOOLTIP_SMELTERY = TConstruct.makeTranslation("jei", "melting.smeltery").withStyle(ChatFormatting.GRAY, ChatFormatting.UNDERLINE);
   private static final Component TOOLTIP_MELTER = TConstruct.makeTranslation("jei", "melting.melter").withStyle(ChatFormatting.GRAY, ChatFormatting.UNDERLINE);
 
-  /** Tooltip callback for items */
+  /**
+   * Tooltip callback for items
+   */
   private static final IRecipeTooltipReplacement ITEM_FUEL_TOOLTIP = (slot, list) -> {
     list.add(1, SOLID_TEMPERATURE);
     list.add(2, SOLID_MULTIPLIER);
   };
 
-  /** Tooltip callback for ores */
+  /**
+   * Tooltip callback for ores
+   */
   private static final IRecipeTooltipReplacement METAL_ORE_TOOLTIP = new MeltingFluidCallback(OreRateType.METAL);
   private static final IRecipeTooltipReplacement GEM_ORE_TOOLTIP = new MeltingFluidCallback(OreRateType.GEM);
 
@@ -79,11 +86,11 @@ public class MeltingCategory extends AbstractMeltingCategory {
     // solid fuel slot
     int temperature = display.getTemperature();
     if (temperature <= FuelModule.SOLID_TEMPERATURE) {
-      ingredients.add(solidFuel.build(1, 19, origin));
+      ingredients.add(this.solidFuel.build(1, 19, origin));
     }
 
     // input
-    ingredients.add(slot(24, 18, origin).markInput().disableBackground().entries(display.getInputEntries().get(0)));
+    ingredients.add(this.slot(24, 18, origin).markInput().disableBackground().entries(display.getInputEntries().get(0)));
 
     // output
     OreRateType oreType = display.getOreType();
@@ -95,7 +102,7 @@ public class MeltingCategory extends AbstractMeltingCategory {
     } else {
       tooltip = MeltingFluidCallback.INSTANCE;
     }
-    Slot output = slot(96, 4, origin).markOutput()
+    Slot output = this.slot(96, 4, origin).markOutput()
       .disableBackground()
       .entries(display.getOutputEntries().get(0));
     EntryStack<FluidStack> stack = output.getCurrentEntry().cast();
@@ -103,14 +110,14 @@ public class MeltingCategory extends AbstractMeltingCategory {
     TinkersCategory.setEntryTooltip(output, tooltip);
     output.getBounds().setSize(34, 34);
     ingredients.add(output);
-    ingredients.add(tankOverlay.build(96, 4, origin));
+    ingredients.add(this.tankOverlay.build(96, 4, origin));
 
     // show fuels that are valid for this recipe
     int fuelHeight = 32;
     // solid fuel
     if (display.getTemperature() <= FuelModule.SOLID_TEMPERATURE) {
       fuelHeight = 15;
-      Slot renderSlot = slot(2, 22, origin)
+      Slot renderSlot = this.slot(2, 22, origin)
         .disableBackground()
         .entries(EntryIngredients.ofItemStacks(MeltingFuelHandler.SOLID_FUELS.get()));
       TinkersCategory.setEntryTooltip(renderSlot, ITEM_FUEL_TOOLTIP);
@@ -118,7 +125,7 @@ public class MeltingCategory extends AbstractMeltingCategory {
     }
 
     // liquid fuel
-    Slot renderSlot = slot(4, 4, origin)
+    Slot renderSlot = this.slot(4, 4, origin)
       .disableBackground()
       .entries(EntryIngredients.of(VanillaEntryTypes.FLUID, TinkersCategory.toREIFluids(MeltingFuelHandler.getUsableFuels(display.getTemperature()))));
     TinkersCategory.setEntryTooltip(renderSlot, FUEL_TOOLTIP);
@@ -126,9 +133,12 @@ public class MeltingCategory extends AbstractMeltingCategory {
     ingredients.add(renderSlot);
   }
 
-  /** Adds amounts to outputs and temperatures to fuels */
+  /**
+   * Adds amounts to outputs and temperatures to fuels
+   */
   @RequiredArgsConstructor
   private static class MeltingFluidCallback extends AbstractMeltingCategory.MeltingFluidCallback {
+
     @Getter
     private final OreRateType oreType;
 
@@ -136,8 +146,8 @@ public class MeltingCategory extends AbstractMeltingCategory {
     protected boolean appendMaterial(FluidStack stack, List<Component> list) {
       Fluid fluid = stack.getFluid();
       long amount = stack.getAmount();
-      long smelteryAmount = Config.COMMON.smelteryOreRate.applyOreBoost(oreType, amount);
-      long melterAmount = Config.COMMON.melterOreRate.applyOreBoost(oreType, amount);
+      long smelteryAmount = Config.COMMON.smelteryOreRate.applyOreBoost(this.oreType, amount);
+      long melterAmount = Config.COMMON.melterOreRate.applyOreBoost(this.oreType, amount);
       if (smelteryAmount != melterAmount) {
         list.add(TOOLTIP_MELTER);
         boolean shift = FluidTooltipHandler.appendMaterialNoShift(fluid, melterAmount, list);

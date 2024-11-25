@@ -20,7 +20,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.material.Fluid;
 import slimeknights.mantle.recipe.IMultiRecipe;
 import slimeknights.tconstruct.library.recipe.TinkerRecipeTypes;
 import slimeknights.tconstruct.library.recipe.casting.DisplayCastingRecipe;
@@ -37,6 +36,7 @@ import java.util.Optional;
  */
 @RequiredArgsConstructor
 public abstract class ContainerFillingRecipe implements ICastingRecipe, IMultiRecipe<DisplayCastingRecipe> {
+
   @Getter
   protected final RecipeType<?> type;
   @Getter
@@ -83,13 +83,15 @@ public abstract class ContainerFillingRecipe implements ICastingRecipe, IMultiRe
     FluidVariant fluid = FluidVariant.of(inv.getFluid());
     try (Transaction tx = TransferUtil.getTransaction()) {
       return stack.getItem() == this.container.asItem()
-           && getFluidHandlerItem(stack)
+        && getFluidHandlerItem(stack)
         .filter(handler -> StorageUtil.simulateInsert(handler, fluid, this.fluidAmount, tx) > 0)
         .isPresent();
     }
   }
 
-  /** @deprecated use {@link ICastingRecipe#assemble(Container, RegistryAccess)} */
+  /**
+   * @deprecated use {@link ICastingRecipe#assemble(Container, RegistryAccess)}
+   */
   @Override
   @Deprecated
   public ItemStack getResultItem(RegistryAccess registryAccess) {
@@ -110,35 +112,40 @@ public abstract class ContainerFillingRecipe implements ICastingRecipe, IMultiRe
   }
 
   /* Display */
-  /** Cache of items to display for this container */
+  /**
+   * Cache of items to display for this container
+   */
   private List<DisplayCastingRecipe> displayRecipes = null;
 
   @Override
   public List<DisplayCastingRecipe> getRecipes() {
-    if (displayRecipes == null) {
-      List<ItemStack> casts = Collections.singletonList(new ItemStack(container));
-      displayRecipes = BuiltInRegistries.FLUID.stream()
-                                             .filter(fluid -> fluid.getBucket() != Items.AIR && fluid.isSource(fluid.defaultFluidState()))
-                                             .map(fluid -> {
-                                               FluidStack fluidStack = new FluidStack(fluid, fluidAmount);
-                                               ItemStack stack = new ItemStack(container);
-                                               ContainerItemContext context = ContainerItemContext.withConstant(stack);
-                                               stack = Optional.ofNullable(FluidStorage.ITEM.find(stack, context)).map(handler -> {
-                                                 try (Transaction tx = TransferUtil.getTransaction()) {
-                                                   handler.insert(fluidStack.getType(), fluidStack.getAmount(), tx);
-                                                   tx.commit();
-                                                 }
-                                                 return context.getItemVariant().toStack((int) context.getAmount());
-                                               }).orElse(stack);
-                                               return new DisplayCastingRecipe(getType(), casts, Collections.singletonList(fluidStack), stack, 5, true);
-                                             })
-                                             .toList();
+    if (this.displayRecipes == null) {
+      List<ItemStack> casts = Collections.singletonList(new ItemStack(this.container));
+      this.displayRecipes = BuiltInRegistries.FLUID.stream()
+        .filter(fluid -> fluid.getBucket() != Items.AIR && fluid.isSource(fluid.defaultFluidState()))
+        .map(fluid -> {
+          FluidStack fluidStack = new FluidStack(fluid, this.fluidAmount);
+          ItemStack stack = new ItemStack(this.container);
+          ContainerItemContext context = ContainerItemContext.withConstant(stack);
+          stack = Optional.ofNullable(FluidStorage.ITEM.find(stack, context)).map(handler -> {
+            try (Transaction tx = TransferUtil.getTransaction()) {
+              handler.insert(fluidStack.getType(), fluidStack.getAmount(), tx);
+              tx.commit();
+            }
+            return context.getItemVariant().toStack((int) context.getAmount());
+          }).orElse(stack);
+          return new DisplayCastingRecipe(this.getType(), casts, Collections.singletonList(fluidStack), stack, 5, true);
+        })
+        .toList();
     }
-    return displayRecipes;
+    return this.displayRecipes;
   }
 
-  /** Basin implementation */
+  /**
+   * Basin implementation
+   */
   public static class Basin extends ContainerFillingRecipe {
+
     public Basin(ResourceLocation idIn, String groupIn, int fluidAmount, Item containerIn) {
       super(TinkerRecipeTypes.CASTING_BASIN.get(), idIn, groupIn, fluidAmount, containerIn);
     }
@@ -149,7 +156,9 @@ public abstract class ContainerFillingRecipe implements ICastingRecipe, IMultiRe
     }
   }
 
-  /** Table implementation */
+  /**
+   * Table implementation
+   */
   public static class Table extends ContainerFillingRecipe {
 
     public Table(ResourceLocation idIn, String groupIn, int fluidAmount, Item containerIn) {

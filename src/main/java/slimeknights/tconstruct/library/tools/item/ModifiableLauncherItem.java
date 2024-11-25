@@ -3,13 +3,13 @@ package slimeknights.tconstruct.library.tools.item;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import io.github.fabricators_of_create.porting_lib.common.util.Lazy;
-import io.github.fabricators_of_create.porting_lib.item.ReequipAnimationItem;
-import io.github.fabricators_of_create.porting_lib.item.api.extensions.RepairableItem;
-import io.github.fabricators_of_create.porting_lib.tool.ToolAction;
 import io.github.fabricators_of_create.porting_lib.enchant.CustomEnchantingBehaviorItem;
 import io.github.fabricators_of_create.porting_lib.item.CustomMaxCountItem;
 import io.github.fabricators_of_create.porting_lib.item.DamageableItem;
+import io.github.fabricators_of_create.porting_lib.item.ReequipAnimationItem;
 import io.github.fabricators_of_create.porting_lib.item.ShieldBlockItem;
+import io.github.fabricators_of_create.porting_lib.item.api.extensions.RepairableItem;
+import io.github.fabricators_of_create.porting_lib.tool.ToolAction;
 import io.github.fabricators_of_create.porting_lib.tool.addons.ToolActionItem;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemItemStorages;
 import lombok.Getter;
@@ -62,25 +62,36 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.Consumer;
 
-/** Base class for any items that launch projectiles */
+/**
+ * Base class for any items that launch projectiles
+ */
 public abstract class ModifiableLauncherItem extends ProjectileWeaponItem implements IModifiableDisplay, CustomEnchantingBehaviorItem, DamageableItem, CustomMaxCountItem, ShieldBlockItem, ToolActionItem, RepairableItem, ReequipAnimationItem {
-  /** Drawspeed as of the time this launcher started charging, used clientside for various features including scope and the model.
-   * Not necessary to clear as its only used by logic that checks other hooks to see if a bow is drawing */
+
+  /**
+   * Drawspeed as of the time this launcher started charging, used clientside for various features including scope and the model.
+   * Not necessary to clear as its only used by logic that checks other hooks to see if a bow is drawing
+   */
   public static final TinkerDataKey<Float> DRAWSPEED = TConstruct.createKey("drawspeed");
-  /** Int version of above, just used for sound effects */
+  /**
+   * Int version of above, just used for sound effects
+   */
   public static final ResourceLocation KEY_DRAWTIME = TConstruct.getResource("drawtime");
 
-  /** Tool definition for the given tool */
+  /**
+   * Tool definition for the given tool
+   */
   @Getter
   private final ToolDefinition toolDefinition;
 
-  /** Cached tool for rendering on UIs */
+  /**
+   * Cached tool for rendering on UIs
+   */
   private ItemStack toolForRendering;
 
   public ModifiableLauncherItem(Properties properties, ToolDefinition toolDefinition, ResourceKey<CreativeModeTab> tab) {
     super(properties);
     this.toolDefinition = toolDefinition;
-    ((FabricItemSettings)properties).customDamage(this::damageItem);
+    ((FabricItemSettings) properties).customDamage(this::damageItem);
     ItemGroupEvents.modifyEntriesEvent(tab).register(this::fillItemCategory);
     FluidStorage.ITEM.registerForItems((itemStack, context) -> new ToolFluidCapability(context, Lazy.of(() -> ToolStack.from(itemStack))), this);
     ItemItemStorages.ITEM.registerForItems((itemStack, context) -> ToolInventoryCapability.getCap(context, itemStack), this);
@@ -125,12 +136,12 @@ public abstract class ModifiableLauncherItem extends ProjectileWeaponItem implem
 
   @Override
   public void verifyTagAfterLoad(CompoundTag nbt) {
-    ToolStack.verifyTag(this, nbt, getToolDefinition());
+    ToolStack.verifyTag(this, nbt, this.getToolDefinition());
   }
 
   @Override
   public void onCraftedBy(ItemStack stack, Level worldIn, Player playerIn) {
-    ToolStack.ensureInitialized(stack, getToolDefinition());
+    ToolStack.ensureInitialized(stack, this.getToolDefinition());
   }
 
 
@@ -178,7 +189,7 @@ public abstract class ModifiableLauncherItem extends ProjectileWeaponItem implem
 
   @Override
   public int getMaxDamage(ItemStack stack) {
-    if (!canBeDepleted()) {
+    if (!this.canBeDepleted()) {
       return 0;
     }
     ToolStack tool = ToolStack.from(stack);
@@ -189,7 +200,7 @@ public abstract class ModifiableLauncherItem extends ProjectileWeaponItem implem
 
   @Override
   public int getDamage(ItemStack stack) {
-    if (!canBeDepleted()) {
+    if (!this.canBeDepleted()) {
       return 0;
     }
     return ToolStack.from(stack).getDamage();
@@ -197,7 +208,7 @@ public abstract class ModifiableLauncherItem extends ProjectileWeaponItem implem
 
   @Override
   public void setDamage(ItemStack stack, int damage) {
-    if (canBeDepleted()) {
+    if (this.canBeDepleted()) {
       ToolStack.from(stack).setDamage(damage);
     }
   }
@@ -247,7 +258,7 @@ public abstract class ModifiableLauncherItem extends ProjectileWeaponItem implem
   }
 
   @Override
-  public Multimap<Attribute,AttributeModifier> getAttributeModifiers(IToolStackView tool, EquipmentSlot slot) {
+  public Multimap<Attribute, AttributeModifier> getAttributeModifiers(IToolStackView tool, EquipmentSlot slot) {
     return ModifiableItemUtil.getMeleeAttributeModifiers(tool, slot);
   }
 
@@ -257,12 +268,12 @@ public abstract class ModifiableLauncherItem extends ProjectileWeaponItem implem
     if (nbt == null || slot.getType() != Type.HAND) {
       return ImmutableMultimap.of();
     }
-    return getAttributeModifiers(ToolStack.from(stack), slot);
+    return this.getAttributeModifiers(ToolStack.from(stack), slot);
   }
 
   @Override
   public boolean canDisableShield(ItemStack stack, ItemStack shield, LivingEntity entity, LivingEntity attacker) {
-    return !ToolDamageUtil.isBroken(stack) && toolDefinition.getData().canPerformAction(TinkerToolActions.SHIELD_DISABLE);
+    return !ToolDamageUtil.isBroken(stack) && this.toolDefinition.getData().canPerformAction(TinkerToolActions.SHIELD_DISABLE);
   }
 
 
@@ -281,7 +292,7 @@ public abstract class ModifiableLauncherItem extends ProjectileWeaponItem implem
 
   @Override
   public Component getName(ItemStack stack) {
-    return TooltipUtil.getDisplayName(stack, getToolDefinition());
+    return TooltipUtil.getDisplayName(stack, this.getToolDefinition());
   }
 
   @Override
@@ -291,7 +302,7 @@ public abstract class ModifiableLauncherItem extends ProjectileWeaponItem implem
 
   @Override
   public int getDefaultTooltipHideFlags(ItemStack stack) {
-    return TooltipUtil.getModifierHideFlags(getToolDefinition());
+    return TooltipUtil.getModifierHideFlags(this.getToolDefinition());
   }
 
 
@@ -303,10 +314,10 @@ public abstract class ModifiableLauncherItem extends ProjectileWeaponItem implem
 
   @Override
   public ItemStack getRenderTool() {
-    if (toolForRendering == null) {
-      toolForRendering = ToolBuildHandler.buildToolForRendering(this, this.getToolDefinition());
+    if (this.toolForRendering == null) {
+      this.toolForRendering = ToolBuildHandler.buildToolForRendering(this, this.getToolDefinition());
     }
-    return toolForRendering;
+    return this.toolForRendering;
   }
 
 
@@ -314,7 +325,7 @@ public abstract class ModifiableLauncherItem extends ProjectileWeaponItem implem
 
   @Override
   public boolean allowContinuingBlockBreaking(Player player, ItemStack oldStack, ItemStack newStack) {
-    return !shouldCauseReequipAnimation(oldStack, newStack, false);
+    return !this.shouldCauseReequipAnimation(oldStack, newStack, false);
   }
 
   @Override
@@ -348,7 +359,9 @@ public abstract class ModifiableLauncherItem extends ProjectileWeaponItem implem
 
   /* Multishot helper */
 
-  /** Gets the angle to fire the first arrow, each additional arrow offsets an additional 10 degrees */
+  /**
+   * Gets the angle to fire the first arrow, each additional arrow offsets an additional 10 degrees
+   */
   protected static float getAngleStart(int count) {
     return -5 * (count - 1);
   }

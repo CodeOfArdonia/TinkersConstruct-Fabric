@@ -30,24 +30,24 @@ import slimeknights.tconstruct.world.worldgen.islands.variants.IslandVariants;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
-import java.util.Random;
 
 public class SlimeIslandPiece extends TemplateStructurePiece {
+
   @Nullable
-  private final ConfiguredFeature<?,?> tree;
+  private final ConfiguredFeature<?, ?> tree;
   private final IIslandVariant variant;
   private int numberOfTreesPlaced;
   private ChunkGenerator chunkGenerator;
 
 
-  private SlimeIslandPiece(StructureTemplateManager manager, IIslandVariant variant, ResourceLocation templateName, BlockPos templatePos, @Nullable ConfiguredFeature<?,?> tree, Rotation rotation, Mirror mirror) {
+  private SlimeIslandPiece(StructureTemplateManager manager, IIslandVariant variant, ResourceLocation templateName, BlockPos templatePos, @Nullable ConfiguredFeature<?, ?> tree, Rotation rotation, Mirror mirror) {
     super(TinkerStructures.slimeIslandPiece.get(), 0, manager, templateName, templateName.toString(), makeSettings(rotation, mirror), templatePos);
     this.variant = variant;
     this.numberOfTreesPlaced = 0;
     this.tree = tree;
   }
 
-  public SlimeIslandPiece(StructureTemplateManager manager, IIslandVariant variant, String templateName, BlockPos templatePos, @Nullable ConfiguredFeature<?,?> tree, Rotation rotation, Mirror mirror) {
+  public SlimeIslandPiece(StructureTemplateManager manager, IIslandVariant variant, String templateName, BlockPos templatePos, @Nullable ConfiguredFeature<?, ?> tree, Rotation rotation, Mirror mirror) {
     this(manager, variant, variant.getStructureName(templateName), templatePos, tree, rotation, mirror);
   }
 
@@ -56,10 +56,10 @@ public class SlimeIslandPiece extends TemplateStructurePiece {
     this.variant = IslandVariants.getVariantFromIndex(nbt.getInt("Variant"));
     this.numberOfTreesPlaced = nbt.getInt("NumberOfTreesPlaced");
     this.tree = Optional.of(nbt.getString("Tree"))
-                        .filter(s -> !s.isEmpty())
-                        .map(ResourceLocation::tryParse)
-                        .flatMap(pContext.registryAccess().registryOrThrow(Registries.CONFIGURED_FEATURE)::getOptional)
-                        .orElse(null);
+      .filter(s -> !s.isEmpty())
+      .map(ResourceLocation::tryParse)
+      .flatMap(pContext.registryAccess().registryOrThrow(Registries.CONFIGURED_FEATURE)::getOptional)
+      .orElse(null);
   }
 
   private static StructurePlaceSettings makeSettings(Rotation rotation, Mirror mirror) {
@@ -73,8 +73,8 @@ public class SlimeIslandPiece extends TemplateStructurePiece {
     tag.putString("Rot", this.placeSettings.getRotation().name());
     tag.putString("Mi", this.placeSettings.getMirror().name());
     tag.putInt("NumberOfTreesPlaced", this.numberOfTreesPlaced);
-    if (tree != null) {
-      ResourceLocation key = pContext.registryAccess().registryOrThrow(Registries.CONFIGURED_FEATURE).getKey(tree);
+    if (this.tree != null) {
+      ResourceLocation key = pContext.registryAccess().registryOrThrow(Registries.CONFIGURED_FEATURE).getKey(this.tree);
       if (key != null) {
         tag.putString("Tree", key.toString());
       }
@@ -94,8 +94,8 @@ public class SlimeIslandPiece extends TemplateStructurePiece {
         }
       }
       case "tconstruct:slime_tree" -> {
-        if (tree != null && this.numberOfTreesPlaced < 3 && rand.nextBoolean() && level instanceof WorldGenLevel worldgenLevel) {
-          if (tree.place(worldgenLevel, this.chunkGenerator, rand, pos)) {
+        if (this.tree != null && this.numberOfTreesPlaced < 3 && rand.nextBoolean() && level instanceof WorldGenLevel worldgenLevel) {
+          if (this.tree.place(worldgenLevel, this.chunkGenerator, rand, pos)) {
             this.numberOfTreesPlaced++;
           }
         }

@@ -18,7 +18,6 @@ import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.properties.Property;
-import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
@@ -44,6 +43,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 public class HarvestAbilityModifier extends InteractionModifier.NoLevels implements BlockInteractionModifierHook {
+
   @Getter
   private final int priority;
 
@@ -55,22 +55,23 @@ public class HarvestAbilityModifier extends InteractionModifier.NoLevels impleme
 
   @Override
   public boolean shouldDisplay(boolean advanced) {
-    return priority > Short.MIN_VALUE;
+    return this.priority > Short.MIN_VALUE;
   }
 
   @Override
   public Component getDisplayName(IToolStackView tool, int level) {
     return DualOptionInteraction.formatModifierName(tool, this, super.getDisplayName(tool, level));
   }
-  
+
   /**
    * Harvests a block that is harvested on interaction, such a berry bushes
-   * @param context  Item use context of the original block clicked
-   * @param world    Level instance
-   * @param state    State to harvest
-   * @param pos      Position to harvest
-   * @param player   Player instance
-   * @return  True if harvested
+   *
+   * @param context Item use context of the original block clicked
+   * @param world   Level instance
+   * @param state   State to harvest
+   * @param pos     Position to harvest
+   * @param player  Player instance
+   * @return True if harvested
    */
 
   private static boolean harvestInteract(UseOnContext context, ServerLevel world, BlockState state, BlockPos pos, @Nullable Player player) {
@@ -84,10 +85,11 @@ public class HarvestAbilityModifier extends InteractionModifier.NoLevels impleme
 
   /**
    * Harvests a stackable block, like sugar cane or kelp
-   * @param world   Level instance
-   * @param state   Block state
-   * @param pos     Block position
-   * @param player  Player instance
+   *
+   * @param world  Level instance
+   * @param state  Block state
+   * @param pos    Block position
+   * @param player Player instance
    * @return True if the block was harvested
    */
   private static boolean harvestStackable(ServerLevel world, BlockState state, BlockPos pos, @Nullable Player player) {
@@ -108,12 +110,13 @@ public class HarvestAbilityModifier extends InteractionModifier.NoLevels impleme
 
   /**
    * Tries harvesting a normal crop, that is a crop that goes through a set number of stages and is broken to drop produce and seeds
-   * @param stack   Tool stack
-   * @param world   Level instance
-   * @param state   Block state
-   * @param pos     Block position
-   * @param player  Player instance
-   * @return  True if the crop was successfully harvested
+   *
+   * @param stack  Tool stack
+   * @param world  Level instance
+   * @param state  Block state
+   * @param pos    Block position
+   * @param player Player instance
+   * @return True if the crop was successfully harvested
    */
   private static boolean harvestCrop(ItemStack stack, ServerLevel world, BlockState state, BlockPos pos, @Nullable Player player) {
     Block block = state.getBlock();
@@ -129,7 +132,7 @@ public class HarvestAbilityModifier extends InteractionModifier.NoLevels impleme
       IntegerProperty age = null;
       for (Property<?> prop : state.getProperties()) {
         if (prop.getName().equals("age") && prop instanceof IntegerProperty) {
-          age = (IntegerProperty)prop;
+          age = (IntegerProperty) prop;
           break;
         }
       }
@@ -194,12 +197,13 @@ public class HarvestAbilityModifier extends InteractionModifier.NoLevels impleme
 
   /**
    * Tries to harvest the crop at the given position
-   * @param context  Item use context of the original block clicked
-   * @param world    Level instance
-   * @param state    State to harvest
-   * @param pos      Position to harvest
-   * @param source   Source of the interaction
-   * @return  True if harvested
+   *
+   * @param context Item use context of the original block clicked
+   * @param world   Level instance
+   * @param state   State to harvest
+   * @param pos     Position to harvest
+   * @param source  Source of the interaction
+   * @return True if harvested
    */
   @SuppressWarnings("deprecation")
   private static boolean harvest(UseOnContext context, IToolStackView tool, ServerLevel world, BlockState state, BlockPos pos, InteractionSource source) {

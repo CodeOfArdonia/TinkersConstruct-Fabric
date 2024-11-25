@@ -16,9 +16,12 @@ import slimeknights.tconstruct.library.tools.helper.ToolAttackUtil;
 import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 import slimeknights.tconstruct.tools.TinkerModifiers;
 
-/** Deals damage in a circle around the primary target */
+/**
+ * Deals damage in a circle around the primary target
+ */
 @RequiredArgsConstructor
 public class CircleWeaponAttack implements IWeaponAttack {
+
   public static final Loader LOADER = new Loader();
 
   private final float radius;
@@ -29,16 +32,16 @@ public class CircleWeaponAttack implements IWeaponAttack {
     // only need fully charged for scythe sweep, easier than sword sweep
     if (context.isFullyCharged()) {
       // basically sword sweep logic, just deals full damage to all entities
-      double range = radius + tool.getModifierLevel(TinkerModifiers.expanded.getId());
+      double range = this.radius + tool.getModifierLevel(TinkerModifiers.expanded.getId());
       // allow having no range until modified with range
-      if (radius > 0) {
+      if (this.radius > 0) {
         double rangeSq = range * range;
         LivingEntity attacker = context.getAttacker();
         Entity target = context.getTarget();
         for (LivingEntity aoeTarget : attacker.level().getEntitiesOfClass(LivingEntity.class, target.getBoundingBox().inflate(range, 0.25D, range))) {
           if (aoeTarget != attacker && aoeTarget != target && !attacker.isAlliedTo(aoeTarget)
-              && !(aoeTarget instanceof ArmorStand stand && stand.isMarker()) && target.distanceToSqr(aoeTarget) < rangeSq) {
-            float angle = attacker.getYRot() * ((float)Math.PI / 180F);
+            && !(aoeTarget instanceof ArmorStand stand && stand.isMarker()) && target.distanceToSqr(aoeTarget) < rangeSq) {
+            float angle = attacker.getYRot() * ((float) Math.PI / 180F);
             aoeTarget.knockback(0.4F, Mth.sin(angle), -Mth.cos(angle));
             hit |= ToolAttackUtil.extraEntityAttack(tool, attacker, context.getHand(), aoeTarget);
           }
@@ -60,6 +63,7 @@ public class CircleWeaponAttack implements IWeaponAttack {
   }
 
   private static class Loader implements IGenericLoader<CircleWeaponAttack> {
+
     @Override
     public CircleWeaponAttack deserialize(JsonObject json) {
       return new CircleWeaponAttack(GsonHelper.getAsFloat(json, "diameter"));

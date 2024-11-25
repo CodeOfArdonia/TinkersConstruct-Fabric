@@ -25,70 +25,74 @@ public interface IToolRecipeHelper extends ICastCreationHelper {
 
   /**
    * Registers recipe for tool building
+   *
    * @param consumer Recipe consumer
    * @param tool     Tool
    * @param folder   Folder for recipe
    */
   default void toolBuilding(Consumer<FinishedRecipe> consumer, IModifiable tool, String folder) {
     ToolBuildingRecipeBuilder.toolBuildingRecipe(tool)
-                             .save(consumer, modResource(folder + Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(tool.asItem())).getPath()));
+      .save(consumer, this.modResource(folder + Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(tool.asItem())).getPath()));
   }
 
   /**
    * Registers recipe for tool building
+   *
    * @param consumer Recipe consumer
    * @param tool     Tool supplier
    * @param folder   Folder for recipe
    */
   default void toolBuilding(Consumer<FinishedRecipe> consumer, Supplier<? extends IModifiable> tool, String folder) {
-    toolBuilding(consumer, tool.get(), folder);
+    this.toolBuilding(consumer, tool.get(), folder);
   }
 
   /**
    * Adds a recipe to craft a material item
-   * @param consumer Recipe consumer
-   * @param part     Part to be crafted
-   * @param cast     Part cast
-   * @param cost     Part cost
-   * @param partFolder   Folder for recipes
+   *
+   * @param consumer   Recipe consumer
+   * @param part       Part to be crafted
+   * @param cast       Part cast
+   * @param cost       Part cost
+   * @param partFolder Folder for recipes
    */
   default void partRecipes(Consumer<FinishedRecipe> consumer, IMaterialItem part, CastItemObject cast, int cost, String partFolder, String castFolder) {
     String name = Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(part.asItem())).getPath();
 
     // Part Builder
     PartRecipeBuilder.partRecipe(part)
-                     .setPattern(modResource(name))
-                     .setPatternItem(DefaultCustomIngredients.any(Ingredient.of(TinkerTags.Items.DEFAULT_PATTERNS), Ingredient.of(cast.get())))
-                     .setCost(cost)
-                     .save(consumer, modResource(partFolder + "builder/" + name));
+      .setPattern(this.modResource(name))
+      .setPatternItem(DefaultCustomIngredients.any(Ingredient.of(TinkerTags.Items.DEFAULT_PATTERNS), Ingredient.of(cast.get())))
+      .setCost(cost)
+      .save(consumer, this.modResource(partFolder + "builder/" + name));
 
     // Material Casting
     String castingFolder = partFolder + "casting/";
     MaterialCastingRecipeBuilder.tableRecipe(part)
-                                .setItemCost(cost)
-                                .setCast(cast.getMultiUseTag(), false)
-                                .save(consumer, modResource(castingFolder + name + "_gold_cast"));
+      .setItemCost(cost)
+      .setCast(cast.getMultiUseTag(), false)
+      .save(consumer, this.modResource(castingFolder + name + "_gold_cast"));
     MaterialCastingRecipeBuilder.tableRecipe(part)
-                                .setItemCost(cost)
-                                .setCast(cast.getSingleUseTag(), true)
-                                .save(consumer, modResource(castingFolder + name + "_sand_cast"));
+      .setItemCost(cost)
+      .setCast(cast.getSingleUseTag(), true)
+      .save(consumer, this.modResource(castingFolder + name + "_sand_cast"));
     CompositeCastingRecipeBuilder.table(part, cost)
-                                 .save(consumer, modResource(castingFolder + name + "_composite"));
+      .save(consumer, this.modResource(castingFolder + name + "_composite"));
 
     // Cast Casting
     MaterialIngredient ingredient = MaterialIngredient.fromItem(part);
-    castCreation(consumer, ingredient, cast, castFolder, Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(part.asItem())).getPath());
+    this.castCreation(consumer, ingredient, cast, castFolder, Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(part.asItem())).getPath());
   }
 
   /**
    * Adds a recipe to craft a material item
-   * @param consumer Recipe consumer
-   * @param part     Part to be crafted
-   * @param cast     Part cast
-   * @param cost     Part cost
-   * @param partFolder   Folder for recipes
+   *
+   * @param consumer   Recipe consumer
+   * @param part       Part to be crafted
+   * @param cast       Part cast
+   * @param cost       Part cost
+   * @param partFolder Folder for recipes
    */
   default void partRecipes(Consumer<FinishedRecipe> consumer, Supplier<? extends IMaterialItem> part, CastItemObject cast, int cost, String partFolder, String castFolder) {
-    partRecipes(consumer, part.get(), cast, cost, partFolder, castFolder);
+    this.partRecipes(consumer, part.get(), cast, cost, partFolder, castFolder);
   }
 }

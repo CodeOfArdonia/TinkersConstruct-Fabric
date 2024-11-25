@@ -2,7 +2,6 @@ package slimeknights.tconstruct.tools.data;
 
 import io.github.fabricators_of_create.porting_lib.tool.ToolActions;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-import net.minecraft.data.DataGenerator;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.Tiers;
 import net.minecraft.world.level.block.Blocks;
@@ -55,6 +54,7 @@ import static slimeknights.tconstruct.tools.TinkerToolParts.toolHandle;
 import static slimeknights.tconstruct.tools.TinkerToolParts.toughHandle;
 
 public class ToolDefinitionDataProvider extends AbstractToolDefinitionDataProvider {
+
   public ToolDefinitionDataProvider(FabricDataOutput output) {
     super(output, TConstruct.MOD_ID);
   }
@@ -62,7 +62,7 @@ public class ToolDefinitionDataProvider extends AbstractToolDefinitionDataProvid
   @Override
   protected void addToolDefinitions() {
     // pickaxes
-    define(ToolDefinitions.PICKAXE)
+    this.define(ToolDefinitions.PICKAXE)
       // parts
       .part(pickHead)
       .part(toolHandle)
@@ -78,7 +78,7 @@ public class ToolDefinitionDataProvider extends AbstractToolDefinitionDataProvid
       .effective(BlockTags.MINEABLE_WITH_PICKAXE)
       .aoe(BoxAOEIterator.builder(0, 0, 0).addDepth(2).addHeight(1).direction(IBoxExpansion.PITCH).build());
 
-    define(ToolDefinitions.SLEDGE_HAMMER)
+    this.define(ToolDefinitions.SLEDGE_HAMMER)
       // parts
       .part(hammerHead, 2)
       .part(toughHandle)
@@ -99,7 +99,7 @@ public class ToolDefinitionDataProvider extends AbstractToolDefinitionDataProvid
       .aoe(BoxAOEIterator.builder(1, 1, 0).addWidth(1).addHeight(1).build())
       .attack(new ParticleWeaponAttack(TinkerTools.hammerAttackParticle.get()));
 
-    define(ToolDefinitions.VEIN_HAMMER)
+    this.define(ToolDefinitions.VEIN_HAMMER)
       // parts
       .part(hammerHead, 2)
       .part(toughHandle)
@@ -122,7 +122,7 @@ public class ToolDefinitionDataProvider extends AbstractToolDefinitionDataProvid
 
 
     // shovels
-    define(ToolDefinitions.MATTOCK)
+    this.define(ToolDefinitions.MATTOCK)
       // parts
       .part(smallAxeHead)
       .part(toolHandle)
@@ -141,14 +141,14 @@ public class ToolDefinitionDataProvider extends AbstractToolDefinitionDataProvid
       .action(ToolActions.AXE_DIG)
       .action(ToolActions.SHOVEL_DIG)
       .harvestLogic(ModifiedHarvestLogic
-                      .builder(TinkerTags.Blocks.MINABLE_WITH_MATTOCK)
-                      // 200% hand speed on any axe block we do not directly target
-                      .addModifier(2f, BlockPredicate.AND.create(new TagBlockPredicate(BlockTags.MINEABLE_WITH_AXE),
-                                                                 new TagBlockPredicate(TinkerTags.Blocks.MINABLE_WITH_MATTOCK).inverted()))
-                      .build())
+        .builder(TinkerTags.Blocks.MINABLE_WITH_MATTOCK)
+        // 200% hand speed on any axe block we do not directly target
+        .addModifier(2f, BlockPredicate.AND.create(new TagBlockPredicate(BlockTags.MINEABLE_WITH_AXE),
+          new TagBlockPredicate(TinkerTags.Blocks.MINABLE_WITH_MATTOCK).inverted()))
+        .build())
       .aoe(new VeiningAOEIterator(0));
 
-    define(ToolDefinitions.PICKADZE)
+    this.define(ToolDefinitions.PICKADZE)
       // parts
       .part(pickHead)
       .part(toolHandle)
@@ -169,7 +169,7 @@ public class ToolDefinitionDataProvider extends AbstractToolDefinitionDataProvid
       .harvestLogic(new FixedTierHarvestLogic(TinkerTags.Blocks.MINABLE_WITH_PICKADZE, Tiers.GOLD))
       .aoe(BoxAOEIterator.builder(0, 0, 0).addHeight(1).build());
 
-    define(ToolDefinitions.EXCAVATOR)
+    this.define(ToolDefinitions.EXCAVATOR)
       // parts
       .part(largePlate)
       .part(toughHandle)
@@ -192,7 +192,7 @@ public class ToolDefinitionDataProvider extends AbstractToolDefinitionDataProvid
 
 
     // axes
-    define(ToolDefinitions.HAND_AXE)
+    this.define(ToolDefinitions.HAND_AXE)
       // parts
       .part(smallAxeHead)
       .part(toolHandle)
@@ -212,7 +212,7 @@ public class ToolDefinitionDataProvider extends AbstractToolDefinitionDataProvid
       .aoe(new CircleAOEIterator(1, false))
       .attack(new ParticleWeaponAttack(TinkerTools.axeAttackParticle.get()));
 
-    define(ToolDefinitions.BROAD_AXE)
+    this.define(ToolDefinitions.BROAD_AXE)
       // parts
       .part(broadAxeHead, 2)
       .part(toughHandle)
@@ -244,7 +244,7 @@ public class ToolDefinitionDataProvider extends AbstractToolDefinitionDataProvid
       .tagModifier(BlockTags.WOOL, 0.3f)
       .blockModifier(0.10f, Blocks.VINE, Blocks.GLOW_LICHEN)
       .build();
-    define(ToolDefinitions.KAMA)
+    this.define(ToolDefinitions.KAMA)
       // parts
       .part(smallBlade)
       .part(toolHandle)
@@ -263,7 +263,7 @@ public class ToolDefinitionDataProvider extends AbstractToolDefinitionDataProvid
       .aoe(new CircleAOEIterator(1, true))
       .attack(new CircleWeaponAttack(1));
 
-    define(ToolDefinitions.SCYTHE)
+    this.define(ToolDefinitions.SCYTHE)
       // parts
       .part(TinkerToolParts.broadBlade)
       .part(TinkerToolParts.toughHandle)
@@ -286,7 +286,7 @@ public class ToolDefinitionDataProvider extends AbstractToolDefinitionDataProvid
 
 
     // swords
-    define(ToolDefinitions.DAGGER)
+    this.define(ToolDefinitions.DAGGER)
       // parts
       .part(smallBlade)
       .part(toolHandle)
@@ -307,16 +307,16 @@ public class ToolDefinitionDataProvider extends AbstractToolDefinitionDataProvid
       .action(ToolActions.SWORD_DIG)
       .action(ToolActions.HOE_DIG)
       .harvestLogic(ModifiedHarvestLogic
-                      .builder(TinkerTags.Blocks.MINABLE_WITH_DAGGER)
-                      .blockModifier(7.5f, Blocks.COBWEB)
-                      .build());
+        .builder(TinkerTags.Blocks.MINABLE_WITH_DAGGER)
+        .blockModifier(7.5f, Blocks.COBWEB)
+        .build());
 
     IHarvestLogic swordLogic = ModifiedHarvestLogic
       .builder(TinkerTags.Blocks.MINABLE_WITH_SWORD)
       .blockModifier(7.5f, Blocks.COBWEB)
       .blockModifier(100f, Blocks.BAMBOO, Blocks.BAMBOO_SAPLING)
       .build();
-    define(ToolDefinitions.SWORD)
+    this.define(ToolDefinitions.SWORD)
       // parts
       .part(smallBlade)
       .part(toolHandle)
@@ -334,7 +334,7 @@ public class ToolDefinitionDataProvider extends AbstractToolDefinitionDataProvid
       .harvestLogic(swordLogic)
       .attack(new SweepWeaponAttack(1));
 
-    define(ToolDefinitions.CLEAVER)
+    this.define(ToolDefinitions.CLEAVER)
       // parts
       .part(broadBlade)
       .part(toughHandle)
@@ -356,7 +356,7 @@ public class ToolDefinitionDataProvider extends AbstractToolDefinitionDataProvid
       .attack(new SweepWeaponAttack(2));
 
     // bows
-    define(ToolDefinitions.CROSSBOW)
+    this.define(ToolDefinitions.CROSSBOW)
       // parts
       .part(bowLimb)
       .part(bowGrip)
@@ -366,7 +366,7 @@ public class ToolDefinitionDataProvider extends AbstractToolDefinitionDataProvid
       .stat(ToolStats.ATTACK_SPEED, 1.0f)
       .multiplier(ToolStats.DURABILITY, 2f)
       .smallToolStartingSlots();
-    define(ToolDefinitions.LONGBOW)
+    this.define(ToolDefinitions.LONGBOW)
       // parts
       .part(bowLimb)
       .part(bowLimb)
@@ -380,7 +380,7 @@ public class ToolDefinitionDataProvider extends AbstractToolDefinitionDataProvid
       .largeToolStartingSlots();
 
     // special
-    define(ToolDefinitions.FLINT_AND_BRICK)
+    this.define(ToolDefinitions.FLINT_AND_BRICK)
       // stats
       .stat(ToolStats.DURABILITY, 100)
       .startingSlots(SlotType.UPGRADE, 1)
@@ -389,7 +389,7 @@ public class ToolDefinitionDataProvider extends AbstractToolDefinitionDataProvid
       .trait(TinkerModifiers.fiery)
       .trait(ModifierIds.scorching);
     // staff
-    define(ToolDefinitions.SKY_STAFF)
+    this.define(ToolDefinitions.SKY_STAFF)
       .stat(ToolStats.DURABILITY, 375)
       .stat(ToolStats.BLOCK_AMOUNT, 15)
       .stat(ToolStats.USE_ITEM_SPEED, 0.4f)
@@ -398,7 +398,7 @@ public class ToolDefinitionDataProvider extends AbstractToolDefinitionDataProvid
       .trait(ModifierIds.overslimeFriend)
       .aoe(new CircleAOEIterator(1, false))
       .module(ToolModuleHooks.INTERACTION, DualOptionInteraction.INSTANCE);
-    define(ToolDefinitions.EARTH_STAFF)
+    this.define(ToolDefinitions.EARTH_STAFF)
       .stat(ToolStats.DURABILITY, 800)
       .stat(ToolStats.BLOCK_AMOUNT, 20)
       .stat(ToolStats.USE_ITEM_SPEED, 0.4f)
@@ -408,7 +408,7 @@ public class ToolDefinitionDataProvider extends AbstractToolDefinitionDataProvid
       .trait(ModifierIds.overslimeFriend)
       .aoe(new CircleAOEIterator(1, false))
       .module(ToolModuleHooks.INTERACTION, DualOptionInteraction.INSTANCE);
-    define(ToolDefinitions.ICHOR_STAFF)
+    this.define(ToolDefinitions.ICHOR_STAFF)
       .stat(ToolStats.DURABILITY, 1225)
       .stat(ToolStats.BLOCK_AMOUNT, 15)
       .stat(ToolStats.USE_ITEM_SPEED, 0.4f)
@@ -420,7 +420,7 @@ public class ToolDefinitionDataProvider extends AbstractToolDefinitionDataProvid
 
 
     // travelers armor
-    defineArmor(ArmorDefinitions.TRAVELERS)
+    this.defineArmor(ArmorDefinitions.TRAVELERS)
       .durabilityFactor(10)
       .statEach(ToolStats.ARMOR, 1, 4, 5, 1)
       .multiplier(ArmorSlotType.CHESTPLATE, ToolStats.ATTACK_DAMAGE, 0.55f)
@@ -428,7 +428,7 @@ public class ToolDefinitionDataProvider extends AbstractToolDefinitionDataProvid
       .startingSlots(SlotType.DEFENSE, 2)
       .startingSlots(SlotType.ABILITY, 1)
       .trait(ArmorSlotType.BOOTS, ModifierIds.snowBoots);
-    define(ArmorDefinitions.TRAVELERS_SHIELD)
+    this.define(ArmorDefinitions.TRAVELERS_SHIELD)
       .stat(ToolStats.DURABILITY, 200)
       .stat(ToolStats.BLOCK_AMOUNT, 10)
       .stat(ToolStats.BLOCK_ANGLE, 90)
@@ -440,7 +440,7 @@ public class ToolDefinitionDataProvider extends AbstractToolDefinitionDataProvid
       .module(ToolModuleHooks.INTERACTION, new PreferenceSetInteraction(InteractionSource.RIGHT_CLICK, new SingleModifierPredicate(TinkerModifiers.blocking.getId())));
 
     // plate armor
-    defineArmor(ArmorDefinitions.PLATE)
+    this.defineArmor(ArmorDefinitions.PLATE)
       .durabilityFactor(30)
       .statEach(ToolStats.ARMOR, 2, 5, 7, 2)
       .statAll(ToolStats.ARMOR_TOUGHNESS, 2)
@@ -449,7 +449,7 @@ public class ToolDefinitionDataProvider extends AbstractToolDefinitionDataProvid
       .startingSlots(SlotType.UPGRADE, 1)
       .startingSlots(SlotType.DEFENSE, 4)
       .startingSlots(SlotType.ABILITY, 1);
-    define(ArmorDefinitions.PLATE_SHIELD)
+    this.define(ArmorDefinitions.PLATE_SHIELD)
       .stat(ToolStats.DURABILITY, 500)
       .stat(ToolStats.BLOCK_AMOUNT, 100)
       .stat(ToolStats.BLOCK_ANGLE, 180)
@@ -461,7 +461,7 @@ public class ToolDefinitionDataProvider extends AbstractToolDefinitionDataProvid
       .module(ToolModuleHooks.INTERACTION, new PreferenceSetInteraction(InteractionSource.RIGHT_CLICK, new SingleModifierPredicate(TinkerModifiers.blocking.getId())));
 
     // slime suit
-    defineArmor(ArmorDefinitions.SLIMESUIT)
+    this.defineArmor(ArmorDefinitions.SLIMESUIT)
       .statEach(ToolStats.DURABILITY, 546, 630, 672, 362)
       .statAll(ToolStats.ARMOR, 0)
       .multiplier(ArmorSlotType.CHESTPLATE, ToolStats.ATTACK_DAMAGE, 0.4f)

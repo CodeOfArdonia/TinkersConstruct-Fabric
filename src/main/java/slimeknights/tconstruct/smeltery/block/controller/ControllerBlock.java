@@ -24,11 +24,15 @@ import slimeknights.tconstruct.smeltery.block.component.SearedBlock;
 
 import javax.annotation.Nullable;
 
-/** Shared logic for all multiblock structure controllers */
+/**
+ * Shared logic for all multiblock structure controllers
+ */
 public abstract class ControllerBlock extends InventoryBlock implements LandPathNodeTypesRegistry.StaticPathNodeTypeProvider {
+
   public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
   public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
   public static final BooleanProperty IN_STRUCTURE = SearedBlock.IN_STRUCTURE;
+
   protected ControllerBlock(Properties builder) {
     super(builder);
     this.registerDefaultState(this.defaultBlockState().setValue(ACTIVE, false).setValue(IN_STRUCTURE, false));
@@ -74,12 +78,16 @@ public abstract class ControllerBlock extends InventoryBlock implements LandPath
    * Tile Entity interaction
    */
 
-  /** @return True if the GUI can be opened */
+  /**
+   * @return True if the GUI can be opened
+   */
   protected boolean canOpenGui(BlockState state) {
     return state.getValue(IN_STRUCTURE);
   }
 
-  /** Displays the multiblock's status, typically an error that it cannot form */
+  /**
+   * Displays the multiblock's status, typically an error that it cannot form
+   */
   protected boolean displayStatus(Player player, Level world, BlockPos pos, BlockState state) {
     return false;
   }
@@ -88,10 +96,10 @@ public abstract class ControllerBlock extends InventoryBlock implements LandPath
   protected boolean openGui(Player player, Level world, BlockPos pos) {
     BlockState state = world.getBlockState(pos);
     if (state.getBlock() == this) {
-      if (canOpenGui(state)) {
+      if (this.canOpenGui(state)) {
         return super.openGui(player, world, pos);
       } else {
-        return displayStatus(player, world, pos, state);
+        return this.displayStatus(player, world, pos, state);
       }
     }
     return false;
@@ -104,28 +112,30 @@ public abstract class ControllerBlock extends InventoryBlock implements LandPath
 
   /**
    * Spawns fire particles at the given location
-   * @param world  World instance
-   * @param state  Block state
-   * @param x      Block X position
-   * @param y      Block Y position
-   * @param z      Block Z position
-   * @param front  Block front
-   * @param side   Block side offset
+   *
+   * @param world World instance
+   * @param state Block state
+   * @param x     Block X position
+   * @param y     Block Y position
+   * @param z     Block Z position
+   * @param front Block front
+   * @param side  Block side offset
    */
   protected void spawnFireParticles(LevelAccessor world, BlockState state, double x, double y, double z, double front, double side) {
-    spawnFireParticles(world, state, x, y, z, front, side, ParticleTypes.FLAME);
+    this.spawnFireParticles(world, state, x, y, z, front, side, ParticleTypes.FLAME);
   }
 
   /**
    * Spawns fire particles at the given location
-   * @param world     World instance
-   * @param state     Block state
-   * @param x         Block X position
-   * @param y         Block Y position
-   * @param z         Block Z position
-   * @param front     Block front
-   * @param side      Block side offset
-   * @param particle  Particle to draw
+   *
+   * @param world    World instance
+   * @param state    Block state
+   * @param x        Block X position
+   * @param y        Block Y position
+   * @param z        Block Z position
+   * @param front    Block front
+   * @param side     Block side offset
+   * @param particle Particle to draw
    */
   protected void spawnFireParticles(LevelAccessor world, BlockState state, double x, double y, double z, double front, double side, ParticleOptions particle) {
     switch (state.getValue(FACING)) {

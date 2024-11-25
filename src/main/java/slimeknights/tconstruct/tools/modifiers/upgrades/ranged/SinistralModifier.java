@@ -16,6 +16,7 @@ import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 import slimeknights.tconstruct.tools.item.ModifiableCrossbowItem;
 
 public class SinistralModifier extends Modifier implements GeneralInteractionModifierHook, EntityInteractionModifierHook {
+
   @Override
   protected void registerHooks(Builder hookBuilder) {
     super.registerHooks(hookBuilder);
@@ -24,7 +25,7 @@ public class SinistralModifier extends Modifier implements GeneralInteractionMod
 
   @Override
   public InteractionResult afterEntityUse(IToolStackView tool, ModifierEntry modifier, Player player, LivingEntity target, InteractionHand hand, InteractionSource source) {
-    return onToolUse(tool, modifier, player, hand, source);
+    return this.onToolUse(tool, modifier, player, hand, source);
   }
 
   @Override

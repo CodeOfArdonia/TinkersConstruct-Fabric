@@ -42,22 +42,22 @@ public class MaterialRegistryImpl implements IMaterialRegistry {
 
   @Override
   public MaterialId resolve(MaterialId id) {
-    return materialManager.resolveRedirect(id);
+    return this.materialManager.resolveRedirect(id);
   }
 
   @Override
   public IMaterial getMaterial(MaterialId id) {
-    return materialManager.getMaterial(id).orElse(IMaterial.UNKNOWN);
+    return this.materialManager.getMaterial(id).orElse(IMaterial.UNKNOWN);
   }
 
   @Override
   public Collection<IMaterial> getVisibleMaterials() {
-    return materialManager.getVisibleMaterials();
+    return this.materialManager.getVisibleMaterials();
   }
 
   @Override
   public Collection<IMaterial> getAllMaterials() {
-    return materialManager.getAllMaterials();
+    return this.materialManager.getAllMaterials();
   }
 
 
@@ -65,12 +65,12 @@ public class MaterialRegistryImpl implements IMaterialRegistry {
 
   @Override
   public boolean isInTag(MaterialId id, TagKey<IMaterial> tag) {
-    return materialManager.isIn(id, tag);
+    return this.materialManager.isIn(id, tag);
   }
 
   @Override
   public Collection<IMaterial> getTagValues(TagKey<Modifier> tag) {
-    return materialManager.getValues(tag);
+    return this.materialManager.getValues(tag);
   }
 
 
@@ -78,34 +78,34 @@ public class MaterialRegistryImpl implements IMaterialRegistry {
 
   @Override
   public <T extends IMaterialStats> Optional<T> getMaterialStats(MaterialId materialId, MaterialStatsId statsId) {
-    return materialStatsManager.getStats(materialId, statsId);
+    return this.materialStatsManager.getStats(materialId, statsId);
   }
 
   @Override
   public Collection<IMaterialStats> getAllStats(MaterialId materialId) {
-    return materialStatsManager.getAllStats(materialId);
+    return this.materialStatsManager.getAllStats(materialId);
   }
 
   @Override
   public <T extends IMaterialStats> T getDefaultStats(MaterialStatsId statsId) {
-    return materialStatsManager.getDefaultStats(statsId);
+    return this.materialStatsManager.getDefaultStats(statsId);
   }
 
   @Override
   public boolean canRepair(MaterialStatsId statsId) {
-    return materialStatsManager.canRepair(statsId);
+    return this.materialStatsManager.canRepair(statsId);
   }
 
   @Override
-  public <T extends IMaterialStats> void registerStatType(T defaultStats, Class<T> clazz, Function<FriendlyByteBuf,T> decoder) {
-    materialStatsManager.registerMaterialStat(defaultStats, clazz, decoder);
+  public <T extends IMaterialStats> void registerStatType(T defaultStats, Class<T> clazz, Function<FriendlyByteBuf, T> decoder) {
+    this.materialStatsManager.registerMaterialStat(defaultStats, clazz, decoder);
   }
 
   @Override
-  public <T extends IMaterialStats> void registerStatType(T defaultStats, Class<T> clazz, Function<FriendlyByteBuf,T> decoder, @Nullable MaterialStatsId fallback) {
-    registerStatType(defaultStats, clazz, decoder);
+  public <T extends IMaterialStats> void registerStatType(T defaultStats, Class<T> clazz, Function<FriendlyByteBuf, T> decoder, @Nullable MaterialStatsId fallback) {
+    this.registerStatType(defaultStats, clazz, decoder);
     if (fallback != null) {
-      materialTraitsManager.registerStatTypeFallback(defaultStats.getIdentifier(), fallback);
+      this.materialTraitsManager.registerStatTypeFallback(defaultStats.getIdentifier(), fallback);
     }
   }
 
@@ -114,16 +114,16 @@ public class MaterialRegistryImpl implements IMaterialRegistry {
 
   @Override
   public List<ModifierEntry> getDefaultTraits(MaterialId materialId) {
-    return materialTraitsManager.getDefaultTraits(materialId);
+    return this.materialTraitsManager.getDefaultTraits(materialId);
   }
 
   @Override
   public boolean hasUniqueTraits(MaterialId materialId, MaterialStatsId statsId) {
-    return materialTraitsManager.hasUniqueTraits(materialId, statsId);
+    return this.materialTraitsManager.hasUniqueTraits(materialId, statsId);
   }
 
   @Override
   public List<ModifierEntry> getTraits(MaterialId materialId, MaterialStatsId statsId) {
-    return materialTraitsManager.getTraits(materialId, statsId);
+    return this.materialTraitsManager.getTraits(materialId, statsId);
   }
 }

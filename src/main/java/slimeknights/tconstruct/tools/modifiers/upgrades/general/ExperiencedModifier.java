@@ -19,7 +19,9 @@ import slimeknights.tconstruct.library.tools.nbt.ModifierNBT;
 import slimeknights.tconstruct.library.tools.nbt.ToolStack;
 
 public class ExperiencedModifier extends Modifier {
+
   private static final TinkerDataKey<Integer> EXPERIENCED = TConstruct.createKey("experienced");
+
   public ExperiencedModifier() {
     LivingEntityEvents.EXPERIENCE_DROP.register(this::onExperienceDrop);
     LivingDeathEvent.DEATH.register(this::onEntityKilled);
@@ -28,17 +30,19 @@ public class ExperiencedModifier extends Modifier {
 
   /**
    * Boosts the original based on the level
-   * @param original  Original amount
-   * @param level     Modifier level
-   * @return  Boosted XP
+   *
+   * @param original Original amount
+   * @param level    Modifier level
+   * @return Boosted XP
    */
   private static int boost(int original, int level) {
-    return (int) (original  * (1 + (0.5 * level)));
+    return (int) (original * (1 + (0.5 * level)));
   }
 
   /**
    * Used to modify the XP dropped, regular hook is just for canceling
-   * @param event  Event
+   *
+   * @param event Event
    */
   private void beforeBlockBreak(BlockEvents.BreakEvent event) {
     // only support main hand block breaking currently
@@ -57,7 +61,9 @@ public class ExperiencedModifier extends Modifier {
     }
   }
 
-  /** Mark entities killed by our arrows */
+  /**
+   * Mark entities killed by our arrows
+   */
   private void onEntityKilled(LivingDeathEvent event) {
     DamageSource source = event.getSource();
     if (source != null && source.getDirectEntity() instanceof Projectile projectile) {
@@ -71,7 +77,8 @@ public class ExperiencedModifier extends Modifier {
 
   /**
    * Event handled locally as its pretty specialized
-   * @param amount  amount of xp
+   *
+   * @param amount amount of xp
    * @param player current player
    */
   private int onExperienceDrop(int amount, Player player, LivingEntity entity) {

@@ -18,6 +18,7 @@ import java.util.function.Function;
  * are also defined in code, which distinguishes them from "non-special" recipes.
  */
 public class SimpleRecipeSerializer<T extends Recipe<?>> implements RecipeSerializer<T> {
+
   private final Function<ResourceLocation, T> constructor;
 
   public SimpleRecipeSerializer(Function<ResourceLocation, T> constructor) {
@@ -26,12 +27,12 @@ public class SimpleRecipeSerializer<T extends Recipe<?>> implements RecipeSerial
 
   @Override
   public T fromJson(ResourceLocation recipeId, JsonObject serializedRecipe) {
-    return (T)this.constructor.apply(recipeId);
+    return this.constructor.apply(recipeId);
   }
 
   @Override
   public T fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
-    return (T)this.constructor.apply(recipeId);
+    return this.constructor.apply(recipeId);
   }
 
   @Override

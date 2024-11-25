@@ -31,24 +31,37 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TinkerTabs {
-  /** Creative tab for items that do not fit in another tab */
+
+  /**
+   * Creative tab for items that do not fit in another tab
+   */
   @SuppressWarnings("WeakerAccess")
   public static final ResourceKey<CreativeModeTab> TAB_GENERAL = createKey("a_general");
 
-  /** Tab for all special tools added by the mod */
+  /**
+   * Tab for all special tools added by the mod
+   */
   public static final ResourceKey<CreativeModeTab> TAB_GADGETS = createKey("b_gadgets");
 
-  /** Tab for anything generated in the world */
+  /**
+   * Tab for anything generated in the world
+   */
   @SuppressWarnings("WeakerAccess")
   public static final ResourceKey<CreativeModeTab> TAB_WORLD = createKey("c_world");
 
-  /** Tab for all tool parts */
+  /**
+   * Tab for all tool parts
+   */
   public static final ResourceKey<CreativeModeTab> TAB_TOOL_PARTS = createKey("d_tool_parts");
 
-  /** Creative tab for all tool items */
+  /**
+   * Creative tab for all tool items
+   */
   public static final ResourceKey<CreativeModeTab> TAB_TOOLS = createKey("e_tools");
 
-  /** Tab for all blocks related to the smeltery */
+  /**
+   * Tab for all blocks related to the smeltery
+   */
   public static final ResourceKey<CreativeModeTab> TAB_SMELTERY = createKey("f_smeltery");
 
   private static ResourceKey<CreativeModeTab> createKey(String tabId) {
@@ -122,16 +135,16 @@ public class TinkerTabs {
     output.accept(TinkerMaterials.nahuatl.getStairs());
     output.accept(TinkerMaterials.nahuatl.getFence());
 
-    ((RetexturedBlockItem)TinkerTables.craftingStation.asItem()).fillItemCategory(output);
-    ((RetexturedBlockItem)TinkerTables.tinkerStation.asItem()).fillItemCategory(output);
-    ((RetexturedBlockItem)TinkerTables.partBuilder.asItem()).fillItemCategory(output);
+    ((RetexturedBlockItem) TinkerTables.craftingStation.asItem()).fillItemCategory(output);
+    ((RetexturedBlockItem) TinkerTables.tinkerStation.asItem()).fillItemCategory(output);
+    ((RetexturedBlockItem) TinkerTables.partBuilder.asItem()).fillItemCategory(output);
 
     output.accept(TinkerTables.tinkersChest);
     output.accept(TinkerTables.partChest);
 
-    ((TableBlockItem)TinkerTables.modifierWorktable.asItem()).fillItemCategory(output);
-    ((TableBlockItem)TinkerTables.tinkersAnvil.asItem()).fillItemCategory(output);
-    ((TableBlockItem)TinkerTables.scorchedAnvil.asItem()).fillItemCategory(output);
+    ((TableBlockItem) TinkerTables.modifierWorktable.asItem()).fillItemCategory(output);
+    ((TableBlockItem) TinkerTables.tinkersAnvil.asItem()).fillItemCategory(output);
+    ((TableBlockItem) TinkerTables.scorchedAnvil.asItem()).fillItemCategory(output);
 
     output.accept(TinkerTables.castChest);
 
@@ -367,9 +380,9 @@ public class TinkerTabs {
     output.accept(TinkerSmeltery.searedGlass);
     output.accept(TinkerSmeltery.searedGlassPane);
 
-    ((TableBlockItem)TinkerSmeltery.searedDrain.asItem()).fillItemCategory(output);
-    ((TableBlockItem)TinkerSmeltery.searedDuct.asItem()).fillItemCategory(output);
-    ((TableBlockItem)TinkerSmeltery.searedChute.asItem()).fillItemCategory(output);
+    ((TableBlockItem) TinkerSmeltery.searedDrain.asItem()).fillItemCategory(output);
+    ((TableBlockItem) TinkerSmeltery.searedDuct.asItem()).fillItemCategory(output);
+    ((TableBlockItem) TinkerSmeltery.searedChute.asItem()).fillItemCategory(output);
 
     output.accept(TinkerSmeltery.scorchedStone);
     output.accept(TinkerSmeltery.polishedScorchedStone);
@@ -387,9 +400,9 @@ public class TinkerTabs {
     output.accept(TinkerSmeltery.scorchedGlass);
     output.accept(TinkerSmeltery.scorchedGlassPane);
 
-    ((TableBlockItem)TinkerSmeltery.scorchedDrain.asItem()).fillItemCategory(output);
-    ((TableBlockItem)TinkerSmeltery.scorchedDuct.asItem()).fillItemCategory(output);
-    ((TableBlockItem)TinkerSmeltery.scorchedChute.asItem()).fillItemCategory(output);
+    ((TableBlockItem) TinkerSmeltery.scorchedDrain.asItem()).fillItemCategory(output);
+    ((TableBlockItem) TinkerSmeltery.scorchedDuct.asItem()).fillItemCategory(output);
+    ((TableBlockItem) TinkerSmeltery.scorchedChute.asItem()).fillItemCategory(output);
 
     TinkerSmeltery.searedTank.forEach(searedTankBlock -> {
       output.accept(searedTankBlock);
@@ -411,8 +424,8 @@ public class TinkerTabs {
     output.accept(TinkerSmeltery.scorchedBasin);
     output.accept(TinkerSmeltery.scorchedTable);
 
-    ((TableBlockItem)TinkerSmeltery.smelteryController.asItem()).fillItemCategory(output);
-    ((TableBlockItem)TinkerSmeltery.foundryController.asItem()).fillItemCategory(output);
+    ((TableBlockItem) TinkerSmeltery.smelteryController.asItem()).fillItemCategory(output);
+    ((TableBlockItem) TinkerSmeltery.foundryController.asItem()).fillItemCategory(output);
 
     output.accept(TinkerSmeltery.searedMelter);
     output.accept(TinkerSmeltery.searedHeater);

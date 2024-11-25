@@ -14,6 +14,7 @@ import slimeknights.mantle.block.RetexturedBlock;
 import javax.annotation.Nullable;
 
 public abstract class RetexturedTableBlock extends TabbedTableBlock implements BlockPickInteractionAware {
+
   public RetexturedTableBlock(Properties builder) {
     super(builder);
   }

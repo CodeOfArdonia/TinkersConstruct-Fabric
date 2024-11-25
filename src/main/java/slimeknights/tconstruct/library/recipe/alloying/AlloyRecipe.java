@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
  */
 @RequiredArgsConstructor
 public class AlloyRecipe implements ICustomOutputRecipe<IAlloyTank> {
+
   @Getter
   private final ResourceLocation id;
   /**
@@ -39,32 +40,40 @@ public class AlloyRecipe implements ICustomOutputRecipe<IAlloyTank> {
    * Making the most strict first will produce the best behavior
    */
   private final List<FluidIngredient> inputs;
-  /** Recipe output */
+  /**
+   * Recipe output
+   */
   @Getter
   private final FluidStack output;
-  /** Required temperature to craft this */
+  /**
+   * Required temperature to craft this
+   */
   @Getter
   private final int temperature;
 
 
-  /** Cache of recipe input list */
+  /**
+   * Cache of recipe input list
+   */
   private List<List<FluidStack>> displayInputs;
 
   /**
    * Gets the list of inputs for display in JEI
-   * @return  List of input list for each "slot"
+   *
+   * @return List of input list for each "slot"
    */
   public List<List<FluidStack>> getDisplayInputs() {
-    if (displayInputs == null) {
-      displayInputs = inputs.stream().map(FluidIngredient::getFluids).collect(Collectors.toList());
+    if (this.displayInputs == null) {
+      this.displayInputs = this.inputs.stream().map(FluidIngredient::getFluids).collect(Collectors.toList());
     }
-    return displayInputs;
+    return this.displayInputs;
   }
 
   /**
    * Creates the bitset used for marking fluids we do not care about
-   * @param inv  Alloy tank
-   * @return  Bitset
+   *
+   * @param inv Alloy tank
+   * @return Bitset
    */
   private static BitSet makeBitset(IAlloyTank inv) {
     int tanks = inv.getTanks();
@@ -80,10 +89,11 @@ public class AlloyRecipe implements ICustomOutputRecipe<IAlloyTank> {
 
   /**
    * Finds a match for the given ingredient
-   * @param ingredient  Ingredient to check
-   * @param inv         Alloy tank to search
-   * @param used        Bitset for already used matches, will be modified
-   * @return  Index of found match, or -1 if match not found
+   *
+   * @param ingredient Ingredient to check
+   * @param inv        Alloy tank to search
+   * @param used       Bitset for already used matches, will be modified
+   * @return Index of found match, or -1 if match not found
    */
   private static int findMatch(FluidIngredient ingredient, IAlloyTank inv, BitSet used, boolean checkSize) {
     FluidStack fluid;
@@ -103,7 +113,7 @@ public class AlloyRecipe implements ICustomOutputRecipe<IAlloyTank> {
   @Override
   public boolean matches(IAlloyTank inv, Level worldIn) {
     BitSet used = makeBitset(inv);
-    for (FluidIngredient ingredient : inputs) {
+    for (FluidIngredient ingredient : this.inputs) {
       // do not care about size for matches, just want a recipe with the right fluids
       int index = findMatch(ingredient, inv, used, false);
       if (index == -1) {
@@ -118,18 +128,19 @@ public class AlloyRecipe implements ICustomOutputRecipe<IAlloyTank> {
   /**
    * Checks if this recipe can be performed.
    * Note that {@link #performRecipe(IMutableAlloyTank)} runs similar logic, so calling both is uneccessary.
-   * @param inv  Alloy tank inventory
-   * @return  True if this recipe can be performed
+   *
+   * @param inv Alloy tank inventory
+   * @return True if this recipe can be performed
    */
   public boolean canPerform(IAlloyTank inv) {
     // skip if temperature is too low
-    if (inv.getTemperature() < temperature) return false;
+    if (inv.getTemperature() < this.temperature) return false;
 
     // bit corresponding to fluids that are already used
     BitSet used = makeBitset(inv);
     int drainAmount = 0;
     FluidStack fluid;
-    for (FluidIngredient ingredient : inputs) {
+    for (FluidIngredient ingredient : this.inputs) {
       // care about size, if too small just skip the recipe
       int index = findMatch(ingredient, inv, used, true);
       if (index != -1) {
@@ -142,16 +153,17 @@ public class AlloyRecipe implements ICustomOutputRecipe<IAlloyTank> {
     }
 
     // ensure there is space for the recipe
-    return inv.canFit(output, drainAmount);
+    return inv.canFit(this.output, drainAmount);
   }
 
   /**
    * Attempts to perform the recipe. Will do nothing if either there is not enough input, or if there is not enough space for the output
-   * @param inv      Fluid inventory that can be read and modified
+   *
+   * @param inv Fluid inventory that can be read and modified
    */
   public void performRecipe(IMutableAlloyTank inv) {
     // skip if temperature is too low
-    if (inv.getTemperature() < temperature) return;
+    if (inv.getTemperature() < this.temperature) return;
 
     // figure out how much fluid we need to remove
     FluidStack[] drainFluids = new FluidStack[inv.getTanks()];
@@ -161,7 +173,7 @@ public class AlloyRecipe implements ICustomOutputRecipe<IAlloyTank> {
     BitSet used = makeBitset(inv);
 
     FluidStack fluid;
-    for (FluidIngredient ingredient : inputs) {
+    for (FluidIngredient ingredient : this.inputs) {
       // care about size, if too small just skip the recipe
       int index = findMatch(ingredient, inv, used, true);
       if (index != -1 && drainFluids[index] == null) {
@@ -177,7 +189,7 @@ public class AlloyRecipe implements ICustomOutputRecipe<IAlloyTank> {
 
     // ensure there is space for the recipe
     FluidStack drained;
-    if (inv.canFit(output, drainAmount)) {
+    if (inv.canFit(this.output, drainAmount)) {
       // drain each marked fluid
       for (int i = 0; i < drainFluids.length; i++) {
         FluidStack toDrain = drainFluids[i];
@@ -185,15 +197,15 @@ public class AlloyRecipe implements ICustomOutputRecipe<IAlloyTank> {
           drained = inv.drain(i, toDrain);
           // ensure the right amount of fluid was drained and skip to next ingredient
           if (drained.getAmount() != toDrain.getAmount()) {
-            TConstruct.LOG.error("Wrong amount of fluid {} drained for recipe {}", drained.getFluid(), id);
+            TConstruct.LOG.error("Wrong amount of fluid {} drained for recipe {}", drained.getFluid(), this.id);
           }
         }
       }
 
       // add the output
-      long filled = inv.fill(output.copy());
-      if (filled != output.getAmount()) {
-        TConstruct.LOG.error("Filled only {} for recipe {}", filled, id);
+      long filled = inv.fill(this.output.copy());
+      if (filled != this.output.getAmount()) {
+        TConstruct.LOG.error("Filled only {} for recipe {}", filled, this.id);
       }
     }
   }
@@ -209,6 +221,7 @@ public class AlloyRecipe implements ICustomOutputRecipe<IAlloyTank> {
   }
 
   public static class Serializer extends LoggingRecipeSerializer<AlloyRecipe> {
+
     @Override
     public AlloyRecipe fromJson(ResourceLocation id, JsonObject json) {
       FluidStack result = RecipeHelper.deserializeFluidStack(GsonHelper.getAsJsonObject(json, "result"));

@@ -26,8 +26,10 @@ import java.util.EnumMap;
 import java.util.Map;
 
 public class FancyItemFrameRenderer<T extends FancyItemFrameEntity> extends ItemFrameRenderer<T> {
+
   public static final Map<FrameType, ResourceLocation> LOCATIONS_MODEL = new EnumMap<>(FrameType.class);
   public static final Map<FrameType, ResourceLocation> LOCATIONS_MODEL_MAP = new EnumMap<>(FrameType.class);
+
   static {
     for (FrameType type : FrameType.values()) {
       String name = type == FrameType.REVERSED_GOLD ? FrameType.GOLD.getSerializedName() : type.getSerializedName();
@@ -100,19 +102,19 @@ public class FancyItemFrameRenderer<T extends FancyItemFrameEntity> extends Item
         matrices.mulPose(Axis.ZP.rotationDegrees(rotation * 360f / 8f));
       }
 //      if (!MinecraftForge.EVENT_BUS.post(new RenderItemInFrameEvent(frame, this, matrices, bufferIn, packedLight))) {
-        if (mapdata != null) {
-          matrices.scale(0.0078125F, 0.0078125F, 0.0078125F);
-          matrices.translate(-64.0D, -64.0D, -1.0D);
-          int light = frameType == FrameType.MANYULLYN ? 0x00F000F0 : packedLight;
-          Integer mapId = MapItem.getMapId(stack);
-          assert mapId != null;
-          Minecraft.getInstance().gameRenderer.getMapRenderer().render(matrices, bufferIn, mapId, mapdata, true, light);
-        } else {
-          float scale = frameType == FrameType.CLEAR ? 0.75f : 0.5f;
-          matrices.scale(scale, scale, scale);
-          int light = frameType == FrameType.MANYULLYN ? 0x00F000F0 : packedLight;
-          this.itemRenderer.renderStatic(stack, ItemDisplayContext.FIXED, light, OverlayTexture.NO_OVERLAY, matrices, bufferIn, frame.level(), frame.getId());
-        }
+      if (mapdata != null) {
+        matrices.scale(0.0078125F, 0.0078125F, 0.0078125F);
+        matrices.translate(-64.0D, -64.0D, -1.0D);
+        int light = frameType == FrameType.MANYULLYN ? 0x00F000F0 : packedLight;
+        Integer mapId = MapItem.getMapId(stack);
+        assert mapId != null;
+        Minecraft.getInstance().gameRenderer.getMapRenderer().render(matrices, bufferIn, mapId, mapdata, true, light);
+      } else {
+        float scale = frameType == FrameType.CLEAR ? 0.75f : 0.5f;
+        matrices.scale(scale, scale, scale);
+        int light = frameType == FrameType.MANYULLYN ? 0x00F000F0 : packedLight;
+        this.itemRenderer.renderStatic(stack, ItemDisplayContext.FIXED, light, OverlayTexture.NO_OVERLAY, matrices, bufferIn, frame.level(), frame.getId());
+      }
 //      }
     }
 

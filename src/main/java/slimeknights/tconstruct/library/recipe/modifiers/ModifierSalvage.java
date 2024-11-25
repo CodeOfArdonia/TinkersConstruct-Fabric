@@ -29,21 +29,34 @@ import javax.annotation.Nullable;
  * Shared logic for main types of salvage recipes
  */
 public class ModifierSalvage implements ICustomOutputRecipe<Container> {
+
   @Getter
   protected final ResourceLocation id;
-  /** Ingredient determining tools matched by this */
+  /**
+   * Ingredient determining tools matched by this
+   */
   protected final Ingredient toolIngredient;
-  /** Max size of the tool for this modifier. If the tool size is smaller, the salvage bonus will be reduced */
+  /**
+   * Max size of the tool for this modifier. If the tool size is smaller, the salvage bonus will be reduced
+   */
   @Getter
   protected final int maxToolSize;
-  /** Modifier represented by this recipe */
+  /**
+   * Modifier represented by this recipe
+   */
   @Getter
   protected final ModifierId modifier;
-  /** Minimum level of the modifier for this to be applicable */
+  /**
+   * Minimum level of the modifier for this to be applicable
+   */
   protected final int minLevel;
-  /** Maximum level of the modifier for this to be applicable */
+  /**
+   * Maximum level of the modifier for this to be applicable
+   */
   protected final int maxLevel;
-  /** Slots restored by this recipe, if null no slots are restored */
+  /**
+   * Slots restored by this recipe, if null no slots are restored
+   */
   @Nullable
   protected final SlotCount slots;
 
@@ -60,6 +73,7 @@ public class ModifierSalvage implements ICustomOutputRecipe<Container> {
 
   /**
    * Checks if the given tool stack and level are applicable for this salvage
+   *
    * @param stack         Tool item stack
    * @param tool          Tool stack instance, for potential extensions
    * @param originalLevel Level to check
@@ -67,16 +81,17 @@ public class ModifierSalvage implements ICustomOutputRecipe<Container> {
    */
   @SuppressWarnings("unused")
   public boolean matches(ItemStack stack, IToolStackView tool, int originalLevel) {
-    return originalLevel >= minLevel && originalLevel <= maxLevel && toolIngredient.test(stack);
+    return originalLevel >= this.minLevel && originalLevel <= this.maxLevel && this.toolIngredient.test(stack);
   }
 
   /**
    * Updates the tool data in light of removing this modifier
-   * @param tool  Tool instance
+   *
+   * @param tool Tool instance
    */
   public void updateTool(IToolStackView tool) {
-    if (slots != null) {
-      tool.getPersistentData().addSlots(slots.getType(), slots.getCount());
+    if (this.slots != null) {
+      tool.getPersistentData().addSlots(this.slots.getType(), this.slots.getCount());
     }
   }
 
@@ -85,7 +100,9 @@ public class ModifierSalvage implements ICustomOutputRecipe<Container> {
     return TinkerRecipeTypes.DATA.get();
   }
 
-  /** @deprecated Use {@link #matches(ItemStack, IToolStackView, int)} */
+  /**
+   * @deprecated Use {@link #matches(ItemStack, IToolStackView, int)}
+   */
   @Deprecated
   @Override
   public boolean matches(Container inv, Level level) {
@@ -101,6 +118,7 @@ public class ModifierSalvage implements ICustomOutputRecipe<Container> {
    * Serializer instance
    */
   public static class Serializer extends LoggingRecipeSerializer<ModifierSalvage> {
+
     @Override
     public ModifierSalvage fromJson(ResourceLocation id, JsonObject json) {
       Ingredient toolIngredient = Ingredient.fromJson(JsonHelper.getElement(json, "tools"));

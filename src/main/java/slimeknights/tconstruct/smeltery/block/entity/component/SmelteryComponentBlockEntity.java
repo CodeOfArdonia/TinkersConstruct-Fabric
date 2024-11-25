@@ -15,7 +15,9 @@ import slimeknights.tconstruct.smeltery.block.component.SearedBlock;
 
 import javax.annotation.Nullable;
 
-/** Mostly extended to make type validaton easier, and the servant base class is not registered */
+/**
+ * Mostly extended to make type validaton easier, and the servant base class is not registered
+ */
 public class SmelteryComponentBlockEntity extends ServantTileEntity {
 
   public SmelteryComponentBlockEntity(BlockPos pos, BlockState state) {
@@ -32,19 +34,20 @@ public class SmelteryComponentBlockEntity extends ServantTileEntity {
     super.setMaster(master, block);
 
     // update the active state
-    if (level != null) {
-      BlockState currentState = getBlockState();
-      boolean hasMaster = getMasterPos() != null;
+    if (this.level != null) {
+      BlockState currentState = this.getBlockState();
+      boolean hasMaster = this.getMasterPos() != null;
       if (currentState.hasProperty(SearedBlock.IN_STRUCTURE) && currentState.getValue(SearedBlock.IN_STRUCTURE) != hasMaster) {
-        level.setBlock(worldPosition, getBlockState().setValue(SearedBlock.IN_STRUCTURE, hasMaster), Block.UPDATE_CLIENTS);
+        this.level.setBlock(this.worldPosition, this.getBlockState().setValue(SearedBlock.IN_STRUCTURE, hasMaster), Block.UPDATE_CLIENTS);
       }
     }
   }
 
   /**
    * Block method to update neighbors of a smeltery component when a new one is placed
-   * @param world  World instance
-   * @param pos    Location of new smeltery component
+   *
+   * @param world World instance
+   * @param pos   Location of new smeltery component
    */
   public static void updateNeighbors(Level world, BlockPos pos, BlockState state) {
     for (Direction direction : Direction.values()) {

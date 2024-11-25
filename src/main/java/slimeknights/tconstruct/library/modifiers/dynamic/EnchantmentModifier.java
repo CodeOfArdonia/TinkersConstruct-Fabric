@@ -21,22 +21,25 @@ import slimeknights.tconstruct.library.tools.helper.ModifierUtil;
 import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 import slimeknights.tconstruct.library.utils.RestrictedCompoundTag;
 
-import java.util.Objects;
-
-/** @deprecated use {@link slimeknights.tconstruct.library.modifiers.modules.EnchantmentModule.Constant} */
+/**
+ * @deprecated use {@link slimeknights.tconstruct.library.modifiers.modules.EnchantmentModule.Constant}
+ */
 @Deprecated
 @RequiredArgsConstructor
 public class EnchantmentModifier extends Modifier {
+
   private final Enchantment enchantment;
   private final int enchantmentLevel;
   private final ModifierLevelDisplay levelDisplay;
 
   @Override
   public Component getDisplayName(int level) {
-    return levelDisplay.nameForLevel(this, level);
+    return this.levelDisplay.nameForLevel(this, level);
   }
 
-  /** Adds an enchantment to the given tool, for use in {@link Constant#addRawData(IToolStackView, ModifierEntry, RestrictedCompoundTag)} */
+  /**
+   * Adds an enchantment to the given tool, for use in {@link Constant#addRawData(IToolStackView, ModifierEntry, RestrictedCompoundTag)}
+   */
   public static void addEnchantmentData(RestrictedCompoundTag tag, Enchantment enchantment, int level) {
     // first, find the enchantment tag
     ListTag enchantments;
@@ -61,7 +64,9 @@ public class EnchantmentModifier extends Modifier {
     enchantments.add(EnchantmentHelper.storeEnchantment(BuiltInRegistries.ENCHANTMENT.getKey(enchantment), level));
   }
 
-  /** Adds an enchantment to the given tool, for use in {@link Constant#removeRawData(IToolStackView, Modifier, RestrictedCompoundTag)} */
+  /**
+   * Adds an enchantment to the given tool, for use in {@link Constant#removeRawData(IToolStackView, Modifier, RestrictedCompoundTag)}
+   */
   public static void removeEnchantmentData(RestrictedCompoundTag tag, Enchantment enchantment) {
     // when removing the modifier, remove the enchant
     // this will clobber anyone else trying to remove it, not much we can do
@@ -84,12 +89,12 @@ public class EnchantmentModifier extends Modifier {
 
   @Override
   public void addRawData(IToolStackView tool, int level, RestrictedCompoundTag tag) {
-    addEnchantmentData(tag, enchantment, level * enchantmentLevel);
+    addEnchantmentData(tag, this.enchantment, level * this.enchantmentLevel);
   }
 
   @Override
   public void beforeRemoved(IToolStackView tool, RestrictedCompoundTag tag) {
-    removeEnchantmentData(tag, enchantment);
+    removeEnchantmentData(tag, this.enchantment);
   }
 
   @Override

@@ -14,9 +14,11 @@ import slimeknights.tconstruct.common.registration.GeodeItemObject;
 import slimeknights.tconstruct.common.registration.GeodeItemObject.BudSize;
 
 public class BuddingCrystalBlock extends CrystalBlock {
+
   private static final Direction[] DIRECTIONS = Direction.values();
 
   private final GeodeItemObject geode;
+
   public BuddingCrystalBlock(GeodeItemObject geode, SoundEvent chimeSound, Properties props) {
     super(chimeSound, props);
     this.geode = geode;
@@ -30,11 +32,11 @@ public class BuddingCrystalBlock extends CrystalBlock {
       BlockState blockstate = pLevel.getBlockState(blockpos);
       Block block = null;
       if (BuddingAmethystBlock.canClusterGrowAtState(blockstate)) {
-        block = geode.getBud(BudSize.SMALL);
+        block = this.geode.getBud(BudSize.SMALL);
       } else {
         for (BudSize size : BudSize.SIZES) {
-          if (blockstate.is(geode.getBud(size))) {
-            block = geode.getBud(size.getNext());
+          if (blockstate.is(this.geode.getBud(size))) {
+            block = this.geode.getBud(size.getNext());
             break;
           }
         }

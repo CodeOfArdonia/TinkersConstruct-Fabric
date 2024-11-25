@@ -13,15 +13,17 @@ import slimeknights.tconstruct.smeltery.TinkerSmeltery;
  */
 @SuppressWarnings("removal")
 public interface ICastingRecipe extends ICommonRecipe<ICastingContainer> {
+
   @Override
   default ItemStack getToastSymbol() {
-    return new ItemStack(getType() == TinkerRecipeTypes.CASTING_TABLE.get() ? TinkerSmeltery.searedTable : TinkerSmeltery.searedBasin);
+    return new ItemStack(this.getType() == TinkerRecipeTypes.CASTING_TABLE.get() ? TinkerSmeltery.searedTable : TinkerSmeltery.searedBasin);
   }
 
   /**
    * Gets the amount of fluid required for this recipe
-   * @param inv  Inventory instance
-   * @return  Fluid amount when using the fluid in the inventory
+   *
+   * @param inv Inventory instance
+   * @return Fluid amount when using the fluid in the inventory
    */
   long getFluidAmount(ICastingContainer inv);
 
@@ -37,15 +39,16 @@ public interface ICastingRecipe extends ICommonRecipe<ICastingContainer> {
 
   /**
    * @param inv ICastingInventory for casting recipe
-   * @return  cooling time for the output.
+   * @return cooling time for the output.
    */
   int getCoolingTime(ICastingContainer inv);
 
   /**
    * Calculates the cooling time for a recipe based on the amount and temperature
-   * @param temperature  Temperature baseline in celsius
-   * @param amount       Output amount
-   * @return  Cooling time based on the given inputs
+   *
+   * @param temperature Temperature baseline in celsius
+   * @param amount      Output amount
+   * @return Cooling time based on the given inputs
    */
   static int calcCoolingTime(int temperature, long amount) {
     // the time in melting reipes assumes updating 5 times a second
@@ -55,8 +58,9 @@ public interface ICastingRecipe extends ICommonRecipe<ICastingContainer> {
 
   /**
    * Calculates the cooling time for a recipe based on the fluid input
-   * @param fluid  Fluid input
-   * @return  Time for the recipe
+   *
+   * @param fluid Fluid input
+   * @return Time for the recipe
    */
   static int calcCoolingTime(FluidStack fluid) {
     return calcCoolingTime(FluidVariantAttributes.getTemperature(fluid.getType()) - 300, fluid.getAmount());

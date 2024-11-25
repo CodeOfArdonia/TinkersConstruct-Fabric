@@ -18,6 +18,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @ToString
 public class ExtraMaterialStats extends BaseMaterialStats {
+
   public static final MaterialStatsId ID = new MaterialStatsId(TConstruct.getResource("extra"));
   public static final ExtraMaterialStats DEFAULT = new ExtraMaterialStats();
   private static final Component NO_STATS = makeTooltip(TConstruct.getResource("extra.no_stats"));

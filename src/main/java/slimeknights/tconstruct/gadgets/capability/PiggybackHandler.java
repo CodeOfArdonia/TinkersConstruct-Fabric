@@ -21,12 +21,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PiggybackHandler implements PlayerComponent<PiggybackHandler> {
 
-  /** Player holding this capability */
+  /**
+   * Player holding this capability
+   */
   @Nullable
   private final Player riddenPlayer;
-  /** Capability instance for the provider method */
+  /**
+   * Capability instance for the provider method
+   */
   private final LazyOptional<PiggybackHandler> capability = LazyOptional.of(() -> this);
-  /** Last found list of passengers, used in serialization and syncing */
+  /**
+   * Last found list of passengers, used in serialization and syncing
+   */
   private List<Entity> lastPassengers;
 
   /**

@@ -1,9 +1,7 @@
 package slimeknights.tconstruct.library.tools.capability;
 
-import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.library.tools.capability.ToolFluidCapability.FluidModifierHook;
@@ -14,29 +12,33 @@ import java.util.Iterator;
 /**
  * Shared logic to iterate fluid capabilities for {@link ToolFluidCapability}
  */
-abstract class FluidModifierHookIterator<I> extends CompoundIndexHookIterator<FluidModifierHook,I> {
-  /** Entry from {@link #findHook(IToolStackView, int)}, will be set during or before iteration */
+abstract class FluidModifierHookIterator<I> extends CompoundIndexHookIterator<FluidModifierHook, I> {
+
+  /**
+   * Entry from {@link #findHook(IToolStackView, int)}, will be set during or before iteration
+   */
   protected ModifierEntry indexEntry = null;
 
   @Override
   protected int getSize(IToolStackView tool, FluidModifierHook hook) {
-    return hook.getTanks(tool, indexEntry.getModifier());
+    return hook.getTanks(tool, this.indexEntry.getModifier());
   }
 
   /**
    * Fills the tank with the given resource
-   * @param tool     Tool to fill
-   * @param resource Resource to fill with
+   *
+   * @param tool      Tool to fill
+   * @param resource  Resource to fill with
    * @param maxAmount Amount to fill
-   * @param tx   Whether to simulate or execute
+   * @param tx        Whether to simulate or execute
    * @return Amount filled
    */
   protected long fill(ContainerItemContext context, IToolStackView tool, FluidVariant resource, long maxAmount, TransactionContext tx) {
     int totalFilled = 0;
-    Iterator<I> iterator = getIterator(tool);
-    while(iterator.hasNext()) {
+    Iterator<I> iterator = this.getIterator(tool);
+    while (iterator.hasNext()) {
       // try filling each modifier
-      long filled = getHook(iterator.next()).fill(context, tool, indexEntry, resource, maxAmount, tx);
+      long filled = this.getHook(iterator.next()).fill(context, tool, this.indexEntry, resource, maxAmount, tx);
       if (filled > 0) {
         // if we filled the entire stack, we are done
         if (filled >= maxAmount) {
@@ -52,18 +54,19 @@ abstract class FluidModifierHookIterator<I> extends CompoundIndexHookIterator<Fl
 
   /**
    * Drains the tool of the specified resource
-   * @param tool     Tool to drain
-   * @param resource Resource to drain
+   *
+   * @param tool      Tool to drain
+   * @param resource  Resource to drain
    * @param maxAmount Amount to drain
-   * @param tx   Whether to simulate or execute
+   * @param tx        Whether to simulate or execute
    * @return Drained resource
    */
   public long drain(ContainerItemContext context, IToolStackView tool, FluidVariant resource, long maxAmount, TransactionContext tx) {
     long drainedSoFar = 0;
-    Iterator<I> iterator = getIterator(tool);
-    while(iterator.hasNext()) {
+    Iterator<I> iterator = this.getIterator(tool);
+    while (iterator.hasNext()) {
       // try draining each modifier
-      long drained = getHook(iterator.next()).drain(context, tool, indexEntry, resource, maxAmount, tx);
+      long drained = this.getHook(iterator.next()).drain(context, tool, this.indexEntry, resource, maxAmount, tx);
       if (drained != 0) {
         // if we managed to drain something, add it into our current drained stack, and decrease the amount we still want to drain
         if (drainedSoFar <= 0) {

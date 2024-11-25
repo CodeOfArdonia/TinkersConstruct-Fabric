@@ -7,9 +7,14 @@ import slimeknights.tconstruct.library.tools.context.ToolAttackContext;
 import slimeknights.tconstruct.library.tools.helper.ToolAttackUtil;
 import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 
-/** Attack logic for a modifiable weapon */
+/**
+ * Attack logic for a modifiable weapon
+ */
 public interface IWeaponAttack extends IHaveLoader<IWeaponAttack> {
-  /** Default weapon attack */
+
+  /**
+   * Default weapon attack
+   */
   IWeaponAttack DEFAULT = new IWeaponAttack() {
     @Override
     public boolean dealDamage(IToolStackView tool, ToolAttackContext context, float damage) {
@@ -22,15 +27,18 @@ public interface IWeaponAttack extends IHaveLoader<IWeaponAttack> {
     }
   };
 
-  /** Registry of all weapon attack loaders */
+  /**
+   * Registry of all weapon attack loaders
+   */
   GenericLoaderRegistry<IWeaponAttack> LOADER = new GenericLoaderRegistry<>(DEFAULT);
 
   /**
    * Deals damage using the tool
+   *
    * @param tool    Tool instance
-   * @param context  Attack context
-   * @param damage   Damage to deal
-   * @return  True if we successfully attacked
+   * @param context Attack context
+   * @param damage  Damage to deal
+   * @return True if we successfully attacked
    */
   boolean dealDamage(IToolStackView tool, ToolAttackContext context, float damage);
 }

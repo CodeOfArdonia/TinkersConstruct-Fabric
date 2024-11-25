@@ -18,8 +18,11 @@ import slimeknights.tconstruct.TConstruct;
 import java.util.Arrays;
 import java.util.List;
 
-/** Condition requiring that items exist in the intersection of all required item tags */
+/**
+ * Condition requiring that items exist in the intersection of all required item tags
+ */
 public class TagDifferencePresentCondition<T> implements ConditionJsonProvider {
+
   public static final ResourceLocation NAME = TConstruct.getResource("tag_difference_present");
 
   private final TagKey<Item> base;
@@ -33,13 +36,17 @@ public class TagDifferencePresentCondition<T> implements ConditionJsonProvider {
     this.subtracted = subtracted;
   }
 
-  /** Creates a condition from a set of keys */
+  /**
+   * Creates a condition from a set of keys
+   */
   @SafeVarargs
   public static TagDifferencePresentCondition<Item> ofKeys(TagKey<Item> base, TagKey<Item>... subtracted) {
     return new TagDifferencePresentCondition<>(base, Arrays.asList(subtracted));
   }
 
-  /** Creates a condition from a registry and a set of names */
+  /**
+   * Creates a condition from a registry and a set of names
+   */
   public static TagDifferencePresentCondition ofNames(ResourceKey<? extends Registry<Item>> registry, ResourceLocation base, ResourceLocation... subtracted) {
     TagKey<Item> baseKey = TagKey.create(registry, base);
     return new TagDifferencePresentCondition<>(baseKey, Arrays.stream(subtracted).map(name -> TagKey.create(registry, name)).toList());
@@ -60,14 +67,14 @@ public class TagDifferencePresentCondition<T> implements ConditionJsonProvider {
     // get subtracted tags
     //List<Tag<Item>> subtracted = this.subtracted.stream().map(itemTags::getTag).filter(tag -> tag == null || tag.getValues().isEmpty()).toList();
     // none of the subtracted tags had anything? done
-    if (subtracted.isEmpty()) {
+    if (this.subtracted.isEmpty()) {
       return true;
     }
     // all tags have something, so find the first item that is in all tags
     itemLoop:
     for (Holder<Item> entry : base) {
       // find the first item contained in no subtracted tags
-      for (TagKey<Item> tag : subtracted) {
+      for (TagKey<Item> tag : this.subtracted) {
         // TODO: will this work?
         if (Iterables.contains(BuiltInRegistries.ITEM.getTagOrEmpty(tag), entry)) {
           continue itemLoop;

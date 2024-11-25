@@ -38,8 +38,11 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
-/** Base logic for containers with tabs on the menu */
+/**
+ * Base logic for containers with tabs on the menu
+ */
 public class TabbedContainerMenu<TILE extends BlockEntity> extends TriggeringMultiModuleContainerMenu<TILE> {
+
   private static final TinkerBlockComp COMPARATOR = new TinkerBlockComp();
   public final List<Pair<BlockPos, BlockState>> stationBlocks;
 
@@ -103,23 +106,25 @@ public class TabbedContainerMenu<TILE extends BlockEntity> extends TriggeringMul
     this.stationBlocks.sort(COMPARATOR);
   }
 
-  /** Adds a side inventory to this container */
+  /**
+   * Adds a side inventory to this container
+   */
   protected void addChestSideInventory() {
-    if (tile == null || inv == null) {
+    if (this.tile == null || this.inv == null) {
       return;
     }
-    Level world = tile.getLevel();
+    Level world = this.tile.getLevel();
     if (world != null) {
       // detect side inventory
       BlockEntity inventoryTE = null;
       Direction accessDir = null;
 
-      BlockPos pos = tile.getBlockPos();
+      BlockPos pos = this.tile.getBlockPos();
       horizontals:
       for (Direction dir : Direction.Plane.HORIZONTAL) {
         // skip any tables in this multiblock
         BlockPos neighbor = pos.relative(dir);
-        for (Pair<BlockPos,BlockState> tinkerPos : this.stationBlocks) {
+        for (Pair<BlockPos, BlockState> tinkerPos : this.stationBlocks) {
           if (tinkerPos.getLeft().equals(neighbor)) {
             continue horizontals;
           }
@@ -127,7 +132,7 @@ public class TabbedContainerMenu<TILE extends BlockEntity> extends TriggeringMul
 
         // fetch tile entity
         BlockEntity te = world.getBlockEntity(neighbor);
-        if (te != null && isUsable(te, inv.player)) {
+        if (te != null && isUsable(te, this.inv.player)) {
           // try internal access first
           if (hasItemHandler(world, neighbor, null)) {
             inventoryTE = te;
@@ -147,29 +152,31 @@ public class TabbedContainerMenu<TILE extends BlockEntity> extends TriggeringMul
 
       // if we found something, add the side inventory
       if (inventoryTE != null) {
-        int invSlots = ((SlottedStorage<ItemVariant>)TransferUtil.getItemStorage(inventoryTE, accessDir)).getSlotCount();
+        int invSlots = ((SlottedStorage<ItemVariant>) TransferUtil.getItemStorage(inventoryTE, accessDir)).getSlotCount();
         int columns = Mth.clamp((invSlots - 1) / 9 + 1, 3, 6);
-        this.addSubContainer(new SideInventoryContainer<>(TinkerTables.craftingStationContainer.get(), containerId, inv, inventoryTE, accessDir, -6 - 18 * 6, 8, columns), false);
+        this.addSubContainer(new SideInventoryContainer<>(TinkerTables.craftingStationContainer.get(), this.containerId, this.inv, inventoryTE, accessDir, -6 - 18 * 6, 8, columns), false);
       }
     }
   }
 
   /**
    * Checks if the given tile entity is blacklisted
-   * @param tileEntity  Tile to check
-   * @return  True if blacklisted
+   *
+   * @param tileEntity Tile to check
+   * @return True if blacklisted
    */
   private static boolean isUsable(BlockEntity tileEntity, Player player) {
     // must not be blacklisted and be usable
     return !RegistryHelper.contains(BuiltInRegistries.BLOCK_ENTITY_TYPE, TinkerTags.TileEntityTypes.CRAFTING_STATION_BLACKLIST, tileEntity.getType())
-           && (!(tileEntity instanceof Container) || ((Container)tileEntity).stillValid(player));
+      && (!(tileEntity instanceof Container) || ((Container) tileEntity).stillValid(player));
   }
 
   /**
    * Checks to see if the given Tile Entity has an item handler that's compatible with the side inventory
    * The Tile Entity's item handler must be an instance of IItemHandlerModifiable
-   * @param level Level to retrieve the storage
-   * @param pos The position of the block where is storage should be located
+   *
+   * @param level     Level to retrieve the storage
+   * @param pos       The position of the block where is storage should be located
    * @param direction the given direction
    * @return True if compatible.
    */
@@ -217,8 +224,11 @@ public class TabbedContainerMenu<TILE extends BlockEntity> extends TriggeringMul
     }
   }
 
-  /** Logic for comparing two blocks based on position and state */
+  /**
+   * Logic for comparing two blocks based on position and state
+   */
   private static class TinkerBlockComp implements Comparator<Pair<BlockPos, BlockState>> {
+
     @Override
     public int compare(Pair<BlockPos, BlockState> o1, Pair<BlockPos, BlockState> o2) {
       // base location: lowest overall position
@@ -240,29 +250,38 @@ public class TabbedContainerMenu<TILE extends BlockEntity> extends TriggeringMul
     }
   }
 
-  /** Methods that only work on the client side */
+  /**
+   * Methods that only work on the client side
+   */
   private static class ClientOnly {
-    /** Updates the client's screen */
+
+    /**
+     * Updates the client's screen
+     */
     private static void clientScreenUpdate() {
       Screen screen = Minecraft.getInstance().screen;
       if (screen instanceof BaseTabbedScreen) {
-        ((BaseTabbedScreen<?,?>) screen).updateDisplay();
+        ((BaseTabbedScreen<?, ?>) screen).updateDisplay();
       }
     }
 
-    /** Sends the error message from the container to the client's screen */
+    /**
+     * Sends the error message from the container to the client's screen
+     */
     private static void clientError(MutableComponent errorMessage) {
       Screen screen = Minecraft.getInstance().screen;
       if (screen instanceof BaseTabbedScreen) {
-        ((BaseTabbedScreen<?,?>) screen).error(errorMessage);
+        ((BaseTabbedScreen<?, ?>) screen).error(errorMessage);
       }
     }
 
-    /** Sends the warning message from the container to the client's screen */
+    /**
+     * Sends the warning message from the container to the client's screen
+     */
     private static void clientWarning(MutableComponent warningMessage) {
       Screen screen = Minecraft.getInstance().screen;
       if (screen instanceof BaseTabbedScreen) {
-        ((BaseTabbedScreen<?,?>) screen).warning(warningMessage);
+        ((BaseTabbedScreen<?, ?>) screen).warning(warningMessage);
       }
     }
   }

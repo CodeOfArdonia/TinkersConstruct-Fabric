@@ -19,7 +19,10 @@ import slimeknights.tconstruct.tools.item.ArmorSlotType;
 import slimeknights.tconstruct.world.TinkerWorld;
 
 public class EnderSlimeEntity extends ArmoredSlimeEntity {
-  /** Predicate for this ender slime to allow teleporting */
+
+  /**
+   * Predicate for this ender slime to allow teleporting
+   */
   private final ITeleportEventFactory teleportPredicate = (entity, x, y, z) -> new EnderSlimeTeleportEvent(entity, x, y, z, this);
 
   public EnderSlimeEntity(EntityType<? extends EnderSlimeEntity> type, Level worldIn) {
@@ -35,16 +38,16 @@ public class EnderSlimeEntity extends ArmoredSlimeEntity {
   public void doEnchantDamageEffects(LivingEntity slime, Entity target) {
     super.doEnchantDamageEffects(slime, target);
     if (target instanceof LivingEntity) {
-      TeleportHelper.randomNearbyTeleport((LivingEntity) target, teleportPredicate);
+      TeleportHelper.randomNearbyTeleport((LivingEntity) target, this.teleportPredicate);
     }
   }
 
   @Override
   protected void actuallyHurt(DamageSource damageSrc, float damageAmount) {
-    float oldHealth = getHealth();
+    float oldHealth = this.getHealth();
     super.actuallyHurt(damageSrc, damageAmount);
-    if (isAlive() && getHealth() < oldHealth) {
-      TeleportHelper.randomNearbyTeleport(this, teleportPredicate);
+    if (this.isAlive() && this.getHealth() < oldHealth) {
+      TeleportHelper.randomNearbyTeleport(this, this.teleportPredicate);
     }
   }
 

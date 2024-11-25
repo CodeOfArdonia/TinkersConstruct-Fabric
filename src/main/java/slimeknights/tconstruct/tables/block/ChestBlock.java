@@ -32,6 +32,7 @@ import javax.annotation.Nullable;
  * Shared block logic for all chest types
  */
 public class ChestBlock extends TabbedTableBlock {
+
   private static final VoxelShape SHAPE = Shapes.or(
     Block.box(0.0D, 15.0D, 0.0D, 16.0D, 16.0D, 16.0D), //top
     Block.box(1.0D, 3.0D, 1.0D, 15.0D, 16.0D, 15.0D), //middle
@@ -39,10 +40,11 @@ public class ChestBlock extends TabbedTableBlock {
     Block.box(13.5D, 0.0D, 0.5D, 15.5D, 15.0D, 2.5D), //leg
     Block.box(13.5D, 0.0D, 13.5D, 15.5D, 15.0D, 15.5D), //leg
     Block.box(0.5D, 0.0D, 13.5D, 2.5D, 15.0D, 15.5D) //leg
-                                                        );
+  );
 
   private final BlockEntitySupplier<? extends BlockEntity> blockEntity;
   private final boolean dropsItems;
+
   public ChestBlock(Properties builder, BlockEntitySupplier<? extends BlockEntity> blockEntity, boolean dropsItems) {
     super(builder);
     this.blockEntity = blockEntity;
@@ -52,7 +54,7 @@ public class ChestBlock extends TabbedTableBlock {
   @Nullable
   @Override
   public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
-    return blockEntity.create(pPos, pState);
+    return this.blockEntity.create(pPos, pState);
   }
 
   @Override
@@ -97,7 +99,7 @@ public class ChestBlock extends TabbedTableBlock {
 
   @Override
   protected void dropInventoryItems(BlockState state, Level worldIn, BlockPos pos, Storage<ItemVariant> inventory) {
-    if (dropsItems) {
+    if (this.dropsItems) {
       dropInventoryItems(worldIn, pos, inventory);
     }
   }

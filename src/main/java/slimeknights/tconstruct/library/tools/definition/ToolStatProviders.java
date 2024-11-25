@@ -19,10 +19,13 @@ import slimeknights.tconstruct.tools.stats.LimbMaterialStats;
 import java.util.Set;
 
 public class ToolStatProviders {
+
   /* Registry for JSON registration, for 1.18 this is not needed but it makes it work with JSON Things. Worth considering moving this to the tool definition in 1.19 */
   public static final NamedComponentRegistry<IToolStatProvider> REGISTRY = new NamedComponentRegistry<>("Tool Stat Provider");
 
-  /** For tools that have no parts, crafted directly in the crafting table */
+  /**
+   * For tools that have no parts, crafted directly in the crafting table
+   */
   public static final IToolStatProvider NO_PARTS = register("no_parts", new IToolStatProvider() {
     @Override
     public StatsNBT buildStats(ToolDefinition definition, MaterialNBT materials) {
@@ -42,7 +45,9 @@ public class ToolStatProviders {
     }
   });
 
-  /** Tools with 1 or more tool parts using melee stats */
+  /**
+   * Tools with 1 or more tool parts using melee stats
+   */
   public static final IToolStatProvider MELEE_HARVEST = register("melee_harvest", new IToolStatProvider() {
     private static final Set<MaterialStatsId> VALID_STATS = ImmutableSet.of(HandleMaterialStats.ID, ExtraMaterialStats.ID);
 
@@ -62,7 +67,9 @@ public class ToolStatProviders {
     }
   });
 
-  /** Tools with 1 or more tool parts using ranged stats */
+  /**
+   * Tools with 1 or more tool parts using ranged stats
+   */
   public static final IToolStatProvider RANGED = register("ranged", new IToolStatProvider() {
     private static final Set<MaterialStatsId> VALID_STATS = ImmutableSet.of(BowstringMaterialStats.ID, GripMaterialStats.ID);
 
@@ -82,7 +89,9 @@ public class ToolStatProviders {
     }
   });
 
-  /** Helper to register in our domain */
+  /**
+   * Helper to register in our domain
+   */
   private static IToolStatProvider register(String name, IToolStatProvider instance) {
     return REGISTRY.register(TConstruct.getResource(name), instance);
   }

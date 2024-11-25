@@ -3,17 +3,15 @@ package slimeknights.tconstruct.library.client.model.block;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
 import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
-import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import lombok.AllArgsConstructor;
-import net.fabricmc.fabric.api.renderer.v1.model.WrapperBakedModel;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachedBlockView;
 import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.block.model.BlockElement;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
@@ -38,8 +36,6 @@ import org.jetbrains.annotations.Nullable;
 import slimeknights.mantle.client.model.RetexturedModel;
 import slimeknights.mantle.client.model.RetexturedModel.RetexturedConfiguration;
 import slimeknights.mantle.client.model.data.IModelData;
-import slimeknights.mantle.client.model.data.ModelDataMap;
-import slimeknights.mantle.client.model.data.SinglePropertyData;
 import slimeknights.mantle.client.model.util.ColoredBlockModel;
 import slimeknights.mantle.client.model.util.ColoredBlockModel.ColorData;
 import slimeknights.mantle.client.model.util.DynamicBakedWrapper;
@@ -65,6 +61,7 @@ import java.util.function.Supplier;
  */
 @AllArgsConstructor
 public class FluidTextureModel implements IUnbakedGeometry<FluidTextureModel> {
+
   public static final Loader LOADER = new Loader();
 
   private final ColoredBlockModel model;
@@ -72,11 +69,13 @@ public class FluidTextureModel implements IUnbakedGeometry<FluidTextureModel> {
   private final Set<String> retextured;
 
   @Override
-  public void resolveParents(Function<ResourceLocation,UnbakedModel> modelGetter, BlockModel owner) {
-    model.resolveParents(modelGetter, owner);
+  public void resolveParents(Function<ResourceLocation, UnbakedModel> modelGetter, BlockModel owner) {
+    this.model.resolveParents(modelGetter, owner);
   }
 
-  /** Trims the # character off the beginning of a texture name (if present) */
+  /**
+   * Trims the # character off the beginning of a texture name (if present)
+   */
   private static String trimTextureName(String name) {
     if (name.charAt(0) == '#') {
       return name.substring(1);
@@ -85,21 +84,21 @@ public class FluidTextureModel implements IUnbakedGeometry<FluidTextureModel> {
   }
 
   @Override
-  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation modelLocation, boolean isGui3d) {
+  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation modelLocation, boolean isGui3d) {
     // start by baking the model, handing UV lock
-    BakedModel baked = model.bake(owner, baker, spriteGetter, transform, overrides, modelLocation, isGui3d);
+    BakedModel baked = this.model.bake(owner, baker, spriteGetter, transform, overrides, modelLocation, isGui3d);
 
     // determine which block parts are fluids
-    Set<String> fluidTextures = this.fluids.isEmpty() ? Collections.emptySet() : RetexturedModel.getAllRetextured(owner, model.getModel(), this.fluids);
-    List<BlockElement> elements = model.getElements();
+    Set<String> fluidTextures = this.fluids.isEmpty() ? Collections.emptySet() : RetexturedModel.getAllRetextured(owner, this.model.getModel(), this.fluids);
+    List<BlockElement> elements = this.model.getElements();
     int size = elements.size();
     BitSet fluidParts = new BitSet(size);
     if (!fluidTextures.isEmpty()) {
       for (int i = 0; i < size; i++) {
         BlockElement part = elements.get(i);
         long fluidFaces = part.faces.values().stream()
-                                    .filter(face -> fluidTextures.contains(trimTextureName(face.texture)))
-                                    .count();
+          .filter(face -> fluidTextures.contains(trimTextureName(face.texture)))
+          .count();
         // for simplicity, each part is either a fluid or not. If for some reason it contains both we mark it as a fluid, meaning it may get colored
         // if this is undesired, just use separate elements
         if (fluidFaces > 0) {
@@ -111,15 +110,18 @@ public class FluidTextureModel implements IUnbakedGeometry<FluidTextureModel> {
       }
     }
     Set<String> retextured = this.retextured.isEmpty() ? Collections.emptySet() : RetexturedModel.getAllRetextured(owner, this.model.getModel(), this.retextured);
-    return new Baked(baked, elements, model.getColorData(), owner, transform, fluidTextures, fluidParts, retextured);
+    return new Baked(baked, elements, this.model.getColorData(), owner, transform, fluidTextures, fluidParts, retextured);
   }
 
   private record BakedCacheKey(FluidStack fluid, @Nullable ResourceLocation texture) {}
 
-  /** Baked wrapper class */
+  /**
+   * Baked wrapper class
+   */
   @SuppressWarnings("removal")
   private static class Baked extends DynamicBakedWrapper<BakedModel> {
-    private final Map<BakedCacheKey,BakedModel> cache = new ConcurrentHashMap<>();
+
+    private final Map<BakedCacheKey, BakedModel> cache = new ConcurrentHashMap<>();
     private final List<BlockElement> elements;
     private final List<ColorData> colorData;
     private final BlockModel owner;
@@ -139,10 +141,12 @@ public class FluidTextureModel implements IUnbakedGeometry<FluidTextureModel> {
       this.retextured = retextured;
     }
 
-    /** Retextures a model for the given fluid */
+    /**
+     * Retextures a model for the given fluid
+     */
     private BakedModel getRetexturedModel(BakedCacheKey key) {
       // setup model baking
-      Function<Material,TextureAtlasSprite> spriteGetter = Material::sprite;
+      Function<Material, TextureAtlasSprite> spriteGetter = Material::sprite;
 
       // if textured, retexture. Its fine to nest these configurations
       BlockModel textured = this.owner;
@@ -161,39 +165,41 @@ public class FluidTextureModel implements IUnbakedGeometry<FluidTextureModel> {
 
       // start baking
       TextureAtlasSprite particle = spriteGetter.apply(textured.getMaterial("particle"));
-      SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(owner.hasAmbientOcclusion(), owner.getGuiLight().lightLikeBlock(), true, owner.getTransforms(), ItemOverrides.EMPTY).particle(particle);
+      SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(this.owner.hasAmbientOcclusion(), this.owner.getGuiLight().lightLikeBlock(), true, this.owner.getTransforms(), ItemOverrides.EMPTY).particle(particle);
 
       // add in elements
-      boolean defaultUvLock = transform.isUvLocked();
-      int size = elements.size();
+      boolean defaultUvLock = this.transform.isUvLocked();
+      int size = this.elements.size();
       for (int i = 0; i < size; i++) {
-        BlockElement element = elements.get(i);
-        ColorData colors = LogicHelper.getOrDefault(colorData, i, ColorData.DEFAULT);
-        if (fluidParts.get(i)) {
-          ColoredBlockModel.bakePart(builder, textured, element, color, luminosity, transform.getRotation(), colors.isUvLock(defaultUvLock), spriteGetter, TankModel.BAKE_LOCATION);
+        BlockElement element = this.elements.get(i);
+        ColorData colors = LogicHelper.getOrDefault(this.colorData, i, ColorData.DEFAULT);
+        if (this.fluidParts.get(i)) {
+          ColoredBlockModel.bakePart(builder, textured, element, color, luminosity, this.transform.getRotation(), colors.isUvLock(defaultUvLock), spriteGetter, TankModel.BAKE_LOCATION);
         } else {
-          ColoredBlockModel.bakePart(builder, textured, element, colors.color(), colors.luminosity(), transform.getRotation(), colors.isUvLock(defaultUvLock), spriteGetter, TankModel.BAKE_LOCATION);
+          ColoredBlockModel.bakePart(builder, textured, element, colors.color(), colors.luminosity(), this.transform.getRotation(), colors.isUvLock(defaultUvLock), spriteGetter, TankModel.BAKE_LOCATION);
         }
       }
       return builder.build();
     }
 
-    /** Gets a retextured model for the given fluid, using the cached model if possible */
+    /**
+     * Gets a retextured model for the given fluid, using the cached model if possible
+     */
     private BakedModel getCachedModel(BakedCacheKey key) {
       return this.cache.computeIfAbsent(key, this::getRetexturedModel);
     }
 
     @Override
     public void emitBlockQuads(BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, RenderContext context) {
-      if(blockView instanceof RenderAttachedBlockView renderAttachedBlockView && renderAttachedBlockView.getBlockEntityRenderAttachment(pos) instanceof IModelData data) {
-        FluidStack fluid = fluids.isEmpty() ? FluidStack.EMPTY : data.getData(IDisplayFluidListener.PROPERTY);
+      if (blockView instanceof RenderAttachedBlockView renderAttachedBlockView && renderAttachedBlockView.getBlockEntityRenderAttachment(pos) instanceof IModelData data) {
+        FluidStack fluid = this.fluids.isEmpty() ? FluidStack.EMPTY : data.getData(IDisplayFluidListener.PROPERTY);
         if (fluid == null) {
-        fluid = FluidStack.EMPTY;
-      }
-      Block block = retextured.isEmpty() ? null : data.getData(RetexturedHelper.BLOCK_PROPERTY);
-      if (!fluid.isEmpty() || block != null) {
-        BakedCacheKey key = new BakedCacheKey(fluid, block != null ? ModelHelper.getParticleTexture(block) : null);
-          getCachedModel(key).emitBlockQuads(blockView, state, pos, randomSupplier, context);
+          fluid = FluidStack.EMPTY;
+        }
+        Block block = this.retextured.isEmpty() ? null : data.getData(RetexturedHelper.BLOCK_PROPERTY);
+        if (!fluid.isEmpty() || block != null) {
+          BakedCacheKey key = new BakedCacheKey(fluid, block != null ? ModelHelper.getParticleTexture(block) : null);
+          this.getCachedModel(key).emitBlockQuads(blockView, state, pos, randomSupplier, context);
           return;
         }
       }
@@ -206,8 +212,11 @@ public class FluidTextureModel implements IUnbakedGeometry<FluidTextureModel> {
     }
   }
 
-  /** Model loader class */
+  /**
+   * Model loader class
+   */
   private static class Loader implements IGeometryLoader<FluidTextureModel> {
+
     @Override
     public FluidTextureModel read(JsonObject json, JsonDeserializationContext context) {
       ColoredBlockModel model = ColoredBlockModel.deserialize(context, json);
@@ -223,8 +232,11 @@ public class FluidTextureModel implements IUnbakedGeometry<FluidTextureModel> {
     }
   }
 
-  /** Override list to swap the texture in from NBT */
+  /**
+   * Override list to swap the texture in from NBT
+   */
   private static class RetexturedOverride extends ItemOverrides {
+
     private static final RetexturedOverride INSTANCE = new RetexturedOverride();
 
     @Nullable

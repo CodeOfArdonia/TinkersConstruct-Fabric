@@ -20,12 +20,14 @@ import java.util.List;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RecipeCacheInvalidator implements IEarlySafeManagerReloadListener, IdentifiableResourceReloadListener {
+
   private static final RecipeCacheInvalidator INSTANCE = new RecipeCacheInvalidator();
   private static final List<BooleanConsumer> listeners = new ArrayList<>();
 
   /**
    * Adds a new listener that runs every time the recipes are reloaded
-   * @param runnable  Runnable
+   *
+   * @param runnable Runnable
    */
   public static void addReloadListener(BooleanConsumer runnable) {
     listeners.add(runnable);
@@ -33,8 +35,9 @@ public class RecipeCacheInvalidator implements IEarlySafeManagerReloadListener, 
 
   /**
    * Registers a listener that properly responds to the client side
-   * @param runnable  Runnable to clear cache
-   * @return  Object that can clear cache as needed
+   *
+   * @param runnable Runnable to clear cache
+   * @return Object that can clear cache as needed
    */
   public static DuelSidedListener addDuelSidedListener(Runnable runnable) {
     DuelSidedListener listener = new DuelSidedListener(runnable);
@@ -68,9 +71,12 @@ public class RecipeCacheInvalidator implements IEarlySafeManagerReloadListener, 
     return TConstruct.getResource("recipe_cache_invalidator");
   }
 
-  /** Logic to respond properly to late running of the client */
+  /**
+   * Logic to respond properly to late running of the client
+   */
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
   public static class DuelSidedListener implements BooleanConsumer {
+
     private final Runnable clearCache;
     private boolean clearQueued = false;
 
@@ -80,9 +86,9 @@ public class RecipeCacheInvalidator implements IEarlySafeManagerReloadListener, 
       // server side runs at the start
       // so queue client side to run at the beginning of the next recipe list
       if (client) {
-        clearQueued = true;
+        this.clearQueued = true;
       } else {
-        clearCache();
+        this.clearCache();
       }
     }
 
@@ -90,16 +96,16 @@ public class RecipeCacheInvalidator implements IEarlySafeManagerReloadListener, 
      * Clears the cache based on the runnable
      */
     public void clearCache() {
-      clearQueued = false;
-      clearCache.run();
+      this.clearQueued = false;
+      this.clearCache.run();
     }
 
     /**
      * Clears the cache if a clear is queued. Intended to be called during add
      */
     public void checkClear() {
-      if (clearQueued) {
-        clearCache();
+      if (this.clearQueued) {
+        this.clearCache();
       }
     }
   }

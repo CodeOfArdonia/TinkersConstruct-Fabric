@@ -24,14 +24,16 @@ import slimeknights.tconstruct.tools.item.ArmorSlotType;
 import slimeknights.tconstruct.world.TinkerWorld;
 
 public class SkySlimeEntity extends ArmoredSlimeEntity {
+
   private double bounceAmount = 0f;
+
   public SkySlimeEntity(EntityType<? extends SkySlimeEntity> type, Level worldIn) {
     super(type, worldIn);
   }
 
   @Override
   protected float getJumpPower() {
-    return (float)Math.sqrt(this.getSize()) * this.getBlockJumpFactor() / 2;
+    return (float) Math.sqrt(this.getSize()) * this.getBlockJumpFactor() / 2;
   }
 
   @Override
@@ -41,7 +43,7 @@ public class SkySlimeEntity extends ArmoredSlimeEntity {
 
   @Override
   public boolean causeFallDamage(float distance, float damageMultiplier, DamageSource source) {
-    if (isSuppressingBounce()) {
+    if (this.isSuppressingBounce()) {
       return super.causeFallDamage(distance, damageMultiplier * 0.2f, source);
     }
     LivingEntityEvents.Fall.FallEvent fallEvent = new LivingEntityEvents.Fall.FallEvent(this, source, distance, damageMultiplier);
@@ -53,13 +55,13 @@ public class SkySlimeEntity extends ArmoredSlimeEntity {
     distance = fallEvent.getDistance();//ret[0];
     if (distance > 2) {
       // invert Y motion, boost X and Z slightly
-      Vec3 motion = getDeltaMovement();
-      setDeltaMovement(motion.x / 0.95f, motion.y * -0.9, motion.z / 0.95f);
-      bounceAmount = getDeltaMovement().y;
-      fallDistance = 0f;
-      hasImpulse = true;
-      setOnGround(false);
-      playSound(Sounds.SLIMY_BOUNCE.getSound(), 1f, 1f);
+      Vec3 motion = this.getDeltaMovement();
+      this.setDeltaMovement(motion.x / 0.95f, motion.y * -0.9, motion.z / 0.95f);
+      this.bounceAmount = this.getDeltaMovement().y;
+      this.fallDistance = 0f;
+      this.hasImpulse = true;
+      this.setOnGround(false);
+      this.playSound(Sounds.SLIMY_BOUNCE.getSound(), 1f, 1f);
     }
     return false;
   }
@@ -67,10 +69,10 @@ public class SkySlimeEntity extends ArmoredSlimeEntity {
   @Override
   public void move(MoverType typeIn, Vec3 pos) {
     super.move(typeIn, pos);
-    if (bounceAmount > 0) {
-      Vec3 motion = getDeltaMovement();
-      setDeltaMovement(motion.x, bounceAmount, motion.z);
-      bounceAmount = 0;
+    if (this.bounceAmount > 0) {
+      Vec3 motion = this.getDeltaMovement();
+      this.setDeltaMovement(motion.x, this.bounceAmount, motion.z);
+      this.bounceAmount = 0;
     }
   }
 
@@ -91,7 +93,7 @@ public class SkySlimeEntity extends ArmoredSlimeEntity {
       ModDataNBT persistentData = tool.getPersistentData();
       if (!isPlate) {
         // travelers dyes a random color
-        persistentData.putInt(TinkerModifiers.dyed.getId(), this.random.nextInt(0xFFFFFF+1));
+        persistentData.putInt(TinkerModifiers.dyed.getId(), this.random.nextInt(0xFFFFFF + 1));
         modifiers = modifiers.withModifier(TinkerModifiers.dyed.getId(), 1);
       }
 
@@ -99,16 +101,16 @@ public class SkySlimeEntity extends ArmoredSlimeEntity {
       // add some random defense modifiers
       int max = tool.getFreeSlots(SlotType.DEFENSE);
       for (int i = 0; i < max; i++) {
-        if (random.nextFloat() > 0.5f * multiplier) {
+        if (this.random.nextFloat() > 0.5f * multiplier) {
           break;
         }
         persistentData.addSlots(SlotType.DEFENSE, -1);
-        modifiers = modifiers.withModifier(randomDefense(random.nextInt(6)), 1);
+        modifiers = modifiers.withModifier(randomDefense(this.random.nextInt(6)), 1);
       }
       // chance of diamond or emerald
-      if (tool.getFreeSlots(SlotType.UPGRADE) > 0 && random.nextFloat() < 0.5f * multiplier) {
+      if (tool.getFreeSlots(SlotType.UPGRADE) > 0 && this.random.nextFloat() < 0.5f * multiplier) {
         persistentData.addSlots(SlotType.UPGRADE, -1);
-        modifiers = modifiers.withModifier(random.nextBoolean() ? ModifierIds.emerald : ModifierIds.diamond, 1);
+        modifiers = modifiers.withModifier(this.random.nextBoolean() ? ModifierIds.emerald : ModifierIds.diamond, 1);
       }
 
       tool.setUpgrades(modifiers);
@@ -120,12 +122,12 @@ public class SkySlimeEntity extends ArmoredSlimeEntity {
 
   private static ModifierId randomDefense(int index) {
     return switch (index) {
-      default -> TinkerModifiers.meleeProtection.getId();
       case 1 -> TinkerModifiers.projectileProtection.getId();
       case 2 -> TinkerModifiers.fireProtection.getId();
       case 3 -> TinkerModifiers.magicProtection.getId();
       case 4 -> TinkerModifiers.blastProtection.getId();
       case 5 -> TinkerModifiers.golden.getId();
+      default -> TinkerModifiers.meleeProtection.getId();
     };
   }
 

@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class PathingModifier extends BlockTransformModifier {
+
   public PathingModifier(int priority) {
     super(priority, ToolActions.SHOVEL_FLATTEN, SoundEvents.SHOVEL_FLATTEN, true);
   }

@@ -10,9 +10,10 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 
 public interface StationMenuInfo<T extends AbstractContainerMenu, D extends Display> extends MenuInfo<T, D> {
+
   default DumpHandler<T, D> getDumpHandler() {
     return (context, stackToDump) -> {
-      Iterable<SlotAccessor> inventoryStacks = getInventorySlots(context);
+      Iterable<SlotAccessor> inventoryStacks = this.getInventorySlots(context);
       SlotAccessor occupiedSlotWithRoomForStack = DumpHandler.getOccupiedSlotWithRoomForStack(stackToDump, inventoryStacks);
       SlotAccessor emptySlot = DumpHandler.getEmptySlot(inventoryStacks);
 
@@ -31,8 +32,8 @@ public interface StationMenuInfo<T extends AbstractContainerMenu, D extends Disp
   @Override
   default InputCleanHandler<T, D> getInputCleanHandler() {
     return context -> {
-      for (SlotAccessor gridStack : getInputSlots(context)) {
-        InputCleanHandler.returnSlotsToPlayerInventory(context, getDumpHandler(), gridStack);
+      for (SlotAccessor gridStack : this.getInputSlots(context)) {
+        InputCleanHandler.returnSlotsToPlayerInventory(context, this.getDumpHandler(), gridStack);
       }
     };
   }
@@ -40,7 +41,7 @@ public interface StationMenuInfo<T extends AbstractContainerMenu, D extends Disp
   @Override
   default RecipeFinderPopulator<T, D> getRecipeFinderPopulator() {
     return (context, finder) -> {
-      for (SlotAccessor inventoryStack : getInventorySlots(context)) {
+      for (SlotAccessor inventoryStack : this.getInventorySlots(context)) {
         finder.addNormalItem(inventoryStack.getItemStack());
       }
     };

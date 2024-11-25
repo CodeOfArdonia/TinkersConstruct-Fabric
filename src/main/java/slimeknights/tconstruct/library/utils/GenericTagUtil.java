@@ -18,27 +18,34 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/** Static helpers for generic tag loading */
+/**
+ * Static helpers for generic tag loading
+ */
 public class GenericTagUtil {
+
   private GenericTagUtil() {}
 
-  /** Creates a map of reverse tags for the given map of tags */
-  public static <T, I extends ResourceLocation> Map<I,Set<TagKey<T>>> reverseTags(ResourceKey<? extends Registry<T>> registry, Function<T,I> keyMapper, Map<ResourceLocation, Collection<T>> tags) {
-    Map<I,ImmutableSet.Builder<TagKey<T>>> reverseTags = new HashMap<>();
-    Function<I,Builder<TagKey<T>>> makeSet = id -> ImmutableSet.builder();
-    for (Entry<ResourceLocation,Collection<T>> entry : tags.entrySet()) {
+  /**
+   * Creates a map of reverse tags for the given map of tags
+   */
+  public static <T, I extends ResourceLocation> Map<I, Set<TagKey<T>>> reverseTags(ResourceKey<? extends Registry<T>> registry, Function<T, I> keyMapper, Map<ResourceLocation, Collection<T>> tags) {
+    Map<I, ImmutableSet.Builder<TagKey<T>>> reverseTags = new HashMap<>();
+    Function<I, Builder<TagKey<T>>> makeSet = id -> ImmutableSet.builder();
+    for (Entry<ResourceLocation, Collection<T>> entry : tags.entrySet()) {
       TagKey<T> key = TagKey.create(registry, entry.getKey());
       for (T value : entry.getValue()) {
         reverseTags.computeIfAbsent(keyMapper.apply(value), makeSet).add(key);
       }
     }
     return reverseTags.entrySet().stream()
-                      .collect(Collectors.toMap(Entry::getKey, entry->entry.getValue().build()));
+      .collect(Collectors.toMap(Entry::getKey, entry -> entry.getValue().build()));
   }
 
-  /** Decodes a map of tags from the packet */
-  public static <T> Map<ResourceLocation,Collection<T>> decodeTags(FriendlyByteBuf buf, Function<ResourceLocation,T> valueGetter) {
-    ImmutableMap.Builder<ResourceLocation,Collection<T>> builder = ImmutableMap.builder();
+  /**
+   * Decodes a map of tags from the packet
+   */
+  public static <T> Map<ResourceLocation, Collection<T>> decodeTags(FriendlyByteBuf buf, Function<ResourceLocation, T> valueGetter) {
+    ImmutableMap.Builder<ResourceLocation, Collection<T>> builder = ImmutableMap.builder();
     int mapSize = buf.readVarInt();
     for (int i = 0; i < mapSize; i++) {
       ResourceLocation tagId = buf.readResourceLocation();
@@ -52,10 +59,12 @@ public class GenericTagUtil {
     return builder.build();
   }
 
-  /** Writes a map of tags to a packet */
-  public static <T> void encodeTags(FriendlyByteBuf buf, Function<T,ResourceLocation> keyGetter, Map<ResourceLocation,Collection<T>> tags) {
+  /**
+   * Writes a map of tags to a packet
+   */
+  public static <T> void encodeTags(FriendlyByteBuf buf, Function<T, ResourceLocation> keyGetter, Map<ResourceLocation, Collection<T>> tags) {
     buf.writeVarInt(tags.size());
-    for (Entry<ResourceLocation,Collection<T>> entry : tags.entrySet()) {
+    for (Entry<ResourceLocation, Collection<T>> entry : tags.entrySet()) {
       buf.writeResourceLocation(entry.getKey());
       Collection<T> values = entry.getValue();
       buf.writeVarInt(values.size());

@@ -49,29 +49,29 @@ public class TinkersDisplay<R extends Recipe<?>> implements Display {
   }
 
   public R getRecipe() {
-    return recipe;
+    return this.recipe;
   }
 
   public IDisplayableCastingRecipe getCastingRecipe() {
-    return castingRecipe;
+    return this.castingRecipe;
   }
 
   public IDisplayModifierRecipe getModifierRecipe() {
-    return modifierRecipe;
+    return this.modifierRecipe;
   }
 
   @Override
   public List<EntryIngredient> getInputEntries() {
-    return input;
+    return this.input;
   }
 
   @Override
   public List<EntryIngredient> getOutputEntries() {
-    return output;
+    return this.output;
   }
 
   @Override
   public CategoryIdentifier<?> getCategoryIdentifier() {
-    return uid;
+    return this.uid;
   }
 }

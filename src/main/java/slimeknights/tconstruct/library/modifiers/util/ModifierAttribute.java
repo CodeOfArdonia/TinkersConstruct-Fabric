@@ -26,6 +26,7 @@ import java.util.function.BiConsumer;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ModifierAttribute {
+
   private final String name;
   private final Attribute attribute;
   private final Operation operation;
@@ -39,7 +40,7 @@ public class ModifierAttribute {
     this.amount = amount;
     this.slotUUIDs = new UUID[6];
     for (EquipmentSlot slot : slots) {
-      slotUUIDs[slot.getFilterFlag()] = getUUID(name, slot);
+      this.slotUUIDs[slot.getFilterFlag()] = getUUID(name, slot);
     }
   }
 
@@ -50,34 +51,37 @@ public class ModifierAttribute {
     this.amount = amount;
     this.slotUUIDs = new UUID[6];
     for (EquipmentSlot slot : slots) {
-      slotUUIDs[slot.getFilterFlag()] = getUUID(name, slot);
+      this.slotUUIDs[slot.getFilterFlag()] = getUUID(name, slot);
     }
   }
 
   /**
    * Applies this attribute boost
-   * @param tool       Tool receiving the boost
-   * @param level      Modifier level
-   * @param slot       Slot receiving the boost
-   * @param consumer   Consumer accepting attributes
+   *
+   * @param tool     Tool receiving the boost
+   * @param level    Modifier level
+   * @param slot     Slot receiving the boost
+   * @param consumer Consumer accepting attributes
    */
-  public void apply(IToolStackView tool, float level, EquipmentSlot slot, BiConsumer<Attribute,AttributeModifier> consumer) {
+  public void apply(IToolStackView tool, float level, EquipmentSlot slot, BiConsumer<Attribute, AttributeModifier> consumer) {
     // TODO: tag condition?
-    UUID uuid = slotUUIDs[slot.getFilterFlag()];
+    UUID uuid = this.slotUUIDs[slot.getFilterFlag()];
     if (uuid != null) {
-      consumer.accept(attribute, new AttributeModifier(uuid, name + "." + slot.getName(), amount * level, operation));
+      consumer.accept(this.attribute, new AttributeModifier(uuid, this.name + "." + slot.getName(), this.amount * level, this.operation));
     }
   }
 
-  /** Converts this to JSON */
+  /**
+   * Converts this to JSON
+   */
   public JsonObject toJson(JsonObject json) {
-    json.addProperty("unique", name);
-    json.addProperty("attribute", Objects.requireNonNull(BuiltInRegistries.ATTRIBUTE.getKey(attribute)).toString());
-    json.addProperty("operation", operation.name().toLowerCase(Locale.ROOT));
-    json.addProperty("amount", amount);
+    json.addProperty("unique", this.name);
+    json.addProperty("attribute", Objects.requireNonNull(BuiltInRegistries.ATTRIBUTE.getKey(this.attribute)).toString());
+    json.addProperty("operation", this.operation.name().toLowerCase(Locale.ROOT));
+    json.addProperty("amount", this.amount);
     JsonArray array = new JsonArray();
     for (EquipmentSlot slot : EquipmentSlot.values()) {
-      if (slotUUIDs[slot.getFilterFlag()] != null) {
+      if (this.slotUUIDs[slot.getFilterFlag()] != null) {
         array.add(slot.getName());
       }
     }
@@ -85,12 +89,16 @@ public class ModifierAttribute {
     return json;
   }
 
-  /** Converts this to JSON */
+  /**
+   * Converts this to JSON
+   */
   public JsonObject toJson() {
-    return toJson(new JsonObject());
+    return this.toJson(new JsonObject());
   }
 
-  /** Parses the modifier attribute from JSON */
+  /**
+   * Parses the modifier attribute from JSON
+   */
   public static ModifierAttribute fromJson(JsonObject json) {
     String unique = GsonHelper.getAsString(json, "unique");
     Attribute attribute = JsonHelper.getAsEntry(BuiltInRegistries.ATTRIBUTE, json, "attribute");
@@ -100,22 +108,26 @@ public class ModifierAttribute {
     return new ModifierAttribute(unique, attribute, op, amount, slots);
   }
 
-  /** Writes this to the network */
+  /**
+   * Writes this to the network
+   */
   public void toNetwork(FriendlyByteBuf buffer) {
-    buffer.writeUtf(name);
-    buffer.writeResourceLocation(BuiltInRegistries.ATTRIBUTE.getKey(attribute));
-    buffer.writeEnum(operation);
-    buffer.writeFloat(amount);
+    buffer.writeUtf(this.name);
+    buffer.writeResourceLocation(BuiltInRegistries.ATTRIBUTE.getKey(this.attribute));
+    buffer.writeEnum(this.operation);
+    buffer.writeFloat(this.amount);
     int packed = 0;
     for (EquipmentSlot slot : EquipmentSlot.values()) {
-      if (slotUUIDs[slot.getFilterFlag()] != null) {
+      if (this.slotUUIDs[slot.getFilterFlag()] != null) {
         packed |= (1 << slot.getFilterFlag());
       }
     }
     buffer.writeInt(packed);
   }
 
-  /** Reads this from the network */
+  /**
+   * Reads this from the network
+   */
   public static ModifierAttribute fromNetwork(FriendlyByteBuf buffer) {
     String name = buffer.readUtf(Short.MAX_VALUE);
     Attribute attribute = BuiltInRegistries.ATTRIBUTE.get(buffer.readResourceLocation());
@@ -131,7 +143,9 @@ public class ModifierAttribute {
     return new ModifierAttribute(name, attribute, operation, amount, slotUUIDs);
   }
 
-  /** Gets the UUID from a name */
+  /**
+   * Gets the UUID from a name
+   */
   public static UUID getUUID(String name, EquipmentSlot slot) {
     return UUID.nameUUIDFromBytes((name + "." + slot.getName()).getBytes());
   }

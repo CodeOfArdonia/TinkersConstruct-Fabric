@@ -11,15 +11,18 @@ import slimeknights.tconstruct.library.tools.SlotType;
 
 import javax.annotation.Nullable;
 
-/** Predicate that matches any modifiers with recipes requiring a slot */
+/**
+ * Predicate that matches any modifiers with recipes requiring a slot
+ */
 @RequiredArgsConstructor
 public class SlotTypeModifierPredicate implements ModifierPredicate {
+
   @Nullable
   private final SlotType slotType;
 
   @Override
   public boolean matches(ModifierId input) {
-    return ModifierRecipeLookup.isRecipeModifier(slotType, input);
+    return ModifierRecipeLookup.isRecipeModifier(this.slotType, input);
   }
 
   @Override
@@ -27,7 +30,9 @@ public class SlotTypeModifierPredicate implements ModifierPredicate {
     return LOADER;
   }
 
-  /** Loader instance */
+  /**
+   * Loader instance
+   */
   public static final IGenericLoader<SlotTypeModifierPredicate> LOADER = new IGenericLoader<>() {
     @Override
     public SlotTypeModifierPredicate deserialize(JsonObject json) {

@@ -6,6 +6,7 @@ import net.minecraft.resources.ResourceLocation;
  * This is just a copy of ResourceLocation for type safety.
  */
 public class MaterialStatsId extends ResourceLocation {
+
   public MaterialStatsId(String text) {
     super(text);
   }

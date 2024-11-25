@@ -11,6 +11,7 @@ import java.util.function.BiPredicate;
 public class StickySlimeBlock extends SlimeBlock implements CustomSlimeBlock, StickyBlock, StickToBlock {
 
   private final BiPredicate<BlockState, BlockState> stickyPredicate;
+
   public StickySlimeBlock(Properties properties, BiPredicate<BlockState, BlockState> stickyPredicate) {
     super(properties);
     this.stickyPredicate = stickyPredicate;
@@ -28,6 +29,6 @@ public class StickySlimeBlock extends SlimeBlock implements CustomSlimeBlock, St
 
   @Override
   public boolean canStickTo(BlockState state, BlockState other) {
-    return stickyPredicate.test(state, other);
+    return this.stickyPredicate.test(state, other);
   }
 }

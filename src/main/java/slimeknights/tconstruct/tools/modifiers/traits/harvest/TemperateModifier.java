@@ -25,13 +25,16 @@ import static slimeknights.tconstruct.tools.modifiers.upgrades.general.Reinforce
 import static slimeknights.tconstruct.tools.modifiers.upgrades.general.ReinforcedModifier.diminishingPercent;
 
 public class TemperateModifier extends Modifier implements ConditionalStatModifierHook {
+
   private static final float BASELINE_TEMPERATURE = 0.75f;
   private static final float MAX_MINING_BOOST = 7.5f;
   private static final float MAX_DRAWSPEED_BOOST = 0.15f;
   private static final Component SPEED = TConstruct.makeTranslation("modifier", "temperate.speed");
   private static final Component REINFORCED = TConstruct.makeTranslation("modifier", "temperate.reinforced");
 
-  /** Gets the bonus for the given position */
+  /**
+   * Gets the bonus for the given position
+   */
   private static float getBonus(LivingEntity living, BlockPos pos, int level) {
     // temperature ranges from -1.25 to 1.25, so make it go -1 to 1
     // negative is cold, positive is hot
@@ -86,13 +89,13 @@ public class TemperateModifier extends Modifier implements ConditionalStatModifi
       }
       if (bonus < -0.01f) {
         if (harvest) {
-          addFlatBoost(SPEED, -bonus * tool.getMultiplier(ToolStats.MINING_SPEED) * MAX_MINING_BOOST, tooltip);
+          this.addFlatBoost(SPEED, -bonus * tool.getMultiplier(ToolStats.MINING_SPEED) * MAX_MINING_BOOST, tooltip);
         } else {
-          addFlatBoost(SPEED, -bonus * tool.getMultiplier(ToolStats.DRAW_SPEED) * MAX_DRAWSPEED_BOOST, tooltip);
+          this.addFlatBoost(SPEED, -bonus * tool.getMultiplier(ToolStats.DRAW_SPEED) * MAX_DRAWSPEED_BOOST, tooltip);
         }
       }
       if (bonus > 0.01f) {
-        tooltip.add(applyStyle(Component.literal(Util.PERCENT_FORMAT.format(diminishingPercent(bonus * 2)) + " ").append(REINFORCED)));
+        tooltip.add(this.applyStyle(Component.literal(Util.PERCENT_FORMAT.format(diminishingPercent(bonus * 2)) + " ").append(REINFORCED)));
       }
     }
   }

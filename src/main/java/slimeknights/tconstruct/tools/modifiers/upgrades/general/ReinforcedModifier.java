@@ -14,7 +14,10 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class ReinforcedModifier extends IncrementalModifier {
-  /** Default logic that starting at 25% gives a bonus of 5% less per level */
+
+  /**
+   * Default logic that starting at 25% gives a bonus of 5% less per level
+   */
   public static float diminishingPercent(float level) {
     // formula gives 25%, 45%, 60%, 70%, 75% for first 5 levels
     if (level < 5) {
@@ -28,8 +31,9 @@ public class ReinforcedModifier extends IncrementalModifier {
 
   /**
    * Gets the reinforcment percentage for the given level
-   * @param level  Level from 0 to 10
-   * @return  Percentage
+   *
+   * @param level Level from 0 to 10
+   * @return Percentage
    */
   protected float getPercentage(float level) {
     return diminishingPercent(level);
@@ -37,9 +41,10 @@ public class ReinforcedModifier extends IncrementalModifier {
 
   /**
    * Damages the given amount with the reinforced percentage
-   * @param amount      Amount to damage
-   * @param percentage  Reinforeced percentage
-   * @return  Amount after reinforced
+   *
+   * @param amount     Amount to damage
+   * @param percentage Reinforeced percentage
+   * @return Amount after reinforced
    */
   public static int damageReinforced(int amount, float percentage) {
     // 100% protection? all damage blocked
@@ -71,8 +76,8 @@ public class ReinforcedModifier extends IncrementalModifier {
     if (tool.getModifierLevel(TinkerModifiers.unbreakable.get()) > 0) {
       reinforced = 1;
     } else {
-      reinforced = getPercentage(getScaledLevel(tool, level));
+      reinforced = getPercentage(this.getScaledLevel(tool, level));
     }
-    tooltip.add(applyStyle(Component.literal(Util.PERCENT_FORMAT.format(reinforced) + " ").append(makeDisplayName())));
+    tooltip.add(this.applyStyle(Component.literal(Util.PERCENT_FORMAT.format(reinforced) + " ").append(this.makeDisplayName())));
   }
 }

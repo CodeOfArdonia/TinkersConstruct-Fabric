@@ -17,6 +17,7 @@ import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.smeltery.block.entity.ITankBlockEntity;
 
 public abstract class TinyMultiblockControllerBlock extends ControllerBlock {
+
   private static final Component NO_FUEL_TANK = TConstruct.makeTranslation("multiblock", "tiny.no_fuel_tank");
 
   protected TinyMultiblockControllerBlock(Properties builder) {
@@ -30,8 +31,9 @@ public abstract class TinyMultiblockControllerBlock extends ControllerBlock {
 
   /**
    * Checks if the given state is a valid melter fuel source
-   * @param state  State instance
-   * @return  True if its a valid fuel source
+   *
+   * @param state State instance
+   * @return True if its a valid fuel source
    */
   protected boolean isValidFuelSource(BlockState state) {
     return state.is(TinkerTags.Blocks.FUEL_TANKS);
@@ -41,7 +43,7 @@ public abstract class TinyMultiblockControllerBlock extends ControllerBlock {
   public BlockState getStateForPlacement(BlockPlaceContext context) {
     BlockState state = super.getStateForPlacement(context);
     if (state != null) {
-      return state.setValue(IN_STRUCTURE, isValidFuelSource(context.getLevel().getBlockState(context.getClickedPos().below())));
+      return state.setValue(IN_STRUCTURE, this.isValidFuelSource(context.getLevel().getBlockState(context.getClickedPos().below())));
     }
     return null;
   }
@@ -50,7 +52,7 @@ public abstract class TinyMultiblockControllerBlock extends ControllerBlock {
   @Override
   public BlockState updateShape(BlockState state, Direction direction, BlockState neighbor, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
     if (direction == Direction.DOWN) {
-      return state.setValue(IN_STRUCTURE, isValidFuelSource(neighbor));
+      return state.setValue(IN_STRUCTURE, this.isValidFuelSource(neighbor));
     }
     return state;
   }

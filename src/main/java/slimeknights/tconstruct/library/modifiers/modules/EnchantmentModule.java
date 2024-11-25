@@ -29,16 +29,21 @@ import java.util.function.BiFunction;
  */
 @RequiredArgsConstructor
 public abstract class EnchantmentModule implements ModifierModule {
+
   protected final Enchantment enchantment;
   protected final int level;
 
-  /** Loader shared logic for enchantment modules */
-  public record Loader<T extends EnchantmentModule>(BiFunction<Enchantment, Integer, T> constructor) implements IGenericLoader<T> {
+  /**
+   * Loader shared logic for enchantment modules
+   */
+  public record Loader<T extends EnchantmentModule>(
+    BiFunction<Enchantment, Integer, T> constructor) implements IGenericLoader<T> {
+
     @Override
     public T deserialize(JsonObject json) {
       Enchantment enchantment = JsonHelper.getAsEntry(BuiltInRegistries.ENCHANTMENT, json, "name");
       int level = JsonUtils.getIntMin(json, "level", 1);
-      return constructor.apply(enchantment, level);
+      return this.constructor.apply(enchantment, level);
     }
 
     @Override
@@ -51,7 +56,7 @@ public abstract class EnchantmentModule implements ModifierModule {
     public T fromNetwork(FriendlyByteBuf buffer) {
       Enchantment enchantment = BuiltInRegistries.ENCHANTMENT.byId(buffer.readVarInt());
       int level = buffer.readVarInt();
-      return constructor.apply(enchantment, level);
+      return this.constructor.apply(enchantment, level);
     }
 
     @Override
@@ -66,6 +71,7 @@ public abstract class EnchantmentModule implements ModifierModule {
    * Currently, does not support incremental.
    */
   public static class Harvest extends EnchantmentModule implements HarvestEnchantmentsModifierHook {
+
     private static final List<ModifierHook<?>> DEFAULT_HOOKS = List.of(TinkerHooks.TOOL_HARVEST_ENCHANTMENTS, TinkerHooks.LEGGINGS_HARVEST_ENCHANTMENTS);
     public static final Loader<Harvest> LOADER = new Loader<>(Harvest::new);
 
@@ -78,8 +84,8 @@ public abstract class EnchantmentModule implements ModifierModule {
     }
 
     @Override
-    public void applyHarvestEnchantments(IToolStackView tool, ModifierEntry modifier, ToolHarvestContext context, BiConsumer<Enchantment,Integer> consumer) {
-      consumer.accept(enchantment, level * modifier.getLevel());
+    public void applyHarvestEnchantments(IToolStackView tool, ModifierEntry modifier, ToolHarvestContext context, BiConsumer<Enchantment, Integer> consumer) {
+      consumer.accept(this.enchantment, this.level * modifier.getLevel());
     }
 
     @Override
@@ -99,6 +105,7 @@ public abstract class EnchantmentModule implements ModifierModule {
    * TODO 1.19: switch to new hook to make this less of a hack
    */
   public static class Constant extends EnchantmentModule implements RawDataModifierHook {
+
     private static final List<ModifierHook<?>> DEFAULT_HOOKS = List.of(TinkerHooks.RAW_DATA);
     public static final Loader<Constant> LOADER = new Loader<>(Constant::new);
 
@@ -112,12 +119,12 @@ public abstract class EnchantmentModule implements ModifierModule {
 
     @Override
     public void addRawData(IToolStackView tool, ModifierEntry modifier, RestrictedCompoundTag tag) {
-      EnchantmentModifier.addEnchantmentData(tag, enchantment, modifier.getLevel() * level);
+      EnchantmentModifier.addEnchantmentData(tag, this.enchantment, modifier.getLevel() * this.level);
     }
 
     @Override
     public void removeRawData(IToolStackView tool, Modifier modifier, RestrictedCompoundTag tag) {
-      EnchantmentModifier.removeEnchantmentData(tag, enchantment);
+      EnchantmentModifier.removeEnchantmentData(tag, this.enchantment);
     }
 
     @Override

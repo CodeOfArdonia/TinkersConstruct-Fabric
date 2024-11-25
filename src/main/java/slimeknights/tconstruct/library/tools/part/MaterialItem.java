@@ -2,7 +2,6 @@ package slimeknights.tconstruct.library.tools.part;
 
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroupEntries;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -31,6 +30,7 @@ import java.util.List;
  * itemstack of this item has.
  */
 public class MaterialItem extends Item implements IMaterialItem {
+
   private static final String ADDED_BY = TConstruct.makeTranslationKey("tooltip", "part.added_by");
 
   public MaterialItem(Properties properties, @Nullable ResourceKey<CreativeModeTab> tab) {
@@ -39,7 +39,9 @@ public class MaterialItem extends Item implements IMaterialItem {
       ItemGroupEvents.modifyEntriesEvent(tab).register(this::fillItemCategory);
   }
 
-  /** Gets the material ID for the given NBT compound */
+  /**
+   * Gets the material ID for the given NBT compound
+   */
   private static MaterialVariantId getMaterialId(@Nullable CompoundTag nbt) {
     if (nbt != null) {
       String str = nbt.getString(NBTTags.PART_MATERIAL);
@@ -65,7 +67,7 @@ public class MaterialItem extends Item implements IMaterialItem {
       boolean added = false;
       if (!showOnlyId.isEmpty()) {
         MaterialVariantId materialId = MaterialVariantId.tryParse(showOnlyId);
-        if (materialId != null && canUseMaterial(materialId.getId())) {
+        if (materialId != null && this.canUseMaterial(materialId.getId())) {
           items.accept(this.withMaterialForDisplay(materialId));
           added = true;
         }
@@ -110,7 +112,7 @@ public class MaterialItem extends Item implements IMaterialItem {
   @Override
   public Component getName(ItemStack stack) {
     // if no material, return part name directly
-    MaterialVariantId material = getMaterial(stack);
+    MaterialVariantId material = this.getMaterial(stack);
     if (material.equals(IMaterial.UNKNOWN_ID)) {
       return super.getName(stack);
     }
@@ -134,7 +136,7 @@ public class MaterialItem extends Item implements IMaterialItem {
   @Nullable
   @Override
   public String getCreatorModId(ItemStack stack) {
-    MaterialVariantId material = getMaterial(stack);
+    MaterialVariantId material = this.getMaterial(stack);
     if (!IMaterial.UNKNOWN_ID.equals(material)) {
       return material.getId().getNamespace();
     }
@@ -145,8 +147,9 @@ public class MaterialItem extends Item implements IMaterialItem {
 
   /**
    * Adds the mod that added the material to the tooltip
-   * @param tooltip   Tooltip list
-   * @param material  Material to add
+   *
+   * @param tooltip  Tooltip list
+   * @param material Material to add
    */
   protected static void addModTooltip(IMaterial material, List<Component> tooltip) {
     if (material != IMaterial.UNKNOWN) {

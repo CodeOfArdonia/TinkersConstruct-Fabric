@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Config {
+
   /**
    * Common specific configuration
    */
@@ -36,7 +37,7 @@ public class Config {
     public final BooleanValue witherBoneConversion;
     public final BooleanValue slimeRecipeFix;
     public final BooleanValue glassRecipeFix;
-    public final Map<TinkerHeadType,BooleanValue> headDrops;
+    public final Map<TinkerHeadType, BooleanValue> headDrops;
     public final DoubleValue repairKitAmount;
 
     // loot
@@ -68,7 +69,8 @@ public class Config {
     // debug
     public final BooleanValue forceIntegrationMaterials;
     public final EnumValue<LogInvalidToolStack> logInvalidToolStack;
-    public enum LogInvalidToolStack { STACKTRACE, WARNING, IGNORED };
+
+    public enum LogInvalidToolStack {STACKTRACE, WARNING, IGNORED}
 
     Common(ModConfigSpec.Builder builder) {
       builder.comment("Everything to do with gameplay").push("gameplay");
@@ -89,7 +91,7 @@ public class Config {
 //        DamageSource.FALLING_STALACTITE.setProjectile();
 //      }));
 //      actions.add(new ConfigurableAction(builder, "lightning", true, "Makes lightning count as fire damage", ((DamageSourceAccessor)DamageSource.LIGHTNING_BOLT)::port_lib$setFireDamage));
-      damageSourceTweaks = actions.build();
+      this.damageSourceTweaks = actions.build();
 
       this.repairKitAmount = builder
         .comment("Amount of durability restored by a repair kit in terms of ingots. Does not affect the cost to create the kit, that is controlled by JSON.")
@@ -190,9 +192,9 @@ public class Config {
       builder.pop();
 
       builder.comment("Entity head drops when killed by a charged creeper").push("heads");
-      headDrops = new EnumMap<>(TinkerHeadType.class);
+      this.headDrops = new EnumMap<>(TinkerHeadType.class);
       for (TinkerHeadType headType : TinkerHeadType.values()) {
-        headDrops.put(headType, builder
+        this.headDrops.put(headType, builder
           .translation("tconstruct.configgui.heads." + headType.getSerializedName())
           .define(headType.getSerializedName(), true));
       }
@@ -203,20 +205,20 @@ public class Config {
         "Options related to loot table injections. Note some of the changes are done via global loot managers, these only control injecting loot into loot pools",
         "If your modpack makes extensive loot table changes, many of these may be automatically disabled. You can also manually set up tables for more control.").push("loot");
 
-      slimyLootChests = builder
+      this.slimyLootChests = builder
         .comment("Adds slimy saplings and seeds into various loot chests. Helps for worlds without slime islands")
         .worldRestart()
         .define("slimy_loot", true);
-      barterBlazingBlood = builder
+      this.barterBlazingBlood = builder
         .comment("Weight of blazing blood in the piglin bartering tables. Set to 0 to disable")
         .worldRestart()
         .defineInRange("barter_blazing_blood", 20, 0, 100);
-      tinkerToolBonusChest = builder
+      this.tinkerToolBonusChest = builder
         .comment("Weight of tinker tools in the vanilla spawn bonus chest, randomly replacing the vanilla axe or shovel. Tool will have a random tier 1 head and binding, plus a wooden handle. Set to 0 to disable.",
-                 "For comparison, vanilla wooden axes and pickaxes have a weight of 3, and stone axes/pickaxes have a weight of 1")
+          "For comparison, vanilla wooden axes and pickaxes have a weight of 3, and stone axes/pickaxes have a weight of 1")
         .worldRestart()
         .defineInRange("tinker_tool_bonus_chest", 2, 0, 25);
-      dropDragonScales = builder
+      this.dropDragonScales = builder
         .comment("If true, ender dragons will drop scales when damaged by explosions")
         .define("drop_dragon_Scales", true);
 
@@ -241,7 +243,7 @@ public class Config {
           .define("forceRecipes", false);
         this.earthGeodes = builder
           .comment("If true, earthslime geodes generate deep in the world as another way to get slime")
-            .define("earth", true);
+          .define("earth", true);
         this.skyGeodes = builder
           .comment("If true, skyslime geodes generate above amethyst as another way to get skyslime")
           .define("sky", true);
@@ -258,7 +260,7 @@ public class Config {
       builder.comment("Features to use in debugging gameplay and mechanics, generally should not be enabled in packs").push("debug");
       this.forceIntegrationMaterials = builder
         .comment("If true, forces integration materials to be enabled, even if the relevant metal is missing. Useful for testing material balance.",
-                 "Does not provide recipes for any of them, they will only be available to cheat in creative.")
+          "Does not provide recipes for any of them, they will only be available to cheat in creative.")
         .worldRestart()
         .define("forceIntegrationMaterials", false);
       this.logInvalidToolStack = builder
@@ -272,6 +274,7 @@ public class Config {
    * Client specific configuration - only loaded clientside from tconstruct-client.toml
    */
   public static class Client {
+
     //public final ForgeConfigSpec.BooleanValue temperatureInCelsius;
     public final ModConfigSpec.BooleanValue tankFluidModel;
     public final ModConfigSpec.BooleanValue extraToolTips;
@@ -304,7 +307,7 @@ public class Config {
         .comment(
           "Experimental. If true, renders fluids in tanks using a dynamic model, being more efficient when the tank is static",
           "If false, renders fluids in tanks using a TESR, which is more efficient when the tank contents are changing"
-         )
+        )
         .translation("tconstruct.configgui.tankFluidModel")
         .define("tankFluidModel", false);
 
@@ -330,12 +333,12 @@ public class Config {
 
       this.maxSmelteryItemQuads = builder
         .comment("Maximum number of quads to render for items in the smeltery. Most blocks are about 6 quads, items like ingots are around 26.",
-                 "Setting this lower will cause fewer items to be renderer (but never a partial item). Set to -1 to allow unlimited quads, and 0 to disable the item renderer.")
+          "Setting this lower will cause fewer items to be renderer (but never a partial item). Set to -1 to allow unlimited quads, and 0 to disable the item renderer.")
         .defineInRange("maxSmelteryItemQuads", 3500, -1, Short.MAX_VALUE);
 
       this.modifiersIDsInAdvancedTooltips = builder
         .comment("If true, shows modifier IDs in advanced tooltips for tools and tool parts.",
-                 "They are more intrusive than most advanced tooltip content, so this option is provided in case some mod made poor design decisions and put essential gameplay info in tooltips or for pack makers who do not need modifier info.")
+          "They are more intrusive than most advanced tooltip content, so this option is provided in case some mod made poor design decisions and put essential gameplay info in tooltips or for pack makers who do not need modifier info.")
         .define("modifiersIDsInAdvancedTooltips", true);
 
       builder.comment("Settings related to modifiers").push("modifiers");
@@ -397,22 +400,27 @@ public class Config {
     COMMON = specPair.getLeft();
   }
 
-  /** Registers any relevant listeners for config */
+  /**
+   * Registers any relevant listeners for config
+   */
   public static void init() {
     ConfigRegistry.registerConfig(TConstruct.MOD_ID, ConfigType.COMMON, Config.commonSpec);
     ConfigRegistry.registerConfig(TConstruct.MOD_ID, ConfigType.CLIENT, Config.clientSpec);
   }
 
-  /** Configuration for an ore rate, such as melter or foundry */
+  /**
+   * Configuration for an ore rate, such as melter or foundry
+   */
   public static class OreRate implements IOreRate {
+
     private final ConfigValue<Integer> nuggetsPerMetal;
     private final ConfigValue<Integer> shardsPerGem;
 
     public OreRate(ModConfigSpec.Builder builder, int defaultNuggets, int defaultQuarters) {
-      nuggetsPerMetal = builder
+      this.nuggetsPerMetal = builder
         .comment("Number of nuggets produced per metal ore unit melted. 9 nuggets would give 1 ingot")
         .defineInRange("nuggetsPerMetal", defaultNuggets, 1, 45);
-      shardsPerGem = builder
+      this.shardsPerGem = builder
         .comment("Number of gem shards produced per gem ore unit melted. 4 gem shards would give 1 gem")
         .defineInRange("shardsPerGem", defaultQuarters, 1, 20);
     }
@@ -420,8 +428,8 @@ public class Config {
     @Override
     public long applyOreBoost(OreRateType rate, long amount) {
       return switch (rate) {
-        case METAL -> amount * nuggetsPerMetal.get() / 9;
-        case GEM -> amount * shardsPerGem.get() / 4;
+        case METAL -> amount * this.nuggetsPerMetal.get() / 9;
+        case GEM -> amount * this.shardsPerGem.get() / 4;
       };
     }
   }

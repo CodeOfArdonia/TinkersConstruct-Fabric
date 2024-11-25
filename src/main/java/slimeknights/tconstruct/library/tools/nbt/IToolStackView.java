@@ -13,34 +13,48 @@ import slimeknights.tconstruct.library.tools.stat.INumericToolStat;
  * If you receive an instance of this interface a parameter, do NOT use an instanceof check and cast it to a ToolStack. Don't make me use a private wrapper class.
  */
 public interface IToolStackView extends IToolContext {
-  /** Commonly used operation, getting a stat multiplier */
+
+  /**
+   * Commonly used operation, getting a stat multiplier
+   */
   default float getMultiplier(INumericToolStat<?> stat) {
-    return getDefinition().getData().getMultiplier(stat);
+    return this.getDefinition().getData().getMultiplier(stat);
   }
 
 
   /* Damage state */
 
-  /** Gets the current damage of the tool */
+  /**
+   * Gets the current damage of the tool
+   */
   int getDamage();
 
-  /** Gets the current durability remaining for this tool */
+  /**
+   * Gets the current durability remaining for this tool
+   */
   int getCurrentDurability();
 
-  /** Checks whether the tool is broken */
+  /**
+   * Checks whether the tool is broken
+   */
   boolean isBroken();
 
-  /** If true, tool is marked unbreakable by vanilla */
+  /**
+   * If true, tool is marked unbreakable by vanilla
+   */
   boolean isUnbreakable();
 
   /**
    * Sets the tools current damage.
    * Note in general you should use {@link ToolDamageUtil#damage(IToolStackView, int, LivingEntity, ItemStack)} or {@link ToolDamageUtil#repair(IToolStackView, int)} as they handle modifiers
-   * @param damage  New damage
+   *
+   * @param damage New damage
    */
   void setDamage(int damage);
 
-  /** Cached tool stats calculated from materials and modifiers */
+  /**
+   * Cached tool stats calculated from materials and modifiers
+   */
   StatsNBT getStats();
 
   /**
@@ -58,9 +72,10 @@ public interface IToolStackView extends IToolContext {
 
   /**
    * Gets the free upgrade slots remaining on the tool
-   * @return  Free upgrade slots
+   *
+   * @return Free upgrade slots
    */
   default int getFreeSlots(SlotType type) {
-    return getPersistentData().getSlots(type) + getVolatileData().getSlots(type);
+    return this.getPersistentData().getSlots(type) + this.getVolatileData().getSlots(type);
   }
 }

@@ -32,11 +32,15 @@ import slimeknights.tconstruct.library.tools.nbt.ToolStack;
 import slimeknights.tconstruct.shared.TinkerCommons;
 import slimeknights.tconstruct.shared.particle.FluidParticleData;
 
-/** Modifier to handle spilling recipes on helmets */
+/**
+ * Modifier to handle spilling recipes on helmets
+ */
 @SuppressWarnings("removal")
 public class SlurpingModifier extends TankModifier implements KeybindInteractModifierHook, GeneralInteractionModifierHook {
-  private static final float DEGREE_TO_RADIANS = (float)Math.PI / 180F;
+
+  private static final float DEGREE_TO_RADIANS = (float) Math.PI / 180F;
   private static final TinkerDataKey<SlurpingInfo> SLURP_FINISH_TIME = TConstruct.createKey("slurping_finish");
+
   public SlurpingModifier() {
     super(FluidConstants.BUCKET);
     PlayerTickEvents.END.register(this::playerTick);
@@ -45,7 +49,7 @@ public class SlurpingModifier extends TankModifier implements KeybindInteractMod
   @Override
   public boolean startInteract(IToolStackView tool, ModifierEntry modifier, Player player, EquipmentSlot slot, TooltipKey keyModifier) {
     if (!player.isShiftKeyDown()) {
-      FluidStack fluid = getFluid(tool);
+      FluidStack fluid = this.getFluid(tool);
       // if we have a recipe, start drinking
       if (!fluid.isEmpty() && SpillingFluidManager.INSTANCE.contains(fluid.getFluid())) {
         TinkerDataCapability.CAPABILITY.maybeGet(player).ifPresent(data -> data.put(SLURP_FINISH_TIME, new SlurpingInfo(fluid, player.tickCount + 20)));
@@ -55,9 +59,11 @@ public class SlurpingModifier extends TankModifier implements KeybindInteractMod
     return false;
   }
 
-  /** Adds the given number of fluid particles */
+  /**
+   * Adds the given number of fluid particles
+   */
   private static void addFluidParticles(Player player, FluidStack fluid, int count) {
-    for(int i = 0; i < count; ++i) {
+    for (int i = 0; i < count; ++i) {
       Vec3 motion = new Vec3((RANDOM.nextFloat() - 0.5D) * 0.1D, Math.random() * 0.1D + 0.1D, 0.0D);
       motion = motion.xRot(-player.getXRot() * DEGREE_TO_RADIANS);
       motion = motion.yRot(-player.getYRot() * DEGREE_TO_RADIANS);
@@ -67,18 +73,20 @@ public class SlurpingModifier extends TankModifier implements KeybindInteractMod
       position = position.add(player.getX(), player.getEyeY(), player.getZ());
       FluidParticleData data = new FluidParticleData(TinkerCommons.fluidParticle.get(), fluid);
       if (player.level() instanceof ServerLevel) {
-        ((ServerLevel)player.level()).sendParticles(data, position.x, position.y, position.z, 1, motion.x, motion.y + 0.05D, motion.z, 0.0D);
+        ((ServerLevel) player.level()).sendParticles(data, position.x, position.y, position.z, 1, motion.x, motion.y + 0.05D, motion.z, 0.0D);
       } else {
         player.level().addParticle(data, position.x, position.y, position.z, motion.x, motion.y + 0.05D, motion.z);
       }
     }
   }
 
-  /** Drinks some of the fluid in the tank, reducing its value */
+  /**
+   * Drinks some of the fluid in the tank, reducing its value
+   */
   private void finishDrinking(IToolStackView tool, Player player, InteractionHand hand) {
     // only server needs to drink
     if (!player.level().isClientSide) {
-      FluidStack fluid = getFluid(tool);
+      FluidStack fluid = this.getFluid(tool);
       if (!fluid.isEmpty()) {
         // find the recipe
         SpillingFluid recipe = SpillingFluidManager.INSTANCE.find(fluid.getFluid());
@@ -86,14 +94,16 @@ public class SlurpingModifier extends TankModifier implements KeybindInteractMod
           ToolAttackContext context = new ToolAttackContext(player, player, hand, player, player, false, 1.0f, false);
           FluidStack remaining = recipe.applyEffects(fluid, tool.getModifierLevel(this), context);
           if (!player.isCreative()) {
-            setFluid(tool, remaining);
+            this.setFluid(tool, remaining);
           }
         }
       }
     }
   }
 
-  /** Called on player tick to update drinking */
+  /**
+   * Called on player tick to update drinking
+   */
   private void playerTick(Player player) {
     if (player.isSpectator()) {
       return;
@@ -110,7 +120,7 @@ public class SlurpingModifier extends TankModifier implements KeybindInteractMod
           addFluidParticles(player, info.fluid, 16);
 
           ToolStack tool = ToolStack.from(player.getItemBySlot(EquipmentSlot.HEAD));
-          finishDrinking(tool, player, InteractionHand.MAIN_HAND);
+          this.finishDrinking(tool, player, InteractionHand.MAIN_HAND);
 
           // stop drinking
           data.remove(SLURP_FINISH_TIME);
@@ -132,7 +142,7 @@ public class SlurpingModifier extends TankModifier implements KeybindInteractMod
   @Override
   public InteractionResult onToolUse(IToolStackView tool, ModifierEntry modifier, Player player, InteractionHand hand, InteractionSource source) {
     if (source == InteractionSource.RIGHT_CLICK) {
-      FluidStack fluid = getFluid(tool);
+      FluidStack fluid = this.getFluid(tool);
       if (!fluid.isEmpty() && SpillingFluidManager.INSTANCE.contains(fluid.getFluid())) {
         ModifierUtil.startUsingItem(tool, modifier.getId(), player, hand);
         return InteractionResult.CONSUME;
@@ -154,7 +164,7 @@ public class SlurpingModifier extends TankModifier implements KeybindInteractMod
   @Override
   public void onUsingTick(IToolStackView tool, ModifierEntry modifier, LivingEntity entity, int timeLeft) {
     if (timeLeft % 4 == 0 && entity instanceof Player player) {
-      FluidStack fluidStack = getFluid(tool);
+      FluidStack fluidStack = this.getFluid(tool);
       if (!fluidStack.isEmpty()) {
         addFluidParticles(player, fluidStack, 5);
       }
@@ -164,7 +174,7 @@ public class SlurpingModifier extends TankModifier implements KeybindInteractMod
   @Override
   public boolean onFinishUsing(IToolStackView tool, ModifierEntry modifier, LivingEntity entity) {
     if (entity instanceof Player player) {
-      finishDrinking(tool, player, entity.getUsedItemHand());
+      this.finishDrinking(tool, player, entity.getUsedItemHand());
     }
     return true;
   }

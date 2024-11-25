@@ -12,48 +12,68 @@ import slimeknights.tconstruct.library.recipe.partbuilder.Pattern;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
-/** A single slot in a slot layout */
+/**
+ * A single slot in a slot layout
+ */
 @RequiredArgsConstructor
 public class LayoutSlot {
+
   public static final LayoutSlot EMPTY = new LayoutSlot(null, "", -1, -1, null);
 
-  /** Icon to display when the slot is empty */
-  @Nullable @Getter
+  /**
+   * Icon to display when the slot is empty
+   */
+  @Nullable
+  @Getter
   private final Pattern icon;
-  /** Name to display in the sidebar for the slot's "needs" */
+  /**
+   * Name to display in the sidebar for the slot's "needs"
+   */
   @Nullable
   private final String translation_key;
   @Getter
   private final int x;
   @Getter
   private final int y;
-  /** Filter to only allow certain items in the slot under this layout */
-  @Nullable @Getter(AccessLevel.PROTECTED) @VisibleForTesting
+  /**
+   * Filter to only allow certain items in the slot under this layout
+   */
+  @Nullable
+  @Getter(AccessLevel.PROTECTED)
+  @VisibleForTesting
   private final Ingredient filter;
 
-  /** If true, this is an empty slot */
+  /**
+   * If true, this is an empty slot
+   */
   public boolean isEmpty() {
-    return getTranslationKey().isEmpty();
+    return this.getTranslationKey().isEmpty();
   }
 
   public boolean isHidden() {
-    return x == -1 && y == -1;
+    return this.x == -1 && this.y == -1;
   }
 
-  /** Gets the translation key of this slot */
+  /**
+   * Gets the translation key of this slot
+   */
   public String getTranslationKey() {
-    return Objects.requireNonNullElse(translation_key, "");
+    return Objects.requireNonNullElse(this.translation_key, "");
   }
 
-  /** Checks if the given stack is valid for this slot */
+  /**
+   * Checks if the given stack is valid for this slot
+   */
   public boolean isValid(ItemStack stack) {
-    return !stack.isEmpty() && (filter == null || filter.test(stack));
+    return !stack.isEmpty() && (this.filter == null || this.filter.test(stack));
   }
 
 
   /* Buffers */
 
-  /** Reads a slot from the packet buffer */
+  /**
+   * Reads a slot from the packet buffer
+   */
   public static LayoutSlot read(FriendlyByteBuf buffer) {
     Pattern pattern = null;
     if (buffer.readBoolean()) {
@@ -69,20 +89,22 @@ public class LayoutSlot {
     return new LayoutSlot(pattern, name, x, y, ingredient);
   }
 
-  /** Writes a slot to the packet buffer */
+  /**
+   * Writes a slot to the packet buffer
+   */
   public void write(FriendlyByteBuf buffer) {
-    if (icon != null) {
+    if (this.icon != null) {
       buffer.writeBoolean(true);
-      buffer.writeResourceLocation(icon);
+      buffer.writeResourceLocation(this.icon);
     } else {
       buffer.writeBoolean(false);
     }
-    buffer.writeUtf(getTranslationKey());
-    buffer.writeVarInt(x);
-    buffer.writeVarInt(y);
-    if (filter != null) {
+    buffer.writeUtf(this.getTranslationKey());
+    buffer.writeVarInt(this.x);
+    buffer.writeVarInt(this.y);
+    if (this.filter != null) {
       buffer.writeBoolean(true);
-      filter.toNetwork(buffer);
+      this.filter.toNetwork(buffer);
     } else {
       buffer.writeBoolean(false);
     }

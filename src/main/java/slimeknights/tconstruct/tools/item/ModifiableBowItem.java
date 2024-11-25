@@ -40,6 +40,7 @@ import java.util.function.Predicate;
 import static slimeknights.tconstruct.tools.modifiers.upgrades.ranged.ScopeModifier.SCOPE;
 
 public class ModifiableBowItem extends ModifiableLauncherItem {
+
   public ModifiableBowItem(Properties properties, ToolDefinition toolDefinition, ResourceKey<CreativeModeTab> tab) {
     super(properties, toolDefinition, tab);
   }
@@ -73,7 +74,7 @@ public class ModifiableBowItem extends ModifiableLauncherItem {
       return InteractionResultHolder.fail(bow);
     }
 
-    boolean hasAmmo = BowAmmoModifierHook.hasAmmo(tool, bow, player, getSupportedHeldProjectiles());
+    boolean hasAmmo = BowAmmoModifierHook.hasAmmo(tool, bow, player, this.getSupportedHeldProjectiles());
     // ask forge if it has any different opinions
     InteractionResultHolder<ItemStack> override = null;//ForgeEventFactory.onArrowNock(bow, level, player, hand, hasAmmo);
     if (override != null) {
@@ -87,7 +88,7 @@ public class ModifiableBowItem extends ModifiableLauncherItem {
     float drawspeed = ConditionalStatModifierHook.getModifiedStat(tool, player, ToolStats.DRAW_SPEED) / 20f;
     TinkerDataCapability.CAPABILITY.maybeGet(player).ifPresent(data -> data.put(DRAWSPEED, drawspeed));
     // we want an int version to make sounds more precise
-    tool.getPersistentData().putInt(KEY_DRAWTIME, (int)Math.ceil(1 / drawspeed));
+    tool.getPersistentData().putInt(KEY_DRAWTIME, (int) Math.ceil(1 / drawspeed));
     if (!level.isClientSide) {
       level.playSound(null, player.getX(), player.getY(), player.getZ(), Sounds.LONGBOW_CHARGE.getSound(), SoundSource.PLAYERS, 0.75F, 1.0F);
     }
@@ -112,7 +113,7 @@ public class ModifiableBowItem extends ModifiableLauncherItem {
     }
 
     // its a little redundant to search for ammo twice, but otherwise we risk shrinking the stack before we know if we can fire
-    boolean hasAmmo = BowAmmoModifierHook.hasAmmo(tool, bow, player, getSupportedHeldProjectiles());
+    boolean hasAmmo = BowAmmoModifierHook.hasAmmo(tool, bow, player, this.getSupportedHeldProjectiles());
 
     // just not handling vanilla infinity at all, we have our own hooks which someone could use to mimic infinity if they wish with a bit of effort
     boolean creative = player.getAbilities().instabuild;
@@ -140,14 +141,14 @@ public class ModifiableBowItem extends ModifiableLauncherItem {
     // launch the arrow
     if (!level.isClientSide) {
       // find ammo after the return above, as otherwise we might consume ammo before
-      ItemStack ammo = BowAmmoModifierHook.findAmmo(tool, bow, player, getSupportedHeldProjectiles());
+      ItemStack ammo = BowAmmoModifierHook.findAmmo(tool, bow, player, this.getSupportedHeldProjectiles());
       // could only be empty at this point if we are creative, as hasAmmo returned true above
       if (ammo.isEmpty()) {
         ammo = new ItemStack(Items.ARROW);
       }
 
       // prepare the arrows
-      ArrowItem arrowItem = ammo.getItem() instanceof ArrowItem arrow ? arrow : (ArrowItem)Items.ARROW;
+      ArrowItem arrowItem = ammo.getItem() instanceof ArrowItem arrow ? arrow : (ArrowItem) Items.ARROW;
       float inaccuracy = ModifierUtil.getInaccuracy(tool, living, velocity);
       float startAngle = getAngleStart(ammo.getCount());
       int primaryIndex = ammo.getCount() / 2;
@@ -161,7 +162,7 @@ public class ModifiableBowItem extends ModifiableLauncherItem {
 
         // vanilla arrows have a base damage of 2, cancel that out then add in our base damage to account for custom arrows with higher base damage
         // calculate it just once as all four arrows are the same item, they should have the same damage
-        float baseArrowDamage = (float)(arrow.getBaseDamage() - 2 + tool.getStats().get(ToolStats.PROJECTILE_DAMAGE));
+        float baseArrowDamage = (float) (arrow.getBaseDamage() - 2 + tool.getStats().get(ToolStats.PROJECTILE_DAMAGE));
         arrow.setBaseDamage(ConditionalStatModifierHook.getModifiedStat(tool, player, ToolStats.PROJECTILE_DAMAGE, baseArrowDamage));
 
         // just store all modifiers on the tool for simplicity
@@ -195,11 +196,10 @@ public class ModifiableBowItem extends ModifiableLauncherItem {
   public void onUseTick(Level level, LivingEntity living, ItemStack bow, int chargeRemaining) {
     // play the sound at the end of loading as an indicator its loaded, texture is another indicator
     if (!level.isClientSide) {
-      if (getUseDuration(bow) - chargeRemaining == ModifierUtil.getPersistentInt(bow, KEY_DRAWTIME, 0)) {
+      if (this.getUseDuration(bow) - chargeRemaining == ModifierUtil.getPersistentInt(bow, KEY_DRAWTIME, 0)) {
         level.playSound(null, living.getX(), living.getY(), living.getZ(), SoundEvents.CROSSBOW_LOADING_MIDDLE, SoundSource.PLAYERS, 0.75F, 1.0F);
       }
-    }
-    else if (ModifierUtil.getModifierLevel(bow, TinkerModifiers.scope.getId()) > 0) {
+    } else if (ModifierUtil.getModifierLevel(bow, TinkerModifiers.scope.getId()) > 0) {
       int chargeTime = this.getUseDuration(bow) - chargeRemaining;
       if (chargeTime > 0) {
         TinkerDataCapability.CAPABILITY.maybeGet(living).ifPresent(data -> {

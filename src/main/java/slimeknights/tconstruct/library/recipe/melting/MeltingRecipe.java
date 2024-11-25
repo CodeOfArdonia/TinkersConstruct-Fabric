@@ -34,6 +34,7 @@ import java.util.stream.Stream;
  */
 @RequiredArgsConstructor
 public class MeltingRecipe implements IMeltingRecipe {
+
   @Getter
   private final ResourceLocation id;
   @Getter
@@ -44,7 +45,9 @@ public class MeltingRecipe implements IMeltingRecipe {
   protected final FluidStack output;
   @Getter
   protected final int temperature;
-  /** Number of "steps" needed to melt this, by default lava increases steps by 5 every 4 ticks (25 a second) */
+  /**
+   * Number of "steps" needed to melt this, by default lava increases steps by 5 every 4 ticks (25 a second)
+   */
   @Getter
   protected final int time;
   protected final List<FluidStack> byproducts;
@@ -52,27 +55,27 @@ public class MeltingRecipe implements IMeltingRecipe {
 
   @Override
   public boolean matches(IMeltingContainer inv, Level world) {
-    return input.test(inv.getStack());
+    return this.input.test(inv.getStack());
   }
 
   @Override
   public int getTemperature(IMeltingContainer inv) {
-    return temperature;
+    return this.temperature;
   }
 
   @Override
   public int getTime(IMeltingContainer inv) {
-    return time;
+    return this.time;
   }
 
   @Override
   public FluidStack getOutput(IMeltingContainer inv) {
-    return output.copy();
+    return this.output.copy();
   }
 
   @Override
   public NonNullList<Ingredient> getIngredients() {
-    return NonNullList.of(Ingredient.EMPTY, input);
+    return NonNullList.of(Ingredient.EMPTY, this.input);
   }
 
   @Override
@@ -80,7 +83,9 @@ public class MeltingRecipe implements IMeltingRecipe {
     return TinkerSmeltery.meltingSerializer.get();
   }
 
-  /** If nonnull, recipe is boosted by this ore type */
+  /**
+   * If nonnull, recipe is boosted by this ore type
+   */
   @Nullable
   public OreRateType getOreType() {
     return null;
@@ -89,38 +94,50 @@ public class MeltingRecipe implements IMeltingRecipe {
   @Override
   public void handleByproducts(IMeltingContainer inv, SlottedStorage<FluidVariant> handler) {
     // fill byproducts until we run out of space or byproducts
-    for (FluidStack fluidStack : byproducts) {
+    for (FluidStack fluidStack : this.byproducts) {
       TransferUtil.insertFluid(handler, fluidStack.copy());
     }
   }
 
-  /** Gets the recipe output for foundry display in JEI */
+  /**
+   * Gets the recipe output for foundry display in JEI
+   */
   public List<List<FluidStack>> getOutputWithByproducts() {
-    if (outputWithByproducts == null) {
-      outputWithByproducts = Stream.concat(Stream.of(output).map(output -> {
+    if (this.outputWithByproducts == null) {
+      this.outputWithByproducts = Stream.concat(Stream.of(this.output).map(output -> {
         // boost for foundry rate, this method is used for the foundry only
-        OreRateType rate = getOreType();
+        OreRateType rate = this.getOreType();
         if (rate != null) {
           return new FluidStack(output, Config.COMMON.foundryOreRate.applyOreBoost(rate, output.getAmount()));
         }
         return output;
-      }), byproducts.stream()).map(Collections::singletonList).collect(Collectors.toList());
+      }), this.byproducts.stream()).map(Collections::singletonList).collect(Collectors.toList());
     }
-    return outputWithByproducts;
+    return this.outputWithByproducts;
   }
 
-  /** Interface for use in the serializer */
+  /**
+   * Interface for use in the serializer
+   */
   @FunctionalInterface
   public interface IFactory<T extends MeltingRecipe> {
-    /** Creates a new instance of this recipe */
+
+    /**
+     * Creates a new instance of this recipe
+     */
     T create(ResourceLocation id, String group, Ingredient input, FluidStack output, int temperature, int time, List<FluidStack> byproducts);
   }
 
   protected abstract static class AbstractSerializer<T extends MeltingRecipe> extends LoggingRecipeSerializer<T> {
-    /** Creates a new recipe instance from Json */
+
+    /**
+     * Creates a new recipe instance from Json
+     */
     protected abstract T createFromJson(ResourceLocation id, String group, Ingredient input, FluidStack output, int temperature, int time, List<FluidStack> byproducts, JsonObject json);
 
-    /** Creates a new recipe instance from the network */
+    /**
+     * Creates a new recipe instance from the network
+     */
     protected abstract T createFromNetwork(ResourceLocation id, String group, Ingredient input, FluidStack output, int temperature, int time, List<FluidStack> byproducts, FriendlyByteBuf buffer);
 
     @Override
@@ -140,7 +157,7 @@ public class MeltingRecipe implements IMeltingRecipe {
         byproducts = JsonHelper.parseList(json, "byproducts", RecipeHelper::deserializeFluidStack);
       }
 
-      return createFromJson(id, group, input, output, temperature, time, byproducts, json);
+      return this.createFromJson(id, group, input, output, temperature, time, byproducts, json);
     }
 
     @Nullable
@@ -156,7 +173,7 @@ public class MeltingRecipe implements IMeltingRecipe {
       for (int i = 0; i < byproductCount; i++) {
         builder.add(FluidStack.readFromPacket(buffer));
       }
-      return createFromNetwork(id, group, input, output, temperature, time, builder.build(), buffer);
+      return this.createFromNetwork(id, group, input, output, temperature, time, builder.build(), buffer);
     }
 
     @Override
@@ -178,16 +195,17 @@ public class MeltingRecipe implements IMeltingRecipe {
    */
   @RequiredArgsConstructor
   public static class Serializer<T extends MeltingRecipe> extends AbstractSerializer<T> {
+
     private final IFactory<T> factory;
 
     @Override
     protected T createFromJson(ResourceLocation id, String group, Ingredient input, FluidStack output, int temperature, int time, List<FluidStack> byproducts, JsonObject json) {
-      return factory.create(id, group, input, output, temperature, time, byproducts);
+      return this.factory.create(id, group, input, output, temperature, time, byproducts);
     }
 
     @Override
     protected T createFromNetwork(ResourceLocation id, String group, Ingredient input, FluidStack output, int temperature, int time, List<FluidStack> byproducts, FriendlyByteBuf buffer) {
-      return factory.create(id, group, input, output, temperature, time, byproducts);
+      return this.factory.create(id, group, input, output, temperature, time, byproducts);
     }
   }
 }

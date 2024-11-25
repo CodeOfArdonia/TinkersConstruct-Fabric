@@ -19,20 +19,25 @@ import java.nio.channels.WritableByteChannel;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-/** Data generator to create png image files */
+/**
+ * Data generator to create png image files
+ */
 @RequiredArgsConstructor
 @Log4j2
 public abstract class GenericTextureGenerator implements DataProvider {
+
   private final PackOutput output;
   private final String folder;
 
-  /** Saves the given image to the given location */
+  /**
+   * Saves the given image to the given location
+   */
   @SuppressWarnings("UnstableApiUsage")
   protected void saveImage(CachedOutput cache, ResourceLocation location, NativeImage image) {
     try {
       Path path = this.output.getOutputFolder().resolve(
         Paths.get(PackType.CLIENT_RESOURCES.getDirectory(),
-          location.getNamespace(), folder, location.getPath() + ".png"));
+          location.getNamespace(), this.folder, location.getPath() + ".png"));
       ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
       HashingOutputStream hashingOutputStream = new HashingOutputStream(Hashing.sha1(), byteArrayOutputStream);
       WritableByteChannel channel = Channels.newChannel(hashingOutputStream);

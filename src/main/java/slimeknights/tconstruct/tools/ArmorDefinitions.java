@@ -17,7 +17,10 @@ import slimeknights.tconstruct.tools.stats.SkullToolStatsBuilder;
 import java.util.List;
 
 public class ArmorDefinitions {
-  /** Stat provider for slimeskull */
+
+  /**
+   * Stat provider for slimeskull
+   */
   public static final IToolStatProvider SKULL_STAT_PROVIDER = new IToolStatProvider() {
     @Override
     public StatsNBT buildStats(ToolDefinition definition, MaterialNBT materials) {
@@ -43,7 +46,9 @@ public class ArmorDefinitions {
     }
   };
 
-  /** Balanced armor set */
+  /**
+   * Balanced armor set
+   */
   public static final ModifiableArmorMaterial TRAVELERS = ModifiableArmorMaterial
     .builder(TConstruct.getResource("travelers"))
     .setStatsProvider(ToolStatProviders.NO_PARTS)
@@ -51,7 +56,9 @@ public class ArmorDefinitions {
     .build();
   public static final ToolDefinition TRAVELERS_SHIELD = ToolDefinition.builder(TinkerTools.travelersShield).noParts().build();
 
-  /** High defense armor set */
+  /**
+   * High defense armor set
+   */
   public static final ModifiableArmorMaterial PLATE = ModifiableArmorMaterial
     .builder(TConstruct.getResource("plate"))
     .setStatsProvider(ToolStatProviders.NO_PARTS)
@@ -59,7 +66,9 @@ public class ArmorDefinitions {
     .build();
   public static final ToolDefinition PLATE_SHIELD = ToolDefinition.builder(TinkerTools.plateShield).noParts().build();
 
-  /** High modifiers armor set */
+  /**
+   * High modifiers armor set
+   */
   public static final ModifiableArmorMaterial SLIMESUIT = ModifiableArmorMaterial
     .builder(TConstruct.getResource("slime"))
     .setStatsProvider(ToolStatProviders.NO_PARTS)

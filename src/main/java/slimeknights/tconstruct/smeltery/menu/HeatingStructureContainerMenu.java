@@ -15,24 +15,26 @@ import javax.annotation.Nullable;
 import java.util.function.Consumer;
 
 public class HeatingStructureContainerMenu extends TriggeringMultiModuleContainerMenu<HeatingStructureBlockEntity> {
+
   @Getter
   private final SideInventoryContainer<HeatingStructureBlockEntity> sideInventory;
+
   public HeatingStructureContainerMenu(int id, @Nullable Inventory inv, @Nullable HeatingStructureBlockEntity structure) {
     super(TinkerSmeltery.smelteryContainer.get(), id, inv, structure);
     if (inv != null && structure != null) {
       // can hold 7 in a column, so try to fill the first column first
       // cap to 4 columns
       MeltingModuleInventory inventory = structure.getMeltingInventory();
-      sideInventory = new SideInventoryContainer<>(TinkerSmeltery.smelteryContainer.get(), id, inv, structure, 0, 0, calcColumns(inventory.getSlotCount()));
-      addSubContainer(sideInventory, true);
+      this.sideInventory = new SideInventoryContainer<>(TinkerSmeltery.smelteryContainer.get(), id, inv, structure, 0, 0, calcColumns(inventory.getSlotCount()));
+      this.addSubContainer(this.sideInventory, true);
 
       Consumer<DataSlot> referenceConsumer = this::addDataSlot;
       ValidZeroDataSlot.trackIntArray(referenceConsumer, structure.getFuelModule());
       inventory.trackInts(array -> ValidZeroDataSlot.trackIntArray(referenceConsumer, array));
     } else {
-      sideInventory = null;
+      this.sideInventory = null;
     }
-    addInventorySlots();
+    this.addInventorySlots();
   }
 
   public HeatingStructureContainerMenu(int id, Inventory inv, FriendlyByteBuf buf) {
@@ -41,8 +43,9 @@ public class HeatingStructureContainerMenu extends TriggeringMultiModuleContaine
 
   /**
    * Calculates the number of columns to use for the screen
-   * @param slots  Number of slots
-   * @return  Number of columns
+   *
+   * @param slots Number of slots
+   * @return Number of columns
    */
   public static int calcColumns(int slots) {
     // every 7 slots gives us a new column, up to a maximum of 4 columns

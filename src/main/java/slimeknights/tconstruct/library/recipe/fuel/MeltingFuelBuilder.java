@@ -13,24 +13,25 @@ import slimeknights.mantle.recipe.ingredient.FluidIngredient;
 import slimeknights.tconstruct.smeltery.TinkerSmeltery;
 
 import javax.annotation.Nullable;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
  * Builds a new recipe for a melter or smeltery fuel
  */
 @SuppressWarnings("removal")
-@AllArgsConstructor(staticName="fuel")
+@AllArgsConstructor(staticName = "fuel")
 public class MeltingFuelBuilder extends AbstractRecipeBuilder<MeltingFuelBuilder> {
+
   private final FluidIngredient input;
   private final int duration;
   private final int temperature;
 
   /**
    * Creates a new builder instance with automatic temperature
-   * @param fluid     Fluid stack
-   * @param duration  Fluid duration
-   * @return  Builder instance
+   *
+   * @param fluid    Fluid stack
+   * @param duration Fluid duration
+   * @return Builder instance
    */
   public static MeltingFuelBuilder fuel(FluidStack fluid, int duration) {
     return fuel(FluidIngredient.of(fluid), duration, FluidVariantAttributes.getTemperature(fluid.getType()) - 300);
@@ -38,10 +39,10 @@ public class MeltingFuelBuilder extends AbstractRecipeBuilder<MeltingFuelBuilder
 
   @Override
   public void save(Consumer<FinishedRecipe> consumer) {
-    if (input.getFluids().isEmpty()) {
+    if (this.input.getFluids().isEmpty()) {
       throw new IllegalStateException("Must have at least one fluid for dynamic input");
     }
-    save(consumer, BuiltInRegistries.FLUID.getKey(input.getFluids().get(0).getFluid()));
+    this.save(consumer, BuiltInRegistries.FLUID.getKey(this.input.getFluids().get(0).getFluid()));
   }
 
   @Override
@@ -51,18 +52,19 @@ public class MeltingFuelBuilder extends AbstractRecipeBuilder<MeltingFuelBuilder
   }
 
   private class Result extends AbstractFinishedRecipe {
+
     public Result(ResourceLocation ID, @Nullable ResourceLocation advancementID) {
       super(ID, advancementID);
     }
 
     @Override
     public void serializeRecipeData(JsonObject json) {
-      if (!group.isEmpty()) {
-        json.addProperty("group", group);
+      if (!MeltingFuelBuilder.this.group.isEmpty()) {
+        json.addProperty("group", MeltingFuelBuilder.this.group);
       }
-      json.add("fluid", input.serialize());
-      json.addProperty("duration", duration);
-      json.addProperty("temperature", temperature);
+      json.add("fluid", MeltingFuelBuilder.this.input.serialize());
+      json.addProperty("duration", MeltingFuelBuilder.this.duration);
+      json.addProperty("temperature", MeltingFuelBuilder.this.temperature);
     }
 
     @Override

@@ -28,16 +28,23 @@ import java.util.function.UnaryOperator;
 
 import static java.awt.Color.HSBtoRGB;
 
-/** Builder for tool stats */
+/**
+ * Builder for tool stats
+ */
 @SuppressWarnings("UnusedReturnValue")
 @RequiredArgsConstructor
 public class TooltipBuilder {
+
   private static final TextColor MAX = valueToColor(1, 1);
   private static final UnaryOperator<Style> APPLY_MAX = style -> style.withColor(MAX);
 
-  /** Formatted broken string */
+  /**
+   * Formatted broken string
+   */
   private static final Component TOOLTIP_BROKEN = TConstruct.makeTranslation("tooltip", "tool.broken").withStyle(ChatFormatting.BOLD, ChatFormatting.DARK_RED);
-  /** Prefixed broken string */
+  /**
+   * Prefixed broken string
+   */
   private static final Component TOOLTIP_BROKEN_PREFIXED = ToolStats.DURABILITY.getPrefix().append(TOOLTIP_BROKEN);
 
   private final IToolStackView tool;
@@ -61,19 +68,21 @@ public class TooltipBuilder {
     return this;
   }
 
-  /** Formats the stat value */
+  /**
+   * Formats the stat value
+   */
   private <T> Component formatValue(IToolStat<T> stat) {
-    return stat.formatValue(tool.getStats().get(stat));
+    return stat.formatValue(this.tool.getStats().get(stat));
   }
 
   /**
    * Adds the given stat to the tooltip
    *
-   * @param stat  Stat to add
+   * @param stat Stat to add
    * @return the tooltip builder
    */
   public TooltipBuilder add(IToolStat<?> stat) {
-    this.tooltips.add(formatValue(stat));
+    this.tooltips.add(this.formatValue(stat));
     return this;
   }
 
@@ -83,7 +92,7 @@ public class TooltipBuilder {
    * @return the tooltip builder
    */
   public TooltipBuilder addTier() {
-    Tier tier = tool.getDefinition().getData().getHarvestLogic().getTier(tool);
+    Tier tier = this.tool.getDefinition().getData().getHarvestLogic().getTier(this.tool);
     this.tooltips.add(ToolStats.HARVEST_TIER.formatValue(tier));
     return this;
   }
@@ -91,11 +100,11 @@ public class TooltipBuilder {
   /**
    * Adds the given stat to the tooltip if above 0
    *
-   * @param stat  Stat to add
+   * @param stat Stat to add
    * @return the tooltip builder
    */
   public TooltipBuilder addOptional(INumericToolStat<?> stat) {
-    return addOptional(stat, 1.0f);
+    return this.addOptional(stat, 1.0f);
   }
 
   /**
@@ -106,14 +115,16 @@ public class TooltipBuilder {
    * @return the tooltip builder
    */
   public TooltipBuilder addOptional(INumericToolStat<?> stat, float scale) {
-    float value = tool.getStats().get(stat).floatValue();
+    float value = this.tool.getStats().get(stat).floatValue();
     if (value > 0) {
       this.tooltips.add(stat.formatValue(value * scale));
     }
     return this;
   }
 
-  /** Applies formatting for durability with a reference durability */
+  /**
+   * Applies formatting for durability with a reference durability
+   */
   public static Component formatDurability(int durability, int ref, boolean textIfBroken) {
     if (textIfBroken && durability == 0) {
       return TOOLTIP_BROKEN_PREFIXED;
@@ -136,9 +147,10 @@ public class TooltipBuilder {
 
   /**
    * Formats a fraction with color based on the percent
-   * @param value  Value
-   * @param max    Max value
-   * @return  Formatted amount
+   *
+   * @param value Value
+   * @param max   Max value
+   * @return Formatted amount
    */
   public static Component formatPartialAmount(int value, int max) {
     return Component.literal(Util.COMMA_FORMAT.format(value))
@@ -154,7 +166,7 @@ public class TooltipBuilder {
    */
   public TooltipBuilder addDurability() {
     // never show broken text in this context
-    this.tooltips.add(formatDurability(tool.getCurrentDurability(), tool.getStats().getInt(ToolStats.DURABILITY), false));
+    this.tooltips.add(formatDurability(this.tool.getCurrentDurability(), this.tool.getStats().getInt(ToolStats.DURABILITY), false));
     return this;
   }
 
@@ -172,17 +184,18 @@ public class TooltipBuilder {
         damage = (float) instance.getBaseValue();
       }
     }
-    this.tooltips.add(stat.formatValue(damage + tool.getStats().get(stat).floatValue()));
+    this.tooltips.add(stat.formatValue(damage + this.tool.getStats().get(stat).floatValue()));
     return this;
   }
 
   /**
    * Adds the specific free slot to the tooltip
-   * @param slotType  Type of slot to add
+   *
+   * @param slotType Type of slot to add
    * @return the tooltip builder
    */
   public TooltipBuilder addFreeSlots(SlotType slotType) {
-    int slots = tool.getFreeSlots(slotType);
+    int slots = this.tool.getFreeSlots(slotType);
     if (slots > 0) {
       this.tooltips.add(IToolStat.formatNumber(slotType.getPrefix(), slotType.getColor(), slots));
     }
@@ -196,7 +209,7 @@ public class TooltipBuilder {
    */
   public TooltipBuilder addAllFreeSlots() {
     for (SlotType slotType : SlotType.getAllSlotTypes()) {
-      addFreeSlots(slotType);
+      this.addFreeSlots(slotType);
     }
     return this;
   }
@@ -207,9 +220,9 @@ public class TooltipBuilder {
    * @return the tooltip builder
    */
   public TooltipBuilder addModifierInfo(boolean advanced) {
-    for (ModifierEntry entry : tool.getModifierList()) {
+    for (ModifierEntry entry : this.tool.getModifierList()) {
       if (entry.getModifier().shouldDisplay(advanced)) {
-        this.tooltips.add(entry.getModifier().getDisplayName(tool, entry.getLevel()));
+        this.tooltips.add(entry.getModifier().getDisplayName(this.tool, entry.getLevel()));
       }
     }
     return this;

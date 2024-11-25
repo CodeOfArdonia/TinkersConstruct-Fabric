@@ -31,23 +31,30 @@ import java.util.Set;
 @SuppressWarnings("rawtypes")
 @RequiredArgsConstructor
 public class EntityIngredientRenderer implements IIngredientRenderer<EntityType> {
-  /** Entity types that will not render, as they either errored or are the wrong type */
+
+  /**
+   * Entity types that will not render, as they either errored or are the wrong type
+   */
   private static final Set<EntityType<?>> IGNORED_ENTITIES = new HashSet<>();
 
-  /** Square size of the renderer in pixels */
+  /**
+   * Square size of the renderer in pixels
+   */
   private final int size;
 
-  /** Cache of entities for each entity type */
-  private final Map<EntityType<?>,Entity> ENTITY_MAP = new HashMap<>();
+  /**
+   * Cache of entities for each entity type
+   */
+  private final Map<EntityType<?>, Entity> ENTITY_MAP = new HashMap<>();
 
   @Override
   public int getWidth() {
-    return size;
+    return this.size;
   }
 
   @Override
   public int getHeight() {
-    return size;
+    return this.size;
   }
 
   @Override
@@ -62,36 +69,36 @@ public class EntityIngredientRenderer implements IIngredientRenderer<EntityType>
           entity = Minecraft.getInstance().player;
         } else {
           // entity is created with the client world, but the entity map is thrown away when JEI restarts so they should be okay I think
-          entity = ENTITY_MAP.computeIfAbsent(type, t -> t.create(world));
+          entity = this.ENTITY_MAP.computeIfAbsent(type, t -> t.create(world));
         }
         // only can draw living entities, plus non-living ones don't get recipes anyways
         if (entity instanceof LivingEntity livingEntity) {
           // scale down large mobs, but don't scale up small ones
-          int scale = size / 2;
+          int scale = this.size / 2;
           float height = entity.getBbHeight();
           float width = entity.getBbWidth();
           if (height > 2 || width > 2) {
-            scale = (int)(size / Math.max(height, width));
+            scale = (int) (this.size / Math.max(height, width));
           }
           // catch exceptions drawing the entity to be safe, any caught exceptions blacklist the entity
           try {
-            InventoryScreen.renderEntityInInventoryFollowsMouse(graphics, size / 2, size, scale, 0, 10, livingEntity);
+            InventoryScreen.renderEntityInInventoryFollowsMouse(graphics, this.size / 2, this.size, scale, 0, 10, livingEntity);
             return;
           } catch (Exception e) {
             TConstruct.LOG.error("Error drawing entity " + BuiltInRegistries.ENTITY_TYPE.getKey(type), e);
             IGNORED_ENTITIES.add(type);
-            ENTITY_MAP.remove(type);
+            this.ENTITY_MAP.remove(type);
           }
         } else {
           // not living, so might as well skip next time
           IGNORED_ENTITIES.add(type);
-          ENTITY_MAP.remove(type);
+          this.ENTITY_MAP.remove(type);
         }
       }
 
       // fallback, draw a pink and black "spawn egg"
       RenderUtils.setup(EntityMeltingRecipeCategory.BACKGROUND_LOC);
-      int offset = (size - 16) / 2;
+      int offset = (this.size - 16) / 2;
       graphics.blit(EntityMeltingRecipeCategory.BACKGROUND_LOC, offset, offset, 149f, 58f, 16, 16, 256, 256);
     }
   }

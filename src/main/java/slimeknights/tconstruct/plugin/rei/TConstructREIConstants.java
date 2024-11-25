@@ -3,12 +3,10 @@ package slimeknights.tconstruct.plugin.rei;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.entry.type.EntryType;
-import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.world.entity.EntityType;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.library.recipe.partbuilder.Pattern;
-import slimeknights.tconstruct.library.recipe.worktable.IModifierWorktableRecipe;
 import slimeknights.tconstruct.plugin.rei.casting.CastingDisplay;
 import slimeknights.tconstruct.plugin.rei.entity.EntityMeltingRecipeDisplay;
 import slimeknights.tconstruct.plugin.rei.entity.SeveringDisplay;
@@ -18,6 +16,7 @@ import slimeknights.tconstruct.plugin.rei.modifiers.ModifierWorktableDisplay;
 import slimeknights.tconstruct.plugin.rei.partbuilder.PartBuilderDisplay;
 
 public class TConstructREIConstants {
+
   // ingredient types
   @SuppressWarnings("rawtypes")
   public static final EntryType<EntityType> ENTITY_TYPE = EntryType.deferred(TConstruct.getResource("entity_type"));

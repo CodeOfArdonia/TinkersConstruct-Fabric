@@ -26,6 +26,7 @@ public class SlimeParticle extends BreakingItemParticle {
 
   @RequiredArgsConstructor
   public static class Factory implements ParticleProvider<SimpleParticleType> {
+
     private final ItemLike slime;
 
     public Factory(SlimeType type) {
@@ -35,7 +36,7 @@ public class SlimeParticle extends BreakingItemParticle {
     @Nullable
     @Override
     public Particle createParticle(SimpleParticleType typeIn, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
-      return new SlimeParticle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed, new ItemStack(slime));
+      return new SlimeParticle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed, new ItemStack(this.slime));
     }
   }
 }

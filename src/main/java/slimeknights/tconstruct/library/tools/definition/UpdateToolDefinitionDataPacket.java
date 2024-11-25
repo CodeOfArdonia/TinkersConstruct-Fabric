@@ -11,9 +11,12 @@ import slimeknights.mantle.network.packet.IThreadsafePacket;
 import java.util.Map;
 import java.util.Map.Entry;
 
-/** Packet to sync tool definitions to the client */
+/**
+ * Packet to sync tool definitions to the client
+ */
 @RequiredArgsConstructor
 public class UpdateToolDefinitionDataPacket implements IThreadsafePacket {
+
   @Getter(AccessLevel.PROTECTED)
   private final Map<ResourceLocation, ToolDefinitionData> dataMap;
 
@@ -25,13 +28,13 @@ public class UpdateToolDefinitionDataPacket implements IThreadsafePacket {
       ToolDefinitionData data = ToolDefinitionData.read(buffer);
       builder.put(name, data);
     }
-    dataMap = builder.build();
+    this.dataMap = builder.build();
   }
 
   @Override
   public void encode(FriendlyByteBuf buffer) {
-    buffer.writeVarInt(dataMap.size());
-    for (Entry<ResourceLocation, ToolDefinitionData> entry : dataMap.entrySet()) {
+    buffer.writeVarInt(this.dataMap.size());
+    for (Entry<ResourceLocation, ToolDefinitionData> entry : this.dataMap.entrySet()) {
       buffer.writeResourceLocation(entry.getKey());
       entry.getValue().write(buffer);
     }
@@ -39,6 +42,6 @@ public class UpdateToolDefinitionDataPacket implements IThreadsafePacket {
 
   @Override
   public void handleThreadsafe(Context context) {
-    ToolDefinitionLoader.getInstance().updateDataFromServer(dataMap);
+    ToolDefinitionLoader.getInstance().updateDataFromServer(this.dataMap);
   }
 }

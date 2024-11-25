@@ -27,16 +27,20 @@ import slimeknights.tconstruct.tables.TinkerTables;
 
 import javax.annotation.Nullable;
 
-/** Recipe using repair kits in the crafting table */
+/**
+ * Recipe using repair kits in the crafting table
+ */
 public class CraftingTableRepairKitRecipe extends CustomRecipe {
+
   public CraftingTableRepairKitRecipe(ResourceLocation id) {
     super(id, CraftingBookCategory.MISC);
   }
 
   /**
    * Checks if the tool is valid for this recipe
-   * @param stack  Tool to check
-   * @return  True if valid
+   *
+   * @param stack Tool to check
+   * @return True if valid
    */
   protected boolean toolMatches(ItemStack stack) {
     return stack.is(TinkerTags.Items.MULTIPART_TOOL) && stack.is(TinkerTags.Items.DURABILITY);
@@ -44,8 +48,9 @@ public class CraftingTableRepairKitRecipe extends CustomRecipe {
 
   /**
    * Gets the tool stack and the repair kit material from the crafting grid
-   * @param inv  Crafting inventory
-   * @return  Relevant inputs, or null if invalid
+   *
+   * @param inv Crafting inventory
+   * @return Relevant inputs, or null if invalid
    */
   @Nullable
   protected Pair<ToolStack, ItemStack> getRelevantInputs(CraftingContainer inv) {
@@ -68,7 +73,7 @@ public class CraftingTableRepairKitRecipe extends CustomRecipe {
           return null;
         }
         repairKit = stack;
-      } else if (toolMatches(stack)) {
+      } else if (this.toolMatches(stack)) {
         // cannot repair multiple tools
         if (tool != null) {
           return null;
@@ -91,11 +96,13 @@ public class CraftingTableRepairKitRecipe extends CustomRecipe {
 
   @Override
   public boolean matches(CraftingContainer inv, Level worldIn) {
-    Pair<ToolStack, ItemStack> inputs = getRelevantInputs(inv);
+    Pair<ToolStack, ItemStack> inputs = this.getRelevantInputs(inv);
     return inputs != null && TinkerStationRepairRecipe.getRepairIndex(inputs.getFirst(), IMaterialItem.getMaterialFromStack(inputs.getSecond()).getId()) >= 0;
   }
 
-  /** Gets the amount to repair for the given material */
+  /**
+   * Gets the amount to repair for the given material
+   */
   protected float getRepairAmount(IToolStackView tool, ItemStack repairStack) {
     MaterialId repairMaterial = IMaterialItem.getMaterialFromStack(repairStack).getId();
     float repairFactor = repairStack.getItem() instanceof IRepairKitItem kit ? kit.getRepairAmount() : Config.COMMON.repairKitAmount.get().floatValue();
@@ -109,16 +116,16 @@ public class CraftingTableRepairKitRecipe extends CustomRecipe {
 
   @Override
   public ItemStack assemble(CraftingContainer inv, RegistryAccess registryAccess) {
-    Pair<ToolStack, ItemStack> inputs = getRelevantInputs(inv);
+    Pair<ToolStack, ItemStack> inputs = this.getRelevantInputs(inv);
     if (inputs == null) {
-      TConstruct.LOG.error("Recipe repair on {} failed to find items after matching", getId());
+      TConstruct.LOG.error("Recipe repair on {} failed to find items after matching", this.getId());
       return ItemStack.EMPTY;
     }
 
     // first identify materials and durability
     ToolStack tool = inputs.getFirst().copy();
     // vanilla says 25% durability per ingot, repair kits are worth 2 ingots
-    float repairAmount = getRepairAmount(tool, inputs.getSecond());
+    float repairAmount = this.getRepairAmount(tool, inputs.getSecond());
     if (repairAmount > 0) {
       // adjust the factor based on modifiers
       // main example is wood, +25% per level
@@ -131,7 +138,7 @@ public class CraftingTableRepairKitRecipe extends CustomRecipe {
       }
 
       // repair the tool
-      ToolDamageUtil.repair(tool, (int)repairAmount);
+      ToolDamageUtil.repair(tool, (int) repairAmount);
     }
     // return final stack
     return tool.createStack();

@@ -10,6 +10,7 @@ import slimeknights.mantle.block.IMultipartConnectedBlock;
 import slimeknights.mantle.client.model.connected.ConnectedModelRegistry;
 
 public class ClearGlassPaneBlock extends BetterPaneBlock implements IMultipartConnectedBlock {
+
   public ClearGlassPaneBlock(Properties builder) {
     super(builder);
     this.registerDefaultState(IMultipartConnectedBlock.defaultConnections(this.defaultBlockState()));
@@ -24,7 +25,7 @@ public class ClearGlassPaneBlock extends BetterPaneBlock implements IMultipartCo
   @Override
   public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor world, BlockPos currentPos, BlockPos facingPos) {
     BlockState state = super.updateShape(stateIn, facing, facingState, world, currentPos, facingPos);
-    return getConnectionUpdate(state, facing, facingState);
+    return this.getConnectionUpdate(state, facing, facingState);
   }
 
   @Override

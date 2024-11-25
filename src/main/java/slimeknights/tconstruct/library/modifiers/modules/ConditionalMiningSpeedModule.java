@@ -25,8 +25,12 @@ import slimeknights.tconstruct.library.tools.stat.ToolStats;
 import javax.annotation.Nullable;
 import java.util.List;
 
-/** Module for boosting the speed of block breaking conditioned on a block state predicate */
-public record ConditionalMiningSpeedModule(IJsonPredicate<BlockState> predicate, boolean requireEffective, float bonus) implements BreakSpeedModifierHook, TooltipModifierHook, ModifierModule {
+/**
+ * Module for boosting the speed of block breaking conditioned on a block state predicate
+ */
+public record ConditionalMiningSpeedModule(IJsonPredicate<BlockState> predicate, boolean requireEffective,
+                                           float bonus) implements BreakSpeedModifierHook, TooltipModifierHook, ModifierModule {
+
   private static final List<ModifierHook<?>> DEFAULT_HOOKS = List.of(TinkerHooks.BREAK_SPEED);
 
   @Override
@@ -36,14 +40,14 @@ public record ConditionalMiningSpeedModule(IJsonPredicate<BlockState> predicate,
 
   @Override
   public void onBreakSpeed(IToolStackView tool, ModifierEntry modifier, PlayerEvents.BreakSpeed event, Direction sideHit, boolean isEffective, float miningSpeedModifier) {
-    if ((isEffective || !requireEffective) && predicate.matches(event.getState())) {
-      event.setNewSpeed(event.getNewSpeed() * (modifier.getEffectiveLevel(tool) * bonus * tool.getMultiplier(ToolStats.MINING_SPEED) * miningSpeedModifier));
+    if ((isEffective || !this.requireEffective) && this.predicate.matches(event.getState())) {
+      event.setNewSpeed(event.getNewSpeed() * (modifier.getEffectiveLevel(tool) * this.bonus * tool.getMultiplier(ToolStats.MINING_SPEED) * miningSpeedModifier));
     }
   }
 
   @Override
   public void addTooltip(IToolStackView tool, ModifierEntry modifier, @Nullable Player player, List<Component> tooltip, TooltipKey tooltipKey, TooltipFlag tooltipFlag) {
-    TooltipModifierHook.addStatBoost(tool, modifier.getModifier(), ToolStats.MINING_SPEED, Items.HARVEST, bonus * modifier.getEffectiveLevel(tool), tooltip);
+    TooltipModifierHook.addStatBoost(tool, modifier.getModifier(), ToolStats.MINING_SPEED, Items.HARVEST, this.bonus * modifier.getEffectiveLevel(tool), tooltip);
   }
 
   @Override

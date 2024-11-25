@@ -6,7 +6,6 @@ import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer;
 import dev.onyxstudios.cca.api.v3.entity.PlayerComponent;
 import io.github.fabricators_of_create.porting_lib.entity.events.EntityEvents;
-import io.github.fabricators_of_create.porting_lib.entity.events.LivingEntityEvents;
 import io.github.fabricators_of_create.porting_lib.entity.events.PlayerTickEvents;
 import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import net.fabricmc.api.EnvType;
@@ -36,12 +35,18 @@ import java.util.Map;
  */
 public class EquipmentChangeWatcher implements EntityComponentInitializer {
 
-  /** Capability ID */
+  /**
+   * Capability ID
+   */
   private static final ResourceLocation ID = TConstruct.getResource("equipment_watcher");
-  /** Capability type */
+  /**
+   * Capability type
+   */
   public static final ComponentKey<PlayerLastEquipment> CAPABILITY = ComponentRegistry.getOrCreate(ID, PlayerLastEquipment.class);
 
-  /** Registers this capability */
+  /**
+   * Registers this capability
+   */
   public static void register() {
 //    FMLJavaModLoadingContext.get().getModEventBus().addListener(EventPriority.NORMAL, false, RegisterCapabilitiesEvent.class, event -> event.register(PlayerLastEquipment.class));
 
@@ -58,27 +63,33 @@ public class EquipmentChangeWatcher implements EntityComponentInitializer {
 
   /* Events */
 
-  /** Serverside modifier hooks */
+  /**
+   * Serverside modifier hooks
+   */
   private static void onEquipmentChange(LivingEntity entity, EquipmentSlot slot, @Nonnull ItemStack from, @Nonnull ItemStack to) {
     runModifierHooks(entity, slot, from, to);
   }
 
-  /** Event listener to attach the capability */
+  /**
+   * Event listener to attach the capability
+   */
   @Override
   public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
     registry.registerForPlayers(CAPABILITY, player -> {
 //        if (player.getCommandSenderWorld().isClientSide) {
-          return new PlayerLastEquipment(player);
+      return new PlayerLastEquipment(player);
 //        }
 //      return null;
     });
     EntityEvents.ON_REMOVE.register((entity, reason) -> {
-      if(entity instanceof Player player)
+      if (entity instanceof Player player)
         player.getComponent(CAPABILITY).run();
     });
   }
 
-  /** Client side modifier hooks */
+  /**
+   * Client side modifier hooks
+   */
   private static void onPlayerTick(Player player) {
     // only run for client side players every 5 ticks
     CAPABILITY.maybeGet(player).ifPresent(PlayerLastEquipment::update);
@@ -87,7 +98,9 @@ public class EquipmentChangeWatcher implements EntityComponentInitializer {
 
   /* Helpers */
 
-  /** Shared modifier hook logic */
+  /**
+   * Shared modifier hook logic
+   */
   private static void runModifierHooks(LivingEntity entity, EquipmentSlot changedSlot, ItemStack original, ItemStack replacement) {
     EquipmentChangeContext context = new EquipmentChangeContext(entity, changedSlot, original, replacement);
 
@@ -129,41 +142,48 @@ public class EquipmentChangeWatcher implements EntityComponentInitializer {
 
   /* Required methods */
 
-  /** Data class that runs actual update logic */
+  /**
+   * Data class that runs actual update logic
+   */
   protected static class PlayerLastEquipment implements PlayerComponent<PlayerLastEquipment>, Runnable {
+
     @Nullable
     private final Player player;
-    private final Map<EquipmentSlot,ItemStack> lastItems = new EnumMap<>(EquipmentSlot.class);
+    private final Map<EquipmentSlot, ItemStack> lastItems = new EnumMap<>(EquipmentSlot.class);
     private LazyOptional<PlayerLastEquipment> capability;
 
     private PlayerLastEquipment(@Nullable Player player) {
       this.player = player;
       for (EquipmentSlot slot : EquipmentSlot.values()) {
-        lastItems.put(slot, ItemStack.EMPTY);
+        this.lastItems.put(slot, ItemStack.EMPTY);
       }
       this.capability = LazyOptional.of(() -> this);
     }
 
-    /** Called on player tick to update the stacks and run the event */
+    /**
+     * Called on player tick to update the stacks and run the event
+     */
     public void update() {
       // run twice a second, should be plenty fast enough
-      if (player != null) {
+      if (this.player != null) {
         for (EquipmentSlot slot : EquipmentSlot.values()) {
-          ItemStack newStack = player.getItemBySlot(slot);
-          ItemStack oldStack = lastItems.get(slot);
+          ItemStack newStack = this.player.getItemBySlot(slot);
+          ItemStack oldStack = this.lastItems.get(slot);
           if (!ItemStack.matches(oldStack, newStack)) {
-            lastItems.put(slot, newStack.copy());
-            runModifierHooks(player, slot, oldStack, newStack);
+            this.lastItems.put(slot, newStack.copy());
+            runModifierHooks(this.player, slot, oldStack, newStack);
           }
         }
       }
     }
 
-    /** Called on capability invalidate to invalidate */
+    /**
+     * Called on capability invalidate to invalidate
+     */
     @Override
     public void run() {
-      capability.invalidate();
-      capability = LazyOptional.of(() -> this);
+      this.capability.invalidate();
+      this.capability = LazyOptional.of(() -> this);
     }
 
 //    @Nonnull

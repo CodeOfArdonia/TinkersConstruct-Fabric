@@ -16,14 +16,16 @@ import slimeknights.tconstruct.transfer.EmptySlottedStorage;
 import java.util.Optional;
 
 public class ScalingChestScreen<T extends BlockEntity> extends DynamicContainerScreen {
+
   private final IScalingContainer scaling;
+
   public ScalingChestScreen(MultiModuleScreen<?> parent, BaseContainerMenu<T> container, Inventory playerInventory, Component title) {
     super(parent, container, playerInventory, title);
     BlockEntity tile = container.getTile();
     SlottedStorage<ItemVariant> handler = (SlottedStorage<ItemVariant>) Optional.ofNullable(TransferUtil.getItemStorage(tile))
-                                   .orElse(EmptySlottedStorage.EMPTY);
+      .orElse(EmptySlottedStorage.EMPTY);
     this.scaling = handler instanceof IScalingContainer ? (IScalingContainer) handler : handler::getSlotCount;
-    this.slotCount = scaling.getVisualSize();
+    this.slotCount = this.scaling.getVisualSize();
     this.sliderActive = true;
   }
 

@@ -7,8 +7,11 @@ import slimeknights.tconstruct.library.modifiers.Modifier;
 import slimeknights.tconstruct.library.modifiers.ModifierId;
 import slimeknights.tconstruct.library.modifiers.ModifierManager;
 
-/** Tag provider to generate modifier tags */
+/**
+ * Tag provider to generate modifier tags
+ */
 public abstract class AbstractModifierTagProvider extends AbstractTagProvider<Modifier> {
+
   protected AbstractModifierTagProvider(FabricDataOutput output, String modId, ExistingFileHelper existingFileHelper) {
     super(output, modId, ModifierManager.TAG_FOLDER, Modifier::getId, id -> ModifierManager.INSTANCE.containsStatic(new ModifierId(id)), existingFileHelper);
   }

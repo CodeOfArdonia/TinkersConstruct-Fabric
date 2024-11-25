@@ -23,8 +23,10 @@ import slimeknights.tconstruct.library.tools.nbt.ModDataNBT;
 import javax.annotation.Nullable;
 
 public class ShieldStrapModifier extends InventoryMenuModifier {
+
   private static final ResourceLocation KEY = TConstruct.getResource("shield_strap");
   private static final Pattern PATTERN = new Pattern(TConstruct.MOD_ID, "shield_plus");
+
   public ShieldStrapModifier() {
     super(KEY, 1);
   }
@@ -51,7 +53,7 @@ public class ShieldStrapModifier extends InventoryMenuModifier {
       }
       // offhand must be able to go in the pants
       ItemStack offhand = player.getOffhandItem();
-      int slots = getSlots(tool, modifier.getLevel());
+      int slots = this.getSlots(tool, modifier.getLevel());
       if (offhand.isEmpty() || !ToolInventoryCapability.isBlacklisted(offhand)) {
         ItemStack newOffhand = ItemStack.EMPTY;
         ModDataNBT persistentData = tool.getPersistentData();

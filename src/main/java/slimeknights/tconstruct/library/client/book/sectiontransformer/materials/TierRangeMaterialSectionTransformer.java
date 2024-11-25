@@ -38,15 +38,18 @@ import java.util.function.Predicate;
  * Section transformer to show a range of materials tiers in the book
  */
 public class TierRangeMaterialSectionTransformer extends BookTransformer {
+
   private static final Set<MaterialStatsId> MELEE_HARVEST = ImmutableSet.of(HeadMaterialStats.ID, HandleMaterialStats.ID, ExtraMaterialStats.ID);
   private static final ResourceLocation KEY = TConstruct.getResource("material_tier");
 
-  private static final Map<ResourceLocation,MaterialType> MATERIAL_TYPES = new HashMap<>();
+  private static final Map<ResourceLocation, MaterialType> MATERIAL_TYPES = new HashMap<>();
 
   public static final TierRangeMaterialSectionTransformer INSTANCE = new TierRangeMaterialSectionTransformer();
 
-  /** Registers a new group of stat types to show on a page */
-  public static void registerMaterialType(ResourceLocation id, BiFunction<MaterialVariantId,Boolean,AbstractMaterialContent> constructor, MaterialStatsId... stats) {
+  /**
+   * Registers a new group of stat types to show on a page
+   */
+  public static void registerMaterialType(ResourceLocation id, BiFunction<MaterialVariantId, Boolean, AbstractMaterialContent> constructor, MaterialStatsId... stats) {
     if (MATERIAL_TYPES.putIfAbsent(id, new MaterialType(constructor, ImmutableSet.copyOf(stats))) != null) {
       throw new IllegalArgumentException("Duplicate material stat group " + id);
     }
@@ -60,7 +63,7 @@ public class TierRangeMaterialSectionTransformer extends BookTransformer {
         try {
           int min = 0;
           int max = Integer.MAX_VALUE;
-          Function<MaterialVariantId,AbstractMaterialContent> pageBuilder;
+          Function<MaterialVariantId, AbstractMaterialContent> pageBuilder;
           Set<MaterialStatsId> visibleStats;
           TagKey<IMaterial> tag = null;
 
@@ -106,8 +109,12 @@ public class TierRangeMaterialSectionTransformer extends BookTransformer {
     }
   }
 
-  /** Helper to create a material predicate */
-  public record ValidMaterial(Set<MaterialStatsId> visibleStats, int min, int max, @Nullable TagKey<IMaterial> tag) implements Predicate<IMaterial> {
+  /**
+   * Helper to create a material predicate
+   */
+  public record ValidMaterial(Set<MaterialStatsId> visibleStats, int min, int max,
+                              @Nullable TagKey<IMaterial> tag) implements Predicate<IMaterial> {
+
     @Deprecated
     public ValidMaterial(Set<MaterialStatsId> visibleStats, int min, int max) {
       this(visibleStats, min, max, null);
@@ -116,18 +123,18 @@ public class TierRangeMaterialSectionTransformer extends BookTransformer {
     @Override
     public boolean test(IMaterial material) {
       int tier = material.getTier();
-      if (tier < min || tier > max) {
+      if (tier < this.min || tier > this.max) {
         return false;
       }
       IMaterialRegistry registry = MaterialRegistry.getInstance();
       MaterialId id = material.getIdentifier();
-      if (tag != null && !registry.isInTag(id, tag)) {
+      if (this.tag != null && !registry.isInTag(id, this.tag)) {
         return false;
       }
       // only show material stats for types with the proper stat types, as otherwise the page will be empty
       // if you want to show another stat type, just override this method/implement the parent class
       for (IMaterialStats stats : registry.getAllStats(id)) {
-        if (visibleStats.contains(stats.getIdentifier())) {
+        if (this.visibleStats.contains(stats.getIdentifier())) {
           return true;
         }
       }
@@ -135,10 +142,14 @@ public class TierRangeMaterialSectionTransformer extends BookTransformer {
     }
   }
 
-  /** Internal record from the registry */
-  private record MaterialType(BiFunction<MaterialVariantId,Boolean,AbstractMaterialContent> pageConstructor, Set<MaterialStatsId> visibleStats) {
-    public Function<MaterialVariantId,AbstractMaterialContent> getMapping(boolean detailed) {
-      return id -> pageConstructor.apply(id, detailed);
+  /**
+   * Internal record from the registry
+   */
+  private record MaterialType(BiFunction<MaterialVariantId, Boolean, AbstractMaterialContent> pageConstructor,
+                              Set<MaterialStatsId> visibleStats) {
+
+    public Function<MaterialVariantId, AbstractMaterialContent> getMapping(boolean detailed) {
+      return id -> this.pageConstructor.apply(id, detailed);
     }
   }
 }

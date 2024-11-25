@@ -17,14 +17,17 @@ import java.lang.reflect.Type;
 
 /**
  * Serializer for a forge condition
+ *
  * @deprecated use {@link slimeknights.tconstruct.common.json.BlockOrEntityCondition.ConditionSerializer}
  */
 @Deprecated
 public interface ConditionSerializer {
+
   ConditionSerializer.Deserializer DESERIALIZER = new ConditionSerializer.Deserializer();
   ConditionSerializer.Serializer SERIALIZER = new ConditionSerializer.Serializer();
 
   class Deserializer implements JsonDeserializer<JsonCondition> {
+
     @Override
     public JsonCondition deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
       JsonObject jsonObject = GsonHelper.convertToJsonObject(json, ResourceConditions.CONDITIONS_KEY);
@@ -38,6 +41,7 @@ public interface ConditionSerializer {
   }
 
   class Serializer implements JsonSerializer<JsonCondition> {
+
     @Override
     public JsonElement serialize(JsonCondition src, Type typeOfSrc, JsonSerializationContext context) {
       if (src.getConditionJsonProvider() != null) {

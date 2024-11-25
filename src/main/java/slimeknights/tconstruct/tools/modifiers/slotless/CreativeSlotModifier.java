@@ -15,9 +15,14 @@ import slimeknights.tconstruct.library.tools.nbt.ModDataNBT;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Modifier that adds a variable number of slots to a tool. Could easily be done via Tag editing, but this makes it easier */
+/**
+ * Modifier that adds a variable number of slots to a tool. Could easily be done via Tag editing, but this makes it easier
+ */
 public class CreativeSlotModifier extends NoLevelsModifier {
-  /** Key representing the slots object in the modifier */
+
+  /**
+   * Key representing the slots object in the modifier
+   */
   public static final ResourceLocation KEY_SLOTS = TConstruct.getResource("creative");
 
   @Override
@@ -39,7 +44,9 @@ public class CreativeSlotModifier extends NoLevelsModifier {
     }
   }
 
-  /** Formats the given slot type as a count */
+  /**
+   * Formats the given slot type as a count
+   */
   private static Component formatCount(SlotType slotType, int count) {
     return Component.literal((count > 0 ? "+" : "") + count + " ")
       .append(slotType.getDisplayName())
@@ -48,7 +55,7 @@ public class CreativeSlotModifier extends NoLevelsModifier {
 
   @Override
   public List<Component> getDescriptionList(IToolStackView tool, int level) {
-    List<Component> tooltip = getDescriptionList(level);
+    List<Component> tooltip = this.getDescriptionList(level);
     IModDataView persistentData = tool.getPersistentData();
     if (persistentData.contains(KEY_SLOTS, Tag.TAG_COMPOUND)) {
       CompoundTag slots = persistentData.getCompound(KEY_SLOTS);

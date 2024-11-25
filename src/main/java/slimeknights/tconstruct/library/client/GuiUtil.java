@@ -15,7 +15,6 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
@@ -28,11 +27,13 @@ import slimeknights.tconstruct.library.recipe.partbuilder.Pattern;
 @SuppressWarnings("removal")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class GuiUtil {
+
   /**
    * Draws the background of a container
-   * @param graphics    Gui graphics
-   * @param screen      Parent screen
-   * @param background  Background location
+   *
+   * @param graphics   Gui graphics
+   * @param screen     Parent screen
+   * @param background Background location
    */
   public static void drawBackground(GuiGraphics graphics, AbstractContainerScreen<?> screen, ResourceLocation background) {
     RenderUtils.setup(background);
@@ -41,11 +42,12 @@ public final class GuiUtil {
 
   /**
    * Draws the container names
-   * @param graphics  Gui graphics
-   * @param screen    Screen name
-   * @param font      Screen font
-   * @param invName   Name of the player inventory
-   * @deprecated  Switch to the vanilla method
+   *
+   * @param graphics Gui graphics
+   * @param screen   Screen name
+   * @param font     Screen font
+   * @param invName  Name of the player inventory
+   * @deprecated Switch to the vanilla method
    */
   @Deprecated
   public static void drawContainerNames(GuiGraphics graphics, AbstractContainerScreen<?> screen, Font font, Component invName) {
@@ -56,13 +58,14 @@ public final class GuiUtil {
 
   /**
    * Checks if the given area is hovered
-   * @param mouseX    Mouse X position
-   * @param mouseY    Mouse Y position
-   * @param x         Tank X position
-   * @param y         Tank Y position
-   * @param width     Tank width
-   * @param height    Tank height
-   * @return  True if the area is hovered
+   *
+   * @param mouseX Mouse X position
+   * @param mouseY Mouse Y position
+   * @param x      Tank X position
+   * @param y      Tank Y position
+   * @param width  Tank width
+   * @param height Tank height
+   * @return True if the area is hovered
    */
   public static boolean isHovered(int mouseX, int mouseY, int x, int y, int width, int height) {
     return mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
@@ -70,15 +73,16 @@ public final class GuiUtil {
 
   /**
    * Checks if the given tank area is hovered
-   * @param mouseX    Mouse X position
-   * @param mouseY    Mouse Y position
-   * @param amount    Current tank amount
-   * @param capacity  Tank capacity
-   * @param x         Tank X position
-   * @param y         Tank Y position
-   * @param width     Tank width
-   * @param height    Tank height
-   * @return  True if the tank is hovered, false otherwise
+   *
+   * @param mouseX   Mouse X position
+   * @param mouseY   Mouse Y position
+   * @param amount   Current tank amount
+   * @param capacity Tank capacity
+   * @param x        Tank X position
+   * @param y        Tank Y position
+   * @param width    Tank width
+   * @param height   Tank height
+   * @return True if the tank is hovered, false otherwise
    */
   public static boolean isTankHovered(int mouseX, int mouseY, int amount, int capacity, int x, int y, int width, int height) {
     // check X position first, its easier
@@ -92,14 +96,15 @@ public final class GuiUtil {
 
   /**
    * Renders a fluid tank with a partial fluid level
-   * @param screen    Parent screen
-   * @param stack     Fluid stack
-   * @param capacity  Tank capacity, determines height
-   * @param x         Tank X position
-   * @param y         Tank Y position
-   * @param width     Tank width
-   * @param height    Tank height
-   * @param depth     Tank depth
+   *
+   * @param screen   Parent screen
+   * @param stack    Fluid stack
+   * @param capacity Tank capacity, determines height
+   * @param x        Tank X position
+   * @param y        Tank Y position
+   * @param width    Tank width
+   * @param height   Tank height
+   * @param depth    Tank depth
    */
   public static void renderFluidTank(PoseStack matrices, AbstractContainerScreen<?> screen, FluidStack stack, long capacity, int x, int y, int width, int height, int depth) {
     renderFluidTank(matrices, screen, stack, stack.getAmount(), capacity, x, y, width, height, depth);
@@ -107,17 +112,18 @@ public final class GuiUtil {
 
   /**
    * Renders a fluid tank with a partial fluid level and an amount override
-   * @param screen    Parent screen
-   * @param stack     Fluid stack
-   * @param capacity  Tank capacity, determines height
-   * @param x         Tank X position
-   * @param y         Tank Y position
-   * @param width     Tank width
-   * @param height    Tank height
-   * @param depth     Tank depth
+   *
+   * @param screen   Parent screen
+   * @param stack    Fluid stack
+   * @param capacity Tank capacity, determines height
+   * @param x        Tank X position
+   * @param y        Tank Y position
+   * @param width    Tank width
+   * @param height   Tank height
+   * @param depth    Tank depth
    */
   public static void renderFluidTank(PoseStack matrices, AbstractContainerScreen<?> screen, FluidStack stack, long amount, long capacity, int x, int y, int width, int height, int depth) {
-    if(!stack.isEmpty() && capacity > 0) {
+    if (!stack.isEmpty() && capacity > 0) {
       int maxY = y + height;
       long fluidHeight = Math.min(height * amount / capacity, height);
       renderTiledFluid(matrices, screen, stack, x, maxY - fluidHeight, width, fluidHeight, depth);
@@ -126,14 +132,15 @@ public final class GuiUtil {
 
   /**
    * Colors and renders a fluid sprite
-   * @param matrices    Matrix instance
-   * @param screen  Parent screen
-   * @param stack   Fluid stack
-   * @param x       Fluid X
-   * @param y       Fluid Y
-   * @param width   Fluid width
-   * @param height  Fluid height
-   * @param depth   Fluid depth
+   *
+   * @param matrices Matrix instance
+   * @param screen   Parent screen
+   * @param stack    Fluid stack
+   * @param x        Fluid X
+   * @param y        Fluid Y
+   * @param width    Fluid width
+   * @param height   Fluid height
+   * @param depth    Fluid depth
    */
   public static void renderTiledFluid(PoseStack matrices, AbstractContainerScreen<?> screen, FluidStack stack, int x, long y, int width, long height, int depth) {
     if (!stack.isEmpty()) {
@@ -146,15 +153,16 @@ public final class GuiUtil {
 
   /**
    * Renders a texture atlas sprite tiled over the given area
-   * @param matrices    Matrix instance
-   * @param screen      Parent screen
-   * @param sprite      Sprite to render
-   * @param x           X position to render
-   * @param y           Y position to render
-   * @param width       Render width
-   * @param height      Render height
-   * @param depth       Render depth
-   * @param upsideDown  If true, flips the sprite
+   *
+   * @param matrices   Matrix instance
+   * @param screen     Parent screen
+   * @param sprite     Sprite to render
+   * @param x          X position to render
+   * @param y          Y position to render
+   * @param width      Render width
+   * @param height     Render height
+   * @param depth      Render depth
+   * @param upsideDown If true, flips the sprite
    */
   public static void renderTiledTextureAtlas(PoseStack matrices, AbstractContainerScreen<?> screen, TextureAtlasSprite sprite, int x, long y, int width, long height, int depth, boolean upsideDown) {
     // start drawing sprites
@@ -184,17 +192,17 @@ public final class GuiUtil {
         widthLeft -= renderWidth;
 
         float u2 = sprite.getU((16f * renderWidth) / spriteWidth);
-        if(upsideDown) {
+        if (upsideDown) {
           // FIXME: I think this causes tiling errors, look into it
           buildSquare(matrix, builder, x2, x2 + renderWidth, startY, startY + renderHeight, depth, u1, u2, v2, v1);
         } else {
           buildSquare(matrix, builder, x2, x2 + renderWidth, startY, startY + renderHeight, depth, u1, u2, v1, v2);
         }
         x2 += renderWidth;
-      } while(widthLeft > 0);
+      } while (widthLeft > 0);
 
       startY += renderHeight;
-    } while(height > 0);
+    } while (height > 0);
 
     // RenderSystem.enableAlphaTest();
     RenderSystem.enableDepthTest(); // TODO: correct
@@ -204,16 +212,17 @@ public final class GuiUtil {
 
   /**
    * Adds a square of texture to a buffer builder
-   * @param builder  Builder instance
-   * @param x1       X start
-   * @param x2       X end
-   * @param y1       Y start
-   * @param y2       Y end
-   * @param z        Depth
-   * @param u1       Texture U start
-   * @param u2       Texture U end
-   * @param v1       Texture V start
-   * @param v2       Texture V end
+   *
+   * @param builder Builder instance
+   * @param x1      X start
+   * @param x2      X end
+   * @param y1      Y start
+   * @param y2      Y end
+   * @param z       Depth
+   * @param u1      Texture U start
+   * @param u2      Texture U end
+   * @param v1      Texture V start
+   * @param v2      Texture V end
    */
   private static void buildSquare(Matrix4f matrix, BufferBuilder builder, int x1, int x2, long y1, long y2, int z, float u1, float u2, float v1, float v2) {
     builder.vertex(matrix, x1, y2, z).uv(u1, v2).endVertex();
@@ -224,10 +233,11 @@ public final class GuiUtil {
 
   /**
    * Draws an upwards progress bar
-   * @param element   Element to draw
-   * @param x         X position to start
-   * @param y         Y position to start
-   * @param progress  Progress between 0 and 1
+   *
+   * @param element  Element to draw
+   * @param x        X position to start
+   * @param y        Y position to start
+   * @param progress Progress between 0 and 1
    */
   public static void drawProgressUp(GuiGraphics graphics, ResourceLocation texture, ElementScreen element, int x, int y, float progress) {
     int height;
@@ -237,7 +247,7 @@ public final class GuiUtil {
       height = 0;
     } else {
       // add an extra 0.5 so it rounds instead of flooring
-      height = (int)(progress * element.h + 0.5);
+      height = (int) (progress * element.h + 0.5);
     }
     // amount to offset element by for the height
     int deltaY = element.h - height;
@@ -246,21 +256,24 @@ public final class GuiUtil {
 
   /**
    * Renders a highlight overlay for the given area
-   * @param graphics  Gui graphics instance
-   * @param x         Element X position
-   * @param y         Element Y position
-   * @param width     Element width
-   * @param height    Element height
+   *
+   * @param graphics Gui graphics instance
+   * @param x        Element X position
+   * @param y        Element Y position
+   * @param width    Element width
+   * @param height   Element height
    */
   public static void renderHighlight(GuiGraphics graphics, int x, int y, int width, int height) {
-      RenderSystem.disableDepthTest();
-      RenderSystem.colorMask(true, true, true, false);
-      graphics.fill(x, y, x + width, y + height, 0x80FFFFFF);
-      RenderSystem.colorMask(true, true, true, true);
-      RenderSystem.enableDepthTest();
+    RenderSystem.disableDepthTest();
+    RenderSystem.colorMask(true, true, true, false);
+    graphics.fill(x, y, x + width, y + height, 0x80FFFFFF);
+    RenderSystem.colorMask(true, true, true, true);
+    RenderSystem.enableDepthTest();
   }
 
-  /** Renders a pattern at the given location */
+  /**
+   * Renders a pattern at the given location
+   */
   public static void renderPattern(GuiGraphics graphics, Pattern pattern, int x, int y) {
     TextureAtlasSprite sprite = Minecraft.getInstance().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS).getSprite(pattern.getTexture());
     graphics.blit(x, y, 100, 16, 16, sprite);

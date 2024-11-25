@@ -19,9 +19,11 @@ import java.util.List;
  */
 @SuppressWarnings("rawtypes")
 public class DefaultEntityMeltingRecipe extends EntityMeltingRecipe {
+
   /**
    * Gets a list of entity types, filtered by the recipe list
-   * @param recipes  Recipe list
+   *
+   * @param recipes Recipe list
    * @return List of entity types
    */
   private static List<EntityType> getEntityList(List<EntityMeltingRecipe> recipes) {
@@ -42,13 +44,14 @@ public class DefaultEntityMeltingRecipe extends EntityMeltingRecipe {
   }
 
   private final Lazy<List<EntityType>> entityList;
+
   public DefaultEntityMeltingRecipe(List<EntityMeltingRecipe> recipes) {
     super(TConstruct.getResource("__default"), EntityIngredient.EMPTY, EntityMeltingModule.getDefaultFluid(), 2);
-    entityList = Lazy.of(() -> getEntityList(recipes));
+    this.entityList = Lazy.of(() -> getEntityList(recipes));
   }
 
   @Override
   public List<EntityType> getEntityInputs() {
-    return entityList.get();
+    return this.entityList.get();
   }
 }

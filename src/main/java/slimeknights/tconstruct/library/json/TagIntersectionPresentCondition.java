@@ -18,8 +18,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-/** Condition requiring that items exist in the intersection of all required item tags */
+/**
+ * Condition requiring that items exist in the intersection of all required item tags
+ */
 public class TagIntersectionPresentCondition<T> implements ConditionJsonProvider {
+
   public static final ResourceLocation NAME = TConstruct.getResource("tag_intersection_present");
 
   private final List<TagKey<T>> names;
@@ -31,13 +34,17 @@ public class TagIntersectionPresentCondition<T> implements ConditionJsonProvider
     this.names = names;
   }
 
-  /** Creates a condition from a set of keys */
+  /**
+   * Creates a condition from a set of keys
+   */
   @SafeVarargs
   public static <T> TagIntersectionPresentCondition<T> ofKeys(TagKey<T>... names) {
     return new TagIntersectionPresentCondition<>(Arrays.asList(names));
   }
 
-  /** Creates a condition from a registry and a set of names */
+  /**
+   * Creates a condition from a registry and a set of names
+   */
   public static <T> TagIntersectionPresentCondition<T> ofNames(ResourceKey<? extends Registry<T>> registry, ResourceLocation... names) {
     return new TagIntersectionPresentCondition<>(Arrays.stream(names).map(name -> TagKey.create(registry, name)).toList());
   }
@@ -59,7 +66,7 @@ public class TagIntersectionPresentCondition<T> implements ConditionJsonProvider
 
   public boolean test() {
     // if there is just one tag, just needs to be filled
-    List<Collection<?>> tags = names.stream().map(tTagKey -> {
+    List<Collection<?>> tags = this.names.stream().map(tTagKey -> {
       for (Map.Entry<ResourceKey<?>, Map<ResourceLocation, Collection<Holder<?>>>> entry : ResourceConditionsImpl.LOADED_TAGS.get().entrySet()) {
         if (entry.getKey() == Registries.ITEM && entry.getValue().get(tTagKey.location()) != null)
           return entry.getValue().get(tTagKey.location());

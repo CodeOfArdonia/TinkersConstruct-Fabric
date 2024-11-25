@@ -29,98 +29,118 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MixerAlloyTank implements IMutableAlloyTank {
   // parameters
-  /** Handler parent */
+  /**
+   * Handler parent
+   */
   private final MantleBlockEntity parent;
-  /** Tank for outputs */
+  /**
+   * Tank for outputs
+   */
   private final SlottedStorage<FluidVariant> outputTank;
 
-  /** Current temperature. Provided as a getter and setter as there are a few contexts with different source for temperature */
+  /**
+   * Current temperature. Provided as a getter and setter as there are a few contexts with different source for temperature
+   */
   @Getter
   @Setter
   private int temperature = 0;
 
   // side tank cache
-  /** Cache of tanks for each of the sides */
-  private final Map<Direction,SlottedStorage<FluidVariant>> inputs = new EnumMap<>(Direction.class);
-  /** Map of invalidation listeners for each side */
-  private final Map<Direction,NonNullConsumer<SlottedStorage<FluidVariant>>> listeners = new EnumMap<>(Direction.class);
-  /** Map of tank index to tank on the side */
+  /**
+   * Cache of tanks for each of the sides
+   */
+  private final Map<Direction, SlottedStorage<FluidVariant>> inputs = new EnumMap<>(Direction.class);
+  /**
+   * Map of invalidation listeners for each side
+   */
+  private final Map<Direction, NonNullConsumer<SlottedStorage<FluidVariant>>> listeners = new EnumMap<>(Direction.class);
+  /**
+   * Map of tank index to tank on the side
+   */
   @Nullable
   private SlottedStorage<FluidVariant>[] indexedList = null;
 
   // state
-  /** If true, tanks are marked for refresh later */
+  /**
+   * If true, tanks are marked for refresh later
+   */
   private boolean needsRefresh = true;
-  /** Number of currently held tanks */
+  /**
+   * Number of currently held tanks
+   */
   private int currentTanks = 0;
 
   @Override
   public int getTanks() {
-    checkTanks();
-    return currentTanks;
+    this.checkTanks();
+    return this.currentTanks;
   }
 
-  /** Gets the map of index to direction */
+  /**
+   * Gets the map of index to direction
+   */
   private SlottedStorage<FluidVariant>[] indexTanks() {
     // convert map into indexed list of fluid handlers, will be cleared next time a side updates
-    if (indexedList == null) {
-      indexedList = new SlottedStorage[currentTanks];
-      if (currentTanks > 0) {
+    if (this.indexedList == null) {
+      this.indexedList = new SlottedStorage[this.currentTanks];
+      if (this.currentTanks > 0) {
         int nextTank = 0;
         for (Direction direction : Direction.values()) {
           if (direction != Direction.DOWN) {
-            SlottedStorage<FluidVariant> handler = inputs.getOrDefault(direction, null);
+            SlottedStorage<FluidVariant> handler = this.inputs.getOrDefault(direction, null);
             if (handler != null) {
-              indexedList[nextTank] = handler;
+              this.indexedList[nextTank] = handler;
               nextTank++;
             }
           }
         }
       }
     }
-    return indexedList;
+    return this.indexedList;
   }
 
-  /** Gets the fluid handler for the given tank index */
+  /**
+   * Gets the fluid handler for the given tank index
+   */
   public SlottedStorage<FluidVariant> getFluidHandler(int tank) {
-    checkTanks();
+    this.checkTanks();
     // invalid index, nothing
-    if (tank >= currentTanks || tank < 0) {
+    if (tank >= this.currentTanks || tank < 0) {
       return EmptyFluidStorage.INSTANCE;
     }
-    return indexTanks()[tank];
+    return this.indexTanks()[tank];
   }
 
   @Override
   public FluidStack getFluidInTank(int tank) {
-    checkTanks();
+    this.checkTanks();
     // invalid index, nothing
-    if (tank >= currentTanks || tank < 0) {
+    if (tank >= this.currentTanks || tank < 0) {
       return FluidStack.EMPTY;
     }
     // get the first fluid from the proper tank, we do not support multiple fluids on a side
-    return new FluidStack(indexTanks()[tank].getSlot(0));
+    return new FluidStack(this.indexTanks()[tank].getSlot(0));
   }
 
   @Override
   public FluidStack drain(int tank, FluidStack fluidStack) {
-    checkTanks();
+    this.checkTanks();
     // invalid index, nothing
-    if (tank >= currentTanks || tank < 0) {
+    if (tank >= this.currentTanks || tank < 0) {
       return FluidStack.EMPTY;
     }
-    return new FluidStack(fluidStack.getType(), TransferUtil.extractFluid(indexTanks()[tank], fluidStack));
+    return new FluidStack(fluidStack.getType(), TransferUtil.extractFluid(this.indexTanks()[tank], fluidStack));
   }
 
   @Override
   public boolean canFit(FluidStack fluid, int removed) {
-    checkTanks();
-    return StorageUtil.simulateInsert(outputTank, fluid.getType(), fluid.getAmount(), null) == fluid.getAmount();
+    this.checkTanks();
+    return StorageUtil.simulateInsert(this.outputTank, fluid.getType(), fluid.getAmount(), null) == fluid.getAmount();
   }
 
   @Override
   public long fill(FluidStack fluidStack) {
-    return TransferUtil.insertFluid(outputTank, fluidStack);
+    return TransferUtil.insertFluid(this.outputTank, fluidStack);
   }
 
   /**
@@ -129,15 +149,15 @@ public class MixerAlloyTank implements IMutableAlloyTank {
    */
   private void checkTanks() {
     // need world to do anything
-    Level world = parent.getLevel();
+    Level world = this.parent.getLevel();
     if (world == null) {
       return;
     }
-    if (needsRefresh) {
+    if (this.needsRefresh) {
       for (Direction direction : Direction.values()) {
         // update each direction we are missing
-        if (direction != Direction.DOWN && !inputs.containsKey(direction)) {
-          BlockPos target = parent.getBlockPos().relative(direction);
+        if (direction != Direction.DOWN && !this.inputs.containsKey(direction)) {
+          BlockPos target = this.parent.getBlockPos().relative(direction);
           // limit by blocks as that gives the modpack more control, say they want to allow only scorched tanks
           if (world.getBlockState(target).is(TinkerTags.Blocks.ALLOYER_TANKS)) {
             // if we found a tank, increment the number of tanks
@@ -149,32 +169,33 @@ public class MixerAlloyTank implements IMutableAlloyTank {
 //                  refresh(dir, false);
 //                }
 //              })));
-              inputs.put(direction, storage);
-              currentTanks++;
+              this.inputs.put(direction, storage);
+              this.currentTanks++;
             } else {
-              inputs.put(direction, null);
+              this.inputs.put(direction, null);
             }
           }
         }
       }
-      needsRefresh = false;
+      this.needsRefresh = false;
     }
   }
 
   /**
    * Called on block update or when a capability invalidates to mark that a direction needs updates
+   *
    * @param direction  Side updating
    * @param checkInput If true, validates that the side contains an input before reducing tank count. False when invalidated through the capability
-   * */
+   */
   public void refresh(Direction direction, boolean checkInput) {
     if (direction == Direction.DOWN) {
       return;
     }
-    if (!checkInput || (inputs.containsKey(direction) && inputs.get(direction) != null)) {
-      currentTanks--;
+    if (!checkInput || (this.inputs.containsKey(direction) && this.inputs.get(direction) != null)) {
+      this.currentTanks--;
     }
-    inputs.remove(direction);
-    needsRefresh = true;
-    indexedList = null;
+    this.inputs.remove(direction);
+    this.needsRefresh = true;
+    this.indexedList = null;
   }
 }

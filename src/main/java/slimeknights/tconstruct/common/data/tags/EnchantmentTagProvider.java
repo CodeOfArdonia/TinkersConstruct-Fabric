@@ -16,6 +16,7 @@ import slimeknights.tconstruct.tools.data.ModifierIds;
 import java.util.concurrent.CompletableFuture;
 
 public class EnchantmentTagProvider extends FabricTagProvider.EnchantmentTagProvider {
+
   public EnchantmentTagProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> completableFuture) {
     super(output, completableFuture);
   }
@@ -23,34 +24,36 @@ public class EnchantmentTagProvider extends FabricTagProvider.EnchantmentTagProv
   @Override
   protected void addTags(HolderLookup.Provider provider) {
     // upgrade
-    modifierTag(TinkerModifiers.experienced.getId(), "cyclic:experience_boost", "ensorcellation:exp_boost");
-    modifierTag(ModifierIds.killager, "ensorcellation:damage_illager");
-    modifierTag(TinkerModifiers.magnetic.getId(), "cyclic:magnet");
-    modifierTag(TinkerModifiers.necrotic.getId(), "cyclic:life_leech", "ensorcellation:leech");
-    modifierTag(TinkerModifiers.severing.getId(), "cyclic:beheading", "ensorcellation:vorpal");
-    modifierTag(ModifierIds.stepUp, "cyclic:step");
-    modifierTag(TinkerModifiers.soulbound.getId(), "ensorcellation:soulbound");
-    modifierTag(ModifierIds.trueshot, "ensorcellation:trueshot");
+    this.modifierTag(TinkerModifiers.experienced.getId(), "cyclic:experience_boost", "ensorcellation:exp_boost");
+    this.modifierTag(ModifierIds.killager, "ensorcellation:damage_illager");
+    this.modifierTag(TinkerModifiers.magnetic.getId(), "cyclic:magnet");
+    this.modifierTag(TinkerModifiers.necrotic.getId(), "cyclic:life_leech", "ensorcellation:leech");
+    this.modifierTag(TinkerModifiers.severing.getId(), "cyclic:beheading", "ensorcellation:vorpal");
+    this.modifierTag(ModifierIds.stepUp, "cyclic:step");
+    this.modifierTag(TinkerModifiers.soulbound.getId(), "ensorcellation:soulbound");
+    this.modifierTag(ModifierIds.trueshot, "ensorcellation:trueshot");
 
     // defense
-    modifierTag(ModifierIds.knockbackResistance, "cyclic:steady");
-    modifierTag(TinkerModifiers.magicProtection.getId(), "ensorcellation:magic_protection");
-    modifierTag(ModifierIds.revitalizing, "ensorcellation:vitality");
+    this.modifierTag(ModifierIds.knockbackResistance, "cyclic:steady");
+    this.modifierTag(TinkerModifiers.magicProtection.getId(), "ensorcellation:magic_protection");
+    this.modifierTag(ModifierIds.revitalizing, "ensorcellation:vitality");
 
     // ability
-    modifierTag(TinkerModifiers.autosmelt.getId(), "cyclic:auto_smelt", "ensorcellation:smelting");
-    modifierTag(TinkerModifiers.doubleJump.getId(), "cyclic:launch", "walljump:doublejump");
-    modifierTag(TinkerModifiers.expanded.getId(), "cyclic:excavate", "ensorcellation:excavating", "ensorcellation:furrowing");
-    modifierTag(ModifierIds.luck, "ensorcellation:hunter");
-    modifierTag(TinkerModifiers.multishot.getId(), "cyclic:multishot", "ensorcellation:volley");
-    modifierTag(ModifierIds.reach, "cyclic:reach", "ensorcellation:reach");
-    modifierTag(TinkerModifiers.tilling.getId(), "ensorcellation:tilling");
-    modifierTag(TinkerModifiers.reflecting.getId(), "parry:rebound");
+    this.modifierTag(TinkerModifiers.autosmelt.getId(), "cyclic:auto_smelt", "ensorcellation:smelting");
+    this.modifierTag(TinkerModifiers.doubleJump.getId(), "cyclic:launch", "walljump:doublejump");
+    this.modifierTag(TinkerModifiers.expanded.getId(), "cyclic:excavate", "ensorcellation:excavating", "ensorcellation:furrowing");
+    this.modifierTag(ModifierIds.luck, "ensorcellation:hunter");
+    this.modifierTag(TinkerModifiers.multishot.getId(), "cyclic:multishot", "ensorcellation:volley");
+    this.modifierTag(ModifierIds.reach, "cyclic:reach", "ensorcellation:reach");
+    this.modifierTag(TinkerModifiers.tilling.getId(), "ensorcellation:tilling");
+    this.modifierTag(TinkerModifiers.reflecting.getId(), "parry:rebound");
   }
 
-  /** Creates a builder for a tag for the given modifier */
+  /**
+   * Creates a builder for a tag for the given modifier
+   */
   private void modifierTag(ModifierId modifier, String... ids) {
-    TagsProvider.TagAppender<Enchantment> appender = tag(TagKey.create(Registries.ENCHANTMENT, TConstruct.getResource("modifier_like/" + modifier.getPath())));
+    TagsProvider.TagAppender<Enchantment> appender = this.tag(TagKey.create(Registries.ENCHANTMENT, TConstruct.getResource("modifier_like/" + modifier.getPath())));
     for (String id : ids) {
       appender.addOptional(new ResourceLocation(id));
     }

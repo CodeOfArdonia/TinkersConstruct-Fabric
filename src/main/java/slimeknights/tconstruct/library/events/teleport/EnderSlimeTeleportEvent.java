@@ -7,7 +7,10 @@ import slimeknights.tconstruct.world.entity.EnderSlimeEntity;
 
 /* Fired when an ender slime teleport or teleports another entity */
 public class EnderSlimeTeleportEvent extends EntityEvents.Teleport.EntityTeleportEvent {
-  /** Gets the slime that caused this teleport. If this is the same as {@link #getEntity()} then the slime is teleporting itself */
+
+  /**
+   * Gets the slime that caused this teleport. If this is the same as {@link #getEntity()} then the slime is teleporting itself
+   */
   @Getter
   private final EnderSlimeEntity slime;
 
@@ -16,9 +19,11 @@ public class EnderSlimeTeleportEvent extends EntityEvents.Teleport.EntityTelepor
     this.slime = slime;
   }
 
-  /** Checks if the enderslime is teleporting itself */
+  /**
+   * Checks if the enderslime is teleporting itself
+   */
   public boolean isTeleportingSelf() {
-    return getEntity() == slime;
+    return this.getEntity() == this.slime;
   }
 
   @Override

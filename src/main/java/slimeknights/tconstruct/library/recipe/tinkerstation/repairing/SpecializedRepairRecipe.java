@@ -18,11 +18,17 @@ import slimeknights.tconstruct.tables.recipe.TinkerStationRepairRecipe;
  * Recipe to repair a specialized tool in the tinker station
  */
 public class SpecializedRepairRecipe extends TinkerStationRepairRecipe implements ISpecializedRepairRecipe {
-  /** Tool that can be repaired with this recipe */
+
+  /**
+   * Tool that can be repaired with this recipe
+   */
   @Getter
   private final Ingredient tool;
-  /** ID of material used in repairing */
+  /**
+   * ID of material used in repairing
+   */
   private final LazyMaterial repairMaterial;
+
   public SpecializedRepairRecipe(ResourceLocation id, Ingredient tool, MaterialId repairMaterialID) {
     super(id);
     this.tool = tool;
@@ -31,24 +37,26 @@ public class SpecializedRepairRecipe extends TinkerStationRepairRecipe implement
 
   @Override
   public MaterialId getRepairMaterial() {
-    return repairMaterial.getId();
+    return this.repairMaterial.getId();
   }
 
   @Override
   protected MaterialId getPrimaryMaterial(IToolStackView tool) {
-    return repairMaterial.getId();
+    return this.repairMaterial.getId();
   }
 
   @Override
   public boolean matches(ITinkerStationContainer inv, Level world) {
     ItemStack tinkerable = inv.getTinkerableStack();
-    if (!tool.test(tinkerable) || repairMaterial.isUnknown()) {
+    if (!this.tool.test(tinkerable) || this.repairMaterial.isUnknown()) {
       return false;
     }
-    return findMaterialItem(inv, repairMaterial);
+    return findMaterialItem(inv, this.repairMaterial);
   }
 
-  /** Find the repair item in the inventory */
+  /**
+   * Find the repair item in the inventory
+   */
   public static boolean findMaterialItem(ITinkerStationContainer inv, LazyMaterial repairMaterial) {
     // validate that we have at least one material
     boolean found = false;

@@ -21,7 +21,9 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class DragonbornModifier extends AbstractProtectionModifier<ModifierMaxLevel> {
+
   private static final TinkerDataKey<ModifierMaxLevel> DRAGONBORN = TConstruct.createKey("dragonborn");
+
   public DragonbornModifier() {
     super(DRAGONBORN);
     CriticalHitEvent.CRITICAL_HIT.register(DragonbornModifier::onCritical);
@@ -39,7 +41,7 @@ public class DragonbornModifier extends AbstractProtectionModifier<ModifierMaxLe
   @Override
   public float getProtectionModifier(IToolStackView tool, int level, EquipmentContext context, EquipmentSlot slotType, DamageSource source, float modifierValue) {
     if (!source.is(DamageTypeTags.BYPASSES_EFFECTS) && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY) && isAirborne(context.getEntity())) {
-      modifierValue += getScaledLevel(tool, level) * 2.5f;
+      modifierValue += this.getScaledLevel(tool, level) * 2.5f;
     }
     return modifierValue;
   }
@@ -49,7 +51,9 @@ public class DragonbornModifier extends AbstractProtectionModifier<ModifierMaxLe
     AbstractProtectionModifier.addResistanceTooltip(this, tool, level, 2.5f, tooltip);
   }
 
-  /** Boosts critical hit damage */
+  /**
+   * Boosts critical hit damage
+   */
   private static void onCritical(CriticalHitEvent event) {
     if (event.getResult() != Result.DENY) {
       // force critical if not already critical and in the air

@@ -24,8 +24,8 @@ public class FluidUpdatePacket implements IThreadsafePacket {
 
   @Override
   public void encode(FriendlyByteBuf buffer) {
-    buffer.writeBlockPos(pos);
-    fluid.writeToPacket(buffer);
+    buffer.writeBlockPos(this.pos);
+    this.fluid.writeToPacket(buffer);
   }
 
   @Override
@@ -33,7 +33,9 @@ public class FluidUpdatePacket implements IThreadsafePacket {
     HandleClient.handle(this);
   }
 
-  /** Interface to implement for anything wishing to receive fluid updates */
+  /**
+   * Interface to implement for anything wishing to receive fluid updates
+   */
   public interface IFluidPacketReceiver {
 
     /**
@@ -44,8 +46,11 @@ public class FluidUpdatePacket implements IThreadsafePacket {
     void updateFluidTo(FluidStack fluid);
   }
 
-  /** Safely runs client side only code in a method only called on client */
+  /**
+   * Safely runs client side only code in a method only called on client
+   */
   private static class HandleClient {
+
     private static void handle(FluidUpdatePacket packet) {
       BlockEntityHelper.get(IFluidPacketReceiver.class, Minecraft.getInstance().level, packet.pos).ifPresent(te -> te.updateFluidTo(packet.fluid));
     }

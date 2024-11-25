@@ -22,7 +22,7 @@ public interface IMaterialStats {
    * Returns the name of the stat type, to be displayed to the player.
    */
   default MutableComponent getLocalizedName() {
-    return Component.translatable(Util.makeTranslationKey("stat", getIdentifier()));
+    return Component.translatable(Util.makeTranslationKey("stat", this.getIdentifier()));
   }
 
   /**
@@ -39,10 +39,13 @@ public interface IMaterialStats {
    * The indices of the lines must line up with the lines from getLocalizedInfo()!</br>
    * *
    * This is used to display properties of materials to the user.
+   *
    * @return a list of Text Components
    */
   List<Component> getLocalizedDescriptions();
 
-  /** Encodes these stats to the buffer */
+  /**
+   * Encodes these stats to the buffer
+   */
   void encode(FriendlyByteBuf buffer);
 }

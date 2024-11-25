@@ -14,12 +14,17 @@ import slimeknights.mantle.fluid.attributes.FluidAttributes;
 import javax.annotation.Nullable;
 import java.util.function.BiFunction;
 
-/** Fluid attributes to color potion fluids */
+/**
+ * Fluid attributes to color potion fluids
+ */
 @SuppressWarnings("removal")
 public class PotionFluidAttributes extends FluidAttributes {
+
   private static final int EMPTY_COLOR = 0xf800f8;
 
-  /** Creates a new builder */
+  /**
+   * Creates a new builder
+   */
   public static FluidAttributes.Builder builder(ResourceLocation texturePrefix) {
     String modId = texturePrefix.getNamespace();
     String path = texturePrefix.getPath();
@@ -43,7 +48,7 @@ public class PotionFluidAttributes extends FluidAttributes {
   @Override
   public Component getDisplayName(FluidStack stack) {
     // stupid forge, not calling the stack sensitive translation key in super...
-    return Component.translatable(getTranslationKey(stack));
+    return Component.translatable(this.getTranslationKey(stack));
   }
 
   @Override
@@ -63,7 +68,9 @@ public class PotionFluidAttributes extends FluidAttributes {
     return itemStack;
   }
 
-  /** Gets the color from a fluid tag, based on potion utils */
+  /**
+   * Gets the color from a fluid tag, based on potion utils
+   */
   private static int getColor(@Nullable CompoundTag tag) {
     if (tag != null && tag.contains("CustomPotionColor", Tag.TAG_ANY_NUMERIC)) {
       return tag.getInt("CustomPotionColor");
@@ -74,8 +81,11 @@ public class PotionFluidAttributes extends FluidAttributes {
     return PotionUtils.getColor(PotionUtils.getAllEffects(tag));
   }
 
-  /** Fluid attributes for the potion fluid */
+  /**
+   * Fluid attributes for the potion fluid
+   */
   private static class Builder extends FluidAttributes.Builder {
+
     protected Builder(ResourceLocation stillTexture, ResourceLocation flowingTexture, BiFunction<FluidAttributes.Builder, Fluid, FluidAttributes> factory) {
       super(stillTexture, flowingTexture, factory);
     }

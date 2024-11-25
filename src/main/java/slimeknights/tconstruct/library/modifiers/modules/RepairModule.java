@@ -12,13 +12,16 @@ import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 
 import java.util.List;
 
-/** Module for multiplying tool repair */
+/**
+ * Module for multiplying tool repair
+ */
 public record RepairModule(float flat, float leveling) implements RepairFactorModifierHook, ModifierModule {
+
   private static final List<ModifierHook<?>> DEFAULT_HOOKS = List.of(TinkerHooks.REPAIR_FACTOR);
 
   @Override
   public float getRepairFactor(IToolStackView tool, ModifierEntry entry, float factor) {
-    factor *= (1 + (entry.getEffectiveLevel(tool) * leveling) + flat);
+    factor *= (1 + (entry.getEffectiveLevel(tool) * this.leveling) + this.flat);
     return factor;
   }
 

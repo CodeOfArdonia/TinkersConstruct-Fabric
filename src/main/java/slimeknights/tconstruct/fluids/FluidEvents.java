@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.registry.FuelRegistry;
  */
 @SuppressWarnings("unused")
 public class FluidEvents {
+
   public static void onFurnaceFuel() {
 //    if (event.getItemStack().getItem() == TinkerFluids.blazingBlood.asItem()) {
 //      // 150% efficiency compared to lava bucket, compare to casting blaze rods, which cast into 120%

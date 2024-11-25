@@ -16,10 +16,11 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class FeatherFallingModifier extends IncrementalModifier {
+
   @Override
   public float getProtectionModifier(IToolStackView tool, int level, EquipmentContext context, EquipmentSlot slotType, DamageSource source, float modifierValue) {
     if (source.is(DamageTypeTags.IS_FALL)) {
-      modifierValue += getScaledLevel(tool, level) * 3.75f;
+      modifierValue += this.getScaledLevel(tool, level) * 3.75f;
     }
     return modifierValue;
   }

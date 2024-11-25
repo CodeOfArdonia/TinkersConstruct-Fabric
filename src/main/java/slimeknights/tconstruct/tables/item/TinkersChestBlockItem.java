@@ -15,8 +15,11 @@ import slimeknights.tconstruct.tables.block.entity.chest.TinkersChestBlockEntity
 
 import javax.annotation.Nullable;
 
-/** Dyeable chest block */
+/**
+ * Dyeable chest block
+ */
 public class TinkersChestBlockItem extends BlockItem implements DyeableLeatherItem {
+
   public TinkersChestBlockItem(Block blockIn, Properties builder) {
     super(blockIn, builder);
   }
@@ -30,8 +33,8 @@ public class TinkersChestBlockItem extends BlockItem implements DyeableLeatherIt
   @Override
   protected boolean updateCustomBlockEntityTag(BlockPos pos, Level worldIn, @Nullable Player player, ItemStack stack, BlockState state) {
     boolean result = super.updateCustomBlockEntityTag(pos, worldIn, player, stack, state);
-    if (hasCustomColor(stack)) {
-      int color = getColor(stack);
+    if (this.hasCustomColor(stack)) {
+      int color = this.getColor(stack);
       BlockEntityHelper.get(TinkersChestBlockEntity.class, worldIn, pos).ifPresent(te -> te.setColor(color));
     }
     return result;

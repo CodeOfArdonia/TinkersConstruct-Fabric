@@ -45,44 +45,55 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ContentTool extends PageContent {
-  public static final transient ResourceLocation ID = TConstruct.getResource("tool");
-  private static final transient String KEY_PROPERTIES = TConstruct.makeTranslationKey("book", "tool.properties");
+
+  public static final ResourceLocation ID = TConstruct.getResource("tool");
+  private static final String KEY_PROPERTIES = TConstruct.makeTranslationKey("book", "tool.properties");
 
   /* Slot backgrounds */
-  private static final transient ImageData IMG_SLOT_1x1 = ContentModifier.IMG_SLOT_1;
-  private static final transient ImageData IMG_SLOT_1x2 = new ImageData(ContentModifier.BOOK_MODIFY, 40, 75, 22, 40, ContentModifier.TEX_SIZE, ContentModifier.TEX_SIZE);
-  private static final transient ImageData IMG_SLOT_1x3 = new ImageData(ContentModifier.BOOK_MODIFY, 62, 75, 22, 58, ContentModifier.TEX_SIZE, ContentModifier.TEX_SIZE);
-  private static final transient ImageData IMG_SLOT_2x1 = ContentModifier.IMG_SLOT_2;
-  private static final transient ImageData IMG_SLOT_2x2 = ContentModifier.IMG_SLOT_4;
-  private static final transient ImageData IMG_SLOT_2x3 = new ImageData(ContentModifier.BOOK_MODIFY, 84, 75, 40, 58, ContentModifier.TEX_SIZE, ContentModifier.TEX_SIZE);
-  private static final transient ImageData IMG_SLOT_3x1 = ContentModifier.IMG_SLOT_3;
-  private static final transient ImageData IMG_SLOT_3x2 = new ImageData(ContentModifier.BOOK_MODIFY, 58, 133, 58, 40, ContentModifier.TEX_SIZE, ContentModifier.TEX_SIZE);
-  private static final transient ImageData IMG_SLOT_3x3 = new ImageData(ContentModifier.BOOK_MODIFY, 58, 173, 58, 58, ContentModifier.TEX_SIZE, ContentModifier.TEX_SIZE);
-  private static final transient ImageData[] IMG_SLOTS_SHAPELESS = {
+  private static final ImageData IMG_SLOT_1x1 = ContentModifier.IMG_SLOT_1;
+  private static final ImageData IMG_SLOT_1x2 = new ImageData(ContentModifier.BOOK_MODIFY, 40, 75, 22, 40, ContentModifier.TEX_SIZE, ContentModifier.TEX_SIZE);
+  private static final ImageData IMG_SLOT_1x3 = new ImageData(ContentModifier.BOOK_MODIFY, 62, 75, 22, 58, ContentModifier.TEX_SIZE, ContentModifier.TEX_SIZE);
+  private static final ImageData IMG_SLOT_2x1 = ContentModifier.IMG_SLOT_2;
+  private static final ImageData IMG_SLOT_2x2 = ContentModifier.IMG_SLOT_4;
+  private static final ImageData IMG_SLOT_2x3 = new ImageData(ContentModifier.BOOK_MODIFY, 84, 75, 40, 58, ContentModifier.TEX_SIZE, ContentModifier.TEX_SIZE);
+  private static final ImageData IMG_SLOT_3x1 = ContentModifier.IMG_SLOT_3;
+  private static final ImageData IMG_SLOT_3x2 = new ImageData(ContentModifier.BOOK_MODIFY, 58, 133, 58, 40, ContentModifier.TEX_SIZE, ContentModifier.TEX_SIZE);
+  private static final ImageData IMG_SLOT_3x3 = new ImageData(ContentModifier.BOOK_MODIFY, 58, 173, 58, 58, ContentModifier.TEX_SIZE, ContentModifier.TEX_SIZE);
+  private static final ImageData[] IMG_SLOTS_SHAPELESS = {
     IMG_SLOT_1x1, IMG_SLOT_2x1, IMG_SLOT_3x1,
     IMG_SLOT_2x2, ContentModifier.IMG_SLOT_5, IMG_SLOT_3x2,
     IMG_SLOT_3x3, IMG_SLOT_3x3, IMG_SLOT_3x3
   };
-  private static final transient ImageData[][] IMG_SLOTS_SHAPED = {
-    { IMG_SLOT_1x1, IMG_SLOT_2x1, IMG_SLOT_3x1, },
-    { IMG_SLOT_1x2, IMG_SLOT_2x2, IMG_SLOT_3x2, },
-    { IMG_SLOT_1x3, IMG_SLOT_2x3, IMG_SLOT_3x3, }
+  private static final ImageData[][] IMG_SLOTS_SHAPED = {
+    {IMG_SLOT_1x1, IMG_SLOT_2x1, IMG_SLOT_3x1,},
+    {IMG_SLOT_1x2, IMG_SLOT_2x2, IMG_SLOT_3x2,},
+    {IMG_SLOT_1x3, IMG_SLOT_2x3, IMG_SLOT_3x3,}
   };
 
 
   /* Slot positions */
-  /** Locations for slots between 0 and 9 for a width of 3 */
-  private static final transient SlotPos[] SLOTS_WIDTH_3 = {new SlotPos(3,  3), new SlotPos(21,  3), new SlotPos(39,  3),
-                                                            new SlotPos(3, 22), new SlotPos(21, 22), new SlotPos(39, 22),
-                                                            new SlotPos(3, 40), new SlotPos(21, 40), new SlotPos(39, 40)};
-  /** Locations for slots between 0 and 6 in a 2x size grid */
-  private static final transient SlotPos[] SLOTS_WIDTH_2 = {SLOTS_WIDTH_3[0], SLOTS_WIDTH_3[1], SLOTS_WIDTH_3[3], SLOTS_WIDTH_3[4], SLOTS_WIDTH_3[6], SLOTS_WIDTH_3[7]};
-  /** Locations for slots between 0 and 3 in a 1x size grid */
-  private static final transient SlotPos[] SLOTS_WIDTH_1 = {SLOTS_WIDTH_3[0], SLOTS_WIDTH_3[3], SLOTS_WIDTH_3[6]};
-  /** Array of width to slot positions */
-  private static final transient SlotPos[][] SLOTS_WIDTH = {SLOTS_WIDTH_1, SLOTS_WIDTH_2, SLOTS_WIDTH_3};
-  /** Locations for slots between 0 and 5 in a 5 slot shapeless recipe */
-  private static final transient SlotPos[] SLOTS_5 = {SLOTS_WIDTH_3[0], SLOTS_WIDTH_3[1], SLOTS_WIDTH_3[2], new SlotPos(12, 22), new SlotPos(30, 22)};
+  /**
+   * Locations for slots between 0 and 9 for a width of 3
+   */
+  private static final SlotPos[] SLOTS_WIDTH_3 = {new SlotPos(3, 3), new SlotPos(21, 3), new SlotPos(39, 3),
+    new SlotPos(3, 22), new SlotPos(21, 22), new SlotPos(39, 22),
+    new SlotPos(3, 40), new SlotPos(21, 40), new SlotPos(39, 40)};
+  /**
+   * Locations for slots between 0 and 6 in a 2x size grid
+   */
+  private static final SlotPos[] SLOTS_WIDTH_2 = {SLOTS_WIDTH_3[0], SLOTS_WIDTH_3[1], SLOTS_WIDTH_3[3], SLOTS_WIDTH_3[4], SLOTS_WIDTH_3[6], SLOTS_WIDTH_3[7]};
+  /**
+   * Locations for slots between 0 and 3 in a 1x size grid
+   */
+  private static final SlotPos[] SLOTS_WIDTH_1 = {SLOTS_WIDTH_3[0], SLOTS_WIDTH_3[3], SLOTS_WIDTH_3[6]};
+  /**
+   * Array of width to slot positions
+   */
+  private static final SlotPos[][] SLOTS_WIDTH = {SLOTS_WIDTH_1, SLOTS_WIDTH_2, SLOTS_WIDTH_3};
+  /**
+   * Locations for slots between 0 and 5 in a 5 slot shapeless recipe
+   */
+  private static final SlotPos[] SLOTS_5 = {SLOTS_WIDTH_3[0], SLOTS_WIDTH_3[1], SLOTS_WIDTH_3[2], new SlotPos(12, 22), new SlotPos(30, 22)};
 
   /* Page computed data */
   @Nullable
@@ -124,8 +135,8 @@ public class ContentTool extends PageContent {
 
   @Override
   public String getTitle() {
-    if (tool != null) {
-      return tool.getLocalizedName().getString();
+    if (this.tool != null) {
+      return this.tool.getLocalizedName().getString();
     }
     return "";
   }
@@ -133,16 +144,16 @@ public class ContentTool extends PageContent {
   @Override
   public void load() {
     // determine the recipe to display
-    if (this.parts == null || slotPos == null) {
-      List<PartRequirement> required = getTool().getToolDefinition().getData().getParts();
+    if (this.parts == null || this.slotPos == null) {
+      List<PartRequirement> required = this.getTool().getToolDefinition().getData().getParts();
       // if no required components, do a crafting recipe lookup
       if (required.isEmpty()) {
         // get the stacks for the first crafting table recipe
         Recipe<CraftingContainer> recipe = Optional.ofNullable(Minecraft.getInstance().level)
-                                                   .flatMap(world -> ((RecipeManagerAccessor)world.getRecipeManager()).port_lib$byType(RecipeType.CRAFTING).values().stream()
-                                                                          .filter(r -> r.getResultItem(world.registryAccess()).getItem() == getTool().asItem())
-                                                                          .findFirst())
-                                                   .orElse(null);
+          .flatMap(world -> ((RecipeManagerAccessor) world.getRecipeManager()).port_lib$byType(RecipeType.CRAFTING).values().stream()
+            .filter(r -> r.getResultItem(world.registryAccess()).getItem() == this.getTool().asItem())
+            .findFirst())
+          .orElse(null);
         if (recipe != null) {
           // parts is just the items in the recipe
           this.parts = recipe.getIngredients().stream().map(ingredient -> ItemStackList.of(ingredient.getItems())).collect(Collectors.toList());
@@ -171,12 +182,12 @@ public class ContentTool extends PageContent {
       }
 
       // for tool crafting and for shapeless recipes, select slots
-      if (slotPos == null) {
+      if (this.slotPos == null) {
         // determine the slot positions by number of slots
         int size = this.parts.size();
         switch (size) {
-          case 4  -> this.slotPos = SLOTS_WIDTH_2;
-          case 5  -> this.slotPos = SLOTS_5;
+          case 4 -> this.slotPos = SLOTS_WIDTH_2;
+          case 5 -> this.slotPos = SLOTS_5;
           default -> this.slotPos = SLOTS_WIDTH_3;
         }
         // slots is just the set matching the size
@@ -189,22 +200,22 @@ public class ContentTool extends PageContent {
 
   @Override
   public void build(BookData book, ArrayList<BookElement> list, boolean brightSide) {
-    this.addTitle(list, getTitle());
+    this.addTitle(list, this.getTitle());
 
     int padding = 5;
 
     // description
     int h = BookScreen.PAGE_WIDTH / 3 - 10;
-    int y = getTitleHeight();
-    list.add(new TextElement(padding, y, BookScreen.PAGE_WIDTH - padding * 2, h, text));
+    int y = this.getTitleHeight();
+    list.add(new TextElement(padding, y, BookScreen.PAGE_WIDTH - padding * 2, h, this.text));
 
     // do we want to show the crafting recipe here perhaps? or just nothing?
     int imgWidth = 0;
     int imgHeight = 0;
     int partsSize = this.parts.size();
-    if (partsSize > 0 && imgSlots != null) {
-      imgWidth = imgSlots.width;
-      imgHeight = imgSlots.height;
+    if (partsSize > 0 && this.imgSlots != null) {
+      imgWidth = this.imgSlots.width;
+      imgHeight = this.imgSlots.height;
     }
 
     int imgX = BookScreen.PAGE_WIDTH / 2 + 20;
@@ -213,13 +224,13 @@ public class ContentTool extends PageContent {
     imgX = imgX + 29 - imgWidth / 2;
     imgY = imgY + 20 - imgHeight / 2;
 
-    if (properties.length > 0) {
+    if (this.properties.length > 0) {
       TextData head = new TextData(I18n.get(KEY_PROPERTIES));
       head.underlined = true;
       list.add(new TextElement(padding, 30 + h, 86 - padding, BookScreen.PAGE_HEIGHT - h - 20, head));
 
       List<TextData> effectData = Lists.newArrayList();
-      for (String e : properties) {
+      for (String e : this.properties) {
         effectData.add(new TextData("\u25CF "));
         effectData.add(new TextData(e));
         effectData.add(new TextData("\n"));
@@ -229,11 +240,11 @@ public class ContentTool extends PageContent {
     }
 
     list.add(new ImageElement(imgX + (imgWidth - ContentModifier.IMG_TABLE.width) / 2, imgY + 28, -1, -1, ContentModifier.IMG_TABLE));
-    if (imgSlots != null) {
-      list.add(new ImageElement(imgX, imgY, -1, -1, imgSlots, book.appearance.slotColor));
+    if (this.imgSlots != null) {
+      list.add(new ImageElement(imgX, imgY, -1, -1, this.imgSlots, book.appearance.slotColor));
     }
 
-    ItemStack demo = getTool().getRenderTool();
+    ItemStack demo = this.getTool().getRenderTool();
 
     TinkerItemElement toolItem = new TinkerItemElement(imgX + (imgWidth - 16) / 2, imgY - 24, 1f, demo);
     //toolItem.noTooltip = true;
@@ -242,18 +253,23 @@ public class ContentTool extends PageContent {
     list.add(new ImageElement(imgX + (imgWidth - 22) / 2, imgY - 27, -1, -1, IMG_SLOT_1x1, 0xffffff));
 
     for (int i = 0; i < partsSize; i++) {
-      SlotPos pos = slotPos[i];
-      TinkerItemElement partItem = new TinkerItemElement(imgX + pos.x(), imgY + pos.y(), 1f,  this.parts.get(i));
+      SlotPos pos = this.slotPos[i];
+      TinkerItemElement partItem = new TinkerItemElement(imgX + pos.x(), imgY + pos.y(), 1f, this.parts.get(i));
       //partItem.noTooltip = true;
       list.add(partItem);
     }
   }
 
-  /** Simple record to hold a XY pair */
+  /**
+   * Simple record to hold a XY pair
+   */
   private record SlotPos(int x, int y) {}
 
-  /** Fallback for when a tool is missing the proper interface */
+  /**
+   * Fallback for when a tool is missing the proper interface
+   */
   private static class Fallback implements IModifiableDisplay {
+
     private final Item item;
     @Getter
     private final ItemStack renderTool;
@@ -265,7 +281,7 @@ public class ContentTool extends PageContent {
 
     @Override
     public Item asItem() {
-      return item;
+      return this.item;
     }
 
     @Override

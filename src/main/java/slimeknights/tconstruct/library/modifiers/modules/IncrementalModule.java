@@ -25,18 +25,25 @@ import java.util.List;
 
 /**
  * Module that makes a modifier incremental.
- * @param key             Persistent data key containing the incremental data. If null, uses the modifier ID.
- *                        Presently, changing this makes it incompatible with the incremental modifier recipe, this is added for future proofing.
- * @param neededPerLevel  If zero, modifier is incremental with no max set and will fetch if from the recipe.
- *                        If greater than zero, modifier will have a fixed max.
+ *
+ * @param key            Persistent data key containing the incremental data. If null, uses the modifier ID.
+ *                       Presently, changing this makes it incompatible with the incremental modifier recipe, this is added for future proofing.
+ * @param neededPerLevel If zero, modifier is incremental with no max set and will fetch if from the recipe.
+ *                       If greater than zero, modifier will have a fixed max.
  */
-public record IncrementalModule(@Nullable ResourceLocation key, int neededPerLevel) implements EffectiveLevelModifierHook, DisplayNameModifierHook, ModifierRemovalHook, ModifierModule, ModuleWithKey {
+public record IncrementalModule(@Nullable ResourceLocation key,
+                                int neededPerLevel) implements EffectiveLevelModifierHook, DisplayNameModifierHook, ModifierRemovalHook, ModifierModule, ModuleWithKey {
+
   private static final List<ModifierHook<?>> DEFAULT_HOOKS = List.of(TinkerHooks.EFFECTIVE_LEVEL, TinkerHooks.DISPLAY_NAME, TinkerHooks.REMOVE);
 
-  /** Recipe controlled incremental modifier with no extra settings */
+  /**
+   * Recipe controlled incremental modifier with no extra settings
+   */
   public static IncrementalModule RECIPE_CONTROLLED = new IncrementalModule(null, 0);
 
-  /** Just saving a bit of memory as most things use the recipe controlled constant */
+  /**
+   * Just saving a bit of memory as most things use the recipe controlled constant
+   */
   public static IncrementalModule create(@Nullable ResourceLocation key, int neededPerLevel) {
     if (key == null && neededPerLevel == 0) {
       return RECIPE_CONTROLLED;
@@ -44,7 +51,9 @@ public record IncrementalModule(@Nullable ResourceLocation key, int neededPerLev
     return new IncrementalModule(key, neededPerLevel);
   }
 
-  /** Gets the number needed per level */
+  /**
+   * Gets the number needed per level
+   */
   private int getNeededPerLevel(ResourceLocation key) {
     if (neededPerLevel > 0) {
       return neededPerLevel;
@@ -52,7 +61,9 @@ public record IncrementalModule(@Nullable ResourceLocation key, int neededPerLev
     return ModifierRecipeLookup.getNeededPerLevel(key);
   }
 
-  /** Gets the amount presently on the tool */
+  /**
+   * Gets the amount presently on the tool
+   */
   private int getAmount(IToolContext tool, ResourceLocation key, int neededPerLevel) {
     INamespacedNBTView data = tool.getPersistentData();
     if (data.contains(key, Tag.TAG_ANY_NUMERIC)) {
@@ -66,7 +77,7 @@ public record IncrementalModule(@Nullable ResourceLocation key, int neededPerLev
     ResourceLocation key = getKey(modifier);
     int neededPerLevel = getNeededPerLevel(key);
     if (neededPerLevel > 0) {
-      return IncrementalModifier.addAmountToName(getAmount(tool, key, neededPerLevel), neededPerLevel, name);
+      return IncrementalModifier.addAmountToName(this.getAmount(tool, key, neededPerLevel), neededPerLevel, name);
     }
     return name;
   }
@@ -76,10 +87,10 @@ public record IncrementalModule(@Nullable ResourceLocation key, int neededPerLev
     if (level <= 0) {
       return 0;
     }
-    ResourceLocation key = getKey(modifier);
-    int neededPerLevel = getNeededPerLevel(key);
+    ResourceLocation key = this.getKey(modifier);
+    int neededPerLevel = this.getNeededPerLevel(key);
     if (neededPerLevel > 0) {
-      return IncrementalModifier.scaleLevel(level, getAmount(tool, key, neededPerLevel), neededPerLevel);
+      return IncrementalModifier.scaleLevel(level, this.getAmount(tool, key, neededPerLevel), neededPerLevel);
     }
     return level;
   }

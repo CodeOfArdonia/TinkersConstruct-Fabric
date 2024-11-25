@@ -16,6 +16,7 @@ import slimeknights.tconstruct.library.client.RenderUtils;
 import slimeknights.tconstruct.library.recipe.partbuilder.Pattern;
 
 public class PatternEntryRenderer implements EntryRenderer<Pattern> {
+
   public static final PatternEntryRenderer INSTANCE = new PatternEntryRenderer();
 
   @Override

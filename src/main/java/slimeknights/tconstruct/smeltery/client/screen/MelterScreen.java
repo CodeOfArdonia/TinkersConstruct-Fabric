@@ -19,6 +19,7 @@ import slimeknights.tconstruct.smeltery.menu.MelterContainerMenu;
 import javax.annotation.Nullable;
 
 public class MelterScreen extends AbstractContainerScreen<MelterContainerMenu> implements IScreenWithFluidTank {
+
   private static final ResourceLocation BACKGROUND = TConstruct.getResource("textures/gui/melter.png");
   private static final ElementScreen SCALA = new ElementScreen(176, 0, 52, 52, 256, 256);
   private static final ElementScreen FUEL_SLOT = new ElementScreen(176, 52, 18, 36, 256, 256);
@@ -27,18 +28,19 @@ public class MelterScreen extends AbstractContainerScreen<MelterContainerMenu> i
   private final GuiMeltingModule melting;
   private final GuiFuelModule fuel;
   private final GuiTankModule tank;
+
   public MelterScreen(MelterContainerMenu container, Inventory inv, Component name) {
     super(container, inv, name);
     MelterBlockEntity te = container.getTile();
     if (te != null) {
       FuelModule fuelModule = te.getFuelModule();
-      melting = new GuiMeltingModule(this, te.getMeltingInventory(), fuelModule::getTemperature, slot -> true);
-      fuel = new GuiFuelModule(this, fuelModule, 153, 32, 12, 36, 152, 15, container.isHasFuelSlot());
-      tank = new GuiTankModule(this, te.getTank(), 90, 16, 52, 52, MelterContainerMenu.TOOLTIP_FORMAT);
+      this.melting = new GuiMeltingModule(this, te.getMeltingInventory(), fuelModule::getTemperature, slot -> true);
+      this.fuel = new GuiFuelModule(this, fuelModule, 153, 32, 12, 36, 152, 15, container.isHasFuelSlot());
+      this.tank = new GuiTankModule(this, te.getTank(), 90, 16, 52, 52, MelterContainerMenu.TOOLTIP_FORMAT);
     } else {
-      melting = null;
-      fuel = null;
-      tank = null;
+      this.melting = null;
+      this.fuel = null;
+      this.tank = null;
     }
   }
 
@@ -54,18 +56,18 @@ public class MelterScreen extends AbstractContainerScreen<MelterContainerMenu> i
     GuiUtil.drawBackground(graphics, this, BACKGROUND);
 
     // fuel
-    if (fuel != null) {
+    if (this.fuel != null) {
       // draw the correct background for the fuel type
-      if (menu.isHasFuelSlot()) {
-        FUEL_SLOT.draw(graphics, BACKGROUND, leftPos + 150, topPos + 31);
+      if (this.menu.isHasFuelSlot()) {
+        FUEL_SLOT.draw(graphics, BACKGROUND, this.leftPos + 150, this.topPos + 31);
       } else {
-        FUEL_TANK.draw(graphics, BACKGROUND, leftPos + 152, topPos + 31);
+        FUEL_TANK.draw(graphics, BACKGROUND, this.leftPos + 152, this.topPos + 31);
       }
-      fuel.draw(graphics, BACKGROUND);
+      this.fuel.draw(graphics, BACKGROUND);
     }
 
     // fluids
-    if (tank != null) tank.draw(graphics);
+    if (this.tank != null) this.tank.draw(graphics);
   }
 
   @Override
@@ -75,17 +77,17 @@ public class MelterScreen extends AbstractContainerScreen<MelterContainerMenu> i
     int checkY = mouseY - this.topPos;
 
     // highlight hovered tank
-    if (tank != null) tank.highlightHoveredFluid(graphics, checkX, checkY);
+    if (this.tank != null) this.tank.highlightHoveredFluid(graphics, checkX, checkY);
     // highlight hovered fuel
-    if (fuel != null) fuel.renderHighlight(graphics, checkX, checkY);
+    if (this.fuel != null) this.fuel.renderHighlight(graphics, checkX, checkY);
 
     // scala
     RenderUtils.setup(BACKGROUND);
     SCALA.draw(graphics, BACKGROUND, 90, 16);
 
     // heat bars
-    if (melting != null) {
-      melting.drawHeatBars(graphics, BACKGROUND);
+    if (this.melting != null) {
+      this.melting.drawHeatBars(graphics, BACKGROUND);
     }
   }
 
@@ -94,28 +96,28 @@ public class MelterScreen extends AbstractContainerScreen<MelterContainerMenu> i
     super.renderTooltip(graphics, mouseX, mouseY);
 
     // tank tooltip
-    if (tank != null) tank.renderTooltip(graphics, mouseX, mouseY);
+    if (this.tank != null) this.tank.renderTooltip(graphics, mouseX, mouseY);
 
     // heat tooltips
-    if (melting != null) melting.drawHeatTooltips(graphics, mouseX, mouseY);
+    if (this.melting != null) this.melting.drawHeatTooltips(graphics, mouseX, mouseY);
 
     // fuel tooltip
-    if (fuel != null) fuel.addTooltip(graphics, mouseX, mouseY, true);
+    if (this.fuel != null) this.fuel.addTooltip(graphics, mouseX, mouseY, true);
   }
 
   @Nullable
   @Override
   public Object getIngredientUnderMouse(double mouseX, double mouseY) {
     Object ingredient = null;
-    int checkX = (int) mouseX - leftPos;
-    int checkY = (int) mouseY - topPos;
+    int checkX = (int) mouseX - this.leftPos;
+    int checkY = (int) mouseY - this.topPos;
 
     // try fuel first, its faster
-    if (fuel != null)
-      ingredient = fuel.getIngredient(checkX, checkY);
+    if (this.fuel != null)
+      ingredient = this.fuel.getIngredient(checkX, checkY);
 
-    if (tank != null && ingredient == null)
-      ingredient = tank.getIngreientUnderMouse(checkX, checkY);
+    if (this.tank != null && ingredient == null)
+      ingredient = this.tank.getIngreientUnderMouse(checkX, checkY);
 
     return ingredient;
   }

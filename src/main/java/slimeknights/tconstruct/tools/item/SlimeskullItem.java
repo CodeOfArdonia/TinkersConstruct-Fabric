@@ -22,8 +22,11 @@ import net.minecraft.world.item.ItemStack;
 import slimeknights.tconstruct.library.tools.definition.ModifiableArmorMaterial;
 import slimeknights.tconstruct.tools.client.SlimeskullArmorModel;
 
-/** This item is mainly to return the proper model for a slimeskull */
+/**
+ * This item is mainly to return the proper model for a slimeskull
+ */
 public class SlimeskullItem extends SlimesuitItem {
+
   public SlimeskullItem(ModifiableArmorMaterial material, Properties properties, ResourceKey<CreativeModeTab> tab) {
     super(material, ArmorSlotType.HELMET, properties, tab);
     EnvExecutor.runWhenOn(EnvType.CLIENT, () -> this::initializeClient);
@@ -36,11 +39,12 @@ public class SlimeskullItem extends SlimesuitItem {
 
   @Environment(EnvType.CLIENT)
   private static final class Slimeskull implements ArmorRenderer {
+
     @Override
     public void render(PoseStack matrices, MultiBufferSource vertexConsumers, ItemStack stack, LivingEntity entity, EquipmentSlot slot, int light, HumanoidModel<LivingEntity> contextModel, HumanoidModel<LivingEntity> armorModel) {
       contextModel.copyPropertiesTo(armorModel);
       ClientHooks.setPartVisibility(armorModel, slot);
-      Model model =  SlimeskullArmorModel.getModel(stack, armorModel);
+      Model model = SlimeskullArmorModel.getModel(stack, armorModel);
       VertexConsumer vertexconsumer = ItemRenderer.getArmorFoilBuffer(vertexConsumers, RenderType.armorCutoutNoCull(ClientHooks.getArmorResource(entity, stack, slot, null)), false, stack.hasFoil());
       model.renderToBuffer(matrices, vertexconsumer, light, OverlayTexture.NO_OVERLAY, 1, 1, 1, 1);
     }

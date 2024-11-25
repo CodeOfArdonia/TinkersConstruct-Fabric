@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class DenseModifier extends ReinforcedModifier {
+
   @Override
   public float getRepairFactor(IToolStackView toolStack, int level, float factor) {
     // the scale used by reinforced was quite nice to use for reduction here, so 25% loss at level 1, etc.
@@ -22,12 +23,12 @@ public class DenseModifier extends ReinforcedModifier {
   @Override
   protected float getPercentage(float level) {
     // formula gives 33%, 55%, 70%, 80% for first 4 levels
-    return 1f - (float)(1f / (Math.pow(1.5f, level)));
+    return 1f - (float) (1f / (Math.pow(1.5f, level)));
   }
 
   @Override
   public void addInformation(IToolStackView tool, int level, @Nullable Player player, List<Component> tooltip, TooltipKey tooltipKey, TooltipFlag tooltipFlag) {
-    tooltip.add(applyStyle(Component.literal(Util.PERCENT_FORMAT.format(getPercentage(getScaledLevel(tool, level))) + " ")
-                             .append(makeDisplayName())));
+    tooltip.add(this.applyStyle(Component.literal(Util.PERCENT_FORMAT.format(this.getPercentage(this.getScaledLevel(tool, level))) + " ")
+      .append(this.makeDisplayName())));
   }
 }

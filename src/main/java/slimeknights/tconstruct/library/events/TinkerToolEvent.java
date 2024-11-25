@@ -24,8 +24,10 @@ import javax.annotation.Nullable;
 @AllArgsConstructor
 @Getter
 public abstract class TinkerToolEvent extends BaseEvent {
+
   private final ItemStack stack;
   private final IToolStackView tool;
+
   public TinkerToolEvent(ItemStack stack) {
     this.stack = stack;
     this.tool = ToolStack.from(stack);
@@ -36,22 +38,29 @@ public abstract class TinkerToolEvent extends BaseEvent {
    */
   @Getter
   public static class ToolHarvestEvent extends TinkerToolEvent {
+
     public static Event<ToolHarvest> EVENT = EventFactory.createArrayBacked(ToolHarvest.class, callbacks -> event -> {
-      for(ToolHarvest e : callbacks)
+      for (ToolHarvest e : callbacks)
         e.onHarvest(event);
     });
 
-    /** Item context, note this is the original context, so some information (such as position) may not be accurate */
+    /**
+     * Item context, note this is the original context, so some information (such as position) may not be accurate
+     */
     private final UseOnContext context;
     private final ServerLevel world;
     private final BlockState state;
     private final BlockPos pos;
     private final InteractionSource source;
-    /** @deprecated use {@link #getSource()} */
+    /**
+     * @deprecated use {@link #getSource()}
+     */
     @Deprecated
     private final EquipmentSlot slotType;
 
-    /** @deprecated use {@link #ToolHarvestEvent(IToolStackView, UseOnContext, ServerLevel, BlockState, BlockPos, InteractionSource)} */
+    /**
+     * @deprecated use {@link #ToolHarvestEvent(IToolStackView, UseOnContext, ServerLevel, BlockState, BlockPos, InteractionSource)}
+     */
     @Deprecated
     public ToolHarvestEvent(IToolStackView tool, UseOnContext context, ServerLevel world, BlockState state, BlockPos pos, EquipmentSlot slotType) {
       super(getItem(context, slotType), tool);
@@ -73,7 +82,9 @@ public abstract class TinkerToolEvent extends BaseEvent {
       this.slotType = source.getSlot(context.getHand());
     }
 
-    /** Gets the item for the event */
+    /**
+     * Gets the item for the event
+     */
     private static ItemStack getItem(UseOnContext context, InteractionSource source) {
       Player player = context.getPlayer();
       if (player != null) {
@@ -82,7 +93,9 @@ public abstract class TinkerToolEvent extends BaseEvent {
       return context.getItemInHand();
     }
 
-    /** Gets the item for the event */
+    /**
+     * Gets the item for the event
+     */
     private static ItemStack getItem(UseOnContext context, EquipmentSlot slotType) {
       Player player = context.getPlayer();
       if (player != null) {
@@ -93,12 +106,14 @@ public abstract class TinkerToolEvent extends BaseEvent {
 
     @Nullable
     public Player getPlayer() {
-      return context.getPlayer();
+      return this.context.getPlayer();
     }
 
-    /** Fires this event and posts the result */
+    /**
+     * Fires this event and posts the result
+     */
     public Result fire() {
-      sendEvent();
+      this.sendEvent();
       return this.getResult();
     }
 
@@ -109,6 +124,7 @@ public abstract class TinkerToolEvent extends BaseEvent {
 
     @FunctionalInterface
     public interface ToolHarvest {
+
       void onHarvest(ToolHarvestEvent event);
     }
   }
@@ -118,8 +134,9 @@ public abstract class TinkerToolEvent extends BaseEvent {
    */
   @Getter
   public static class ToolShearEvent extends TinkerToolEvent {
+
     public static Event<ToolShear> EVENT = EventFactory.createArrayBacked(ToolShear.class, callbacks -> event -> {
-      for(ToolShear e : callbacks)
+      for (ToolShear e : callbacks)
         e.onToolShear(event);
     });
 
@@ -127,6 +144,7 @@ public abstract class TinkerToolEvent extends BaseEvent {
     private final Player player;
     private final Entity target;
     private final int fortune;
+
     public ToolShearEvent(ItemStack stack, IToolStackView tool, Level world, Player player, Entity target, int fortune) {
       super(stack, tool);
       this.world = world;
@@ -135,9 +153,11 @@ public abstract class TinkerToolEvent extends BaseEvent {
       this.fortune = fortune;
     }
 
-    /** Fires this event and posts the result */
+    /**
+     * Fires this event and posts the result
+     */
     public Result fire() {
-      sendEvent();
+      this.sendEvent();
       return this.getResult();
     }
 
@@ -148,6 +168,7 @@ public abstract class TinkerToolEvent extends BaseEvent {
 
     @FunctionalInterface
     public interface ToolShear {
+
       void onToolShear(ToolShearEvent event);
     }
   }

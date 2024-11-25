@@ -14,10 +14,10 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import slimeknights.tconstruct.TConstruct;
 
 import javax.annotation.Nullable;
-import java.util.Random;
 
 @RequiredArgsConstructor
 public class ClayIslandVariant implements IIslandVariant {
+
   @Getter
   private final int index;
 
@@ -50,7 +50,7 @@ public class ClayIslandVariant implements IIslandVariant {
 
   @Nullable
   @Override
-  public ConfiguredFeature<?,?> getTreeFeature(RandomSource random, RegistryAccess registryAccess) {
+  public ConfiguredFeature<?, ?> getTreeFeature(RandomSource random, RegistryAccess registryAccess) {
     return switch (random.nextInt(10)) {
       // 40% oak
       case 0, 1, 2, 3 -> registryAccess.registryOrThrow(Registries.CONFIGURED_FEATURE).get(TreeFeatures.OAK);

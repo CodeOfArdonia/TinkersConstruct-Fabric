@@ -26,22 +26,33 @@ import java.util.function.Consumer;
 @Accessors(chain = true)
 @RequiredArgsConstructor(staticName = "material")
 public class MaterialFluidRecipeBuilder extends AbstractRecipeBuilder<MaterialFluidRecipeBuilder> {
-  /** Output material ID */
+
+  /**
+   * Output material ID
+   */
   private final MaterialVariantId outputId;
-  /** Fluid used for casting */
+  /**
+   * Fluid used for casting
+   */
   @Setter
   private FluidIngredient fluid = FluidIngredient.EMPTY;
-  /** Temperature for cooling time calculations */
+  /**
+   * Temperature for cooling time calculations
+   */
   @Setter
   private int temperature = -1;
-  /** Material base for composite */
-  @Setter @Nullable
+  /**
+   * Material base for composite
+   */
+  @Setter
+  @Nullable
   private MaterialVariantId inputId;
 
   /**
    * Sets the fluid for this recipe, and cooling time if unset.
-   * @param fluidStack  Fluid input
-   * @return  Builder instance
+   *
+   * @param fluidStack Fluid input
+   * @return Builder instance
    */
   public MaterialFluidRecipeBuilder setFluidAndTemp(FluidStack fluidStack) {
     this.fluid = FluidIngredient.of(fluidStack);
@@ -53,17 +64,18 @@ public class MaterialFluidRecipeBuilder extends AbstractRecipeBuilder<MaterialFl
 
   /**
    * Sets the fluid for this recipe, and cooling time
-   * @param tagIn   Tag<Fluid> instance
-   * @param amount  Fluid amount
+   *
+   * @param tagIn  Tag<Fluid> instance
+   * @param amount Fluid amount
    */
   public MaterialFluidRecipeBuilder setFluid(TagKey<Fluid> tagIn, long amount) {
-    setFluid(FluidIngredient.of(tagIn, amount));
+    this.setFluid(FluidIngredient.of(tagIn, amount));
     return this;
   }
 
   @Override
   public void save(Consumer<FinishedRecipe> consumer) {
-    save(consumer, outputId.getId());
+    this.save(consumer, this.outputId.getId());
   }
 
   @Override
@@ -79,18 +91,19 @@ public class MaterialFluidRecipeBuilder extends AbstractRecipeBuilder<MaterialFl
   }
 
   private class Result extends AbstractFinishedRecipe {
+
     public Result(ResourceLocation ID, @Nullable ResourceLocation advancementID) {
       super(ID, advancementID);
     }
 
     @Override
     public void serializeRecipeData(JsonObject json) {
-      if (inputId != null) {
-        json.addProperty("input", inputId.toString());
+      if (MaterialFluidRecipeBuilder.this.inputId != null) {
+        json.addProperty("input", MaterialFluidRecipeBuilder.this.inputId.toString());
       }
-      json.add("fluid", fluid.serialize());
-      json.addProperty("temperature", temperature);
-      json.addProperty("output", outputId.toString());
+      json.add("fluid", MaterialFluidRecipeBuilder.this.fluid.serialize());
+      json.addProperty("temperature", MaterialFluidRecipeBuilder.this.temperature);
+      json.addProperty("output", MaterialFluidRecipeBuilder.this.outputId.toString());
     }
 
     @Override

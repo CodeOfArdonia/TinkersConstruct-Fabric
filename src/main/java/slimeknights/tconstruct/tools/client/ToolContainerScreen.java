@@ -28,30 +28,54 @@ import java.util.function.Function;
 import static slimeknights.tconstruct.tools.menu.ToolContainerMenu.REPEAT_BACKGROUND_START;
 import static slimeknights.tconstruct.tools.menu.ToolContainerMenu.SLOT_SIZE;
 
-/** Screen for a tool inventory */
+/**
+ * Screen for a tool inventory
+ */
 public class ToolContainerScreen extends AbstractContainerScreen<ToolContainerMenu> {
-  /** The ResourceLocation containing the chest GUI texture. */
+
+  /**
+   * The ResourceLocation containing the chest GUI texture.
+   */
   private static final ResourceLocation TEXTURE = TConstruct.getResource("textures/gui/tool.png");
 
-  /** Max number of rows in the repeat slots background */
+  /**
+   * Max number of rows in the repeat slots background
+   */
   private static final int REPEAT_BACKGROUND_ROWS = 6;
-  /** Start location of the player inventory */
+  /**
+   * Start location of the player inventory
+   */
   private static final int PLAYER_INVENTORY_START = REPEAT_BACKGROUND_START + (REPEAT_BACKGROUND_ROWS * SLOT_SIZE);
-  /** Height of the player inventory texture */
+  /**
+   * Height of the player inventory texture
+   */
   private static final int PLAYER_INVENTORY_HEIGHT = 97;
-  /** Start Y location of the slot start element */
+  /**
+   * Start Y location of the slot start element
+   */
   private static final int SLOTS_START = 256 - SLOT_SIZE;
-  /** Selected slot texture X position */
+  /**
+   * Selected slot texture X position
+   */
   private static final int SELECTED_X = 176;
 
-  /** Total number of slots in the inventory */
+  /**
+   * Total number of slots in the inventory
+   */
   private final int slots;
-  /** Number of rows in this inventory */
+  /**
+   * Number of rows in this inventory
+   */
   private final int inventoryRows;
-  /** Number of slots in the final row */
+  /**
+   * Number of slots in the final row
+   */
   private final int slotsInLastRow;
-  /** Tool instance being rendered */
+  /**
+   * Tool instance being rendered
+   */
   private final IToolStackView tool;
+
   public ToolContainerScreen(ToolContainerMenu menu, Inventory inv, Component title) {
     super(menu, inv, title);
     int slots = menu.getItemHandler().getSlotCount();
@@ -77,8 +101,8 @@ public class ToolContainerScreen extends AbstractContainerScreen<ToolContainerMe
   protected void slotClicked(Slot slot, int slotId, int index, ClickType type) {
     // disallow swapping the tool slot
     if (type == ClickType.SWAP) {
-      EquipmentSlot toolSlot = menu.getSlotType();
-      if (toolSlot == EquipmentSlot.MAINHAND && index == menu.getSelectedHotbarSlot() || toolSlot == EquipmentSlot.OFFHAND && index == Inventory.SLOT_OFFHAND) {
+      EquipmentSlot toolSlot = this.menu.getSlotType();
+      if (toolSlot == EquipmentSlot.MAINHAND && index == this.menu.getSelectedHotbarSlot() || toolSlot == EquipmentSlot.OFFHAND && index == Inventory.SLOT_OFFHAND) {
         return;
       }
     }
@@ -99,8 +123,8 @@ public class ToolContainerScreen extends AbstractContainerScreen<ToolContainerMe
     int yStart = (this.height - this.imageHeight) / 2;
 
     int yOffset; // after ifs, will be the height of the final element
-    if (inventoryRows <= REPEAT_BACKGROUND_ROWS) {
-      yOffset = inventoryRows * SLOT_SIZE + REPEAT_BACKGROUND_START;
+    if (this.inventoryRows <= REPEAT_BACKGROUND_ROWS) {
+      yOffset = this.inventoryRows * SLOT_SIZE + REPEAT_BACKGROUND_START;
       graphics.blit(TEXTURE, xStart, yStart, 0, 0, this.imageWidth, yOffset);
     } else {
       // draw top area with first 6 rows
@@ -108,7 +132,7 @@ public class ToolContainerScreen extends AbstractContainerScreen<ToolContainerMe
       graphics.blit(TEXTURE, xStart, yStart, 0, 0, this.imageWidth, yOffset);
 
       // draw each next group of 6
-      int remaining = inventoryRows - REPEAT_BACKGROUND_ROWS;
+      int remaining = this.inventoryRows - REPEAT_BACKGROUND_ROWS;
       int height = REPEAT_BACKGROUND_ROWS * SLOT_SIZE;
       for (; remaining > REPEAT_BACKGROUND_ROWS; remaining -= REPEAT_BACKGROUND_ROWS) {
         graphics.blit(TEXTURE, xStart, yStart + yOffset, 0, REPEAT_BACKGROUND_START, this.imageWidth, height);
@@ -126,21 +150,21 @@ public class ToolContainerScreen extends AbstractContainerScreen<ToolContainerMe
     // draw slot background
     int rowLeft = xStart + 7;
     int rowStart = yStart + REPEAT_BACKGROUND_START - SLOT_SIZE;
-    for (int i = 1; i < inventoryRows; i++) {
+    for (int i = 1; i < this.inventoryRows; i++) {
       graphics.blit(TEXTURE, rowLeft, rowStart + i * SLOT_SIZE, 0, SLOTS_START, 9 * SLOT_SIZE, SLOT_SIZE);
     }
     // last row may not have all slots
-    graphics.blit(TEXTURE, rowLeft, rowStart + inventoryRows * SLOT_SIZE, 0, SLOTS_START, slotsInLastRow * SLOT_SIZE, SLOT_SIZE);
+    graphics.blit(TEXTURE, rowLeft, rowStart + this.inventoryRows * SLOT_SIZE, 0, SLOTS_START, this.slotsInLastRow * SLOT_SIZE, SLOT_SIZE);
 
     // draw a background on the selected slot index
-    int selectedSlot = menu.getSelectedHotbarSlot();
+    int selectedSlot = this.menu.getSelectedHotbarSlot();
     if (selectedSlot != -1) {
-      int slotIndex = slots - 1;
+      int slotIndex = this.slots - 1;
       if (selectedSlot != 10) {
         slotIndex += 28 + selectedSlot;
       }
-      if (slotIndex < menu.slots.size()) {
-        Slot slot = menu.getSlot(slotIndex);
+      if (slotIndex < this.menu.slots.size()) {
+        Slot slot = this.menu.getSlot(slotIndex);
         graphics.blit(TEXTURE, xStart + slot.x - 2, yStart + slot.y - 2, SELECTED_X, 0, SLOT_SIZE + 2, SLOT_SIZE + 2);
       }
     }
@@ -149,24 +173,24 @@ public class ToolContainerScreen extends AbstractContainerScreen<ToolContainerMe
     // prepare pattern drawing
     RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
     assert this.minecraft != null;
-    Function<ResourceLocation,TextureAtlasSprite> spriteGetter = this.minecraft.getTextureAtlas(InventoryMenu.BLOCK_ATLAS);
+    Function<ResourceLocation, TextureAtlasSprite> spriteGetter = this.minecraft.getTextureAtlas(InventoryMenu.BLOCK_ATLAS);
 
     // draw slot patterns for all empty slots
     int start = 0;
-    int maxSlots = menu.slots.size();
+    int maxSlots = this.menu.slots.size();
 
-    List<ModifierEntry> modifiers = tool.getModifierList();
+    List<ModifierEntry> modifiers = this.tool.getModifierList();
     modifiers:
     for (int modIndex = modifiers.size() - 1; modIndex >= 0; modIndex--) {
       ModifierEntry entry = modifiers.get(modIndex);
       InventoryModifierHook inventory = entry.getHook(ToolInventoryCapability.HOOK);
-      int size = inventory.getSlots(tool, entry);
+      int size = inventory.getSlots(this.tool, entry);
       for (int i = 0; i < size; i++) {
         if (start + i >= maxSlots) {
           break modifiers;
         }
-        Slot slot = menu.getSlot(start + i);
-        Pattern pattern = inventory.getPattern(tool, entry, i, slot.hasItem());
+        Slot slot = this.menu.getSlot(start + i);
+        Pattern pattern = inventory.getPattern(this.tool, entry, i, slot.hasItem());
         if (pattern != null) {
           TextureAtlasSprite sprite = spriteGetter.apply(pattern.getTexture());
           graphics.blit(xStart + slot.x, yStart + slot.y, 100, 16, 16, sprite);
@@ -176,8 +200,8 @@ public class ToolContainerScreen extends AbstractContainerScreen<ToolContainerMe
     }
 
     // offhand icon
-    if (menu.isShowOffhand()) {
-      Slot slot = menu.getSlot(slots - 1);
+    if (this.menu.isShowOffhand()) {
+      Slot slot = this.menu.getSlot(this.slots - 1);
       if (!slot.hasItem()) {
         TextureAtlasSprite sprite = spriteGetter.apply(Patterns.SHIELD.getTexture());
         graphics.blit(xStart + slot.x, yStart + slot.y, 100, 16, 16, sprite);

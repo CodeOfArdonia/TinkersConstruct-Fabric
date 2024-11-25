@@ -30,12 +30,18 @@ import java.util.Optional;
  */
 public class PersistentDataCapability implements EntityComponentInitializer {
 
-  /** Capability ID */
+  /**
+   * Capability ID
+   */
   private static final ResourceLocation ID = TConstruct.getResource("persistent_data");
-  /** Capability type */
+  /**
+   * Capability type
+   */
   public static final ComponentKey<NamespacedNBT> CAPABILITY = ComponentRegistry.getOrCreate(ID, NamespacedNBT.class);
 
-  /** Gets the data or warns if its missing */
+  /**
+   * Gets the data or warns if its missing
+   */
   public static NamespacedNBT getOrWarn(Entity entity) {
     Optional<NamespacedNBT> data = CAPABILITY.maybeGet(entity);
     if (data.isEmpty()) {
@@ -45,7 +51,9 @@ public class PersistentDataCapability implements EntityComponentInitializer {
     return data.get();
   }
 
-  /** Registers this capability */
+  /**
+   * Registers this capability
+   */
   public static void register() {
 //    FMLJavaModLoadingContext.get().getModEventBus().addListener(EventPriority.NORMAL, false, RegisterCapabilitiesEvent.class, PersistentDataCapability::register);
 //    MinecraftForge.EVENT_BUS.addGenericListener(Entity.class, PersistentDataCapability::attachCapability);
@@ -55,7 +63,9 @@ public class PersistentDataCapability implements EntityComponentInitializer {
     ServerPlayConnectionEvents.JOIN.register(PersistentDataCapability::playerLoggedIn);
   }
 
-  /** Event listener to attach the capability */
+  /**
+   * Event listener to attach the capability
+   */
   public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
     // must be on players, but also support anything else with modifiers, this is their data
     for (Class<? extends Entity> clazz : EntityModifierCapability.ENTITY_PREDICATES) {
@@ -64,12 +74,16 @@ public class PersistentDataCapability implements EntityComponentInitializer {
     registry.registerForPlayers(CAPABILITY, player -> new NamespacedNBT());
   }
 
-  /** Syncs the data to the given player */
+  /**
+   * Syncs the data to the given player
+   */
   private static void sync(Player player) {
     CAPABILITY.maybeGet(player).ifPresent(data -> TinkerNetwork.getInstance().sendTo(new SyncPersistentDataPacket(data.getCopy()), player));
   }
 
-  /** copy caps when the player respawns/returns from the end */
+  /**
+   * copy caps when the player respawns/returns from the end
+   */
   private static void playerClone(ServerPlayer oldPlayer, ServerPlayer newPlayer, boolean alive) {
     CAPABILITY.maybeGet(oldPlayer).ifPresent(oldData -> {
       CompoundTag nbt = oldData.getCopy();
@@ -79,35 +93,45 @@ public class PersistentDataCapability implements EntityComponentInitializer {
     });
   }
 
-  /** sync caps when the player respawns/returns from the end */
+  /**
+   * sync caps when the player respawns/returns from the end
+   */
   private static void playerRespawn(ServerPlayer oldPlayer, ServerPlayer newPlayer, boolean alive) {
     sync(newPlayer);
   }
 
-  /** sync caps when the player changes dimensions */
+  /**
+   * sync caps when the player changes dimensions
+   */
   private static void playerChangeDimension(ServerPlayer player, ServerLevel origin, ServerLevel destination) {
     sync(player);
   }
 
-  /** sync caps when the player logs in */
+  /**
+   * sync caps when the player logs in
+   */
   private static void playerLoggedIn(ServerGamePacketListenerImpl handler, PacketSender sender, MinecraftServer server) {
     sync(handler.getPlayer());
   }
 
-  /** Capability provider instance */
+  /**
+   * Capability provider instance
+   */
   private static class Provider implements Component {
+
     private NamespacedNBT capability;
+
     private Provider(Entity entity) {
       this.capability = NamespacedNBT.readFromNBT(new CompoundTag());
     }
 
     public NamespacedNBT getCapability() {
-      return capability;
+      return this.capability;
     }
 
     @Override
     public void writeToNbt(CompoundTag tag) {
-      capability.writeToNbt(tag);
+      this.capability.writeToNbt(tag);
     }
 
     @Override

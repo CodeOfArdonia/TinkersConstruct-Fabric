@@ -13,15 +13,16 @@ import slimeknights.tconstruct.smeltery.block.entity.tank.ISmelteryTankHandler;
  */
 @AllArgsConstructor
 public class SmelteryFluidClickedPacket implements IThreadsafePacket {
+
   private final int index;
 
   public SmelteryFluidClickedPacket(FriendlyByteBuf buffer) {
-    index = buffer.readVarInt();
+    this.index = buffer.readVarInt();
   }
 
   @Override
   public void encode(FriendlyByteBuf buffer) {
-    buffer.writeVarInt(index);
+    buffer.writeVarInt(this.index);
   }
 
   @Override
@@ -30,7 +31,7 @@ public class SmelteryFluidClickedPacket implements IThreadsafePacket {
     if (sender != null) {
       AbstractContainerMenu container = sender.containerMenu;
       if (container instanceof BaseContainerMenu<?> base && base.getTile() instanceof ISmelteryTankHandler tank) {
-        tank.getTank().moveFluidToBottom(index);
+        tank.getTank().moveFluidToBottom(this.index);
       }
     }
   }

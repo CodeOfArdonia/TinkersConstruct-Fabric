@@ -1,7 +1,6 @@
 package slimeknights.tconstruct.tools.item;
 
 import io.github.fabricators_of_create.porting_lib.item.InfiniteArrowItem;
-import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -13,7 +12,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ArrowItem;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
@@ -23,10 +21,16 @@ import slimeknights.tconstruct.tools.TinkerTools;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Internal item used by crystalshot modifier */
+/**
+ * Internal item used by crystalshot modifier
+ */
 public class CrystalshotItem extends ArrowItem implements InfiniteArrowItem {
-  /** Possible variants for a random crystalshot, so addons can register their own if desired */
+
+  /**
+   * Possible variants for a random crystalshot, so addons can register their own if desired
+   */
   public static final List<String> RANDOM_VARIANTS;
+
   static {
     RANDOM_VARIANTS = new ArrayList<>();
     RANDOM_VARIANTS.add("amethyst");
@@ -36,8 +40,12 @@ public class CrystalshotItem extends ArrowItem implements InfiniteArrowItem {
     RANDOM_VARIANTS.add("enderslime");
     RANDOM_VARIANTS.add("quartz");
   }
-  /** NBT key for variants on the stack and entity */
+
+  /**
+   * NBT key for variants on the stack and entity
+   */
   private static final String TAG_VARIANT = "variant";
+
   public CrystalshotItem(Properties props) {
     super(props);
   }
@@ -62,7 +70,9 @@ public class CrystalshotItem extends ArrowItem implements InfiniteArrowItem {
     return EnchantmentHelper.getItemEnchantmentLevel(net.minecraft.world.item.enchantment.Enchantments.INFINITY_ARROWS, bow) > 0;
   }
 
-  /** Creates a crystal shot with the given variant */
+  /**
+   * Creates a crystal shot with the given variant
+   */
   public static ItemStack withVariant(String variant, int size) {
     ItemStack stack = new ItemStack(TinkerTools.crystalshotItem);
     stack.setCount(size);
@@ -71,18 +81,19 @@ public class CrystalshotItem extends ArrowItem implements InfiniteArrowItem {
   }
 
   public static class CrystalshotEntity extends AbstractArrow {
+
     private static final EntityDataAccessor<String> SYNC_VARIANT = SynchedEntityData.defineId(CrystalshotEntity.class, EntityDataSerializers.STRING);
 
     public CrystalshotEntity(EntityType<? extends CrystalshotEntity> type, Level level) {
       super(type, level);
-      pickup = Pickup.CREATIVE_ONLY;
-      soundEvent = Sounds.CRYSTALSHOT.getSound();
+      this.pickup = Pickup.CREATIVE_ONLY;
+      this.soundEvent = Sounds.CRYSTALSHOT.getSound();
     }
 
     public CrystalshotEntity(Level level, LivingEntity shooter) {
       super(TinkerTools.crystalshotEntity.get(), shooter, level);
-      pickup = Pickup.CREATIVE_ONLY;
-      soundEvent = Sounds.CRYSTALSHOT.getSound();
+      this.pickup = Pickup.CREATIVE_ONLY;
+      this.soundEvent = Sounds.CRYSTALSHOT.getSound();
     }
 
     @Override
@@ -98,7 +109,9 @@ public class CrystalshotItem extends ArrowItem implements InfiniteArrowItem {
       this.entityData.define(SYNC_VARIANT, "");
     }
 
-    /** Gets the texture variant of this shot */
+    /**
+     * Gets the texture variant of this shot
+     */
     public String getVariant() {
       String variant = this.entityData.get(SYNC_VARIANT);
       if (variant.isEmpty()) {
@@ -107,26 +120,28 @@ public class CrystalshotItem extends ArrowItem implements InfiniteArrowItem {
       return variant;
     }
 
-    /** Sets the arrow's variant */
+    /**
+     * Sets the arrow's variant
+     */
     public void setVariant(String variant) {
       this.entityData.set(SYNC_VARIANT, variant);
     }
 
     @Override
     public ItemStack getPickupItem() {
-      return withVariant(getVariant(), 1);
+      return withVariant(this.getVariant(), 1);
     }
 
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
       super.addAdditionalSaveData(tag);
-      tag.putString(TAG_VARIANT, getVariant());
+      tag.putString(TAG_VARIANT, this.getVariant());
     }
 
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
       super.readAdditionalSaveData(tag);
-      setVariant(tag.getString(TAG_VARIANT));
+      this.setVariant(tag.getString(TAG_VARIANT));
     }
   }
 }

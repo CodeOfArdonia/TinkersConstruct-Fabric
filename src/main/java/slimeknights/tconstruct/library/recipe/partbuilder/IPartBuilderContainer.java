@@ -10,16 +10,19 @@ import javax.annotation.Nullable;
  * Inventory interface for the part builder
  */
 public interface IPartBuilderContainer extends ISingleStackContainer {
+
   /**
    * Gets the material recipe based on the current slot contents
-   * @return  Material recipe, or null if the slot contents are not a valid material
+   *
+   * @return Material recipe, or null if the slot contents are not a valid material
    */
   @Nullable
   IMaterialValue getMaterial();
 
   /**
    * Gets the stack in the pattern slot
-   * @return  Pattern slot stack
+   *
+   * @return Pattern slot stack
    */
   ItemStack getPatternStack();
 
@@ -29,23 +32,27 @@ public interface IPartBuilderContainer extends ISingleStackContainer {
    */
   //ResourceLocation getPattern();
 
-  /** @deprecated use {{@link #getStack()}} */
+  /**
+   * @deprecated use {{@link #getStack()}}
+   */
   @Deprecated
   @Override
   default ItemStack getItem(int index) {
     return switch (index) {
-      case 0 -> getStack();
-      case 1 -> getPatternStack();
+      case 0 -> this.getStack();
+      case 1 -> this.getPatternStack();
       default -> ItemStack.EMPTY;
     };
   }
 
   @Override
   default boolean isEmpty() {
-    return getStack().isEmpty() && getPatternStack().isEmpty();
+    return this.getStack().isEmpty() && this.getPatternStack().isEmpty();
   }
 
-  /** @deprecated always 1, not useful */
+  /**
+   * @deprecated always 1, not useful
+   */
   @Deprecated
   @Override
   default int getContainerSize() {

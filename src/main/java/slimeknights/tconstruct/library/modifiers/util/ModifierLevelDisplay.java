@@ -13,13 +13,16 @@ import slimeknights.tconstruct.library.utils.RomanNumeralHelper;
 import static slimeknights.mantle.data.GenericLoaderRegistry.SingletonLoader.singleton;
 
 public interface ModifierLevelDisplay extends IHaveLoader<ModifierLevelDisplay> {
-  /** Default display, listing name followed by a roman numeral for level */
+
+  /**
+   * Default display, listing name followed by a roman numeral for level
+   */
   ModifierLevelDisplay DEFAULT = singleton(loader -> new ModifierLevelDisplay() {
     @Override
     public Component nameForLevel(Modifier modifier, int level) {
       return modifier.applyStyle(Component.translatable(modifier.getTranslationKey())
-                                   .append(" ")
-                                   .append(RomanNumeralHelper.getNumeral(level)));
+        .append(" ")
+        .append(RomanNumeralHelper.getNumeral(level)));
     }
 
     @Override
@@ -28,16 +31,22 @@ public interface ModifierLevelDisplay extends IHaveLoader<ModifierLevelDisplay> 
     }
   });
 
-  /** Loader instance */
+  /**
+   * Loader instance
+   */
   GenericLoaderRegistry<ModifierLevelDisplay> LOADER = new GenericLoaderRegistry<>(DEFAULT, true);
 
-  /** Gets the name for a modifier for the given level */
+  /**
+   * Gets the name for a modifier for the given level
+   */
   Component nameForLevel(Modifier modifier, int level);
 
 
   /* Non-default implementations */
 
-  /** Displays just the name, for modifiers where multiple levels has no effect */
+  /**
+   * Displays just the name, for modifiers where multiple levels has no effect
+   */
   ModifierLevelDisplay NO_LEVELS = singleton(loader -> new ModifierLevelDisplay() {
     @Override
     public Component nameForLevel(Modifier modifier, int level) {
@@ -50,7 +59,9 @@ public interface ModifierLevelDisplay extends IHaveLoader<ModifierLevelDisplay> 
     }
   });
 
-  /** Displays just the name for the first level, for modifiers that can have multiple levels but don't by design */
+  /**
+   * Displays just the name for the first level, for modifiers that can have multiple levels but don't by design
+   */
   ModifierLevelDisplay SINGLE_LEVEL = singleton(loader -> new ModifierLevelDisplay() {
     @Override
     public Component nameForLevel(Modifier modifier, int level) {
@@ -66,7 +77,9 @@ public interface ModifierLevelDisplay extends IHaveLoader<ModifierLevelDisplay> 
     }
   });
 
-  /** Displays level with pluses instead of numbers */
+  /**
+   * Displays level with pluses instead of numbers
+   */
   ModifierLevelDisplay PLUSES = singleton(loader -> new ModifierLevelDisplay() {
     @Override
     public Component nameForLevel(Modifier modifier, int level) {
@@ -86,9 +99,10 @@ public interface ModifierLevelDisplay extends IHaveLoader<ModifierLevelDisplay> 
    * Name that is unique for the first several levels
    */
   record UniqueForLevels(int unique) implements ModifierLevelDisplay {
+
     @Override
     public Component nameForLevel(Modifier modifier, int level) {
-      if (level <= unique) {
+      if (level <= this.unique) {
         return modifier.applyStyle(Component.translatable(modifier.getTranslationKey() + "." + level));
       }
       return DEFAULT.nameForLevel(modifier, level);
@@ -99,7 +113,9 @@ public interface ModifierLevelDisplay extends IHaveLoader<ModifierLevelDisplay> 
       return LOADER;
     }
 
-    /** Loader for a unique for levels display */
+    /**
+     * Loader for a unique for levels display
+     */
     public static final IGenericLoader<UniqueForLevels> LOADER = new IGenericLoader<>() {
       @Override
       public UniqueForLevels deserialize(JsonObject json) {

@@ -12,15 +12,16 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 public class NearsightedModifier extends IncrementalModifier {
+
   private final ResourceLocation[] SLOT_KEYS = Arrays.stream(EquipmentSlot.values())
-                                                     .sorted(Comparator.comparing(EquipmentSlot::getFilterFlag))
-                                                     .map(slot -> TConstruct.getResource("nearsighted_" + slot.getName()))
-                                                     .toArray(ResourceLocation[]::new);
+    .sorted(Comparator.comparing(EquipmentSlot::getFilterFlag))
+    .map(slot -> TConstruct.getResource("nearsighted_" + slot.getName()))
+    .toArray(ResourceLocation[]::new);
 
   @Override
   public void onEquip(IToolStackView tool, int level, EquipmentChangeContext context) {
     if (!tool.isBroken()) {
-      ResourceLocation key = SLOT_KEYS[context.getChangedSlot().getFilterFlag()];
+      ResourceLocation key = this.SLOT_KEYS[context.getChangedSlot().getFilterFlag()];
       context.getTinkerData().ifPresent(data -> data.computeIfAbsent(TinkerDataKeys.FOV_MODIFIER).set(key, 1 + 0.05f * level));
     }
   }
@@ -28,7 +29,7 @@ public class NearsightedModifier extends IncrementalModifier {
   @Override
   public void onUnequip(IToolStackView tool, int level, EquipmentChangeContext context) {
     if (!tool.isBroken()) {
-      ResourceLocation key = SLOT_KEYS[context.getChangedSlot().getFilterFlag()];
+      ResourceLocation key = this.SLOT_KEYS[context.getChangedSlot().getFilterFlag()];
       context.getTinkerData().ifPresent(data -> data.computeIfAbsent(TinkerDataKeys.FOV_MODIFIER).remove(key));
     }
   }

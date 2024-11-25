@@ -1,6 +1,5 @@
 package slimeknights.tconstruct.plugin.rei.entity;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import lombok.Getter;
@@ -37,15 +36,20 @@ import java.util.List;
  * Entity melting display in REI
  */
 public class EntityMeltingRecipeCategory implements TinkersCategory<EntityMeltingRecipeDisplay> {
+
   public static final ResourceLocation BACKGROUND_LOC = TConstruct.getResource("textures/gui/jei/melting.png");
   private static final Component TITLE = TConstruct.makeTranslation("jei", "entity_melting.title");
   private static final String KEY_PER_HEARTS = TConstruct.makeTranslationKey("jei", "entity_melting.per_hearts");
   private static final Component TOOLTIP_PER_HEART = Component.translatable(TConstruct.makeTranslationKey("jei", "entity_melting.per_heart")).withStyle(ChatFormatting.GRAY);
 
-  /** Map of damage value to tooltip callbacks */
+  /**
+   * Map of damage value to tooltip callbacks
+   */
   private static final Int2ObjectMap<IRecipeTooltipReplacement> TOOLTIP_MAP = new Int2ObjectOpenHashMap<>();
 
-  /** Renderer instance to use in this category */
+  /**
+   * Renderer instance to use in this category
+   */
   private final EntityEntryRenderer entityRenderer = new EntityEntryRenderer(32);
 
   @Getter
@@ -64,7 +68,7 @@ public class EntityMeltingRecipeCategory implements TinkersCategory<EntityMeltin
     return new Renderer() {
       @Override
       public void render(GuiGraphics graphics, Rectangle bounds, int mouseX, int mouseY, float delta) {
-        icon.build(0, 0, bounds.getLocation()).render(graphics, bounds, mouseX, mouseY, delta);
+        EntityMeltingRecipeCategory.this.icon.build(0, 0, bounds.getLocation()).render(graphics, bounds, mouseX, mouseY, delta);
       }
     };
   }
@@ -93,16 +97,16 @@ public class EntityMeltingRecipeCategory implements TinkersCategory<EntityMeltin
   public void addWidgets(EntityMeltingRecipeDisplay display, List<Widget> ingredients, Point origin, Rectangle bounds) {
     // inputs, filtered by spawn egg item
     List<EntityType> displayTypes = EntityEntryDefinition.applyFocus(display.getRecipe().getEntityInputs());
-    Slot input = slot(19, 11, origin).markInput()
+    Slot input = this.slot(19, 11, origin).markInput()
       .entries(EntryIngredients.of(TConstructREIConstants.ENTITY_TYPE, displayTypes));
     input.getBounds().setSize(34, 34);
-    ClientEntryStacks.setRenderer(input.getCurrentEntry(), entityRenderer);
+    ClientEntryStacks.setRenderer(input.getCurrentEntry(), this.entityRenderer);
     ingredients.add(input);
     // add spawn eggs as hidden inputs
 //    builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).addItemStacks(display.getItemInputs());
 
     // output
-    Slot output = slot(115, 11, origin).markOutput()
+    Slot output = this.slot(115, 11, origin).markOutput()
       .entries(display.getOutputEntries().get(0));
     output.getBounds().setSize(18, 34);
     output.getEntries().forEach(entryStack -> ClientEntryStacks.setFluidRenderRatio(entryStack.cast(), entryStack.<dev.architectury.fluid.FluidStack>castValue().getAmount() / (float) FluidValues.INGOT * 2));
@@ -110,28 +114,31 @@ public class EntityMeltingRecipeCategory implements TinkersCategory<EntityMeltin
     ingredients.add(output);
 
     // show fuels that are valid for this recipe
-    Slot catalyst = slot(75, 43, origin)
+    Slot catalyst = this.slot(75, 43, origin)
       .entries(EntryIngredients.of(VanillaEntryTypes.FLUID, TinkersCategory.toREIFluids(MeltingFuelHandler.getUsableFuels(1))));
     catalyst.getBounds().setSize(18, 18);
     TinkersCategory.setEntryTooltip(catalyst, IRecipeTooltipReplacement.EMPTY);
     ingredients.add(catalyst);
-    ingredients.add(tank.build(75, 43, origin));
+    ingredients.add(this.tank.build(75, 43, origin));
 
-    ingredients.add(new ArrowWidget(point(71, 21, origin), BACKGROUND_LOC, 150, 41).animationDurationTicks(200));
+    ingredients.add(new ArrowWidget(this.point(71, 21, origin), BACKGROUND_LOC, 150, 41).animationDurationTicks(200));
   }
 
-  /** Tooltip for relevant damage on the fluid */
+  /**
+   * Tooltip for relevant damage on the fluid
+   */
   private record FluidTooltip(int damage) implements IRecipeTooltipReplacement {
+
     @Override
     public void addMiddleLines(Slot recipeSlotView, List<Component> list) {
       // add fluid units
       if (recipeSlotView.getCurrentEntry().getType() == VanillaEntryTypes.FLUID)
         FluidTooltipHandler.appendMaterial(TinkersCategory.fromREIFluid(recipeSlotView.getCurrentEntry().castValue()), list);
       // output rate
-      if (damage == 2) {
+      if (this.damage == 2) {
         list.add(TOOLTIP_PER_HEART);
       } else {
-        list.add(Component.translatable(KEY_PER_HEARTS, damage / 2f).withStyle(ChatFormatting.GRAY));
+        list.add(Component.translatable(KEY_PER_HEARTS, this.damage / 2f).withStyle(ChatFormatting.GRAY));
       }
     }
   }

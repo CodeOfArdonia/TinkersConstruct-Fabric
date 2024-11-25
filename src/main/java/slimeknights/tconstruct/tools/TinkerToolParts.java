@@ -1,15 +1,9 @@
 package slimeknights.tconstruct.tools;
 
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import slimeknights.mantle.registration.object.ItemObject;
-import slimeknights.mantle.util.SupplierCreativeTab;
-import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.common.TinkerModule;
 import slimeknights.tconstruct.common.TinkerTabs;
-import slimeknights.tconstruct.library.materials.MaterialRegistry;
-import slimeknights.tconstruct.library.materials.definition.IMaterial;
 import slimeknights.tconstruct.library.tools.part.ToolPartItem;
 import slimeknights.tconstruct.tools.item.RepairKitItem;
 import slimeknights.tconstruct.tools.stats.BowstringMaterialStats;
@@ -19,10 +13,8 @@ import slimeknights.tconstruct.tools.stats.HandleMaterialStats;
 import slimeknights.tconstruct.tools.stats.HeadMaterialStats;
 import slimeknights.tconstruct.tools.stats.LimbMaterialStats;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public final class TinkerToolParts extends TinkerModule {
+
   private static final Item.Properties PARTS_PROPS = new Item.Properties();
 
   // repair kit, technically a head so it filters to things useful for repair

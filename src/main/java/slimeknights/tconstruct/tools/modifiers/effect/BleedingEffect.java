@@ -19,7 +19,9 @@ import slimeknights.tconstruct.tools.modifiers.traits.melee.LaceratingModifier;
  * Potion effect from {@link LaceratingModifier}
  */
 public class BleedingEffect extends NoMilkEffect {
+
   private static final String SOURCE_KEY = TConstruct.prefix("bleed");
+
   public BleedingEffect() {
     super(MobEffectCategory.HARMFUL, 0xa80000, true);
   }
@@ -35,10 +37,9 @@ public class BleedingEffect extends NoMilkEffect {
     // attribute to player kill
     LivingEntity lastAttacker = target.getLastHurtMob();
     DamageSource source;
-    if(lastAttacker != null) {
+    if (lastAttacker != null) {
       source = new BleedingDamageSource(target.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(TinkerDamageTypes.BLEEDING), lastAttacker);
-    }
-    else {
+    } else {
       source = new DamageSource(target.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(TinkerDamageTypes.BLEEDING));
     }
 
@@ -53,9 +54,12 @@ public class BleedingEffect extends NoMilkEffect {
     }
   }
 
-  /** Guardians use the direct entity to determine if they should thorns, while the direct marks for player kills
-   * treat this as indirect damage by making the direct entity null, so guardians treat it like arrows */
+  /**
+   * Guardians use the direct entity to determine if they should thorns, while the direct marks for player kills
+   * treat this as indirect damage by making the direct entity null, so guardians treat it like arrows
+   */
   private static class BleedingDamageSource extends DamageSource {
+
     public BleedingDamageSource(Holder<DamageType> holder, Entity entity) {
       super(holder, entity);
     }

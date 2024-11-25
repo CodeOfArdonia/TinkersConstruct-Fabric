@@ -23,6 +23,7 @@ import slimeknights.tconstruct.tools.TinkerModifiers;
 
 @RequiredArgsConstructor
 public class BlockTransformWalkerModifier extends AbstractWalkerModifier {
+
   private final ToolAction action;
   private final SoundEvent sound;
   private MutableUseOnContext context;
@@ -41,7 +42,7 @@ public class BlockTransformWalkerModifier extends AbstractWalkerModifier {
   public void onWalk(IToolStackView tool, ModifierEntry modifier, LivingEntity living, BlockPos prevPos, BlockPos newPos) {
     super.onWalk(tool, modifier, living, prevPos, newPos);
     // clear the context to prevent memory leaks
-    context = null;
+    this.context = null;
   }
 
   @Override
@@ -50,18 +51,18 @@ public class BlockTransformWalkerModifier extends AbstractWalkerModifier {
       mutable.set(target.getX(), target.getY() - 1, target.getZ());
 
       // prepare context, reused to save effort as only the position changes
-      if (context == null) {
-        context = new MutableUseOnContext(living.level(), living instanceof Player p ? p : null, InteractionHand.MAIN_HAND, living.getItemBySlot(EquipmentSlot.FEET), Util.createTraceResult(mutable, Direction.UP, false));
+      if (this.context == null) {
+        this.context = new MutableUseOnContext(living.level(), living instanceof Player p ? p : null, InteractionHand.MAIN_HAND, living.getItemBySlot(EquipmentSlot.FEET), Util.createTraceResult(mutable, Direction.UP, false));
       } else {
-        context.setOffsetPos(mutable);
+        this.context.setOffsetPos(mutable);
       }
       // transform the block
       BlockState original = world.getBlockState(mutable);
-      BlockState transformed = original.getToolModifiedState(context, action, false);
+      BlockState transformed = original.getToolModifiedState(this.context, this.action, false);
       if (transformed != null) {
         world.setBlock(mutable, transformed, Block.UPDATE_ALL_IMMEDIATE);
         world.destroyBlock(target, true);
-        world.playSound(null, mutable, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
+        world.playSound(null, mutable, this.sound, SoundSource.BLOCKS, 1.0F, 1.0F);
         ToolDamageUtil.damageAnimated(tool, 1, living, EquipmentSlot.FEET);
       }
     }

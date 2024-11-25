@@ -22,7 +22,10 @@ import slimeknights.tconstruct.library.recipe.worktable.IModifierWorktableRecipe
  * Class containing all of Tinkers Construct recipe types
  */
 public class TinkerRecipeTypes {
-  /** Deferred instance */
+
+  /**
+   * Deferred instance
+   */
   private static final LazyRegistrar<RecipeType<?>> TYPES = LazyRegistrar.create(Registries.RECIPE_TYPE, TConstruct.MOD_ID);
 
   public static final RegistryObject<RecipeType<IPartBuilderRecipe>> PART_BUILDER = register("part_builder");
@@ -45,19 +48,24 @@ public class TinkerRecipeTypes {
   // modifiers
   public static final RegistryObject<RecipeType<SeveringRecipe>> SEVERING = register("severing");
 
-  /** Internal recipe type for recipes that are not pulled by any specific crafting block */
+  /**
+   * Internal recipe type for recipes that are not pulled by any specific crafting block
+   */
   public static final RegistryObject<RecipeType<Recipe<?>>> DATA = register("data");
 
-  /** Initializes the deferred register */
+  /**
+   * Initializes the deferred register
+   */
   public static void init() {
     TYPES.register();
   }
 
   /**
    * Registers a new recipe type, prefixing with the mod ID
-   * @param name  Recipe type name
-   * @param <T>   Recipe type
-   * @return  Registered recipe type
+   *
+   * @param name Recipe type name
+   * @param <T>  Recipe type
+   * @return Registered recipe type
    */
   static <T extends Recipe<?>> RegistryObject<RecipeType<T>> register(String name) {
     return TYPES.register(name, () -> new RecipeType<>() {

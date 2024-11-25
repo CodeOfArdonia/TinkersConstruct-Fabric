@@ -16,29 +16,30 @@ import java.util.List;
  */
 @AllArgsConstructor
 public class StructureUpdatePacket implements IThreadsafePacket {
+
   private final BlockPos pos;
   private final BlockPos minPos;
   private final BlockPos maxPos;
   private final List<BlockPos> tanks;
 
   public StructureUpdatePacket(FriendlyByteBuf buffer) {
-    pos = buffer.readBlockPos();
-    minPos = buffer.readBlockPos();
-    maxPos = buffer.readBlockPos();
+    this.pos = buffer.readBlockPos();
+    this.minPos = buffer.readBlockPos();
+    this.maxPos = buffer.readBlockPos();
     int count = buffer.readVarInt();
-    tanks = new ArrayList<>(count);
+    this.tanks = new ArrayList<>(count);
     for (int i = 0; i < count; i++) {
-      tanks.add(buffer.readBlockPos());
+      this.tanks.add(buffer.readBlockPos());
     }
   }
 
   @Override
   public void encode(FriendlyByteBuf buffer) {
-    buffer.writeBlockPos(pos);
-    buffer.writeBlockPos(minPos);
-    buffer.writeBlockPos(maxPos);
-    buffer.writeVarInt(tanks.size());
-    for (BlockPos tank : tanks) {
+    buffer.writeBlockPos(this.pos);
+    buffer.writeBlockPos(this.minPos);
+    buffer.writeBlockPos(this.maxPos);
+    buffer.writeVarInt(this.tanks.size());
+    for (BlockPos tank : this.tanks) {
       buffer.writeBlockPos(tank);
     }
   }
@@ -49,9 +50,10 @@ public class StructureUpdatePacket implements IThreadsafePacket {
   }
 
   private static class HandleClient {
+
     private static void handle(StructureUpdatePacket packet) {
       BlockEntityHelper.get(HeatingStructureBlockEntity.class, Minecraft.getInstance().level, packet.pos)
-                       .ifPresent(te -> te.setStructureSize(packet.minPos, packet.maxPos, packet.tanks));
+        .ifPresent(te -> te.setStructureSize(packet.minPos, packet.maxPos, packet.tanks));
     }
   }
 }

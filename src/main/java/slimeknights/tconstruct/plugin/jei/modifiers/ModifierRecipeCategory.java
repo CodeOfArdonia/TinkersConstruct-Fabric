@@ -53,6 +53,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ModifierRecipeCategory implements IRecipeCategory<IDisplayModifierRecipe> {
+
   protected static final ResourceLocation BACKGROUND_LOC = TConstruct.getResource("textures/gui/jei/tinker_station.png");
   private static final Component TITLE = TConstruct.makeTranslation("jei", "modifiers.title");
 
@@ -72,14 +73,15 @@ public class ModifierRecipeCategory implements IRecipeCategory<IDisplayModifierR
   private final String maxPrefix;
   private final IDrawable requirements, incremental;
   private final IDrawable[] slotIcons;
-  private final Map<SlotType,TextureAtlasSprite> slotTypeSprites = new HashMap<>();
+  private final Map<SlotType, TextureAtlasSprite> slotTypeSprites = new HashMap<>();
+
   public ModifierRecipeCategory(IGuiHelper helper) {
     this.maxPrefix = ForgeI18n.getPattern(KEY_MAX);
     this.background = helper.createDrawable(BACKGROUND_LOC, 0, 0, 128, 77);
     this.icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK, CreativeSlotItem.withSlot(new ItemStack(TinkerModifiers.creativeSlotItem), SlotType.UPGRADE));
     this.slotIcons = new IDrawable[6];
     for (int i = 0; i < 6; i++) {
-      slotIcons[i] = helper.createDrawable(BACKGROUND_LOC, 128 + i * 16, 0, 16, 16);
+      this.slotIcons[i] = helper.createDrawable(BACKGROUND_LOC, 128 + i * 16, 0, 16, 16);
     }
     this.requirements = helper.createDrawable(BACKGROUND_LOC, 128, 17, 16, 16);
     this.incremental = helper.createDrawable(BACKGROUND_LOC, 128, 33, 16, 16);
@@ -95,33 +97,37 @@ public class ModifierRecipeCategory implements IRecipeCategory<IDisplayModifierR
     return TITLE;
   }
 
-  /** Draws a single slot icon */
+  /**
+   * Draws a single slot icon
+   */
   private void drawSlot(GuiGraphics graphics, IDisplayModifierRecipe recipe, int slot, int x, int y) {
     List<ItemStack> stacks = recipe.getDisplayItems(slot);
     if (stacks.isEmpty()) {
       // -1 as the item list includes the output slot, we skip that
-      slotIcons[slot].draw(graphics, x + 1, y + 1);
+      this.slotIcons[slot].draw(graphics, x + 1, y + 1);
     }
   }
 
-  /** Draws the icon for the given slot type */
+  /**
+   * Draws the icon for the given slot type
+   */
   private void drawSlotType(GuiGraphics graphics, @Nullable SlotType slotType, int x, int y) {
     Minecraft minecraft = Minecraft.getInstance();
     TextureAtlasSprite sprite;
-    if (slotTypeSprites.containsKey(slotType)) {
-      sprite = slotTypeSprites.get(slotType);
+    if (this.slotTypeSprites.containsKey(slotType)) {
+      sprite = this.slotTypeSprites.get(slotType);
     } else {
       ModelManager modelManager = minecraft.getModelManager();
       // gets the model for the item, its a sepcial one that gives us texture info
       BakedModel model = minecraft.getItemRenderer().getItemModelShaper().getItemModel(TinkerModifiers.creativeSlotItem.get());
       if (model != null && model.getOverrides() instanceof NBTKeyModel.Overrides) {
-        Material material = ((NBTKeyModel.Overrides)model.getOverrides()).getTexture(slotType == null ? "slotless" : slotType.getName());
+        Material material = ((NBTKeyModel.Overrides) model.getOverrides()).getTexture(slotType == null ? "slotless" : slotType.getName());
         sprite = modelManager.getAtlas(material.atlasLocation()).getSprite(material.texture());
       } else {
         // failed to use the model, use missing texture
         sprite = modelManager.getAtlas(InventoryMenu.BLOCK_ATLAS).getSprite(MissingTextureAtlasSprite.getLocation());
       }
-      slotTypeSprites.put(slotType, sprite);
+      this.slotTypeSprites.put(slotType, sprite);
     }
     RenderSystem.setShader(GameRenderer::getPositionTexShader);
     RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
@@ -131,33 +137,33 @@ public class ModifierRecipeCategory implements IRecipeCategory<IDisplayModifierR
 
   @Override
   public void draw(IDisplayModifierRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
-    drawSlot(graphics, recipe, 0,  2, 32);
-    drawSlot(graphics, recipe, 1, 24, 14);
-    drawSlot(graphics, recipe, 2, 46, 32);
-    drawSlot(graphics, recipe, 3, 42, 57);
-    drawSlot(graphics, recipe, 4,  6, 57);
+    this.drawSlot(graphics, recipe, 0, 2, 32);
+    this.drawSlot(graphics, recipe, 1, 24, 14);
+    this.drawSlot(graphics, recipe, 2, 46, 32);
+    this.drawSlot(graphics, recipe, 3, 42, 57);
+    this.drawSlot(graphics, recipe, 4, 6, 57);
 
     // draw info icons
     if (recipe.hasRequirements()) {
-      requirements.draw(graphics, 66, 58);
+      this.requirements.draw(graphics, 66, 58);
     }
     if (recipe.isIncremental()) {
-      incremental.draw(graphics, 83, 59);
+      this.incremental.draw(graphics, 83, 59);
     }
 
     // draw max count
     Font fontRenderer = Minecraft.getInstance().font;
     int max = recipe.getMaxLevel();
     if (max > 0) {
-      graphics.drawString(fontRenderer, maxPrefix + max, 66, 16, Color.GRAY.getRGB(), false);
+      graphics.drawString(fontRenderer, this.maxPrefix + max, 66, 16, Color.GRAY.getRGB(), false);
     }
 
     // draw slot cost
     SlotCount slots = recipe.getSlots();
     if (slots == null) {
-      drawSlotType(graphics, null, 110, 58);
+      this.drawSlotType(graphics, null, 110, 58);
     } else {
-      drawSlotType(graphics, slots.getType(), 110, 58);
+      this.drawSlotType(graphics, slots.getType(), 110, 58);
       String text = Integer.toString(slots.getCount());
       int x = 111 - fontRenderer.width(text);
       graphics.drawString(fontRenderer, text, x, 63, Color.GRAY.getRGB(), false);
@@ -193,15 +199,15 @@ public class ModifierRecipeCategory implements IRecipeCategory<IDisplayModifierR
   @Override
   public void setRecipe(IRecipeLayoutBuilder builder, IDisplayModifierRecipe recipe, IFocusGroup focuses) {
     // inputs
-    builder.addSlot(RecipeIngredientRole.INPUT,  3, 33).addItemStacks(recipe.getDisplayItems(0));
+    builder.addSlot(RecipeIngredientRole.INPUT, 3, 33).addItemStacks(recipe.getDisplayItems(0));
     builder.addSlot(RecipeIngredientRole.INPUT, 25, 15).addItemStacks(recipe.getDisplayItems(1));
     builder.addSlot(RecipeIngredientRole.INPUT, 47, 33).addItemStacks(recipe.getDisplayItems(2));
     builder.addSlot(RecipeIngredientRole.INPUT, 43, 58).addItemStacks(recipe.getDisplayItems(3));
-    builder.addSlot(RecipeIngredientRole.INPUT,  7, 58).addItemStacks(recipe.getDisplayItems(4));
+    builder.addSlot(RecipeIngredientRole.INPUT, 7, 58).addItemStacks(recipe.getDisplayItems(4));
     // modifiers
     builder.addSlot(RecipeIngredientRole.OUTPUT, 3, 3)
-           .setCustomRenderer(TConstructJEIConstants.MODIFIER_TYPE, modifierRenderer)
-           .addIngredient(TConstructJEIConstants.MODIFIER_TYPE, recipe.getDisplayResult());
+      .setCustomRenderer(TConstructJEIConstants.MODIFIER_TYPE, this.modifierRenderer)
+      .addIngredient(TConstructJEIConstants.MODIFIER_TYPE, recipe.getDisplayResult());
     // tool
     List<ItemStack> toolWithoutModifier = recipe.getToolWithoutModifier();
     List<ItemStack> toolWithModifier = recipe.getToolWithModifier();
@@ -234,29 +240,35 @@ public class ModifierRecipeCategory implements IRecipeCategory<IDisplayModifierR
         }
       }
     }
-    builder.addSlot(RecipeIngredientRole.CATALYST,  25, 38).addItemStacks(toolWithoutModifier);
+    builder.addSlot(RecipeIngredientRole.CATALYST, 25, 38).addItemStacks(toolWithoutModifier);
     builder.addSlot(RecipeIngredientRole.CATALYST, 105, 34).addItemStacks(toolWithModifier);
   }
 
 
   /* Slimeskull workaround */
-  /** internal list of slimeskulls for the sake of ingredient lookup, needed since they are technically distinct but modifiers treat them as the same */
+  /**
+   * internal list of slimeskulls for the sake of ingredient lookup, needed since they are technically distinct but modifiers treat them as the same
+   */
   private static List<ItemStack> SLIMESKULL_HELMETS = null;
 
-  /** called to clear the cache on ingredient reload as materials may have changed */
+  /**
+   * called to clear the cache on ingredient reload as materials may have changed
+   */
   public static void clearSlimeskullCache() {
     SLIMESKULL_HELMETS = null;
   }
 
-  /** gets the list of slimeskull helmets, loading it if needed */
+  /**
+   * gets the list of slimeskull helmets, loading it if needed
+   */
   private static List<ItemStack> getSlimeskullHelmets() {
     if (SLIMESKULL_HELMETS == null) {
       IMaterialRegistry registry = MaterialRegistry.getInstance();
       IModifiable slimeskull = TinkerTools.slimesuit.get(ArmorSlotType.HELMET);
       SLIMESKULL_HELMETS = registry.getAllMaterials().stream()
-                                   .filter(material -> registry.getMaterialStats(material.getIdentifier(), SkullStats.ID).isPresent())
-                                   .map(material -> ToolBuildHandler.buildItemFromMaterials(slimeskull, MaterialNBT.of(material)))
-                                   .toList();
+        .filter(material -> registry.getMaterialStats(material.getIdentifier(), SkullStats.ID).isPresent())
+        .map(material -> ToolBuildHandler.buildItemFromMaterials(slimeskull, MaterialNBT.of(material)))
+        .toList();
     }
     return SLIMESKULL_HELMETS;
   }

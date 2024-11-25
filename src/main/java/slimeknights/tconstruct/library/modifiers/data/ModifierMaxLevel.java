@@ -6,35 +6,47 @@ import slimeknights.tconstruct.library.tools.definition.ModifiableArmorMaterial;
 
 import javax.annotation.Nullable;
 
-/** Helper class to keep track the max modifier level in a modifier, floats, keeps track of max slot, and tracks all 6 slots */
+/**
+ * Helper class to keep track the max modifier level in a modifier, floats, keeps track of max slot, and tracks all 6 slots
+ */
 public class ModifierMaxLevel {
-  /** Level for each slot */
+
+  /**
+   * Level for each slot
+   */
   private final float[] levels = new float[6];
-  /** Max level across all slots */
+  /**
+   * Max level across all slots
+   */
   @Getter
   private float max = 0;
-  /** Slot containing the max level */
-  @Getter @Nullable
+  /**
+   * Slot containing the max level
+   */
+  @Getter
+  @Nullable
   private EquipmentSlot maxSlot;
 
-  /** Sets the given value in the structure */
+  /**
+   * Sets the given value in the structure
+   */
   public void set(EquipmentSlot slot, float level) {
-    float oldLevel = levels[slot.getFilterFlag()];
+    float oldLevel = this.levels[slot.getFilterFlag()];
     if (level != oldLevel) {
       // first, update level
-      levels[slot.getFilterFlag()] = level;
+      this.levels[slot.getFilterFlag()] = level;
       // if larger than max, new max
-      if (level >= max) {
-        max = level;
-        maxSlot = slot;
-      } else if (slot == maxSlot) {
+      if (level >= this.max) {
+        this.max = level;
+        this.maxSlot = slot;
+      } else if (slot == this.maxSlot) {
         // if the old level was max, find new max
-        max = 0;
+        this.max = 0;
         for (EquipmentSlot armorSlot : ModifiableArmorMaterial.ARMOR_SLOTS) {
-          float value = levels[armorSlot.getFilterFlag()];
-          if (value > max) {
-            max = value;
-            maxSlot = armorSlot;
+          float value = this.levels[armorSlot.getFilterFlag()];
+          if (value > this.max) {
+            this.max = value;
+            this.maxSlot = armorSlot;
           }
         }
       }

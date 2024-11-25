@@ -4,8 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import com.mojang.blaze3d.vertex.PoseStack;
-import io.github.fabricators_of_create.porting_lib.event.client.TextureStitchCallback;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -13,7 +11,6 @@ import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
@@ -31,7 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Consumer;
 
 /**
  * Class handling the loading of modifier UI icons
@@ -39,17 +35,28 @@ import java.util.function.Consumer;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Log4j2
 public class ModifierIconManager implements IEarlySafeManagerReloadListener, IdentifiableResourceReloadListener {
-  /** Icon file to load, has merging behavior but forge prevents multiple mods from loading the same file */
+
+  /**
+   * Icon file to load, has merging behavior but forge prevents multiple mods from loading the same file
+   */
   private static final String ICONS = "tinkering/modifier_icons.json";
-  /** First layer of the default icon, will be tinted */
+  /**
+   * First layer of the default icon, will be tinted
+   */
   public static final ResourceLocation DEFAULT_PAGES = TConstruct.getResource("gui/modifiers/default_pages");
-  /** Second layer of the default icon, will be tinted */
+  /**
+   * Second layer of the default icon, will be tinted
+   */
   public static final ResourceLocation DEFAULT_COVER = TConstruct.getResource("gui/modifiers/default_cover");
-  /** Instance of this manager */
+  /**
+   * Instance of this manager
+   */
   public static final ModifierIconManager INSTANCE = new ModifierIconManager();
 
-  /** Map of icons for each modifier */
-  public static Map<ModifierId,List<ResourceLocation>> modifierIcons = Collections.emptyMap();
+  /**
+   * Map of icons for each modifier
+   */
+  public static Map<ModifierId, List<ResourceLocation>> modifierIcons = Collections.emptyMap();
 
   /**
    * Initializes this manager, registering it relevant event busses
@@ -58,7 +65,9 @@ public class ModifierIconManager implements IEarlySafeManagerReloadListener, Ide
     ModifierIconManager.onResourceManagerRegister();
   }
 
-  /** Called on resource manager build to add the manager */
+  /**
+   * Called on resource manager build to add the manager
+   */
   private static void onResourceManagerRegister() {
     ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(INSTANCE);
   }
@@ -66,7 +75,7 @@ public class ModifierIconManager implements IEarlySafeManagerReloadListener, Ide
   @Override
   public void onReloadSafe(ResourceManager manager) {
     // start building the model map
-    Map<ModifierId,List<ResourceLocation>> icons = new HashMap<>();
+    Map<ModifierId, List<ResourceLocation>> icons = new HashMap<>();
 
     // get a list of files from all namespaces
     List<JsonObject> jsonFiles = JsonHelper.getFileInAllDomainsAndPacks(manager, ICONS, null);
@@ -74,7 +83,7 @@ public class ModifierIconManager implements IEarlySafeManagerReloadListener, Ide
     for (int i = jsonFiles.size() - 1; i >= 0; i--) {
       JsonObject json = jsonFiles.get(i);
       // right now just do simply key value pairs
-      for (Entry<String,JsonElement> entry : json.entrySet()) {
+      for (Entry<String, JsonElement> entry : json.entrySet()) {
         // get a valid name
         String key = entry.getKey();
         ModifierId name = ModifierId.tryParse(key);
@@ -114,12 +123,13 @@ public class ModifierIconManager implements IEarlySafeManagerReloadListener, Ide
 
   /**
    * Renders a modifier icon at the given location
-   * @param graphics  Gui graphics instance
-   * @param modifier  Modifier to draw
-   * @param x         X offset
-   * @param y         Y offset
-   * @param z         Render depth offset, typically 100 is good
-   * @param size      Size to render, 16 is default
+   *
+   * @param graphics Gui graphics instance
+   * @param modifier Modifier to draw
+   * @param x        X offset
+   * @param y        Y offset
+   * @param z        Render depth offset, typically 100 is good
+   * @param size     Size to render, 16 is default
    */
   public static void renderIcon(GuiGraphics graphics, Modifier modifier, int x, int y, int z, int size) {
     RenderUtils.setup(InventoryMenu.BLOCK_ATLAS);

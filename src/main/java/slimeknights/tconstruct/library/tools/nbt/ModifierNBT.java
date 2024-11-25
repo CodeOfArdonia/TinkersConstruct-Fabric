@@ -28,32 +28,39 @@ import java.util.stream.Collectors;
 @EqualsAndHashCode
 @RequiredArgsConstructor
 public class ModifierNBT {
+
   public static final String TAG_MODIFIER = "name";
   public static final String TAG_LEVEL = "level";
 
-  /** Instance containing no modifiers */
+  /**
+   * Instance containing no modifiers
+   */
   public static final ModifierNBT EMPTY = new ModifierNBT(Collections.emptyList());
 
-  /** Sorted list of modifiers */
+  /**
+   * Sorted list of modifiers
+   */
   @Getter
   private final List<ModifierEntry> modifiers;
 
   /**
    * Checks if the NBT has no modifiers
-   * @return  True if there are no modifiers
+   *
+   * @return True if there are no modifiers
    */
   public boolean isEmpty() {
-    return modifiers.isEmpty();
+    return this.modifiers.isEmpty();
   }
 
   /**
    * Gets the modifier entry for a modifier
-   * @param modifier  Modifier to check
-   * @return  Modifier entry, or null if absent
+   *
+   * @param modifier Modifier to check
+   * @return Modifier entry, or null if absent
    */
   @Nullable
   public ModifierEntry getEntry(ModifierId modifier) {
-    for (ModifierEntry entry : modifiers) {
+    for (ModifierEntry entry : this.modifiers) {
       if (entry.matches(modifier)) {
         return entry;
       }
@@ -63,11 +70,12 @@ public class ModifierNBT {
 
   /**
    * Gets the level of a modifier
-   * @param modifier  Modifier to check
-   * @return  Modifier level, or 0 if modifier is missing
+   *
+   * @param modifier Modifier to check
+   * @return Modifier level, or 0 if modifier is missing
    */
   public int getLevel(ModifierId modifier) {
-    for (ModifierEntry entry : modifiers) {
+    for (ModifierEntry entry : this.modifiers) {
       if (entry.matches(modifier)) {
         return entry.getLevel();
       }
@@ -78,9 +86,10 @@ public class ModifierNBT {
   /**
    * Creates a copy of this NBT with the given modifier added. Result will be unsorted
    * Do not use if you need to make multiple additions, use {@link ModifierNBT.Builder}
-   * @param modifier  Modifier
-   * @param level     Levels of the modifier to add
-   * @return  Instance with the given modifier
+   *
+   * @param modifier Modifier
+   * @param level    Levels of the modifier to add
+   * @return Instance with the given modifier
    */
   public ModifierNBT withModifier(ModifierId modifier, int level) {
     if (level <= 0) {
@@ -110,9 +119,10 @@ public class ModifierNBT {
 
   /**
    * Creates a copy of this NBT without the given modifier
-   * @param modifier  Modifier to remove
-   * @param level     Level to remove
-   * @return  ModifierNBT without the given modifier
+   *
+   * @param modifier Modifier to remove
+   * @param level    Level to remove
+   * @return ModifierNBT without the given modifier
    */
   public ModifierNBT withoutModifier(ModifierId modifier, int level) {
     if (level <= 0) {
@@ -137,13 +147,15 @@ public class ModifierNBT {
     return new ModifierNBT(builder.build());
   }
 
-  /** Re-adds the modifier list from NBT */
+  /**
+   * Re-adds the modifier list from NBT
+   */
   public static ModifierNBT readFromNBT(@Nullable Tag inbt) {
     if (inbt == null || inbt.getId() != Tag.TAG_LIST) {
       return EMPTY;
     }
 
-    ListTag listNBT = (ListTag)inbt;
+    ListTag listNBT = (ListTag) inbt;
     if (listNBT.getElementType() != Tag.TAG_COMPOUND) {
       return EMPTY;
     }
@@ -162,13 +174,15 @@ public class ModifierNBT {
     return new ModifierNBT(builder.build());
   }
 
-  /** Writes these modifiers to NBT */
+  /**
+   * Writes these modifiers to NBT
+   */
   public ListTag serializeToNBT() {
     ListTag list = new ListTag();
-    for (ModifierEntry entry : modifiers) {
+    for (ModifierEntry entry : this.modifiers) {
       CompoundTag tag = new CompoundTag();
       tag.putString(TAG_MODIFIER, entry.getId().toString());
-      tag.putShort(TAG_LEVEL, (short)entry.getLevel());
+      tag.putShort(TAG_LEVEL, (short) entry.getLevel());
       list.add(tag);
     }
     return list;
@@ -176,7 +190,8 @@ public class ModifierNBT {
 
   /**
    * Creates a new builder for modifier NBT
-   * @return  Builder instance
+   *
+   * @return Builder instance
    */
   public static Builder builder() {
     return new Builder();
@@ -187,14 +202,18 @@ public class ModifierNBT {
    */
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   public static class Builder {
-    /** Intentionally using modifiers to ensure they are resolved */
+
+    /**
+     * Intentionally using modifiers to ensure they are resolved
+     */
     private final Map<Modifier, Integer> modifiers = new LinkedHashMap<>();
 
     /**
      * Adds a single modifier to the builder
-     * @param modifier  Modifier
-     * @param level     Modifier level
-     * @return  Builder instance
+     *
+     * @param modifier Modifier
+     * @param level    Modifier level
+     * @return Builder instance
      */
     public Builder add(Modifier modifier, int level) {
       if (level <= 0) {
@@ -202,56 +221,61 @@ public class ModifierNBT {
       }
       // skip if its the empty modifier, no sense tracking
       if (modifier != ModifierManager.INSTANCE.getDefaultValue()) {
-        Integer value = modifiers.get(modifier);
+        Integer value = this.modifiers.get(modifier);
         if (value != null) {
           level += value;
         }
-        modifiers.put(modifier, level);
+        this.modifiers.put(modifier, level);
       }
       return this;
     }
 
     /**
      * Adds an entry to the builder
-     * @param entry  Entry to add
-     * @return  Builder instance
+     *
+     * @param entry Entry to add
+     * @return Builder instance
      */
     public Builder add(ModifierEntry entry) {
-      add(entry.getModifier(), entry.getLevel());
+      this.add(entry.getModifier(), entry.getLevel());
       return this;
     }
 
     /**
      * Adds an entry to the builder
-     * @param entries  Entries to add
-     * @return  Builder instance
+     *
+     * @param entries Entries to add
+     * @return Builder instance
      */
     public Builder add(List<ModifierEntry> entries) {
       for (ModifierEntry entry : entries) {
-        add(entry);
+        this.add(entry);
       }
       return this;
     }
 
     /**
      * Adds all modifiers from the given modifier NBT
-     * @param nbt  NBT object
-     * @return  Builder instance
+     *
+     * @param nbt NBT object
+     * @return Builder instance
      */
     public Builder add(ModifierNBT nbt) {
-      add(nbt.getModifiers());
+      this.add(nbt.getModifiers());
       return this;
     }
 
-    /** Builds the NBT */
+    /**
+     * Builds the NBT
+     */
     public ModifierNBT build() {
       // converts the map into a list of entries, priority sorted
       // note priority is negated so higher numbers go first
-      List<ModifierEntry> list = modifiers.entrySet().stream()
-                                          .map(entry -> new ModifierEntry(entry.getKey(), entry.getValue()))
-                                          // sort on priority, falls back to the order they were added
-                                          .sorted(Comparator.comparingInt(entry -> -entry.getModifier().getPriority()))
-                                          .collect(Collectors.toList());
+      List<ModifierEntry> list = this.modifiers.entrySet().stream()
+        .map(entry -> new ModifierEntry(entry.getKey(), entry.getValue()))
+        // sort on priority, falls back to the order they were added
+        .sorted(Comparator.comparingInt(entry -> -entry.getModifier().getPriority()))
+        .collect(Collectors.toList());
       return new ModifierNBT(ImmutableList.copyOf(list));
     }
   }

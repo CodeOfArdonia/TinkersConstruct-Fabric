@@ -11,6 +11,7 @@ import java.util.Iterator;
 
 @AllArgsConstructor
 public class DuctTankWrapper implements SlottedStorage<FluidVariant> {
+
   private final SlottedStorage<FluidVariant> parent;
   private final DuctItemHandler itemHandler;
 
@@ -19,17 +20,17 @@ public class DuctTankWrapper implements SlottedStorage<FluidVariant> {
 
   @Override
   public int getSlotCount() {
-    return parent.getSlotCount();
+    return this.parent.getSlotCount();
   }
 
   @Override
   public SingleSlotStorage<FluidVariant> getSlot(int tank) {
-    return parent.getSlot(tank);
+    return this.parent.getSlot(tank);
   }
 
   @Override
   public Iterator<StorageView<FluidVariant>> iterator() {
-    return parent.iterator();
+    return this.parent.iterator();
   }
 
 
@@ -37,17 +38,17 @@ public class DuctTankWrapper implements SlottedStorage<FluidVariant> {
 
   @Override
   public long insert(FluidVariant resource, long maxAmount, TransactionContext transaction) {
-    if ((maxAmount <= 0 || resource.isBlank()) || !itemHandler.getFluid().isFluidEqual(resource)) {
+    if ((maxAmount <= 0 || resource.isBlank()) || !this.itemHandler.getFluid().isFluidEqual(resource)) {
       return 0;
     }
-    return parent.insert(resource, maxAmount, transaction);
+    return this.parent.insert(resource, maxAmount, transaction);
   }
 
   @Override
   public long extract(FluidVariant resource, long maxAmount, TransactionContext transaction) {
-    if ((maxAmount <= 0 || resource.isBlank()) || !itemHandler.getFluid().isFluidEqual(resource)) {
+    if ((maxAmount <= 0 || resource.isBlank()) || !this.itemHandler.getFluid().isFluidEqual(resource)) {
       return 0;
     }
-    return parent.extract(resource, maxAmount, transaction);
+    return this.parent.extract(resource, maxAmount, transaction);
   }
 }

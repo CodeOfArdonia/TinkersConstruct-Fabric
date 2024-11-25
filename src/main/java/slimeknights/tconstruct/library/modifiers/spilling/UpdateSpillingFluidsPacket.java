@@ -14,12 +14,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
-/** Packet to sync fluid predicates to the client */
+/**
+ * Packet to sync fluid predicates to the client
+ */
 @RequiredArgsConstructor
 public class UpdateSpillingFluidsPacket implements ISimplePacket {
+
   private final List<SpillingFluid> fluids;
 
-  /** Clientside constructor, sets ingredients */
+  /**
+   * Clientside constructor, sets ingredients
+   */
   public UpdateSpillingFluidsPacket(FriendlyByteBuf buf) {
     int size = buf.readVarInt();
     ImmutableList.Builder<SpillingFluid> fluids = ImmutableList.builder();
@@ -32,18 +37,19 @@ public class UpdateSpillingFluidsPacket implements ISimplePacket {
 
   @Override
   public void encode(FriendlyByteBuf buf) {
-    buf.writeVarInt(fluids.size());
-    for (SpillingFluid fluid : fluids) {
+    buf.writeVarInt(this.fluids.size());
+    for (SpillingFluid fluid : this.fluids) {
       fluid.ingredient().write(buf);
     }
   }
 
   @Override
   public void handle(Supplier<Context> context) {
-    SpillingFluidManager.INSTANCE.updateFromServer(fluids);
+    SpillingFluidManager.INSTANCE.updateFromServer(this.fluids);
   }
 
   private static class NoEffect implements ISpillingEffect {
+
     private static final ISpillingEffect INSTANCE = new NoEffect();
 
     @Override

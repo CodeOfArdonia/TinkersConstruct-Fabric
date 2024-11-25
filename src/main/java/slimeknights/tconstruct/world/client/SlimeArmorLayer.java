@@ -12,7 +12,6 @@ import net.minecraft.client.model.SkullModelBase;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.blockentity.SkullBlockRenderer;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
@@ -39,11 +38,15 @@ import net.minecraft.world.level.block.SkullBlock.Type;
 
 import java.util.Map;
 
-/** Generics do not match to use the vanilla armor layer */
-public class SlimeArmorLayer<T extends Slime, M extends HierarchicalModel<T>, A extends HumanoidModel<T>> extends RenderLayer<T,M> {
+/**
+ * Generics do not match to use the vanilla armor layer
+ */
+public class SlimeArmorLayer<T extends Slime, M extends HierarchicalModel<T>, A extends HumanoidModel<T>> extends RenderLayer<T, M> {
+
   private final A armorModel;
-  public final Map<Type,SkullModelBase> skullModels;
-  public SlimeArmorLayer(RenderLayerParent<T,M> pRenderer, A armorModel, EntityModelSet modelSet) {
+  public final Map<Type, SkullModelBase> skullModels;
+
+  public SlimeArmorLayer(RenderLayerParent<T, M> pRenderer, A armorModel, EntityModelSet modelSet) {
     super(pRenderer);
     this.armorModel = armorModel;
     this.skullModels = SkullBlockRenderer.createSkullRenderers(modelSet);
@@ -60,11 +63,11 @@ public class SlimeArmorLayer<T extends Slime, M extends HierarchicalModel<T>, A 
       Item item = helmet.getItem();
       // helmet renderer, based on humanoid armor layer
       if (item instanceof ArmorItem armor && armor.getType() == ArmorItem.Type.HELMET) {
-        this.getParentModel().copyPropertiesTo(armorModel);
-        armorModel.setAllVisible(false);
-        armorModel.head.visible = true;
-        armorModel.hat.visible = true;
-        Model model = armorModel;
+        this.getParentModel().copyPropertiesTo(this.armorModel);
+        this.armorModel.setAllVisible(false);
+        this.armorModel.head.visible = true;
+        this.armorModel.hat.visible = true;
+        Model model = this.armorModel;
         boolean enchanted = helmet.hasFoil();
         if (armor instanceof DyeableLeatherItem dyeable) {
           int color = dyeable.getColor(helmet);
@@ -111,9 +114,9 @@ public class SlimeArmorLayer<T extends Slime, M extends HierarchicalModel<T>, A 
    * More generic ForgeHook version of the above function, it allows for Items to have more control over what texture they provide.
    *
    * @param entity Entity wearing the armor
-   * @param stack ItemStack for the armor
-   * @param armor Armor item instance
-   * @param type Subtype, can be null or "overlay"
+   * @param stack  ItemStack for the armor
+   * @param armor  Armor item instance
+   * @param type   Subtype, can be null or "overlay"
    * @return ResourceLocation pointing at the armor's texture
    */
   public static ResourceLocation getArmorResource(Entity entity, ItemStack stack, ArmorItem armor, String type) {

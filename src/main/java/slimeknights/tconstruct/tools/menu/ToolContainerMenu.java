@@ -21,17 +21,28 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-/** Container for a tool inventory */
+/**
+ * Container for a tool inventory
+ */
 public class ToolContainerMenu extends AbstractContainerMenu {
-  /** Size of a single slot */
+
+  /**
+   * Size of a single slot
+   */
   public static final int SLOT_SIZE = 18;
-  /** Y start of the repeat slots background */
+  /**
+   * Y start of the repeat slots background
+   */
   public static final int REPEAT_BACKGROUND_START = 17;
 
-  /** Stack containing the tool being rendered */
+  /**
+   * Stack containing the tool being rendered
+   */
   @Getter
   private final ItemStack stack;
-  /** Item handler being rendered */
+  /**
+   * Item handler being rendered
+   */
   @Getter
   private final SlottedStackStorage itemHandler;
   private final Player player;
@@ -41,14 +52,18 @@ public class ToolContainerMenu extends AbstractContainerMenu {
   private final int selectedHotbarSlot;
   @Getter
   private final boolean showOffhand;
-  /** Index of the first player inventory slot */
+  /**
+   * Index of the first player inventory slot
+   */
   private final int playerInventoryStart;
 
   public ToolContainerMenu(int id, Inventory playerInventory, ItemStack stack, SlottedStackStorage itemHandler, EquipmentSlot slotType) {
     this(TinkerTools.toolContainer.get(), id, playerInventory, stack, itemHandler, slotType);
   }
 
-  /** Creates a new instance of this container on the client side */
+  /**
+   * Creates a new instance of this container on the client side
+   */
   public static ToolContainerMenu forClient(int id, Inventory inventory, FriendlyByteBuf buffer) {
     EquipmentSlot slotType = buffer.readEnum(EquipmentSlot.class);
     ItemStack stack = inventory.player.getItemBySlot(slotType);
@@ -64,9 +79,9 @@ public class ToolContainerMenu extends AbstractContainerMenu {
     this.slotType = slotType;
 
     // add tool slots
-    int slots = itemHandler.getSlotCount();
+    int slots = this.itemHandler.getSlotCount();
     for (int i = 0; i < slots; i++) {
-      this.addSlot(new ToolContainerSlot(itemHandler, i, 8 + (i % 9) * SLOT_SIZE, (REPEAT_BACKGROUND_START + 1) + (i / 9) * SLOT_SIZE));
+      this.addSlot(new ToolContainerSlot(this.itemHandler, i, 8 + (i % 9) * SLOT_SIZE, (REPEAT_BACKGROUND_START + 1) + (i / 9) * SLOT_SIZE));
     }
     // add offhand if requested
     this.showOffhand = ModifierUtil.checkVolatileFlag(stack, ToolInventoryCapability.INCLUDE_OFFHAND);
@@ -85,15 +100,15 @@ public class ToolContainerMenu extends AbstractContainerMenu {
 
     // add player slots
     int playerY = 32 + SLOT_SIZE * ((slots + 8) / 9);
-    for(int r = 0; r < 3; ++r) {
-      for(int c = 0; c < 9; ++c) {
+    for (int r = 0; r < 3; ++r) {
+      for (int c = 0; c < 9; ++c) {
         this.addSlot(new Slot(playerInventory, c + r * 9 + 9, 8 + c * 18, playerY + r * 18));
       }
     }
     int hotbarStart = playerY + 58;
-    selectedHotbarSlot = slotType == EquipmentSlot.MAINHAND ? playerInventory.selected : (slotType == EquipmentSlot.OFFHAND ? 10 : -1);
-    for(int c = 0; c < 9; ++c) {
-      if (c == selectedHotbarSlot) {
+    this.selectedHotbarSlot = slotType == EquipmentSlot.MAINHAND ? playerInventory.selected : (slotType == EquipmentSlot.OFFHAND ? 10 : -1);
+    for (int c = 0; c < 9; ++c) {
+      if (c == this.selectedHotbarSlot) {
         this.addSlot(new ReadOnlySlot(playerInventory, c, 8 + c * 18, hotbarStart));
       } else {
         this.addSlot(new Slot(playerInventory, c, 8 + c * 18, hotbarStart));
@@ -104,7 +119,7 @@ public class ToolContainerMenu extends AbstractContainerMenu {
   @Override
   public boolean stillValid(Player playerIn) {
     // if the stack ever leaves the slot, close the menu, as we have no way to recover then and dupes are likely
-    return player == playerIn && !stack.isEmpty() && player.getItemBySlot(slotType) == stack;
+    return this.player == playerIn && !this.stack.isEmpty() && this.player.getItemBySlot(this.slotType) == this.stack;
   }
 
   @Override
@@ -146,13 +161,13 @@ public class ToolContainerMenu extends AbstractContainerMenu {
     @Override
     public void set(@Nonnull ItemStack stack) {
       // using set as an indicator it changed, so no need to call setChanged anymore here
-      ((SlottedStackStorage)this.getItemHandler()).setStackInSlot(index, stack);
+      ((SlottedStackStorage) this.getItemHandler()).setStackInSlot(this.index, stack);
     }
 
     @Override
     public void setChanged() {
       // no proper setChanged method on item handler, so just set the existing stack
-      set(getItem());
+      this.set(this.getItem());
     }
   }
 }

@@ -14,7 +14,9 @@ import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Special modifier ingredient renderer used for ingredients in the bookmark menu */
+/**
+ * Special modifier ingredient renderer used for ingredients in the bookmark menu
+ */
 public enum ModifierBookmarkEntryRenderer implements EntryRenderer<ModifierEntry> {
   INSTANCE;
 

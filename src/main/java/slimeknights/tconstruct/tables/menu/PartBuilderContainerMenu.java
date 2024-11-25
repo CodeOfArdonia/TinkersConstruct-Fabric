@@ -17,6 +17,7 @@ import slimeknights.tconstruct.tables.menu.slot.LazyResultSlot;
 import javax.annotation.Nullable;
 
 public class PartBuilderContainerMenu extends TabbedContainerMenu<PartBuilderBlockEntity> {
+
   // slots
   @Getter
   private final Slot patternSlot;
@@ -29,20 +30,20 @@ public class PartBuilderContainerMenu extends TabbedContainerMenu<PartBuilderBlo
     super(TinkerTables.partBuilderContainer.get(), windowIdIn, playerInventoryIn, partBuilderTileEntity);
 
     // unfortunately, nothing works with no tile
-    if (tile != null) {
+    if (this.tile != null) {
       // slots
-      this.addSlot(this.outputSlot = new LazyResultSlot(tile.getCraftingResult(), 148, 33));
+      this.addSlot(this.outputSlot = new LazyResultSlot(this.tile.getCraftingResult(), 148, 33));
       // inputs
-      this.addSlot(this.patternSlot = new PatternSlot(tile, 8, 34));
-      this.addSlot(this.inputSlot = new PartBuilderSlot(tile, PartBuilderBlockEntity.MATERIAL_SLOT, 29, 34));
+      this.addSlot(this.patternSlot = new PatternSlot(this.tile, 8, 34));
+      this.addSlot(this.inputSlot = new PartBuilderSlot(this.tile, PartBuilderBlockEntity.MATERIAL_SLOT, 29, 34));
 
       // other inventories
       this.addChestSideInventory();
       this.addInventorySlots();
 
       // listen for the button to change in the tile
-      this.addDataSlot(new LambdaDataSlot(-1, tile::getSelectedIndex, i -> {
-        tile.selectRecipe(i);
+      this.addDataSlot(new LambdaDataSlot(-1, this.tile::getSelectedIndex, i -> {
+        this.tile.selectRecipe(i);
         this.updateScreen();
       }));
       // update for the first time
@@ -70,8 +71,8 @@ public class PartBuilderContainerMenu extends TabbedContainerMenu<PartBuilderBlo
     if (playerIn.isSpectator()) {
       return false;
     }
-    if (id >= 0 && tile != null) {
-      tile.selectRecipe(id);
+    if (id >= 0 && this.tile != null) {
+      this.tile.selectRecipe(id);
     }
     return true;
   }
@@ -81,17 +82,21 @@ public class PartBuilderContainerMenu extends TabbedContainerMenu<PartBuilderBlo
     return slotIn != this.outputSlot && super.canTakeItemForPickAll(stack, slotIn);
   }
 
-  /** Slot to update recipe on change */
+  /**
+   * Slot to update recipe on change
+   */
   private static class PartBuilderSlot extends Slot {
+
     private final LazyResultContainer craftResult;
+
     public PartBuilderSlot(PartBuilderBlockEntity tile, int index, int xPosition, int yPosition) {
       super(tile, index, xPosition, yPosition);
-      craftResult = tile.getCraftingResult();
+      this.craftResult = tile.getCraftingResult();
     }
 
     @Override
     public void setChanged() {
-      craftResult.clearContent();
+      this.craftResult.clearContent();
       super.setChanged();
     }
   }
@@ -100,6 +105,7 @@ public class PartBuilderContainerMenu extends TabbedContainerMenu<PartBuilderBlo
    * Slot for the pattern, updates buttons on change
    */
   private static class PatternSlot extends PartBuilderSlot {
+
     private PatternSlot(PartBuilderBlockEntity tile, int x, int y) {
       super(tile, PartBuilderBlockEntity.PATTERN_SLOT, x, y);
     }

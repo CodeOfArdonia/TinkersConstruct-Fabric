@@ -59,7 +59,7 @@ public class SlotButtonItem extends Button {
       }
 
       //this.drawIcon(matrices, Minecraft.getInstance());
-      TinkerStationScreen.renderIcon(graphics, layout.getIcon(), this.getX() + 1, this.getY() + 1);
+      TinkerStationScreen.renderIcon(graphics, this.layout.getIcon(), this.getX() + 1, this.getY() + 1);
     }
   }
 

@@ -23,13 +23,14 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class ThornsModifier extends IncrementalModifier {
+
   @Override
   public void onAttacked(IToolStackView tool, int level, EquipmentContext context, EquipmentSlot slotType, DamageSource source, float amount, boolean isDirectDamage) {
     // this works like vanilla, damage is capped due to the hurt immunity mechanics, so if multiple pieces apply thorns between us and vanilla, damage is capped at 4
     Entity attacker = source.getEntity();
     if (attacker != null && isDirectDamage) {
       // 15% chance of working per level, doubled bonus on shields
-      float scaledLevel = getScaledLevel(tool, level);
+      float scaledLevel = this.getScaledLevel(tool, level);
       if (slotType.getType() == Type.HAND) {
         scaledLevel *= 2;
       }
@@ -52,7 +53,7 @@ public class ThornsModifier extends IncrementalModifier {
     } else {
       source = player.damageSources().source(TinkerDamageTypes.MOB_ATTACK_BYPASS_ARMOR, context.getAttacker());
     }
-    float secondaryDamage = (getScaledLevel(tool, level) * tool.getMultiplier(ToolStats.ATTACK_DAMAGE) * 0.75f) * context.getCooldown();
+    float secondaryDamage = (this.getScaledLevel(tool, level) * tool.getMultiplier(ToolStats.ATTACK_DAMAGE) * 0.75f) * context.getCooldown();
     if (context.isCritical()) {
       secondaryDamage *= 1.5f;
     }
@@ -63,7 +64,7 @@ public class ThornsModifier extends IncrementalModifier {
   @Override
   public void addInformation(IToolStackView tool, int level, @Nullable Player player, List<Component> tooltip, TooltipKey tooltipKey, TooltipFlag tooltipFlag) {
     if (tool.hasTag(TinkerTags.Items.UNARMED)) {
-      addDamageTooltip(tool, getScaledLevel(tool, level) * 0.75f, tooltip);
+      this.addDamageTooltip(tool, this.getScaledLevel(tool, level) * 0.75f, tooltip);
     }
   }
 }

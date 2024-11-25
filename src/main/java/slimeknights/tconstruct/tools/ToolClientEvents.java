@@ -69,12 +69,19 @@ import static slimeknights.tconstruct.library.client.model.tools.ToolModel.regis
 
 @SuppressWarnings("unused")
 public class ToolClientEvents extends ClientEventBase {
-  /** Keybinding for interacting using a helmet */
+
+  /**
+   * Keybinding for interacting using a helmet
+   */
   private static final KeyMapping HELMET_INTERACT = new KeyMapping(TConstruct.makeTranslationKey("key", "helmet_interact")/*, KeyConflictContext.IN_GAME*/, InputConstants.getKey("key.keyboard.z").getValue(), "key.categories.tconstruct");
-  /** Keybinding for interacting using leggings */
+  /**
+   * Keybinding for interacting using leggings
+   */
   private static final KeyMapping LEGGINGS_INTERACT = new KeyMapping(TConstruct.makeTranslationKey("key", "leggings_interact")/*, KeyConflictContext.IN_GAME*/, InputConstants.getKey("key.keyboard.i").getValue(), "key.categories.tconstruct");
 
-  /** Listener to clear modifier cache */
+  /**
+   * Listener to clear modifier cache
+   */
   private static final IdentifiableISafeManagerReloadListener MODIFIER_RELOAD_LISTENER = new IdentifiableISafeManagerReloadListener(TConstruct.getResource("modifier_reload_listener")) {
     @Override
     public void onReloadSafe(ResourceManager manager) {
@@ -203,14 +210,22 @@ public class ToolClientEvents extends ClientEventBase {
   }
 
   // values to check if a key was being pressed last tick, safe as a static value as we only care about a single player client side
-  /** If true, we were jumping last tick */
+  /**
+   * If true, we were jumping last tick
+   */
   private static boolean wasJumping = false;
-  /** If true, we were interacting with helmet last tick */
+  /**
+   * If true, we were interacting with helmet last tick
+   */
   private static boolean wasHelmetInteracting = false;
-  /** If true, we were interacting with leggings last tick */
+  /**
+   * If true, we were interacting with leggings last tick
+   */
   private static boolean wasLeggingsInteracting = false;
 
-  /** Called on player tick to handle keybinding presses */
+  /**
+   * Called on player tick to handle keybinding presses
+   */
   private static void handleKeyBindings(Player player) {
     Minecraft minecraft = Minecraft.getInstance();
     if (minecraft.player != null && minecraft.player == player && player.level().isClientSide() && !minecraft.player.isSpectator()) {

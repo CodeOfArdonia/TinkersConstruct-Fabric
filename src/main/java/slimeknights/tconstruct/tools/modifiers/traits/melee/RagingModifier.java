@@ -19,8 +19,11 @@ import slimeknights.tconstruct.library.utils.TooltipKey;
 import javax.annotation.Nullable;
 import java.util.List;
 
-/** Modifier that boosts damage at low health */
+/**
+ * Modifier that boosts damage at low health
+ */
 public class RagingModifier extends Modifier implements ConditionalStatModifierHook {
+
   private static final float LOWEST_HEALTH = 2f;
   private static final float HIGHEST_HEALTH = 10f;
   private static final float DAMAGE_PER_LEVEL = 4f;
@@ -31,7 +34,9 @@ public class RagingModifier extends Modifier implements ConditionalStatModifierH
     hookBuilder.addHook(this, TinkerHooks.CONDITIONAL_STAT);
   }
 
-  /** Gets the bonus for the given health */
+  /**
+   * Gets the bonus for the given health
+   */
   private static float getBonus(LivingEntity attacker, int level) {
     float health = attacker.getHealth();
     // if the max health is less than our range of boost, decrease the max possible boost
@@ -45,7 +50,7 @@ public class RagingModifier extends Modifier implements ConditionalStatModifierH
       return level;
       // if below highest health, scale boost
     } else if (health < HIGHEST_HEALTH) {
-      return level * (HIGHEST_HEALTH - health)  / (HIGHEST_HEALTH - LOWEST_HEALTH);
+      return level * (HIGHEST_HEALTH - health) / (HIGHEST_HEALTH - LOWEST_HEALTH);
     }
     return 0;
   }
@@ -60,7 +65,7 @@ public class RagingModifier extends Modifier implements ConditionalStatModifierH
     if (stat == ToolStats.DRAW_SPEED) {
       return baseValue + getBonus(living, modifier.getLevel()) * DRAWSPEED_PER_LEVEL * multiplier;
     }
-    return  baseValue;
+    return baseValue;
   }
 
   @Override
@@ -70,8 +75,8 @@ public class RagingModifier extends Modifier implements ConditionalStatModifierH
       bonus = getBonus(player, level);
     }
     if (bonus > 0) {
-      addDamageTooltip(tool, bonus * DAMAGE_PER_LEVEL, tooltip);
-      addStatTooltip(tool, ToolStats.DRAW_SPEED, TinkerTags.Items.RANGED, bonus * DRAWSPEED_PER_LEVEL, tooltip);
+      this.addDamageTooltip(tool, bonus * DAMAGE_PER_LEVEL, tooltip);
+      this.addStatTooltip(tool, ToolStats.DRAW_SPEED, TinkerTags.Items.RANGED, bonus * DRAWSPEED_PER_LEVEL, tooltip);
     }
   }
 }

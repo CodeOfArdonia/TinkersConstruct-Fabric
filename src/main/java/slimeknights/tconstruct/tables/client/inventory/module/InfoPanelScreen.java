@@ -1,7 +1,6 @@
 package slimeknights.tconstruct.tables.client.inventory.module;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.vertex.PoseStack;
 import lombok.Setter;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
@@ -16,7 +15,6 @@ import slimeknights.mantle.client.screen.ModuleScreen;
 import slimeknights.mantle.client.screen.MultiModuleScreen;
 import slimeknights.mantle.client.screen.ScalableElementScreen;
 import slimeknights.mantle.client.screen.SliderWidget;
-import slimeknights.tconstruct.FabricEvents;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.client.RenderUtils;
 import slimeknights.tconstruct.shared.TinkerClient;
@@ -29,10 +27,13 @@ import java.util.List;
 import java.util.ListIterator;
 
 public class InfoPanelScreen extends ModuleScreen {
+
   private static final int resW = 118;
   private static final int resH = 75;
 
-  /** Default caption displayed until one is set */
+  /**
+   * Default caption displayed until one is set
+   */
   private static final Component DEFAULT_CAPTION = TConstruct.makeTranslation("gui", "caption").withStyle(ChatFormatting.UNDERLINE);
 
   protected static ResourceLocation BACKGROUND_IMAGE = TConstruct.getResource("textures/gui/panel.png");
@@ -68,6 +69,7 @@ public class InfoPanelScreen extends ModuleScreen {
 
   @Setter
   protected float textScale = 1.0f;
+
   public InfoPanelScreen(MultiModuleScreen parent, AbstractContainerMenu container, Inventory playerInventory, Component title) {
     super(parent, container, playerInventory, title, true, false);
 
@@ -88,9 +90,11 @@ public class InfoPanelScreen extends ModuleScreen {
     this.text = Lists.newLinkedList();
   }
 
-  /** Gets the height to render fonts scaled by the text scale */
+  /**
+   * Gets the height to render fonts scaled by the text scale
+   */
   public int getScaledFontHeight() {
-    return (int)Math.ceil(this.font.lineHeight * textScale);
+    return (int) Math.ceil(this.font.lineHeight * this.textScale);
   }
 
   @Override
@@ -146,7 +150,7 @@ public class InfoPanelScreen extends ModuleScreen {
     int neededHeight = 0;
 
     if (!this.hasInitialized()) {
-      return height;
+      return this.height;
     }
 
     int scaledFontHeight = this.getScaledFontHeight();
@@ -164,7 +168,7 @@ public class InfoPanelScreen extends ModuleScreen {
     // we assume slider not shown
     this.slider.hide();
 
-    int h = imageHeight - 2 * 5; // we use 5 as border thickness
+    int h = this.imageHeight - 2 * 5; // we use 5 as border thickness
 
     // check if we can display all lines
     if (this.calcNeededHeight() <= h)
@@ -243,7 +247,7 @@ public class InfoPanelScreen extends ModuleScreen {
 
   @Override
   protected void renderLabels(GuiGraphics graphics, int x, int y) {
-   // no-op
+    // no-op
   }
 
   @Override
@@ -261,18 +265,18 @@ public class InfoPanelScreen extends ModuleScreen {
     // floating over tooltip info?
     int scaledFontHeight = this.getScaledFontHeight();
     if (this.hasTooltips() && mouseX >= this.guiRight() - this.border.w - this.font.width("?") / 2 && mouseX < this.guiRight()
-        && mouseY > this.topPos + 5 && mouseY < this.topPos + 5 + scaledFontHeight) {
+      && mouseY > this.topPos + 5 && mouseY < this.topPos + 5 + scaledFontHeight) {
       graphics.renderTooltip(this.font, this.font.split(Component.translatable("gui.tconstruct.general.hover"), 150), mouseX - 155, mouseY);
     }
 
     // are we hovering over an entry?
-    float y = getTooltipStart(5 + this.topPos);
-    float textHeight = (font.lineHeight + 0.5f) * this.textScale;
+    float y = this.getTooltipStart(5 + this.topPos);
+    float textHeight = (this.font.lineHeight + 0.5f) * this.textScale;
     float lowerBound = (this.topPos + this.imageHeight - 5);
 
     // get the index of the currently hovered line
     int index = -1;
-    ListIterator<FormattedCharSequence> iter = this.getTotalLines().listIterator(slider.getValue());
+    ListIterator<FormattedCharSequence> iter = this.getTotalLines().listIterator(this.slider.getValue());
 
     while (iter.hasNext()) {
       if (y + textHeight > lowerBound) {
@@ -282,8 +286,7 @@ public class InfoPanelScreen extends ModuleScreen {
       if (mouseY > y && mouseY <= y + textHeight) {
         index = iter.nextIndex();
         break;
-      }
-      else {
+      } else {
         iter.next();
       }
       y += textHeight;
@@ -339,7 +342,7 @@ public class InfoPanelScreen extends ModuleScreen {
 
     // info ? in the top right corner
     if (this.hasTooltips()) {
-      graphics.drawString(this.font, "?", guiRight() - this.border.w - this.font.width("?") / 2, this.topPos + 5, 0xff5f5f5f, false);
+      graphics.drawString(this.font, "?", this.guiRight() - this.border.w - this.font.width("?") / 2, this.topPos + 5, 0xff5f5f5f, false);
     }
 
     // draw caption
@@ -357,7 +360,7 @@ public class InfoPanelScreen extends ModuleScreen {
       return;
     }
 
-    float textHeight = font.lineHeight + 0.5f;
+    float textHeight = this.font.lineHeight + 0.5f;
     float lowerBound = (this.topPos + this.imageHeight - 5) / this.textScale;
     graphics.pose().pushPose();
     graphics.pose().scale(this.textScale, this.textScale, 1.0f);

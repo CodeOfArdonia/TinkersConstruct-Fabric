@@ -20,6 +20,7 @@ import slimeknights.tconstruct.smeltery.block.entity.controller.HeatingStructure
 import javax.annotation.Nullable;
 
 public class FoundryControllerBlock extends HeatingControllerBlock {
+
   public FoundryControllerBlock(Properties builder) {
     super(builder);
   }
@@ -60,7 +61,7 @@ public class FoundryControllerBlock extends HeatingControllerBlock {
       double z = pos.getZ() + 0.5D;
       double frontOffset = 0.52D;
       double sideOffset = rand.nextDouble() * 0.6D - 0.3D;
-      spawnFireParticles(world, state, x, y, z, frontOffset, sideOffset, ParticleTypes.SOUL_FIRE_FLAME);
+      this.spawnFireParticles(world, state, x, y, z, frontOffset, sideOffset, ParticleTypes.SOUL_FIRE_FLAME);
     }
   }
 

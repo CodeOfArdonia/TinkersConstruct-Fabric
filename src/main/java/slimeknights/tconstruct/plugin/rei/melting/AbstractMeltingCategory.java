@@ -1,6 +1,5 @@
 package slimeknights.tconstruct.plugin.rei.melting;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import dev.architectury.fluid.FluidStack;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -30,13 +29,16 @@ import java.util.Collections;
 import java.util.List;
 
 public abstract class AbstractMeltingCategory implements TinkersCategory<MeltingDisplay> {
+
   protected static final ResourceLocation BACKGROUND_LOC = TConstruct.getResource("textures/gui/jei/melting.png");
   protected static final String KEY_COOLING_TIME = TConstruct.makeTranslationKey("jei", "melting.time");
   protected static final String KEY_TEMPERATURE = TConstruct.makeTranslationKey("jei", "temperature");
   protected static final String KEY_MULTIPLIER = TConstruct.makeTranslationKey("jei", "melting.multiplier");
   protected static final Component TOOLTIP_ORE = Component.translatable(TConstruct.makeTranslationKey("jei", "melting.ore"));
 
-  /** Tooltip for fuel display */
+  /**
+   * Tooltip for fuel display
+   */
   public static final IRecipeTooltipReplacement FUEL_TOOLTIP = (slot, tooltip) -> {
     //noinspection SimplifyOptionalCallChains  Not for int streams
     EntryStack<FluidStack> stack = slot.getCurrentEntry().cast();
@@ -70,16 +72,16 @@ public abstract class AbstractMeltingCategory implements TinkersCategory<Melting
   @Override
   public void addWidgets(MeltingDisplay display, List<Widget> ingredients, Point origin, Rectangle bounds) {
     // draw the arrow
-    ingredients.add(new ArrowWidget(point(56, 18, origin), BACKGROUND_LOC, 150, 41).animationDurationTicks(display.getTime() * 5));
+    ingredients.add(new ArrowWidget(this.point(56, 18, origin), BACKGROUND_LOC, 150, 41).animationDurationTicks(display.getTime() * 5));
 
     if (display.getOreType() != null)
-      ingredients.add(plus.build(87, 31, origin));
+      ingredients.add(this.plus.build(87, 31, origin));
   }
 
   @Override
   public List<Component> getTooltipStrings(MeltingDisplay display, List<Widget> widgets, double mouseXD, double mouseYD) {
-    int mouseX = (int)mouseXD;
-    int mouseY = (int)mouseYD;
+    int mouseX = (int) mouseXD;
+    int mouseY = (int) mouseYD;
     if (display.getOreType() != null && GuiUtil.isHovered(mouseX, mouseY, 87, 31, 16, 16)) {
       return Collections.singletonList(TOOLTIP_ORE);
     }
@@ -90,16 +92,19 @@ public abstract class AbstractMeltingCategory implements TinkersCategory<Melting
     return Collections.emptyList();
   }
 
-  /** Adds amounts to outputs and temperatures to fuels */
+  /**
+   * Adds amounts to outputs and temperatures to fuels
+   */
   @RequiredArgsConstructor
   public static class MeltingFluidCallback implements IRecipeTooltipReplacement {
+
     public static final MeltingFluidCallback INSTANCE = new MeltingFluidCallback();
 
     /**
      * Adds teh tooltip for ores
      *
-     * @param stack  Fluid to draw
-     * @param list   Tooltip so far
+     * @param stack Fluid to draw
+     * @param list  Tooltip so far
      * @return true if the amount is not in buckets
      */
     protected boolean appendMaterial(FluidStack stack, List<Component> list) {
@@ -109,7 +114,7 @@ public abstract class AbstractMeltingCategory implements TinkersCategory<Melting
     @Override
     public void addMiddleLines(Slot slot, List<Component> list) {
       EntryStack<FluidStack> stack = slot.getCurrentEntry().cast();
-      if (appendMaterial(stack.getValue(), list)) {
+      if (this.appendMaterial(stack.getValue(), list)) {
         FluidTooltipHandler.appendShift(list);
       }
     }

@@ -27,13 +27,22 @@ import slimeknights.tconstruct.tools.TinkerModifiers;
 
 import java.util.Set;
 
-/** Boosts drop rates based on modifier level */
+/**
+ * Boosts drop rates based on modifier level
+ */
 public class ModifierBonusLootFunction extends LootItemConditionalFunction {
-  /** Modifier ID to use for multiplier bonus */
+
+  /**
+   * Modifier ID to use for multiplier bonus
+   */
   private final ModifierId modifier;
-  /** Formula to apply */
+  /**
+   * Formula to apply
+   */
   private final Formula formula;
-  /** If true, considers level 1 as bonus, if false considers level 1 as no bonus */
+  /**
+   * If true, considers level 1 as bonus, if false considers level 1 as no bonus
+   */
   private final boolean includeBase;
 
   protected ModifierBonusLootFunction(LootItemCondition[] conditions, ModifierId modifier, Formula formula, boolean includeBase) {
@@ -43,22 +52,30 @@ public class ModifierBonusLootFunction extends LootItemConditionalFunction {
     this.includeBase = includeBase;
   }
 
-  /** Creates a generic builder */
+  /**
+   * Creates a generic builder
+   */
   public static Builder<?> builder(ModifierId modifier, Formula formula, boolean includeBase) {
     return simpleBuilder(conditions -> new ModifierBonusLootFunction(conditions, modifier, formula, includeBase));
   }
 
-  /** Creates a builder for the binomial with bonus formula */
+  /**
+   * Creates a builder for the binomial with bonus formula
+   */
   public static Builder<?> binomialWithBonusCount(ModifierId modifier, float probability, int extra, boolean includeBase) {
     return builder(modifier, new BinomialWithBonusCount(extra, probability), includeBase);
   }
 
-  /** Creates a builder for the ore drops formula */
+  /**
+   * Creates a builder for the ore drops formula
+   */
   public static Builder<?> oreDrops(ModifierId modifier, boolean includeBase) {
     return builder(modifier, new OreDrops(), includeBase);
   }
 
-  /** Creates a builder for the uniform bonus count */
+  /**
+   * Creates a builder for the uniform bonus count
+   */
   public static Builder<?> uniformBonusCount(ModifierId modifier, int bonusMultiplier, boolean includeBase) {
     return builder(modifier, new UniformBonusCount(bonusMultiplier), includeBase);
   }
@@ -75,18 +92,21 @@ public class ModifierBonusLootFunction extends LootItemConditionalFunction {
 
   @Override
   protected ItemStack run(ItemStack stack, LootContext context) {
-    int level = ModifierUtil.getModifierLevel(context.getParam(LootContextParams.TOOL), modifier);
-    if (!includeBase) {
+    int level = ModifierUtil.getModifierLevel(context.getParam(LootContextParams.TOOL), this.modifier);
+    if (!this.includeBase) {
       level--;
     }
     if (level > 0) {
-      stack.setCount(formula.calculateNewCount(context.getRandom(), stack.getCount(), level));
+      stack.setCount(this.formula.calculateNewCount(context.getRandom(), stack.getCount(), level));
     }
     return stack;
   }
 
-  /** Serializer class */
+  /**
+   * Serializer class
+   */
   public static class Serializer extends LootItemConditionalFunction.Serializer<ModifierBonusLootFunction> {
+
     @Override
     public void serialize(JsonObject json, ModifierBonusLootFunction loot, JsonSerializationContext context) {
       super.serialize(json, loot, context);

@@ -20,16 +20,20 @@ import slimeknights.tconstruct.library.utils.TooltipKey;
 
 import javax.annotation.Nullable;
 import java.util.List;
+
 public class SoulSpeedModifier extends EnchantmentModifier {
+
   public SoulSpeedModifier() {
     super(Enchantments.SOUL_SPEED, 1, ModifierLevelDisplay.DEFAULT);
   }
 
-  /** Gets the position this entity is standing on, cloned from protected living entity method */
+  /**
+   * Gets the position this entity is standing on, cloned from protected living entity method
+   */
   private static BlockPos getOnPosition(LivingEntity living) {
     Vec3 position = living.position();
     int x = Mth.floor(position.x);
-    int y = Mth.floor(position.y - (double)0.2F);
+    int y = Mth.floor(position.y - (double) 0.2F);
     int z = Mth.floor(position.z);
     BlockPos pos = new BlockPos(x, y, z);
     if (living.level().isEmptyBlock(pos)) {
@@ -53,7 +57,7 @@ public class SoulSpeedModifier extends EnchantmentModifier {
     if (player == null || key != TooltipKey.SHIFT || (!player.isFallFlying() && player.level().getBlockState(getOnPosition(player)).is(BlockTags.SOUL_SPEED_BLOCKS))) {
       // multiplies boost by 10 and displays as a percent as the players base movement speed is 0.1 and is in unknown units
       // percentages make sense
-      addPercentTooltip(getDisplayName(), 0.3f + level * 0.105f, tooltip);
+      this.addPercentTooltip(this.getDisplayName(), 0.3f + level * 0.105f, tooltip);
     }
   }
 }

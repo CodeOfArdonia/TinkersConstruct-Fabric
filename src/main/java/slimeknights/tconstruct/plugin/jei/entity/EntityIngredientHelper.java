@@ -6,7 +6,6 @@ import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.ingredients.subtypes.UidContext;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
@@ -18,7 +17,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-/** Handler for working with entity types as ingredients */
+/**
+ * Handler for working with entity types as ingredients
+ */
 @SuppressWarnings("rawtypes")
 public class EntityIngredientHelper implements IIngredientHelper<EntityType> {
 
@@ -59,16 +60,18 @@ public class EntityIngredientHelper implements IIngredientHelper<EntityType> {
     return name.toString();
   }
 
-  /** Applies the item focuses to the list of entities */
+  /**
+   * Applies the item focuses to the list of entities
+   */
   public static List<EntityType> applyFocus(RecipeIngredientRole role, List<EntityType> displayInputs, IFocusGroup focuses) {
     return focuses.getFocuses(VanillaTypes.ITEM_STACK)
-                  .filter(focus -> focus.getRole() == role)
-                  .map(focus -> focus.getTypedValue().getIngredient().getItem())
-                  .filter(item -> item instanceof SpawnEggItem)
-                  .<EntityType>map(item -> ((SpawnEggItem) item).getType(null))
-                  .filter(displayInputs::contains)
-                  .map(Collections::singletonList)
-                  .findFirst()
-                  .orElse(displayInputs);
+      .filter(focus -> focus.getRole() == role)
+      .map(focus -> focus.getTypedValue().getIngredient().getItem())
+      .filter(item -> item instanceof SpawnEggItem)
+      .<EntityType>map(item -> ((SpawnEggItem) item).getType(null))
+      .filter(displayInputs::contains)
+      .map(Collections::singletonList)
+      .findFirst()
+      .orElse(displayInputs);
   }
 }

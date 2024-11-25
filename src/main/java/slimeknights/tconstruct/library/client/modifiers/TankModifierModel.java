@@ -14,7 +14,10 @@ import javax.annotation.Nullable;
  * Model for tank modifiers, also displays the fluid
  */
 public class TankModifierModel extends FluidModifierModel {
-  /** Constant unbaked model instance, as they are all the same */
+
+  /**
+   * Constant unbaked model instance, as they are all the same
+   */
   public static final IUnbakedModifierModel UNBAKED_INSTANCE = (smallGetter, largeGetter) -> {
     Material smallTexture = smallGetter.apply("");
     Material largeTexture = largeGetter.apply("");
@@ -31,7 +34,7 @@ public class TankModifierModel extends FluidModifierModel {
   public TankModifierModel(@Nullable Material smallTexture, @Nullable Material largeTexture,
                            @Nullable Material smallPartial, @Nullable Material largePartial,
                            @Nullable Material smallFull, @Nullable Material largeFull) {
-    super(smallTexture, largeTexture, new Material[] { smallPartial, largePartial, smallFull, largeFull });
+    super(smallTexture, largeTexture, new Material[]{smallPartial, largePartial, smallFull, largeFull});
   }
 
   @Nullable
@@ -51,7 +54,7 @@ public class TankModifierModel extends FluidModifierModel {
   @Nullable
   protected Material getTemplate(TankModifier tank, IToolStackView tool, FluidStack fluid, boolean isLarge) {
     boolean isFull = fluid.getAmount() == tank.getCapacity(tool);
-    return fluidTextures[(isFull ? 2 : 0) | (isLarge ? 1 : 0)];
+    return this.fluidTextures[(isFull ? 2 : 0) | (isLarge ? 1 : 0)];
   }
 
   /**

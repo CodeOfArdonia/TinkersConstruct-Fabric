@@ -14,20 +14,26 @@ import java.util.function.Function;
  * If you wish to use this hook for another slot, please discuss it with us, so we can implement a solution that will benefit all addons rather than having dupliate keybinds.
  */
 public interface KeybindInteractModifierHook {
-  /** Empty implementation */
+
+  /**
+   * Empty implementation
+   */
   KeybindInteractModifierHook EMPTY = new KeybindInteractModifierHook() {};
 
-  /** Merger that uses the first on start interact, but runs all on stop */
-  Function<Collection<KeybindInteractModifierHook>,KeybindInteractModifierHook> MERGER = InteractMerger::new;
+  /**
+   * Merger that uses the first on start interact, but runs all on stop
+   */
+  Function<Collection<KeybindInteractModifierHook>, KeybindInteractModifierHook> MERGER = InteractMerger::new;
 
 
   /**
    * Called when the helmet keybinding is pressed to interact with this helmet modifier
+   *
    * @param tool     Tool instance
    * @param modifier Entry calling this hook
    * @param player   Player wearing the helmet
    * @param slot     Slot containing the tool
-   * @return  True if no other modifiers should process
+   * @return True if no other modifiers should process
    */
   default boolean startInteract(IToolStackView tool, ModifierEntry modifier, Player player, EquipmentSlot slot, TooltipKey keyModifier) {
     return false;
@@ -35,6 +41,7 @@ public interface KeybindInteractModifierHook {
 
   /**
    * Called when the helmet keybinding is released to interact with this modifier
+   *
    * @param tool     Tool instance
    * @param modifier Entry calling this hook
    * @param player   Player wearing the helmet
@@ -43,11 +50,14 @@ public interface KeybindInteractModifierHook {
   default void stopInteract(IToolStackView tool, ModifierEntry modifier, Player player, EquipmentSlot slot) {}
 
 
-  /** Merger that uses the first on start interact, but runs all on stop */
+  /**
+   * Merger that uses the first on start interact, but runs all on stop
+   */
   record InteractMerger(Collection<KeybindInteractModifierHook> modules) implements KeybindInteractModifierHook {
+
     @Override
     public boolean startInteract(IToolStackView tool, ModifierEntry modifier, Player player, EquipmentSlot slot, TooltipKey keyModifier) {
-      for (KeybindInteractModifierHook module : modules) {
+      for (KeybindInteractModifierHook module : this.modules) {
         if (module.startInteract(tool, modifier, player, slot, keyModifier)) {
           return true;
         }
@@ -57,7 +67,7 @@ public interface KeybindInteractModifierHook {
 
     @Override
     public void stopInteract(IToolStackView tool, ModifierEntry modifier, Player player, EquipmentSlot slot) {
-      for (KeybindInteractModifierHook module : modules) {
+      for (KeybindInteractModifierHook module : this.modules) {
         module.stopInteract(tool, modifier, player, slot);
       }
     }

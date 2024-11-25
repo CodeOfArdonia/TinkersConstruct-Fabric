@@ -11,10 +11,12 @@ import slimeknights.tconstruct.library.utils.Util;
  */
 @EqualsAndHashCode
 public abstract class BaseMaterialStats implements IMaterialStats {
+
   /**
    * Helper to make a translation key for the given name
-   * @param name  name
-   * @return  Text component
+   *
+   * @param name name
+   * @return Text component
    */
   protected static String makeTooltipKey(ResourceLocation name) {
     return Util.makeTranslationKey("tool_stat", name);
@@ -22,8 +24,9 @@ public abstract class BaseMaterialStats implements IMaterialStats {
 
   /**
    * Helper to make a text component for the given name
-   * @param name  name
-   * @return  Text component
+   *
+   * @param name name
+   * @return Text component
    */
   protected static Component makeTooltip(ResourceLocation name) {
     return Component.translatable(makeTooltipKey(name));

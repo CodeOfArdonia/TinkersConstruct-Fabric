@@ -24,11 +24,17 @@ import slimeknights.tconstruct.library.utils.Util;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
-/** Tool stat for comparing tool tiers */
+/**
+ * Tool stat for comparing tool tiers
+ */
 @SuppressWarnings("ClassCanBeRecord")
-@Getter @RequiredArgsConstructor
+@Getter
+@RequiredArgsConstructor
 public class ToolTierStat implements IToolStat<Tier> {
-  /** Name of this tool stat */
+
+  /**
+   * Name of this tool stat
+   */
   private final ToolStatId name;
 
   @Override
@@ -43,7 +49,7 @@ public class ToolTierStat implements IToolStat<Tier> {
 
   @Override
   public Object makeBuilder() {
-    return new TierBuilder(getDefaultValue());
+    return new TierBuilder(this.getDefaultValue());
   }
 
   @Override
@@ -53,8 +59,9 @@ public class ToolTierStat implements IToolStat<Tier> {
 
   /**
    * Sets the tier to the new tier, keeping the largest
-   * @param builder  Builder instance
-   * @param value    Amount to add
+   *
+   * @param builder Builder instance
+   * @param value   Amount to add
    */
   @Override
   public void update(ModifierStatsBuilder builder, Tier value) {
@@ -84,7 +91,7 @@ public class ToolTierStat implements IToolStat<Tier> {
 
   @Override
   public Tier deserialize(JsonElement json) {
-    ResourceLocation id = JsonHelper.convertToResourceLocation(json, getName().toString());
+    ResourceLocation id = JsonHelper.convertToResourceLocation(json, this.getName().toString());
     Tier tier = TierSortingRegistry.byName(id);
     if (tier != null) {
       return tier;
@@ -114,17 +121,20 @@ public class ToolTierStat implements IToolStat<Tier> {
 
   @Override
   public Component formatValue(Tier value) {
-    return Component.translatable(Util.makeTranslationKey("tool_stat", getName())).append(HarvestTiers.getName(value));
+    return Component.translatable(Util.makeTranslationKey("tool_stat", this.getName())).append(HarvestTiers.getName(value));
   }
 
   @Override
   public String toString() {
-    return "ToolTierStat{" + name + '}';
+    return "ToolTierStat{" + this.name + '}';
   }
 
-  /** Builder for a tier object */
+  /**
+   * Builder for a tier object
+   */
   @AllArgsConstructor
   private static class TierBuilder {
+
     private Tier value;
   }
 }

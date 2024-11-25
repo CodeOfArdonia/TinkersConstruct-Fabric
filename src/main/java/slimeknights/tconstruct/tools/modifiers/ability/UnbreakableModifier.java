@@ -7,6 +7,7 @@ import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 import javax.annotation.Nullable;
 
 public class UnbreakableModifier extends NoLevelsModifier {
+
   @Override
   public int onDamageTool(IToolStackView tool, int level, int amount, @Nullable LivingEntity holder) {
     return 0;

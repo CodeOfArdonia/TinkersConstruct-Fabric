@@ -16,6 +16,7 @@ import slimeknights.tconstruct.library.tools.helper.ModifierUtil;
 import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 
 public class BlockingModifier extends NoLevelsModifier implements GeneralInteractionModifierHook {
+
   @Override
   protected void registerHooks(Builder hookBuilder) {
     hookBuilder.addHook(this, TinkerHooks.CHARGEABLE_INTERACT);

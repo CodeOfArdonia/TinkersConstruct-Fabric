@@ -17,14 +17,19 @@ import java.util.function.Function;
  */
 public interface BlockTransformModifierHook {
 
-  /** Default behavior of no action */
+  /**
+   * Default behavior of no action
+   */
   BlockTransformModifierHook EMPTY = (tool, modifier, context, state, pos, action) -> {};
 
-  /** Merger that runs all hooks */
+  /**
+   * Merger that runs all hooks
+   */
   Function<Collection<BlockTransformModifierHook>, BlockTransformModifierHook> ALL_MERGER = AllMerger::new;
 
   /**
    * Called after a block is successfully transformed
+   *
    * @param tool     Tool used in transforming
    * @param modifier Entry calling this hook
    * @param context  Item use context, corresponds to the original targeted position
@@ -36,6 +41,7 @@ public interface BlockTransformModifierHook {
 
   /**
    * Runs the hook after transforming a block
+   *
    * @param tool    Tool instance, for running modifier hooks
    * @param context Item use context, corresponds to the original targeted position
    * @param state   State before it was transformed
@@ -48,11 +54,14 @@ public interface BlockTransformModifierHook {
     }
   }
 
-  /** Merger that runs all hooks */
+  /**
+   * Merger that runs all hooks
+   */
   record AllMerger(Collection<BlockTransformModifierHook> modules) implements BlockTransformModifierHook {
+
     @Override
     public void afterTransformBlock(IToolStackView tool, ModifierEntry modifier, UseOnContext context, BlockState state, BlockPos pos, ToolAction action) {
-      for (BlockTransformModifierHook module : modules) {
+      for (BlockTransformModifierHook module : this.modules) {
         module.afterTransformBlock(tool, modifier, context, state, pos, action);
       }
     }

@@ -157,19 +157,19 @@ public abstract class CastingBlockEntity extends TableBlockEntity implements Wor
     this.castingType = castingType;
     this.moldingType = moldingType;
     this.castingInventory = new CastingContainerWrapper(this);
-    this.moldingInventory = new MoldingContainerWrapper(itemHandler, INPUT);
+    this.moldingInventory = new MoldingContainerWrapper(this.itemHandler, INPUT);
   }
 
   @Override
   public Storage<FluidVariant> getFluidStorage(@org.jetbrains.annotations.Nullable Direction direction) {
-    return tank;
+    return this.tank;
   }
 
   public void dropStacks() {
     if (this.level == null) return;
     BlockPos pos = this.getBlockPos();
-    this.level.addFreshEntity(new ItemEntity(this.level, pos.getX(), pos.getY(), pos.getZ(), getItem(INPUT)));
-    this.level.addFreshEntity(new ItemEntity(this.level, pos.getX(), pos.getY(), pos.getZ(), getItem(OUTPUT)));
+    this.level.addFreshEntity(new ItemEntity(this.level, pos.getX(), pos.getY(), pos.getZ(), this.getItem(INPUT)));
+    this.level.addFreshEntity(new ItemEntity(this.level, pos.getX(), pos.getY(), pos.getZ(), this.getItem(OUTPUT)));
   }
 
   /**
@@ -178,65 +178,65 @@ public abstract class CastingBlockEntity extends TableBlockEntity implements Wor
    * @param player Player activating the block.
    */
   public void interact(Player player, InteractionHand hand) {
-    if (level == null || level.isClientSide) {
+    if (this.level == null || this.level.isClientSide) {
       return;
     }
     // can't interact if liquid inside
-    if (!tank.isEmpty()) {
+    if (!this.tank.isEmpty()) {
       return;
     }
 
     ItemStack held = player.getItemInHand(hand);
-    ItemStack input = getItem(INPUT);
-    ItemStack output = getItem(OUTPUT);
+    ItemStack input = this.getItem(INPUT);
+    ItemStack output = this.getItem(OUTPUT);
 
     // all molding recipes require a stack in the input slot and nothing in the output slot
     if (!input.isEmpty() && output.isEmpty()) {
       // first, try the players hand item for a recipe
-      moldingInventory.setPattern(held);
-      MoldingRecipe recipe = findMoldingRecipe();
+      this.moldingInventory.setPattern(held);
+      MoldingRecipe recipe = this.findMoldingRecipe();
       if (recipe != null) {
         // if hand is empty, pick up the result (hand empty will only match recipes with no mold item)
-        ItemStack result = recipe.assemble(moldingInventory, level.registryAccess());
-        result.onCraftedBy(level, player, 1);
+        ItemStack result = recipe.assemble(this.moldingInventory, this.level.registryAccess());
+        result.onCraftedBy(this.level, player, 1);
         if (held.isEmpty()) {
-          setItem(INPUT, ItemStack.EMPTY);
+          this.setItem(INPUT, ItemStack.EMPTY);
           player.setItemInHand(hand, result);
         } else {
           // if the recipe has a mold, hand item goes on table (if not consumed in crafting)
-          setItem(INPUT, result);
+          this.setItem(INPUT, result);
           if (!recipe.isPatternConsumed()) {
-            setItem(OUTPUT, ItemHandlerHelper.copyStackWithSize(held, 1));
+            this.setItem(OUTPUT, ItemHandlerHelper.copyStackWithSize(held, 1));
             // send a block update for the comparator, needs to be done after the stack is removed
-            level.updateNeighborsAt(this.worldPosition, this.getBlockState().getBlock());
+            this.level.updateNeighborsAt(this.worldPosition, this.getBlockState().getBlock());
           }
           held.shrink(1);
           player.setItemInHand(hand, held.isEmpty() ? ItemStack.EMPTY : held);
         }
-        moldingInventory.setPattern(ItemStack.EMPTY);
+        this.moldingInventory.setPattern(ItemStack.EMPTY);
         return;
       } else {
         // if no recipe was found using the held item, try to find a mold-less recipe to perform
         // this ensures that if a recipe happens "on pickup" you get consistent behavior, without this it would fall though to pick up normally
-        moldingInventory.setPattern(ItemStack.EMPTY);
-        recipe = findMoldingRecipe();
+        this.moldingInventory.setPattern(ItemStack.EMPTY);
+        recipe = this.findMoldingRecipe();
         if (recipe != null) {
-          setItem(INPUT, ItemStack.EMPTY);
-          ItemHandlerHelper.giveItemToPlayer(player, recipe.assemble(moldingInventory, this.level.registryAccess()), player.getInventory().selected);
+          this.setItem(INPUT, ItemStack.EMPTY);
+          ItemHandlerHelper.giveItemToPlayer(player, recipe.assemble(this.moldingInventory, this.level.registryAccess()), player.getInventory().selected);
           return;
         }
       }
       // clear mold stack, prevents storing an unneeded item
-      moldingInventory.setPattern(ItemStack.EMPTY);
+      this.moldingInventory.setPattern(ItemStack.EMPTY);
     }
 
     // recipes failed, so do normal pickup
     // completely empty -> insert current item into input
     if (input.isEmpty() && output.isEmpty()) {
       if (!held.isEmpty()) {
-        ItemStack stack = held.split(stackSizeLimit);
+        ItemStack stack = held.split(this.stackSizeLimit);
         player.setItemInHand(hand, held.isEmpty() ? ItemStack.EMPTY : held);
-        setItem(INPUT, stack);
+        this.setItem(INPUT, stack);
       }
     } else {
       // stack in either slot, take one out
@@ -246,24 +246,24 @@ public abstract class CastingBlockEntity extends TableBlockEntity implements Wor
       // Additional info: Only 1 item can be put into the casting block usually, however recipes
       // can have ItemStacks with stacksize > 1 as output
       // we therefore spill the whole contents on extraction.
-      ItemStack stack = getItem(slot);
+      ItemStack stack = this.getItem(slot);
       ItemHandlerHelper.giveItemToPlayer(player, stack, player.getInventory().selected);
-      setItem(slot, ItemStack.EMPTY);
+      this.setItem(slot, ItemStack.EMPTY);
 
       // send a block update for the comparator, needs to be done after the stack is removed
       if (slot == OUTPUT) {
-        level.updateNeighborsAt(this.worldPosition, this.getBlockState().getBlock());
+        this.level.updateNeighborsAt(this.worldPosition, this.getBlockState().getBlock());
       }
     }
   }
 
   @Override
   public void setItem(int slot, ItemStack stack) {
-    ItemStack original = getItem(slot);
+    ItemStack original = this.getItem(slot);
     super.setItem(slot, stack);
     // if the stack changed emptiness, update
     if (original.isEmpty() != stack.isEmpty()) {
-      updateAnalogSignal();
+      this.updateAnalogSignal();
     }
   }
 
@@ -271,13 +271,13 @@ public abstract class CastingBlockEntity extends TableBlockEntity implements Wor
    * Called on block update to update the redstone state
    */
   public void handleRedstone(boolean hasSignal) {
-    if (lastRedstone != hasSignal) {
+    if (this.lastRedstone != hasSignal) {
       if (hasSignal) {
-        if (level != null) {
-          level.scheduleTick(worldPosition, this.getBlockState().getBlock(), 2);
+        if (this.level != null) {
+          this.level.scheduleTick(this.worldPosition, this.getBlockState().getBlock(), 2);
         }
       }
-      lastRedstone = hasSignal;
+      this.lastRedstone = hasSignal;
     }
   }
 
@@ -285,12 +285,12 @@ public abstract class CastingBlockEntity extends TableBlockEntity implements Wor
    * Called after a redstone tick to swap input and output
    */
   public void swap() {
-    if (currentRecipe == null) {
-      ItemStack output = getItem(OUTPUT);
-      setItem(OUTPUT, getItem(INPUT));
-      setItem(INPUT, output);
-      if (level != null) {
-        level.playSound(null, getBlockPos(), Sounds.CASTING_CLICKS.getSound(), SoundSource.BLOCKS, 1.0f, 1.0f);
+    if (this.currentRecipe == null) {
+      ItemStack output = this.getItem(OUTPUT);
+      this.setItem(OUTPUT, this.getItem(INPUT));
+      this.setItem(INPUT, output);
+      if (this.level != null) {
+        this.level.playSound(null, this.getBlockPos(), Sounds.CASTING_CLICKS.getSound(), SoundSource.BLOCKS, 1.0f, 1.0f);
       }
     }
   }
@@ -303,12 +303,12 @@ public abstract class CastingBlockEntity extends TableBlockEntity implements Wor
 
   @Override
   public boolean canPlaceItemThroughFace(int index, ItemStack itemStackIn, @Nullable Direction direction) {
-    return tank.isEmpty() && index == INPUT && !isStackInSlot(OUTPUT);
+    return this.tank.isEmpty() && index == INPUT && !this.isStackInSlot(OUTPUT);
   }
 
   @Override
   public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction direction) {
-    return tank.isEmpty() && index == OUTPUT;
+    return this.tank.isEmpty() && index == OUTPUT;
   }
 
   /**
@@ -318,45 +318,45 @@ public abstract class CastingBlockEntity extends TableBlockEntity implements Wor
     // no recipe
     // TODO: should consider the case where the tank has fluid, but there is no current recipe
     // would like to avoid doing a recipe lookup every tick, so need some way to handle the case of no recipe found, ideally without fluid voiding
-    if (currentRecipe == null) {
+    if (this.currentRecipe == null) {
       return;
     }
     // fully filled
-    FluidStack currentFluid = tank.getFluid();
-    if (coolingTime >= 0) {
-      timer++;
-      if (timer >= coolingTime) {
-        if (!currentRecipe.matches(castingInventory, level)) {
+    FluidStack currentFluid = this.tank.getFluid();
+    if (this.coolingTime >= 0) {
+      this.timer++;
+      if (this.timer >= this.coolingTime) {
+        if (!this.currentRecipe.matches(this.castingInventory, level)) {
           // if lost our recipe or the recipe needs more fluid then we have, we are done
           // will come around later for the proper fluid amount
-          currentRecipe = findCastingRecipe();
-          recipeName = null;
-          if (currentRecipe == null || currentRecipe.getFluidAmount(castingInventory) > currentFluid.getAmount()) {
-            timer = 0;
-            updateAnalogSignal();
+          this.currentRecipe = this.findCastingRecipe();
+          this.recipeName = null;
+          if (this.currentRecipe == null || this.currentRecipe.getFluidAmount(this.castingInventory) > currentFluid.getAmount()) {
+            this.timer = 0;
+            this.updateAnalogSignal();
             // TODO: client does not get updated if this happens
             return;
           }
         }
 
         // actual recipe result
-        ItemStack output = currentRecipe.assemble(castingInventory, level.registryAccess());
-        if (currentRecipe.switchSlots() != lastRedstone) {
-          if (!currentRecipe.isConsumed()) {
-            setItem(OUTPUT, getItem(INPUT));
+        ItemStack output = this.currentRecipe.assemble(this.castingInventory, level.registryAccess());
+        if (this.currentRecipe.switchSlots() != this.lastRedstone) {
+          if (!this.currentRecipe.isConsumed()) {
+            this.setItem(OUTPUT, this.getItem(INPUT));
           }
-          setItem(INPUT, output);
-          level.playSound(null, getBlockPos(), Sounds.CASTING_CLICKS.getSound(), SoundSource.BLOCKS, 1.0f, 1.0f);
+          this.setItem(INPUT, output);
+          level.playSound(null, this.getBlockPos(), Sounds.CASTING_CLICKS.getSound(), SoundSource.BLOCKS, 1.0f, 1.0f);
         } else {
-          if (currentRecipe.isConsumed()) {
-            setItem(INPUT, ItemStack.EMPTY);
+          if (this.currentRecipe.isConsumed()) {
+            this.setItem(INPUT, ItemStack.EMPTY);
           }
-          setItem(OUTPUT, output);
+          this.setItem(OUTPUT, output);
         }
         level.playSound(null, pos, Sounds.CASTING_COOLS.getSound(), SoundSource.BLOCKS, 0.5f, 4f);
-        reset();
+        this.reset();
       } else {
-        updateAnalogSignal();
+        this.updateAnalogSignal();
       }
     }
   }
@@ -365,13 +365,13 @@ public abstract class CastingBlockEntity extends TableBlockEntity implements Wor
    * Handles animating the recipe
    */
   private void clientTick(Level level, BlockPos pos) {
-    if (currentRecipe == null) {
+    if (this.currentRecipe == null) {
       return;
     }
     // fully filled
-    FluidStack currentFluid = tank.getFluid();
-    if (currentFluid.getAmount() >= tank.getCapacity() && !currentFluid.isEmpty()) {
-      timer++;
+    FluidStack currentFluid = this.tank.getFluid();
+    if (currentFluid.getAmount() >= this.tank.getCapacity() && !currentFluid.isEmpty()) {
+      this.timer++;
       if (level.random.nextFloat() > 0.9f) {
         level.addParticle(ParticleTypes.SMOKE, pos.getX() + level.random.nextDouble(), pos.getY() + 1.1d, pos.getZ() + level.random.nextDouble(), 0.0D, 0.0D, 0.0D);
       }
@@ -380,11 +380,11 @@ public abstract class CastingBlockEntity extends TableBlockEntity implements Wor
 
   @Nullable
   private ICastingRecipe findCastingRecipe() {
-    if (level == null) return null;
-    if (this.lastCastingRecipe != null && this.lastCastingRecipe.matches(castingInventory, level)) {
+    if (this.level == null) return null;
+    if (this.lastCastingRecipe != null && this.lastCastingRecipe.matches(this.castingInventory, this.level)) {
       return this.lastCastingRecipe;
     }
-    ICastingRecipe castingRecipe = level.getRecipeManager().getRecipeFor(this.castingType, castingInventory, level).orElse(null);
+    ICastingRecipe castingRecipe = this.level.getRecipeManager().getRecipeFor(this.castingType, this.castingInventory, this.level).orElse(null);
     if (castingRecipe != null) {
       this.lastCastingRecipe = castingRecipe;
     }
@@ -399,14 +399,14 @@ public abstract class CastingBlockEntity extends TableBlockEntity implements Wor
    */
   @Nullable
   private MoldingRecipe findMoldingRecipe() {
-    if (level == null) return null;
-    if (lastMoldingRecipe != null && lastMoldingRecipe.matches(moldingInventory, level)) {
-      return lastMoldingRecipe;
+    if (this.level == null) return null;
+    if (this.lastMoldingRecipe != null && this.lastMoldingRecipe.matches(this.moldingInventory, this.level)) {
+      return this.lastMoldingRecipe;
     }
-    Optional<MoldingRecipe> newRecipe = level.getRecipeManager().getRecipeFor(moldingType, moldingInventory, level);
+    Optional<MoldingRecipe> newRecipe = this.level.getRecipeManager().getRecipeFor(this.moldingType, this.moldingInventory, this.level);
     if (newRecipe.isPresent()) {
-      lastMoldingRecipe = newRecipe.get();
-      return lastMoldingRecipe;
+      this.lastMoldingRecipe = newRecipe.get();
+      return this.lastMoldingRecipe;
     }
     return null;
   }
@@ -423,8 +423,8 @@ public abstract class CastingBlockEntity extends TableBlockEntity implements Wor
       return 0;
     }
 
-    boolean hasInput = !getItem(INPUT).isEmpty();
-    boolean hasOutput = !getItem(OUTPUT).isEmpty();
+    boolean hasInput = !this.getItem(INPUT).isEmpty();
+    boolean hasOutput = !this.getItem(OUTPUT).isEmpty();
 
     // no space for output, done
     if (hasInput && hasOutput) {
@@ -435,11 +435,11 @@ public abstract class CastingBlockEntity extends TableBlockEntity implements Wor
     // normal casting requires an empty output
     if (!hasOutput) {
       // scorched basins require a cast to be present
-      if (!hasInput && requireCast) {
+      if (!hasInput && this.requireCast) {
         return 0;
       }
-      castingInventory.useInput();
-      ICastingRecipe castingRecipe = findCastingRecipe();
+      this.castingInventory.useInput();
+      ICastingRecipe castingRecipe = this.findCastingRecipe();
       if (castingRecipe != null) {
         tx.addOuterCloseCallback(result -> {
           if (result.wasCommitted()) {
@@ -448,12 +448,12 @@ public abstract class CastingBlockEntity extends TableBlockEntity implements Wor
             this.lastOutput = null;
           }
         });
-        return castingRecipe.getFluidAmount(castingInventory);
+        return castingRecipe.getFluidAmount(this.castingInventory);
       }
     } else {
       // if we have an output and no input, try using that as the input
-      castingInventory.useOutput();
-      ICastingRecipe castingRecipe = findCastingRecipe();
+      this.castingInventory.useOutput();
+      ICastingRecipe castingRecipe = this.findCastingRecipe();
       if (castingRecipe != null) {
         tx.addOuterCloseCallback(result -> {
           if (result.wasCommitted()) {
@@ -461,12 +461,12 @@ public abstract class CastingBlockEntity extends TableBlockEntity implements Wor
             this.recipeName = null;
             this.lastOutput = null;
             // move output to input slot, prevents removing and ensures item is reduced properly
-            setItem(INPUT, getItem(OUTPUT));
-            setItem(OUTPUT, ItemStack.EMPTY);
-            castingInventory.useInput();
+            this.setItem(INPUT, this.getItem(OUTPUT));
+            this.setItem(OUTPUT, ItemStack.EMPTY);
+            this.castingInventory.useInput();
           }
         });
-        return castingRecipe.getFluidAmount(castingInventory);
+        return castingRecipe.getFluidAmount(this.castingInventory);
       }
     }
     return 0;
@@ -476,13 +476,13 @@ public abstract class CastingBlockEntity extends TableBlockEntity implements Wor
    * Resets the casting table recipe to the default empty state
    */
   public void reset() {
-    timer = 0;
-    currentRecipe = null;
-    recipeName = null;
-    lastOutput = null;
-    castingInventory.setFluid(FluidStack.EMPTY);
-    tank.reset();
-    onContentsChanged();
+    this.timer = 0;
+    this.currentRecipe = null;
+    this.recipeName = null;
+    this.lastOutput = null;
+    this.castingInventory.setFluid(FluidStack.EMPTY);
+    this.tank.reset();
+    this.onContentsChanged();
   }
 
   /**
@@ -490,20 +490,20 @@ public abstract class CastingBlockEntity extends TableBlockEntity implements Wor
    */
   public void onContentsChanged() {
     // start timer
-    FluidStack fluidStack = tank.getFluid();
-    if (fluidStack.getAmount() >= tank.getCapacity() && currentRecipe != null) {
-      castingInventory.setFluid(fluidStack);
-      coolingTime = Math.max(0, currentRecipe.getCoolingTime(castingInventory));
+    FluidStack fluidStack = this.tank.getFluid();
+    if (fluidStack.getAmount() >= this.tank.getCapacity() && this.currentRecipe != null) {
+      this.castingInventory.setFluid(fluidStack);
+      this.coolingTime = Math.max(0, this.currentRecipe.getCoolingTime(this.castingInventory));
     } else {
-      coolingTime = -1;
+      this.coolingTime = -1;
     }
-    setChangedFast();
+    this.setChangedFast();
     // update comparators
-    updateAnalogSignal();
+    this.updateAnalogSignal();
     // update client
-    Level world = getLevel();
+    Level world = this.getLevel();
     if (world != null && !world.isClientSide) {
-      BlockPos pos = getBlockPos();
+      BlockPos pos = this.getBlockPos();
       TinkerNetwork.getInstance().sendToClientsAround(new FluidUpdatePacket(pos, fluidStack), world, pos);
     }
   }
@@ -511,18 +511,18 @@ public abstract class CastingBlockEntity extends TableBlockEntity implements Wor
   @Override
   public void updateFluidTo(FluidStack fluid) {
     if (fluid.isEmpty()) {
-      reset();
+      this.reset();
     } else {
       try (Transaction tx = TransferUtil.getTransaction()) {
-        long capacity = initNewCasting(fluid, tx);
+        long capacity = this.initNewCasting(fluid, tx);
         if (capacity > 0) {
-          tank.setCapacity(capacity);
+          this.tank.setCapacity(capacity);
         }
         tx.commit();
       }
     }
-    tank.setFluid(fluid);
-    onContentsChanged();
+    this.tank.setFluid(fluid);
+    this.onContentsChanged();
   }
 
   @Nullable
@@ -541,26 +541,26 @@ public abstract class CastingBlockEntity extends TableBlockEntity implements Wor
    * @return Recipe output
    */
   public ItemStack getRecipeOutput() {
-    if (lastOutput == null) {
-      if (currentRecipe == null) {
+    if (this.lastOutput == null) {
+      if (this.currentRecipe == null) {
         return ItemStack.EMPTY;
       }
-      castingInventory.setFluid(tank.getFluid());
-      lastOutput = currentRecipe.assemble(castingInventory, this.level.registryAccess());
+      this.castingInventory.setFluid(this.tank.getFluid());
+      this.lastOutput = this.currentRecipe.assemble(this.castingInventory, this.level.registryAccess());
     }
-    return lastOutput;
+    return this.lastOutput;
   }
 
   /**
    * Updates the comparator strength if needed
    */
   private void updateAnalogSignal() {
-    if (level == null || !level.isClientSide) {
-      long newStrength = getAnalogSignal();
-      if (newStrength != lastAnalogSignal) {
-        lastAnalogSignal = newStrength;
-        if (level != null) {
-          level.updateNeighborsAt(getBlockPos(), getBlockState().getBlock());
+    if (this.level == null || !this.level.isClientSide) {
+      long newStrength = this.getAnalogSignal();
+      if (newStrength != this.lastAnalogSignal) {
+        this.lastAnalogSignal = newStrength;
+        if (this.level != null) {
+          this.level.updateNeighborsAt(this.getBlockPos(), this.getBlockState().getBlock());
         }
       }
     }
@@ -570,20 +570,20 @@ public abstract class CastingBlockEntity extends TableBlockEntity implements Wor
    * Gets the comparator strength
    */
   public long getAnalogSignal() {
-    if (isStackInSlot(CastingBlockEntity.OUTPUT)) {
+    if (this.isStackInSlot(CastingBlockEntity.OUTPUT)) {
       return 15;
     }
     // 11 - 14 are cooling time from 0 to 99%
-    if (coolingTime > 0) {
-      return 11 + (timer * 4 / coolingTime);
+    if (this.coolingTime > 0) {
+      return 11 + (this.timer * 4L / this.coolingTime);
     }
     // 2 - 9 are fluid between 0 and 99%
-    long capacity = tank.getCapacity();
+    long capacity = this.tank.getCapacity();
     if (capacity > 0) {
-      return 2 + (tank.getFluid().getAmount() * 9 / capacity);
+      return 2 + (this.tank.getFluid().getAmount() * 9 / capacity);
     }
     // 1: has cast
-    if (isStackInSlot(CastingBlockEntity.INPUT)) {
+    if (this.isStackInSlot(CastingBlockEntity.INPUT)) {
       return 1;
     }
     // 0: empty
@@ -601,15 +601,15 @@ public abstract class CastingBlockEntity extends TableBlockEntity implements Wor
    */
   private void loadRecipe(Level level, ResourceLocation name) {
     // if the tank is empty, ignore old recipe
-    FluidStack fluid = tank.getFluid();
+    FluidStack fluid = this.tank.getFluid();
     if (!fluid.isEmpty()) {
       // fetch recipe by name
       RecipeHelper.getRecipe(level.getRecipeManager(), name, ICastingRecipe.class).ifPresent(recipe -> {
         this.currentRecipe = recipe;
-        castingInventory.setFluid(fluid);
-        tank.setCapacity(recipe.getFluidAmount(castingInventory));
-        if (fluid.getAmount() >= tank.getCapacity()) {
-          coolingTime = recipe.getCoolingTime(castingInventory);
+        this.castingInventory.setFluid(fluid);
+        this.tank.setCapacity(recipe.getFluidAmount(this.castingInventory));
+        if (fluid.getAmount() >= this.tank.getCapacity()) {
+          this.coolingTime = recipe.getCoolingTime(this.castingInventory);
         }
       });
     }
@@ -619,48 +619,48 @@ public abstract class CastingBlockEntity extends TableBlockEntity implements Wor
   public void setLevel(Level pLevel) {
     super.setLevel(pLevel);
     // if we have a recipe name, swap recipe name for recipe instance
-    if (recipeName != null) {
-      loadRecipe(pLevel, recipeName);
-      recipeName = null;
+    if (this.recipeName != null) {
+      this.loadRecipe(pLevel, this.recipeName);
+      this.recipeName = null;
     }
   }
 
   @Override
   public void saveAdditional(CompoundTag tags) {
     super.saveAdditional(tags);
-    tags.putBoolean(TAG_REDSTONE, lastRedstone);
+    tags.putBoolean(TAG_REDSTONE, this.lastRedstone);
   }
 
   @Override
   public void saveSynced(CompoundTag tags) {
     super.saveSynced(tags);
-    tags.put(TAG_TANK, tank.writeToTag(new CompoundTag()));
-    if (currentRecipe != null || recipeName != null) {
-      tags.putInt(TAG_TIMER, timer);
+    tags.put(TAG_TANK, this.tank.writeToTag(new CompoundTag()));
+    if (this.currentRecipe != null || this.recipeName != null) {
+      tags.putInt(TAG_TIMER, this.timer);
     }
-    if (currentRecipe != null) {
-      tags.putString(TAG_RECIPE, currentRecipe.getId().toString());
-    } else if (recipeName != null) {
-      tags.putString(TAG_RECIPE, recipeName.toString());
+    if (this.currentRecipe != null) {
+      tags.putString(TAG_RECIPE, this.currentRecipe.getId().toString());
+    } else if (this.recipeName != null) {
+      tags.putString(TAG_RECIPE, this.recipeName.toString());
     }
   }
 
   @Override
   public void load(CompoundTag tags) {
     super.load(tags);
-    tank.readFromTag(tags.getCompound(TAG_TANK));
-    timer = tags.getInt(TAG_TIMER);
+    this.tank.readFromTag(tags.getCompound(TAG_TANK));
+    this.timer = tags.getInt(TAG_TIMER);
     if (tags.contains(TAG_RECIPE, CompoundTag.TAG_STRING)) {
       ResourceLocation name = new ResourceLocation(tags.getString(TAG_RECIPE));
       // if we have a level, fetch the recipe
-      if (level != null) {
-        loadRecipe(level, name);
+      if (this.level != null) {
+        this.loadRecipe(this.level, name);
       } else {
         // otherwise fetch the recipe when the level is set
-        recipeName = name;
+        this.recipeName = name;
       }
     }
-    lastRedstone = tags.getBoolean(TAG_REDSTONE);
+    this.lastRedstone = tags.getBoolean(TAG_REDSTONE);
   }
 
   public static class Basin extends CastingBlockEntity {

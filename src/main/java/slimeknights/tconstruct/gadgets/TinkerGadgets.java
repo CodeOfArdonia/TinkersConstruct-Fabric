@@ -51,9 +51,11 @@ import java.util.function.Function;
  */
 @SuppressWarnings("unused")
 public final class TinkerGadgets extends TinkerModule {
+
   public TinkerGadgets() {
 //    slimeSling.values(); // Force enums to register
   }
+
   static final Logger log = Util.getLogger("tinker_gadgets");
 
   /*
@@ -61,9 +63,9 @@ public final class TinkerGadgets extends TinkerModule {
    */
   private static final Item.Properties GADGET_PROPS = new Item.Properties();
   private static final Item.Properties UNSTACKABLE_PROPS = new Item.Properties().stacksTo(1);
-  private static final Function<Block,? extends BlockItem> DEFAULT_BLOCK_ITEM = (b) -> new BlockItem(b, GADGET_PROPS);
-  private static final Function<Block,? extends BlockItem> TOOLTIP_BLOCK_ITEM = (b) -> new BlockTooltipItem(b, GADGET_PROPS);
-  private static final Function<Block,? extends BlockItem> UNSTACKABLE_BLOCK_ITEM = (b) -> new BlockTooltipItem(b, UNSTACKABLE_PROPS);
+  private static final Function<Block, ? extends BlockItem> DEFAULT_BLOCK_ITEM = (b) -> new BlockItem(b, GADGET_PROPS);
+  private static final Function<Block, ? extends BlockItem> TOOLTIP_BLOCK_ITEM = (b) -> new BlockTooltipItem(b, GADGET_PROPS);
+  private static final Function<Block, ? extends BlockItem> UNSTACKABLE_BLOCK_ITEM = (b) -> new BlockTooltipItem(b, UNSTACKABLE_PROPS);
 
   /*
    * Blocks
@@ -74,7 +76,7 @@ public final class TinkerGadgets extends TinkerModule {
    * Items
    */
   public static final ItemObject<PiggyBackPackItem> piggyBackpack = ITEMS_DEFFERED.register("piggy_backpack", () -> new PiggyBackPackItem(new Properties().stacksTo(16)));
-  public static final EnumObject<FrameType,FancyItemFrameItem> itemFrame = ITEMS_DEFFERED.registerEnum(FrameType.values(), "item_frame", (type) -> new FancyItemFrameItem(GADGET_PROPS, (world, pos, dir) -> new FancyItemFrameEntity(world, pos, dir, type)));
+  public static final EnumObject<FrameType, FancyItemFrameItem> itemFrame = ITEMS_DEFFERED.registerEnum(FrameType.values(), "item_frame", (type) -> new FancyItemFrameItem(GADGET_PROPS, (world, pos, dir) -> new FancyItemFrameEntity(world, pos, dir, type)));
   // slime tools
   private static final Item.Properties SLING_PROPS = new Item.Properties().stacksTo(1).durability(250);
   public static final EnumObject<SlimeType, BaseSlimeSlingItem> slimeSling = new EnumObject.Builder<SlimeType, BaseSlimeSlingItem>(SlimeType.class)
@@ -89,7 +91,7 @@ public final class TinkerGadgets extends TinkerModule {
 
   // foods
   private static final BlockBehaviour.Properties CAKE = builder(SoundType.WOOL).pushReaction(PushReaction.DESTROY).strength(0.5F);
-  public static final EnumObject<SlimeType,FoodCakeBlock> cake = BLOCKS_DEFFERED.registerEnum(SlimeType.LIQUID, "cake", type -> new FoodCakeBlock(CAKE, TinkerFood.getCake(type)), UNSTACKABLE_BLOCK_ITEM);
+  public static final EnumObject<SlimeType, FoodCakeBlock> cake = BLOCKS_DEFFERED.registerEnum(SlimeType.LIQUID, "cake", type -> new FoodCakeBlock(CAKE, TinkerFood.getCake(type)), UNSTACKABLE_BLOCK_ITEM);
   public static final ItemObject<FoodCakeBlock> magmaCake = BLOCKS_DEFFERED.register("magma_cake", () -> new FoodCakeBlock(CAKE, TinkerFood.MAGMA_CAKE), UNSTACKABLE_BLOCK_ITEM);
 
   // Shurikens
@@ -153,8 +155,8 @@ public final class TinkerGadgets extends TinkerModule {
   public static void commonSetup() {
 //    PiggybackCapability.register();
 //    event.enqueueWork(() -> {
-      cake.forEach(block -> CompostingChanceRegistry.INSTANCE.add(block, 1.0f));
-      CompostingChanceRegistry.INSTANCE.add(magmaCake.get(), 1.0f);
+    cake.forEach(block -> CompostingChanceRegistry.INSTANCE.add(block, 1.0f));
+    CompostingChanceRegistry.INSTANCE.add(magmaCake.get(), 1.0f);
 //    });
   }
 

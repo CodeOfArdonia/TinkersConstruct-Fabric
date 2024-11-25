@@ -13,7 +13,10 @@ import slimeknights.tconstruct.tools.stats.LimbMaterialStats;
 import javax.annotation.Nullable;
 
 public class RangedMaterialContent extends AbstractMaterialContent {
-  /** Page ID for using this index directly */
+
+  /**
+   * Page ID for using this index directly
+   */
   public static final ResourceLocation ID = TConstruct.getResource("ranged_material");
 
   public RangedMaterialContent(MaterialVariantId materialVariant, boolean detailed) {
@@ -38,7 +41,7 @@ public class RangedMaterialContent extends AbstractMaterialContent {
 
   @Override
   protected String getTextKey(MaterialId material) {
-    if (detailed) {
+    if (this.detailed) {
       String primaryKey = String.format("material.%s.%s.ranged", material.getNamespace(), material.getPath());
       if (Util.canTranslate(primaryKey)) {
         return primaryKey;

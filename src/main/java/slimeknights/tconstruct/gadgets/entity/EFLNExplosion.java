@@ -111,8 +111,8 @@ public class EFLNExplosion extends Explosion {
           blockstate.getDrops(builder).forEach((stack) -> addStack(arrayList, stack, blockpos1));
         }
 
-        level.setBlock(blockpos, Blocks.AIR.defaultBlockState(), 3);
-        blockstate.getBlock().wasExploded(level, blockpos, this);
+        this.level.setBlock(blockpos, Blocks.AIR.defaultBlockState(), 3);
+        blockstate.getBlock().wasExploded(this.level, blockpos, this);
         this.level.getProfiler().pop();
       }
     }

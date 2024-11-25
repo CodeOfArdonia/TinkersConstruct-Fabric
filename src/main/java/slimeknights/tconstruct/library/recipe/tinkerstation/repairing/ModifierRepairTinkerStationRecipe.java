@@ -24,6 +24,7 @@ import slimeknights.tconstruct.tools.TinkerModifiers;
 
 @RequiredArgsConstructor
 public class ModifierRepairTinkerStationRecipe implements ITinkerStationRecipe, IModifierRepairRecipe {
+
   @Getter
   private final ResourceLocation id;
   @Getter
@@ -40,16 +41,16 @@ public class ModifierRepairTinkerStationRecipe implements ITinkerStationRecipe, 
       return false;
     }
     ToolStack tool = ToolStack.from(tinkerable);
-    if (tool.getModifierLevel(modifier) == 0) {
+    if (tool.getModifierLevel(this.modifier) == 0) {
       return false;
     }
-    return IncrementalModifierRecipe.containsOnlyIngredient(inv, ingredient);
+    return IncrementalModifierRecipe.containsOnlyIngredient(inv, this.ingredient);
   }
 
   @Override
   public ValidatedResult getValidatedResult(ITinkerStationContainer inv, RegistryAccess registryAccess) {
     ToolStack tool = ToolStack.from(inv.getTinkerableStack());
-    int amountPerItem = tool.getModifierLevel(modifier) * repairAmount;
+    int amountPerItem = tool.getModifierLevel(this.modifier) * this.repairAmount;
     if (amountPerItem <= 0) {
       return ValidatedResult.PASS;
     }
@@ -65,7 +66,7 @@ public class ModifierRepairTinkerStationRecipe implements ITinkerStationRecipe, 
     amountPerItem *= repairFactor;
 
     // get the max amount we can repair
-    int available = IncrementalModifierRecipe.getAvailableAmount(inv, ingredient, amountPerItem);
+    int available = IncrementalModifierRecipe.getAvailableAmount(inv, this.ingredient, amountPerItem);
     if (available <= 0) {
       return ValidatedResult.PASS;
     }
@@ -93,13 +94,13 @@ public class ModifierRepairTinkerStationRecipe implements ITinkerStationRecipe, 
       }
     }
     // also scale by relevant modifier level
-    int amountPerItem = (int)(tool.getModifierLevel(modifier) * repairAmount * repairFactor);
+    int amountPerItem = (int) (tool.getModifierLevel(this.modifier) * this.repairAmount * repairFactor);
     if (amountPerItem < 0) {
       return;
     }
     // how much do we need to subtract from our inputs still
     int repairRemaining = tool.getDamage() - ToolStack.from(result).getDamage();
-    IncrementalModifierRecipe.updateInputs(inv, ingredient, repairRemaining, amountPerItem, ItemStack.EMPTY);
+    IncrementalModifierRecipe.updateInputs(inv, this.ingredient, repairRemaining, amountPerItem, ItemStack.EMPTY);
   }
 
   @Override

@@ -16,20 +16,29 @@ import slimeknights.tconstruct.library.tools.item.ModifiableLauncherItem;
 import slimeknights.tconstruct.library.tools.nbt.ToolStack;
 import slimeknights.tconstruct.tools.item.ModifiableCrossbowItem;
 
-/** Properties for tinker tools */
+/**
+ * Properties for tinker tools
+ */
 public class TinkerItemProperties {
-  /** ID for the pull property */
+
+  /**
+   * ID for the pull property
+   */
   private static final ResourceLocation PULL_ID = new ResourceLocation("pull");
-  /** Property for bow pull amount */
+  /**
+   * Property for bow pull amount
+   */
   private static final ItemPropertyFunction PULL = (stack, level, holder, seed) -> {
     if (holder == null || holder.getUseItem() != stack) {
       return 0.0F;
     }
-    float drawSpeed = TinkerDataCapability.CAPABILITY.maybeGet(holder).map(data -> data.get(ModifiableLauncherItem.DRAWSPEED)).orElse(1/20f);
-    return (float)(stack.getUseDuration() - holder.getUseItemRemainingTicks()) * drawSpeed;
+    float drawSpeed = TinkerDataCapability.CAPABILITY.maybeGet(holder).map(data -> data.get(ModifiableLauncherItem.DRAWSPEED)).orElse(1 / 20f);
+    return (float) (stack.getUseDuration() - holder.getUseItemRemainingTicks()) * drawSpeed;
   };
 
-  /** ID for the pulling property */
+  /**
+   * ID for the pulling property
+   */
   private static final ResourceLocation PULLING_ID = new ResourceLocation("pulling");
   /**
    * Boolean indicating the bow is pulling
@@ -37,9 +46,13 @@ public class TinkerItemProperties {
    */
   private static final ItemPropertyFunction PULLING = (stack, level, holder, seed) -> holder != null && holder.isUsingItem() && holder.getUseItem() == stack ? 1.0F : 0.0F;
 
-  /** ID for ammo property */
+  /**
+   * ID for ammo property
+   */
   private static final ResourceLocation AMMO_ID = TConstruct.getResource("ammo");
-  /** Int declaring ammo type */
+  /**
+   * Int declaring ammo type
+   */
   private static final ItemPropertyFunction AMMO = (stack, level, entity, seed) -> {
     CompoundTag nbt = stack.getTag();
     if (nbt != null) {
@@ -55,9 +68,13 @@ public class TinkerItemProperties {
     return 0;
   };
 
-  /** ID for the pulling property */
+  /**
+   * ID for the pulling property
+   */
   private static final ResourceLocation CHARGING_ID = TConstruct.getResource("charging");
-  /** Boolean indicating the bow is pulling */
+  /**
+   * Boolean indicating the bow is pulling
+   */
   private static final ItemPropertyFunction CHARGING = (stack, level, holder, seed) -> {
     if (holder != null && holder.isUsingItem() && holder.getUseItem() == stack) {
       UseAnim anim = stack.getUseAnimation();
@@ -69,29 +86,39 @@ public class TinkerItemProperties {
     }
     return 0;
   };
-  /** ID for the pull property */
+  /**
+   * ID for the pull property
+   */
   private static final ResourceLocation CHARGE_ID = TConstruct.getResource("charge");
-  /** Property for bow pull amount */
+  /**
+   * Property for bow pull amount
+   */
   private static final ItemPropertyFunction CHARGE = (stack, level, holder, seed) -> {
     if (holder == null || holder.getUseItem() != stack) {
       return 0.0F;
     }
-    return (float)(stack.getUseDuration() - holder.getUseItemRemainingTicks()) / ModifierUtil.getPersistentInt(stack, ModifiableLauncherItem.KEY_DRAWTIME, 20);
+    return (float) (stack.getUseDuration() - holder.getUseItemRemainingTicks()) / ModifierUtil.getPersistentInt(stack, ModifiableLauncherItem.KEY_DRAWTIME, 20);
   };
 
-  /** Registers properties for a bow */
+  /**
+   * Registers properties for a bow
+   */
   public static void registerBowProperties(Item item) {
     ItemProperties.PROPERTIES.computeIfAbsent(item, itemx -> Maps.newHashMap()).put(PULL_ID, PULL);
     ItemProperties.PROPERTIES.computeIfAbsent(item, itemx -> Maps.newHashMap()).put(PULLING_ID, PULLING);
   }
 
-  /** Registers properties for a bow */
+  /**
+   * Registers properties for a bow
+   */
   public static void registerCrossbowProperties(Item item) {
     registerBowProperties(item);
     ItemProperties.PROPERTIES.computeIfAbsent(item, itemx -> Maps.newHashMap()).put(AMMO_ID, AMMO);
   }
 
-  /** Registers properties for a bow */
+  /**
+   * Registers properties for a bow
+   */
   public static void registerToolProperties(Item item) {
     ItemProperties.PROPERTIES.computeIfAbsent(item, itemx -> Maps.newHashMap()).put(CHARGING_ID, CHARGING);
     ItemProperties.PROPERTIES.computeIfAbsent(item, itemx -> Maps.newHashMap()).put(CHARGE_ID, CHARGE);

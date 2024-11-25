@@ -5,6 +5,7 @@ import mezz.jei.api.ingredients.IIngredientTypeWithSubtypes;
 import net.minecraft.world.level.material.Fluid;
 
 public class JEITypes {
+
   public static final IIngredientTypeWithSubtypes<Fluid, FluidStack> FLUID_STACK = new IIngredientTypeWithSubtypes<>() {
     @Override
     public Class<? extends FluidStack> getIngredientClass() {

@@ -15,8 +15,10 @@ import java.io.IOException;
  * Color reload listener for all slime foliage types
  */
 public class SlimeColorReloadListener extends SimplePreparableReloadListener<int[]> implements IdentifiableResourceReloadListener {
+
   private final SlimeType color;
   private final ResourceLocation path;
+
   public SlimeColorReloadListener(SlimeType color) {
     this.color = color;
     this.path = TConstruct.getResource("textures/colormap/" + color.getSerializedName() + "_grass_color.png");
@@ -28,7 +30,7 @@ public class SlimeColorReloadListener extends SimplePreparableReloadListener<int
   @Override
   protected int[] prepare(ResourceManager resourceManager, ProfilerFiller profiler) {
     try {
-      return LegacyStuffWrapper.getPixels(resourceManager, path);
+      return LegacyStuffWrapper.getPixels(resourceManager, this.path);
     } catch (IOException ioexception) {
       TConstruct.LOG.error("Failed to load slime colors", ioexception);
       return new int[0];
@@ -38,12 +40,12 @@ public class SlimeColorReloadListener extends SimplePreparableReloadListener<int
   @Override
   protected void apply(int[] buffer, ResourceManager resourceManager, ProfilerFiller profiler) {
     if (buffer.length != 0) {
-      SlimeColorizer.setGrassColor(color, buffer);
+      SlimeColorizer.setGrassColor(this.color, buffer);
     }
   }
 
   @Override
   public ResourceLocation getFabricId() {
-    return path;
+    return this.path;
   }
 }

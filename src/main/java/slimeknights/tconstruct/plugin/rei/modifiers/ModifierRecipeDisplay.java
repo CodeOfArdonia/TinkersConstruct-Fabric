@@ -16,6 +16,7 @@ import slimeknights.tconstruct.plugin.rei.TConstructREIConstants;
 import java.util.List;
 
 public class ModifierRecipeDisplay implements Display {
+
   @Getter
   private final List<EntryIngredient> inputEntries, outputEntries;
 

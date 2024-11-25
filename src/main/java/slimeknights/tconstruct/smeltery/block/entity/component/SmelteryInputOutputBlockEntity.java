@@ -41,18 +41,25 @@ import static slimeknights.mantle.util.RetexturedHelper.TAG_TEXTURE;
  * Shared logic between drains and ducts
  */
 public abstract class SmelteryInputOutputBlockEntity<T> extends SmelteryComponentBlockEntity implements IRetexturedBlockEntity {
-  /** Capability this TE watches */
+
+  /**
+   * Capability this TE watches
+   */
   private final BlockApiLookup<Storage<T>, @org.jetbrains.annotations.Nullable Direction> capability;
-  /** Empty capability for in case the valid capability becomes invalid without invalidating */
+  /**
+   * Empty capability for in case the valid capability becomes invalid without invalidating
+   */
   protected final Storage<T> emptyInstance = Storage.empty();
-  /** Listener to attach to consumed capabilities */
+  /**
+   * Listener to attach to consumed capabilities
+   */
   protected final NonNullConsumer<LazyOptional<T>> listener = new WeakConsumerWrapper<>(this, (te, cap) -> te.clearHandler());
   @Nullable
   private Storage<T> capabilityHolder = null;
 
   /* Retexturing */
   @Getter
-  private final IModelData modelData = getRetexturedModelData();
+  private final IModelData modelData = this.getRetexturedModelData();
   @Nonnull
   @Getter
   private Block texture = Blocks.AIR;
@@ -62,61 +69,64 @@ public abstract class SmelteryInputOutputBlockEntity<T> extends SmelteryComponen
     this.capability = capability;
   }
 
-  /** Clears all cached capabilities */
+  /**
+   * Clears all cached capabilities
+   */
   private void clearHandler() {
-    if (capabilityHolder != null) {
-      capabilityHolder = null;
+    if (this.capabilityHolder != null) {
+      this.capabilityHolder = null;
     }
   }
 
   @Override
   public void invalidateCaps() {
     super.invalidateCaps();
-    clearHandler();
+    this.clearHandler();
   }
 
   @Override
   protected void setMaster(@Nullable BlockPos master, @Nullable Block block) {
-    assert level != null;
+    assert this.level != null;
 
     // if we have a new master, invalidate handlers
     boolean masterChanged = false;
-    if (!Objects.equals(getMasterPos(), master)) {
-      clearHandler();
+    if (!Objects.equals(this.getMasterPos(), master)) {
+      this.clearHandler();
       masterChanged = true;
     }
     super.setMaster(master, block);
     // notify neighbors of the change (state change skips the notify flag)
     if (masterChanged) {
-      level.blockUpdated(worldPosition, getBlockState().getBlock());
+      this.level.blockUpdated(this.worldPosition, this.getBlockState().getBlock());
     }
   }
 
   /**
    * Gets the capability to store in this IO block. Capability parent should have the proper listeners attached
-   * @param level  Parent level
-   * @param pos    Parent pos
-   * @return  Capability from parent, or empty if absent
+   *
+   * @param level Parent level
+   * @param pos   Parent pos
+   * @return Capability from parent, or empty if absent
    */
   protected Storage<T> getCapability(Level level, BlockPos pos) {
-    return capability.find(level, pos, null);
+    return this.capability.find(level, pos, null);
   }
 
   /**
    * Fetches the capability handlers if missing
    */
   protected Storage<T> getCachedCapability() {
-    if (capabilityHolder == null) {
-      if (validateMaster()) {
-        BlockPos master = getMasterPos();
+    if (this.capabilityHolder == null) {
+      if (this.validateMaster()) {
+        BlockPos master = this.getMasterPos();
         if (master != null && this.level != null) {
-          capabilityHolder = getCapability(level, master);
-          return capabilityHolder;
+          this.capabilityHolder = this.getCapability(this.level, master);
+          return this.capabilityHolder;
         }
       }
-      capabilityHolder = null;
+      this.capabilityHolder = null;
     }
-    return capabilityHolder;
+    return this.capabilityHolder;
   }
 
 //  @Nonnull
@@ -138,15 +148,15 @@ public abstract class SmelteryInputOutputBlockEntity<T> extends SmelteryComponen
 
   @Override
   public String getTextureName() {
-    return RetexturedHelper.getTextureName(texture);
+    return RetexturedHelper.getTextureName(this.texture);
   }
 
   @Override
   public void updateTexture(String name) {
-    Block oldTexture = texture;
-    texture = RetexturedHelper.getBlock(name);
-    if (oldTexture != texture) {
-      setChangedFast();
+    Block oldTexture = this.texture;
+    this.texture = RetexturedHelper.getBlock(name);
+    if (oldTexture != this.texture) {
+      this.setChangedFast();
       RetexturedHelper.onTextureUpdated(this);
     }
   }
@@ -162,8 +172,8 @@ public abstract class SmelteryInputOutputBlockEntity<T> extends SmelteryComponen
   @Override
   protected void saveSynced(CompoundTag tags) {
     super.saveSynced(tags);
-    if (texture != Blocks.AIR) {
-      tags.putString(TAG_TEXTURE, getTextureName());
+    if (this.texture != Blocks.AIR) {
+      tags.putString(TAG_TEXTURE, this.getTextureName());
     }
   }
 
@@ -171,7 +181,7 @@ public abstract class SmelteryInputOutputBlockEntity<T> extends SmelteryComponen
   public void load(CompoundTag tags) {
     super.load(tags);
     if (tags.contains(TAG_TEXTURE, Tag.TAG_STRING)) {
-      texture = RetexturedHelper.getBlock(tags.getString(TAG_TEXTURE));
+      this.texture = RetexturedHelper.getBlock(tags.getString(TAG_TEXTURE));
       RetexturedHelper.onTextureUpdated(this);
     }
   }
@@ -181,13 +191,18 @@ public abstract class SmelteryInputOutputBlockEntity<T> extends SmelteryComponen
     return this.modelData;
   }
 
-  /** Fluid implementation of smeltery IO */
+  /**
+   * Fluid implementation of smeltery IO
+   */
   public static abstract class SmelteryFluidIO extends SmelteryInputOutputBlockEntity<FluidVariant> implements SidedStorageBlockEntity {
+
     protected SmelteryFluidIO(BlockEntityType<?> type, BlockPos pos, BlockState state) {
       super(type, pos, state, FluidStorage.SIDED);
     }
 
-    /** Wraps the given capability */
+    /**
+     * Wraps the given capability
+     */
     protected Storage<FluidVariant> makeWrapper(SlottedStorage<FluidVariant> capability) {
       return capability;
     }
@@ -199,7 +214,7 @@ public abstract class SmelteryInputOutputBlockEntity<T> extends SmelteryComponen
       if (parent instanceof ISmelteryTankHandler) {
         SlottedStorage<FluidVariant> capability = ((ISmelteryTankHandler) parent).getFluidCapability();
         if (capability != null) {
-          return makeWrapper(capability);
+          return this.makeWrapper(capability);
         }
       }
       return null;
@@ -207,7 +222,7 @@ public abstract class SmelteryInputOutputBlockEntity<T> extends SmelteryComponen
 
     @Override
     public IModelData getRenderData() {
-      return getModelData();
+      return this.getModelData();
     }
 
     @Override
@@ -218,12 +233,15 @@ public abstract class SmelteryInputOutputBlockEntity<T> extends SmelteryComponen
     @Nullable
     @Override
     public Storage<FluidVariant> getFluidStorage(@Nullable Direction direction) {
-      return getCachedCapability();
+      return this.getCachedCapability();
     }
   }
 
-  /** Item implementation of smeltery IO */
+  /**
+   * Item implementation of smeltery IO
+   */
   public static class ChuteBlockEntity extends SmelteryInputOutputBlockEntity<ItemVariant> implements SidedStorageBlockEntity {
+
     public ChuteBlockEntity(BlockPos pos, BlockState state) {
       this(TinkerSmeltery.chute.get(), pos, state);
     }
@@ -235,7 +253,7 @@ public abstract class SmelteryInputOutputBlockEntity<T> extends SmelteryComponen
     @Nullable
     @Override
     public Storage<ItemVariant> getItemStorage(@Nullable Direction direction) {
-      return getCachedCapability();
+      return this.getCachedCapability();
     }
   }
 

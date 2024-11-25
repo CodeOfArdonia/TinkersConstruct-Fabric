@@ -18,25 +18,34 @@ import slimeknights.mantle.fluid.FluidTransferHelper;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FluidTransferUtil {
-  /** @deprecated use {@link FluidTransferHelper#tryTransfer(Storage, Storage, long)} */
+
+  /**
+   * @deprecated use {@link FluidTransferHelper#tryTransfer(Storage, Storage, long)}
+   */
   @Deprecated
   public static FluidStack tryTransfer(Storage<FluidVariant> input, Storage<FluidVariant> output, long maxFill) {
     return FluidTransferHelper.tryTransfer(input, output, maxFill);
   }
 
-  /** @deprecated use {@link FluidTransferHelper#interactWithBucket(Level, BlockPos, Player, InteractionHand, Direction, Direction)} */
+  /**
+   * @deprecated use {@link FluidTransferHelper#interactWithBucket(Level, BlockPos, Player, InteractionHand, Direction, Direction)}
+   */
   @Deprecated
   public static boolean interactWithBucket(Level world, BlockPos pos, Player player, InteractionHand hand, Direction hit, Direction offset) {
     return FluidTransferHelper.interactWithBucket(world, pos, player, hand, hit, offset);
   }
 
-  /** @deprecated use {@link FluidTransferHelper#interactWithFluidItem(Level, BlockPos, Player, InteractionHand, BlockHitResult)} (IFluidHandler, IFluidHandler, int)} */
+  /**
+   * @deprecated use {@link FluidTransferHelper#interactWithFluidItem(Level, BlockPos, Player, InteractionHand, BlockHitResult)} (IFluidHandler, IFluidHandler, int)}
+   */
   @Deprecated
   public static boolean interactWithFluidItem(Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
     return FluidTransferHelper.interactWithFluidItem(world, pos, player, hand, hit);
   }
 
-  /** @deprecated use {@link FluidTransferHelper#interactWithTank(Level, BlockPos, Player, InteractionHand, BlockHitResult)} (IFluidHandler, IFluidHandler, int)} */
+  /**
+   * @deprecated use {@link FluidTransferHelper#interactWithTank(Level, BlockPos, Player, InteractionHand, BlockHitResult)} (IFluidHandler, IFluidHandler, int)}
+   */
   @Deprecated
   public static boolean interactWithTank(Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
     return FluidTransferHelper.interactWithTank(world, pos, player, hand, hit);

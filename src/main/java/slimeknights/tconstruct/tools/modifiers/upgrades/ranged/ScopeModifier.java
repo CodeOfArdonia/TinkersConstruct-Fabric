@@ -8,6 +8,7 @@ import slimeknights.tconstruct.library.tools.context.EquipmentChangeContext;
 import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 
 public class ScopeModifier extends Modifier {
+
   public static final ResourceLocation SCOPE = TConstruct.getResource("longbow_scope");
 
   @Override

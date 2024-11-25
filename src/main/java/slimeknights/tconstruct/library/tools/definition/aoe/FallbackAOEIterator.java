@@ -17,16 +17,25 @@ import slimeknights.mantle.data.GenericLoaderRegistry.IGenericLoader;
 import slimeknights.mantle.util.JsonHelper;
 import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 
-/** Iterator that tries one iterator, falling back to a second if the block does not match a tag */
+/**
+ * Iterator that tries one iterator, falling back to a second if the block does not match a tag
+ */
 @RequiredArgsConstructor
 public class FallbackAOEIterator implements IAreaOfEffectIterator {
+
   public static final Loader LOADER = new Loader();
 
-  /** Tag to check the block against */
+  /**
+   * Tag to check the block against
+   */
   private final TagKey<Block> tag;
-  /** Iterator to use if the block matches the tag */
+  /**
+   * Iterator to use if the block matches the tag
+   */
   private final IAreaOfEffectIterator taggedIterator;
-  /** Iterator to use if the block does not match the tag */
+  /**
+   * Iterator to use if the block does not match the tag
+   */
   private final IAreaOfEffectIterator fallbackIterator;
 
   @Override
@@ -36,11 +45,12 @@ public class FallbackAOEIterator implements IAreaOfEffectIterator {
 
   @Override
   public Iterable<BlockPos> getBlocks(IToolStackView tool, ItemStack stack, Player player, BlockState state, Level world, BlockPos origin, Direction sideHit, AOEMatchType matchType) {
-    IAreaOfEffectIterator iterator = state.is(tag) ? taggedIterator : fallbackIterator;
+    IAreaOfEffectIterator iterator = state.is(this.tag) ? this.taggedIterator : this.fallbackIterator;
     return iterator.getBlocks(tool, stack, player, state, world, origin, sideHit, matchType);
   }
 
   private static class Loader implements IGenericLoader<FallbackAOEIterator> {
+
     @Override
     public FallbackAOEIterator deserialize(JsonObject json) {
       TagKey<Block> tag = TagKey.create(Registries.BLOCK, JsonHelper.getResourceLocation(json, "tag"));

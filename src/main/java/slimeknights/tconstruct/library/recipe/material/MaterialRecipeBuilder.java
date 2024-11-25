@@ -25,6 +25,7 @@ import java.util.function.Consumer;
 @RequiredArgsConstructor(staticName = "materialRecipe")
 @Accessors(chain = true)
 public class MaterialRecipeBuilder extends AbstractRecipeBuilder<MaterialRecipeBuilder> {
+
   private final MaterialVariantId material;
   private Ingredient ingredient = Ingredient.EMPTY;
   @Setter
@@ -36,8 +37,9 @@ public class MaterialRecipeBuilder extends AbstractRecipeBuilder<MaterialRecipeB
 
   /**
    * Sets the input ingredient for this material recipe
-   * @param tag  Tag input
-   * @return  Builder instance
+   *
+   * @param tag Tag input
+   * @return Builder instance
    */
   public MaterialRecipeBuilder setIngredient(TagKey<Item> tag) {
     return this.setIngredient(Ingredient.of(tag));
@@ -45,8 +47,9 @@ public class MaterialRecipeBuilder extends AbstractRecipeBuilder<MaterialRecipeB
 
   /**
    * Sets the input ingredient for this material recipe
-   * @param item  Item input
-   * @return  Builder instance
+   *
+   * @param item Item input
+   * @return Builder instance
    */
   public MaterialRecipeBuilder setIngredient(ItemLike item) {
     return this.setIngredient(Ingredient.of(item));
@@ -54,8 +57,9 @@ public class MaterialRecipeBuilder extends AbstractRecipeBuilder<MaterialRecipeB
 
   /**
    * Sets the input ingredient for this material recipe
-   * @param ingredient  Ingredient input
-   * @return  Builder instance
+   *
+   * @param ingredient Ingredient input
+   * @return Builder instance
    */
   public MaterialRecipeBuilder setIngredient(Ingredient ingredient) {
     this.ingredient = ingredient;
@@ -64,7 +68,7 @@ public class MaterialRecipeBuilder extends AbstractRecipeBuilder<MaterialRecipeB
 
   @Override
   public void save(Consumer<FinishedRecipe> consumerIn) {
-    this.save(consumerIn, material.getId());
+    this.save(consumerIn, this.material.getId());
   }
 
   @Override
@@ -86,21 +90,22 @@ public class MaterialRecipeBuilder extends AbstractRecipeBuilder<MaterialRecipeB
   }
 
   private class Result extends AbstractFinishedRecipe {
+
     public Result(ResourceLocation ID, @Nullable ResourceLocation advancementID) {
       super(ID, advancementID);
     }
 
     @Override
     public void serializeRecipeData(JsonObject json) {
-      if (!group.isEmpty()) {
-        json.addProperty("group", group);
+      if (!MaterialRecipeBuilder.this.group.isEmpty()) {
+        json.addProperty("group", MaterialRecipeBuilder.this.group);
       }
-      json.add("ingredient", ingredient.toJson());
-      json.addProperty("value", value);
-      json.addProperty("needed", needed);
-      json.addProperty("material", material.toString());
-      if (value > 1 && leftover != null) {
-        json.add("leftover", leftover.serialize());
+      json.add("ingredient", MaterialRecipeBuilder.this.ingredient.toJson());
+      json.addProperty("value", MaterialRecipeBuilder.this.value);
+      json.addProperty("needed", MaterialRecipeBuilder.this.needed);
+      json.addProperty("material", MaterialRecipeBuilder.this.material.toString());
+      if (MaterialRecipeBuilder.this.value > 1 && MaterialRecipeBuilder.this.leftover != null) {
+        json.add("leftover", MaterialRecipeBuilder.this.leftover.serialize());
       }
     }
 

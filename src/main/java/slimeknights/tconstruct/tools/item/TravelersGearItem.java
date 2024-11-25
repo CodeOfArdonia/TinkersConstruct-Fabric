@@ -5,7 +5,6 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.github.fabricators_of_create.porting_lib.client.armor.ArmorRenderer;
 import io.github.fabricators_of_create.porting_lib.client.armor.ArmorRendererRegistry;
 import io.github.fabricators_of_create.porting_lib.item.ArmorTextureItem;
-import io.github.fabricators_of_create.porting_lib.item.WalkOnSnowItem;
 import io.github.fabricators_of_create.porting_lib.util.EnvExecutor;
 import io.github.fabricators_of_create.porting_lib.util.client.ClientHooks;
 import net.fabricmc.api.EnvType;
@@ -32,9 +31,14 @@ import slimeknights.tconstruct.tools.client.TravelersGearModel;
 import javax.annotation.Nullable;
 
 public class TravelersGearItem extends ModifiableArmorItem implements ArmorTextureItem {
-  /** Golden texture for armor */
+
+  /**
+   * Golden texture for armor
+   */
   private static final String GOLDEN_ARMOR = TConstruct.resourceString("textures/models/armor/travelers_golden_1.png");
-  /** Golden texture for leggings */
+  /**
+   * Golden texture for leggings
+   */
   private static final String GOLDEN_LEGS = TConstruct.resourceString("textures/models/armor/travelers_golden_2.png");
 
   public TravelersGearItem(ModifiableArmorMaterial material, ArmorSlotType slotType, Properties properties, ResourceKey<CreativeModeTab> tab) {
@@ -58,6 +62,7 @@ public class TravelersGearItem extends ModifiableArmorItem implements ArmorTextu
 
   @Environment(EnvType.CLIENT)
   private static final class TravelersGearRenderer implements ArmorRenderer {
+
     @Override
     public void render(PoseStack matrices, MultiBufferSource vertexConsumers, ItemStack itemStack, LivingEntity entity, EquipmentSlot armorSlot, int light, HumanoidModel<LivingEntity> playerModel, HumanoidModel<LivingEntity> baseArmorModel) {
       playerModel.copyPropertiesTo(baseArmorModel);

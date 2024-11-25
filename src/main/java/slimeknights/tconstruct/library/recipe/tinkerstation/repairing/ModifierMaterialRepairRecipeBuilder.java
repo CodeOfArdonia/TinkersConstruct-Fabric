@@ -15,9 +15,12 @@ import slimeknights.tconstruct.tools.TinkerModifiers;
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
 
-/** Builds a recipe to repair a tool using a modifier via a material */
+/**
+ * Builds a recipe to repair a tool using a modifier via a material
+ */
 @RequiredArgsConstructor(staticName = "repair")
 public class ModifierMaterialRepairRecipeBuilder extends AbstractRecipeBuilder<ModifierMaterialRepairRecipeBuilder> {
+
   private final ModifierId modifier;
   private final MaterialId material;
 
@@ -27,23 +30,26 @@ public class ModifierMaterialRepairRecipeBuilder extends AbstractRecipeBuilder<M
 
   @Override
   public void save(Consumer<FinishedRecipe> consumer) {
-    save(consumer, modifier);
+    this.save(consumer, this.modifier);
   }
 
-  /** Builds the recipe for the crafting table using a repair kit */
+  /**
+   * Builds the recipe for the crafting table using a repair kit
+   */
   public ModifierMaterialRepairRecipeBuilder saveCraftingTable(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
-    ResourceLocation advancementId = buildOptionalAdvancement(id, "tinker_station");
+    ResourceLocation advancementId = this.buildOptionalAdvancement(id, "tinker_station");
     consumer.accept(new Finished(id, advancementId, TinkerModifiers.craftingModifierMaterialRepair.get()));
     return this;
   }
 
   @Override
   public void save(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
-    ResourceLocation advancementId = buildOptionalAdvancement(id, "tinker_station");
+    ResourceLocation advancementId = this.buildOptionalAdvancement(id, "tinker_station");
     consumer.accept(new Finished(id, advancementId, TinkerModifiers.modifierMaterialRepair.get()));
   }
 
   private class Finished extends AbstractFinishedRecipe {
+
     @Getter
     private final RecipeSerializer<?> type;
 
@@ -54,8 +60,8 @@ public class ModifierMaterialRepairRecipeBuilder extends AbstractRecipeBuilder<M
 
     @Override
     public void serializeRecipeData(JsonObject json) {
-      json.addProperty("modifier", modifier.toString());
-      json.addProperty("repair_material", material.toString());
+      json.addProperty("modifier", ModifierMaterialRepairRecipeBuilder.this.modifier.toString());
+      json.addProperty("repair_material", ModifierMaterialRepairRecipeBuilder.this.material.toString());
     }
   }
 }

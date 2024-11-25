@@ -18,7 +18,7 @@ public class Tinkers3Schema extends NamespacedSchema {
 
   @Override
   public Map<String, Supplier<TypeTemplate>> registerBlockEntities(Schema schema) {
-    Map<String, Supplier<TypeTemplate>> existing =  super.registerBlockEntities(schema);
+    Map<String, Supplier<TypeTemplate>> existing = super.registerBlockEntities(schema);
     // Mantle
     schema.registerSimple(existing, "mantle:sign");
 

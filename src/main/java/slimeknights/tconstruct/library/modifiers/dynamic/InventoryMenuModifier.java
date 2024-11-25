@@ -23,7 +23,10 @@ import slimeknights.tconstruct.library.tools.definition.module.interaction.DualO
 import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 
 public class InventoryMenuModifier extends InventoryModifier implements KeybindInteractModifierHook, GeneralInteractionModifierHook {
-  /** Loader instance */
+
+  /**
+   * Loader instance
+   */
   public static final GenericIntSerializer<InventoryMenuModifier> LOADER = new GenericIntSerializer<>("size", InventoryMenuModifier::new, t -> t.slotsPerLevel);
 
   public InventoryMenuModifier(int size) {

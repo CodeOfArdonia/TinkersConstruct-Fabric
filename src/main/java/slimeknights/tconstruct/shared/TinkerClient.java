@@ -40,6 +40,7 @@ import java.util.function.Consumer;
  */
 @SuppressWarnings("removal")
 public class TinkerClient implements ClientModInitializer {
+
   /**
    * Called by TConstruct to handle any client side logic that needs to run during the constructor
    */

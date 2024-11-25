@@ -15,14 +15,22 @@ import slimeknights.tconstruct.library.tools.part.IMaterialItem;
 import slimeknights.tconstruct.tables.TinkerTables;
 import slimeknights.tconstruct.tables.recipe.CraftingTableRepairKitRecipe;
 
-/** Recipe for using a repair kit in a crafting station for a specialized tool */
+/**
+ * Recipe for using a repair kit in a crafting station for a specialized tool
+ */
 public class SpecializedRepairKitRecipe extends CraftingTableRepairKitRecipe implements ISpecializedRepairRecipe {
-  /** Tool that can be repaired with this recipe */
+
+  /**
+   * Tool that can be repaired with this recipe
+   */
   @Getter
   private final Ingredient tool;
-  /** ID of material used in repairing */
+  /**
+   * ID of material used in repairing
+   */
   @Getter
   private final MaterialId repairMaterial;
+
   public SpecializedRepairKitRecipe(ResourceLocation id, Ingredient tool, MaterialId repairMaterial) {
     super(id);
     this.tool = tool;
@@ -31,13 +39,13 @@ public class SpecializedRepairKitRecipe extends CraftingTableRepairKitRecipe imp
 
   @Override
   protected boolean toolMatches(ItemStack stack) {
-    return tool.test(stack);
+    return this.tool.test(stack);
   }
 
   @Override
   public boolean matches(CraftingContainer inv, Level worldIn) {
-    Pair<ToolStack, ItemStack> inputs = getRelevantInputs(inv);
-    return inputs != null && repairMaterial.equals(IMaterialItem.getMaterialFromStack(inputs.getSecond()).getId());
+    Pair<ToolStack, ItemStack> inputs = this.getRelevantInputs(inv);
+    return inputs != null && this.repairMaterial.equals(IMaterialItem.getMaterialFromStack(inputs.getSecond()).getId());
   }
 
   @Override

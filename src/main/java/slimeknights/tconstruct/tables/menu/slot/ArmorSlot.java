@@ -10,9 +10,12 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 
-/** Slot for accessing player armor */
+/**
+ * Slot for accessing player armor
+ */
 public class ArmorSlot extends Slot {
-  private static final ResourceLocation[] ARMOR_SLOT_BACKGROUNDS = new ResourceLocation[] {
+
+  private static final ResourceLocation[] ARMOR_SLOT_BACKGROUNDS = new ResourceLocation[]{
     InventoryMenu.EMPTY_ARMOR_SLOT_BOOTS,
     InventoryMenu.EMPTY_ARMOR_SLOT_LEGGINGS,
     InventoryMenu.EMPTY_ARMOR_SLOT_CHESTPLATE,
@@ -26,7 +29,7 @@ public class ArmorSlot extends Slot {
     super(inv, 36 + slotType.getIndex(), xPosition, yPosition);
     this.player = inv.player;
     this.slotType = slotType;
-    setBackground(InventoryMenu.BLOCK_ATLAS, ARMOR_SLOT_BACKGROUNDS[slotType.getIndex()]);
+    this.setBackground(InventoryMenu.BLOCK_ATLAS, ARMOR_SLOT_BACKGROUNDS[slotType.getIndex()]);
   }
 
   @Override
@@ -36,7 +39,7 @@ public class ArmorSlot extends Slot {
 
   @Override
   public boolean mayPlace(ItemStack stack) {
-    return Mob.getEquipmentSlotForItem(stack) == slotType;
+    return Mob.getEquipmentSlotForItem(stack) == this.slotType;
   }
 
   @Override

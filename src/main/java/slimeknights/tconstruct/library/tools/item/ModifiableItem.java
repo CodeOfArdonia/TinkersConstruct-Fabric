@@ -3,8 +3,6 @@ package slimeknights.tconstruct.library.tools.item;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import io.github.fabricators_of_create.porting_lib.common.util.Lazy;
-import io.github.fabricators_of_create.porting_lib.item.api.extensions.RepairableItem;
-import io.github.fabricators_of_create.porting_lib.tool.ToolAction;
 import io.github.fabricators_of_create.porting_lib.enchant.CustomEnchantingBehaviorItem;
 import io.github.fabricators_of_create.porting_lib.item.ContinueUsingItem;
 import io.github.fabricators_of_create.porting_lib.item.CustomMaxCountItem;
@@ -12,6 +10,8 @@ import io.github.fabricators_of_create.porting_lib.item.DamageableItem;
 import io.github.fabricators_of_create.porting_lib.item.ReequipAnimationItem;
 import io.github.fabricators_of_create.porting_lib.item.ShieldBlockItem;
 import io.github.fabricators_of_create.porting_lib.item.UseFirstBehaviorItem;
+import io.github.fabricators_of_create.porting_lib.item.api.extensions.RepairableItem;
+import io.github.fabricators_of_create.porting_lib.tool.ToolAction;
 import io.github.fabricators_of_create.porting_lib.tool.addons.ToolActionItem;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemItemStorages;
 import lombok.Getter;
@@ -20,7 +20,6 @@ import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroupEntries;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -79,17 +78,22 @@ import java.util.function.Consumer;
  * This class handles how all the modifier hooks and display data for items made out of different materials
  */
 public class ModifiableItem extends Item implements IModifiableDisplay, UseFirstBehaviorItem, DamageableItem, ShieldBlockItem, CustomMaxCountItem, ReequipAnimationItem, CustomEnchantingBehaviorItem, ContinueUsingItem, ToolActionItem, RepairableItem {
-  /** Tool definition for the given tool */
+
+  /**
+   * Tool definition for the given tool
+   */
   @Getter
   private final ToolDefinition toolDefinition;
 
-  /** Cached tool for rendering on UIs */
+  /**
+   * Cached tool for rendering on UIs
+   */
   private ItemStack toolForRendering;
 
   public ModifiableItem(Properties properties, ToolDefinition toolDefinition, ResourceKey<CreativeModeTab> tab) {
     super(properties);
     this.toolDefinition = toolDefinition;
-    ((FabricItemSettings)properties).customDamage(this::damageItem);
+    ((FabricItemSettings) properties).customDamage(this::damageItem);
     ItemGroupEvents.modifyEntriesEvent(tab).register(this::fillItemCategory);
     FluidStorage.ITEM.registerForItems((itemStack, context) -> new ToolFluidCapability(context, Lazy.of(() -> ToolStack.from(itemStack))), this);
     ItemItemStorages.ITEM.registerForItems((itemStack, context) -> ToolInventoryCapability.getCap(context, itemStack), this);
@@ -129,12 +133,12 @@ public class ModifiableItem extends Item implements IModifiableDisplay, UseFirst
 
   @Override
   public void verifyTagAfterLoad(CompoundTag nbt) {
-    ToolStack.verifyTag(this, nbt, getToolDefinition());
+    ToolStack.verifyTag(this, nbt, this.getToolDefinition());
   }
 
   @Override
   public void onCraftedBy(ItemStack stack, Level worldIn, Player playerIn) {
-    ToolStack.ensureInitialized(stack, getToolDefinition());
+    ToolStack.ensureInitialized(stack, this.getToolDefinition());
   }
 
 
@@ -182,7 +186,7 @@ public class ModifiableItem extends Item implements IModifiableDisplay, UseFirst
 
   @Override
   public int getMaxDamage(ItemStack stack) {
-    if (!canBeDepleted()) {
+    if (!this.canBeDepleted()) {
       return 0;
     }
     ToolStack tool = ToolStack.from(stack);
@@ -193,7 +197,7 @@ public class ModifiableItem extends Item implements IModifiableDisplay, UseFirst
 
   @Override
   public int getDamage(ItemStack stack) {
-    if (!canBeDepleted()) {
+    if (!this.canBeDepleted()) {
       return 0;
     }
     return ToolStack.from(stack).getDamage();
@@ -201,7 +205,7 @@ public class ModifiableItem extends Item implements IModifiableDisplay, UseFirst
 
   @Override
   public void setDamage(ItemStack stack, int damage) {
-    if (canBeDepleted()) {
+    if (this.canBeDepleted()) {
       ToolStack.from(stack).setDamage(damage);
     }
   }
@@ -238,7 +242,7 @@ public class ModifiableItem extends Item implements IModifiableDisplay, UseFirst
   }
 
   @Override
-  public Multimap<Attribute,AttributeModifier> getAttributeModifiers(IToolStackView tool, EquipmentSlot slot) {
+  public Multimap<Attribute, AttributeModifier> getAttributeModifiers(IToolStackView tool, EquipmentSlot slot) {
     return ModifiableItemUtil.getMeleeAttributeModifiers(tool, slot);
   }
 
@@ -248,12 +252,12 @@ public class ModifiableItem extends Item implements IModifiableDisplay, UseFirst
     if (nbt == null || slot.getType() != Type.HAND) {
       return ImmutableMultimap.of();
     }
-    return getAttributeModifiers(ToolStack.from(stack), slot);
+    return this.getAttributeModifiers(ToolStack.from(stack), slot);
   }
 
   @Override
   public boolean canDisableShield(ItemStack stack, ItemStack shield, LivingEntity entity, LivingEntity attacker) {
-    return !ToolDamageUtil.isBroken(stack) && toolDefinition.getData().canPerformAction(TinkerToolActions.SHIELD_DISABLE);
+    return !ToolDamageUtil.isBroken(stack) && this.toolDefinition.getData().canPerformAction(TinkerToolActions.SHIELD_DISABLE);
   }
 
 
@@ -286,10 +290,12 @@ public class ModifiableItem extends Item implements IModifiableDisplay, UseFirst
   public void inventoryTick(ItemStack stack, Level worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
     ModifiableItemUtil.heldInventoryTick(stack, worldIn, entityIn, itemSlot, isSelected);
   }
-  
+
   /* Right click hooks */
 
-  /** If true, this interaction hook should defer to the offhand */
+  /**
+   * If true, this interaction hook should defer to the offhand
+   */
   protected static boolean shouldInteract(@Nullable LivingEntity player, ToolStack toolStack, InteractionHand hand) {
     IModDataView volatileData = toolStack.getVolatileData();
     if (volatileData.getBoolean(NO_INTERACTION)) {
@@ -305,7 +311,7 @@ public class ModifiableItem extends Item implements IModifiableDisplay, UseFirst
     // if mainhand is told to defer, offhand must be empty to run
     return player == null || !deferOffhand || player.getOffhandItem().isEmpty();
   }
-  
+
   @Override
   public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
     ToolStack tool = ToolStack.from(stack);
@@ -469,7 +475,7 @@ public class ModifiableItem extends Item implements IModifiableDisplay, UseFirst
 
   @Override
   public Component getName(ItemStack stack) {
-    return TooltipUtil.getDisplayName(stack, getToolDefinition());
+    return TooltipUtil.getDisplayName(stack, this.getToolDefinition());
   }
 
   @Override
@@ -479,9 +485,9 @@ public class ModifiableItem extends Item implements IModifiableDisplay, UseFirst
 
   @Override
   public int getDefaultTooltipHideFlags(ItemStack stack) {
-    return TooltipUtil.getModifierHideFlags(getToolDefinition());
+    return TooltipUtil.getModifierHideFlags(this.getToolDefinition());
   }
-  
+
 
   /* Display items */
 
@@ -491,10 +497,10 @@ public class ModifiableItem extends Item implements IModifiableDisplay, UseFirst
 
   @Override
   public ItemStack getRenderTool() {
-    if (toolForRendering == null) {
-      toolForRendering = ToolBuildHandler.buildToolForRendering(this, this.getToolDefinition());
+    if (this.toolForRendering == null) {
+      this.toolForRendering = ToolBuildHandler.buildToolForRendering(this, this.getToolDefinition());
     }
-    return toolForRendering;
+    return this.toolForRendering;
   }
 
 
@@ -502,7 +508,7 @@ public class ModifiableItem extends Item implements IModifiableDisplay, UseFirst
 
   @Override
   public boolean allowContinuingBlockBreaking(Player player, ItemStack oldStack, ItemStack newStack) {
-    return !shouldCauseReequipAnimation(oldStack, newStack, false);
+    return !this.shouldCauseReequipAnimation(oldStack, newStack, false);
   }
 
   @Override
@@ -516,11 +522,10 @@ public class ModifiableItem extends Item implements IModifiableDisplay, UseFirst
   /**
    * Creates a raytrace and casts it to a BlockRayTraceResult
    *
-   * @param worldIn the world
-   * @param player the given player
+   * @param worldIn   the world
+   * @param player    the given player
    * @param fluidMode the fluid mode to use for the raytrace event
-   *
-   * @return  Raytrace
+   * @return Raytrace
    */
   public static BlockHitResult blockRayTrace(Level worldIn, Player player, ClipContext.Fluid fluidMode) {
     return Item.getPlayerPOVHitResult(worldIn, player, fluidMode);

@@ -22,15 +22,18 @@ import java.util.function.Consumer;
 
 @SuppressWarnings("unused")
 public class ModifierRecipeBuilder extends AbstractModifierRecipeBuilder<ModifierRecipeBuilder> {
+
   protected final List<SizedIngredient> inputs = new ArrayList<>();
+
   protected ModifierRecipeBuilder(ModifierEntry result) {
     super(result);
   }
 
   /**
    * Creates a new recipe for multiple levels of a modifier
-   * @param modifier  Modifier
-   * @return  Recipe for multiple levels of the modifier
+   *
+   * @param modifier Modifier
+   * @return Recipe for multiple levels of the modifier
    */
   public static ModifierRecipeBuilder modifier(ModifierEntry modifier) {
     return new ModifierRecipeBuilder(modifier);
@@ -38,8 +41,9 @@ public class ModifierRecipeBuilder extends AbstractModifierRecipeBuilder<Modifie
 
   /**
    * Creates a new recipe for 1 level of a modifier
-   * @param modifier  Modifier
-   * @return  Recipe for 1 level of the modifier
+   *
+   * @param modifier Modifier
+   * @return Recipe for 1 level of the modifier
    */
   public static ModifierRecipeBuilder modifier(ModifierId modifier) {
     return modifier(new ModifierEntry(modifier, 1));
@@ -47,8 +51,9 @@ public class ModifierRecipeBuilder extends AbstractModifierRecipeBuilder<Modifie
 
   /**
    * Creates a new recipe for 1 level of a modifier
-   * @param modifier  Modifier
-   * @return  Recipe for 1 level of the modifier
+   *
+   * @param modifier Modifier
+   * @return Recipe for 1 level of the modifier
    */
   public static ModifierRecipeBuilder modifier(LazyModifier modifier) {
     return modifier(modifier.getId());
@@ -59,8 +64,9 @@ public class ModifierRecipeBuilder extends AbstractModifierRecipeBuilder<Modifie
 
   /**
    * Adds an input to the recipe
-   * @param ingredient  Input
-   * @return  Builder instance
+   *
+   * @param ingredient Input
+   * @return Builder instance
    */
   public ModifierRecipeBuilder addInput(SizedIngredient ingredient) {
     this.inputs.add(ingredient);
@@ -69,49 +75,54 @@ public class ModifierRecipeBuilder extends AbstractModifierRecipeBuilder<Modifie
 
   /**
    * Adds an input to the recipe
-   * @param ingredient  Input
-   * @return  Builder instance
+   *
+   * @param ingredient Input
+   * @return Builder instance
    */
   public ModifierRecipeBuilder addInput(Ingredient ingredient) {
-    return addInput(SizedIngredient.of(ingredient));
+    return this.addInput(SizedIngredient.of(ingredient));
   }
 
   /**
    * Adds an input with the given amount, does not affect the salvage builder
-   * @param item    Item
-   * @param amount  Amount
-   * @return  Builder instance
+   *
+   * @param item   Item
+   * @param amount Amount
+   * @return Builder instance
    */
   public ModifierRecipeBuilder addInput(ItemLike item, int amount) {
-    return addInput(SizedIngredient.fromItems(amount, item));
+    return this.addInput(SizedIngredient.fromItems(amount, item));
   }
 
   /**
    * Adds an input with a size of 1, does not affect the salvage builder
-   * @param item    Item
-   * @return  Builder instance
+   *
+   * @param item Item
+   * @return Builder instance
    */
   public ModifierRecipeBuilder addInput(ItemLike item) {
-    return addInput(item, 1);
+    return this.addInput(item, 1);
   }
 
   /**
    * Adds an input to the recipe
-   * @param tag     Tag input
-   * @param amount  Amount required
-   * @return  Builder instance
+   *
+   * @param tag    Tag input
+   * @param amount Amount required
+   * @return Builder instance
    */
   public ModifierRecipeBuilder addInput(TagKey<Item> tag, int amount) {
-    return addInput(SizedIngredient.fromTag(tag, amount));
+    return this.addInput(SizedIngredient.fromTag(tag, amount));
   }
 
   /**
    * Adds an input to the recipe
-   * @param tag     Tag input
-   * @return  Builder instance
+   *
+   * @param tag Tag input
+   * @return Builder instance
    */
   public ModifierRecipeBuilder addInput(TagKey<Item> tag) {
-    return addInput(tag, 1);
+    return this.addInput(tag, 1);
   }
 
 
@@ -119,24 +130,25 @@ public class ModifierRecipeBuilder extends AbstractModifierRecipeBuilder<Modifie
 
   @Override
   public void save(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
-    if (inputs.isEmpty() && !allowCrystal) {
+    if (this.inputs.isEmpty() && !this.allowCrystal) {
       throw new IllegalStateException("Must have at least 1 input");
     }
-    ResourceLocation advancementId = buildOptionalAdvancement(id, "modifiers");
-    consumer.accept(new FinishedAdding(id, advancementId, includeUnarmed));
+    ResourceLocation advancementId = this.buildOptionalAdvancement(id, "modifiers");
+    consumer.accept(new FinishedAdding(id, advancementId, this.includeUnarmed));
   }
 
   @Override
   public ModifierRecipeBuilder saveSalvage(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
-    if (salvageMaxLevel != 0 && salvageMaxLevel < salvageMinLevel) {
+    if (this.salvageMaxLevel != 0 && this.salvageMaxLevel < this.salvageMinLevel) {
       throw new IllegalStateException("Max level must be greater than min level");
     }
-    ResourceLocation advancementId = buildOptionalAdvancement(id, "modifiers");
+    ResourceLocation advancementId = this.buildOptionalAdvancement(id, "modifiers");
     consumer.accept(new SalvageFinishedRecipe(id, advancementId));
     return this;
   }
 
   protected class FinishedAdding extends ModifierFinishedRecipe {
+
     public FinishedAdding(ResourceLocation ID, @Nullable ResourceLocation advancementID, boolean withUnarmed) {
       super(ID, advancementID, withUnarmed);
     }
@@ -144,7 +156,7 @@ public class ModifierRecipeBuilder extends AbstractModifierRecipeBuilder<Modifie
     @Override
     public void serializeRecipeData(JsonObject json) {
       JsonArray array = new JsonArray();
-      for (SizedIngredient ingredient : inputs) {
+      for (SizedIngredient ingredient : ModifierRecipeBuilder.this.inputs) {
         array.add(ingredient.serialize());
       }
       json.add("inputs", array);

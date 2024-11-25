@@ -18,8 +18,10 @@ import java.util.Optional;
  * Packet to send the current crafting recipe to a player who opens the tinker station
  */
 public class UpdateTinkerStationRecipePacket implements IThreadsafePacket {
+
   private final BlockPos pos;
   private final ResourceLocation recipe;
+
   public UpdateTinkerStationRecipePacket(BlockPos pos, ITinkerStationRecipe recipe) {
     this.pos = pos;
     this.recipe = recipe.getId();
@@ -32,8 +34,8 @@ public class UpdateTinkerStationRecipePacket implements IThreadsafePacket {
 
   @Override
   public void encode(FriendlyByteBuf buffer) {
-    buffer.writeBlockPos(pos);
-    buffer.writeResourceLocation(recipe);
+    buffer.writeBlockPos(this.pos);
+    buffer.writeResourceLocation(this.recipe);
   }
 
   @Override
@@ -41,8 +43,11 @@ public class UpdateTinkerStationRecipePacket implements IThreadsafePacket {
     HandleClient.handle(this);
   }
 
-  /** Safely runs client side only code in a method only called on client */
+  /**
+   * Safely runs client side only code in a method only called on client
+   */
   private static class HandleClient {
+
     private static void handle(UpdateTinkerStationRecipePacket packet) {
       Level world = Minecraft.getInstance().level;
       if (world != null) {

@@ -23,6 +23,7 @@ import slimeknights.tconstruct.library.tools.definition.ModifiableArmorMaterial;
 import slimeknights.tconstruct.tools.client.SlimelytraArmorModel;
 
 public class SlimelytraItem extends SlimesuitItem {
+
   public SlimelytraItem(ModifiableArmorMaterial material, Properties properties, ResourceKey<CreativeModeTab> tab) {
     super(material, ArmorSlotType.CHESTPLATE, properties, tab);
     EnvExecutor.runWhenOn(EnvType.CLIENT, () -> this::initializeClient);

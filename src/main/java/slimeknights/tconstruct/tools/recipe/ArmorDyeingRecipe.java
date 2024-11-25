@@ -1,10 +1,10 @@
 package slimeknights.tconstruct.tools.recipe;
 
 import com.google.gson.JsonObject;
+import io.github.fabricators_of_create.porting_lib.tags.Tags.Items;
 import io.github.fabricators_of_create.porting_lib.util.TagUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import io.github.fabricators_of_create.porting_lib.tags.Tags.Items;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.FinishedRecipe;
@@ -36,8 +36,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/** Recipe to dye travelers gear */
+/**
+ * Recipe to dye travelers gear
+ */
 public class ArmorDyeingRecipe implements ITinkerStationRecipe, IMultiRecipe<IDisplayModifierRecipe> {
+
   @Getter
   private final ResourceLocation id;
   private final Ingredient toolRequirement;
@@ -83,8 +86,8 @@ public class ArmorDyeingRecipe implements ITinkerStationRecipe, IMultiRecipe<IDi
     if (persistentData.contains(key, Tag.TAG_INT)) {
       int color = persistentData.getInt(key);
       int r = color >> 16 & 255;
-      int g = color >>  8 & 255;
-      int b = color       & 255;
+      int g = color >> 8 & 255;
+      int b = color & 255;
       brightness = Math.max(r, Math.max(g, b));
       nr = r;
       nb = b;
@@ -99,9 +102,9 @@ public class ArmorDyeingRecipe implements ITinkerStationRecipe, IMultiRecipe<IDi
         DyeColor dye = TagUtil.getColorFromStack(stack);
         if (dye != null) {
           float[] color = dye.getTextureDiffuseColors();
-          int r = (int)(color[0] * 255);
-          int g = (int)(color[1] * 255);
-          int b = (int)(color[2] * 255);
+          int r = (int) (color[0] * 255);
+          int g = (int) (color[1] * 255);
+          int b = (int) (color[2] * 255);
           brightness += Math.max(r, Math.max(g, b));
           nr += r;
           ng += g;
@@ -120,11 +123,11 @@ public class ArmorDyeingRecipe implements ITinkerStationRecipe, IMultiRecipe<IDi
     nr /= count;
     ng /= count;
     nb /= count;
-    float scaledBrightness = (float)brightness / (float)count;
+    float scaledBrightness = (float) brightness / (float) count;
     brightness = Math.max(nr, Math.max(ng, nb));
-    nr = (int)((float)nr * scaledBrightness / brightness);
-    ng = (int)((float)ng * scaledBrightness / brightness);
-    nb = (int)((float)nb * scaledBrightness / brightness);
+    nr = (int) ((float) nr * scaledBrightness / brightness);
+    ng = (int) ((float) ng * scaledBrightness / brightness);
+    nb = (int) ((float) nb * scaledBrightness / brightness);
     int finalColor = (nr << 16) | (ng << 8) | nb;
     persistentData.putInt(key, finalColor);
 
@@ -133,7 +136,7 @@ public class ArmorDyeingRecipe implements ITinkerStationRecipe, IMultiRecipe<IDi
     if (tool.getModifierLevel(modifier) == 0) {
       tool.addModifier(modifier, 1);
     }
-    return tool.createStack(Math.min(tinkerable.getCount(), shrinkToolSlotBy()));
+    return tool.createStack(Math.min(tinkerable.getCount(), this.shrinkToolSlotBy()));
   }
 
   @Override
@@ -149,31 +152,36 @@ public class ArmorDyeingRecipe implements ITinkerStationRecipe, IMultiRecipe<IDi
 
   @Override
   public List<IDisplayModifierRecipe> getRecipes() {
-    if (displayRecipes == null) {
+    if (this.displayRecipes == null) {
       List<ItemStack> toolInputs = Arrays.stream(this.toolRequirement.getItems()).map(stack -> {
         if (stack.getItem() instanceof IModifiableDisplay) {
-          return ((IModifiableDisplay)stack.getItem()).getRenderTool();
+          return ((IModifiableDisplay) stack.getItem()).getRenderTool();
         }
         return stack;
       }).toList();
       ModifierEntry result = new ModifierEntry(TinkerModifiers.dyed.get(), 1);
-      displayRecipes = Arrays.stream(DyeColor.values()).map(dye -> new DisplayRecipe(result, toolInputs, dye)).collect(Collectors.toList());
+      this.displayRecipes = Arrays.stream(DyeColor.values()).map(dye -> new DisplayRecipe(result, toolInputs, dye)).collect(Collectors.toList());
     }
-    return displayRecipes;
+    return this.displayRecipes;
   }
 
 
   /* Required */
 
-  /** @deprecated use {@link #assemble(ITinkerStationContainer, RegistryAccess)}  */
+  /**
+   * @deprecated use {@link #assemble(ITinkerStationContainer, RegistryAccess)}
+   */
   @Deprecated
   @Override
   public ItemStack getResultItem(RegistryAccess registryAccess) {
     return ItemStack.EMPTY;
   }
 
-  /** Serializer logic */
+  /**
+   * Serializer logic
+   */
   public static class Serializer extends LoggingRecipeSerializer<ArmorDyeingRecipe> {
+
     @Nullable
     @Override
     protected ArmorDyeingRecipe fromNetworkSafe(ResourceLocation id, FriendlyByteBuf buffer) {
@@ -193,17 +201,20 @@ public class ArmorDyeingRecipe implements ITinkerStationRecipe, IMultiRecipe<IDi
     }
   }
 
-  /** Finished recipe */
+  /**
+   * Finished recipe
+   */
   @SuppressWarnings("ClassCanBeRecord")
   @RequiredArgsConstructor
   public static class Finished implements FinishedRecipe {
+
     @Getter
     private final ResourceLocation id;
     private final Ingredient toolRequirement;
 
     @Override
     public void serializeRecipeData(JsonObject json) {
-      json.add("tools", toolRequirement.toJson());
+      json.add("tools", this.toolRequirement.toJson());
     }
 
     @Override
@@ -225,16 +236,21 @@ public class ArmorDyeingRecipe implements ITinkerStationRecipe, IMultiRecipe<IDi
   }
 
   private static class DisplayRecipe implements IDisplayModifierRecipe {
-    /** Cache of tint colors to save calculating it twice */
+
+    /**
+     * Cache of tint colors to save calculating it twice
+     */
     private static final int[] TINT_COLORS = new int[16];
 
-    /** Gets the tint color for the given dye */
+    /**
+     * Gets the tint color for the given dye
+     */
     private static int getTintColor(DyeColor color) {
       int id = color.getId();
       // taking advantage of the fact no color is pure black
       if (TINT_COLORS[id] == 0) {
         float[] colors = color.getTextureDiffuseColors();
-        TINT_COLORS[id] = ((int)(colors[0] * 255) << 16) | ((int)(colors[1] * 255) << 8) | (int)(colors[2] * 255);
+        TINT_COLORS[id] = ((int) (colors[0] * 255) << 16) | ((int) (colors[1] * 255) << 8) | (int) (colors[2] * 255);
       }
       return TINT_COLORS[id];
     }
@@ -246,6 +262,7 @@ public class ArmorDyeingRecipe implements ITinkerStationRecipe, IMultiRecipe<IDi
     private final List<ItemStack> toolWithoutModifier;
     @Getter
     private final List<ItemStack> toolWithModifier;
+
     public DisplayRecipe(ModifierEntry result, List<ItemStack> tools, DyeColor color) {
       this.displayResult = result;
       this.toolWithoutModifier = tools;
@@ -253,7 +270,7 @@ public class ArmorDyeingRecipe implements ITinkerStationRecipe, IMultiRecipe<IDi
 
       ResourceLocation id = result.getModifier().getId();
       int tintColor = getTintColor(color);
-      toolWithModifier = tools.stream().map(stack -> IDisplayModifierRecipe.withModifiers(stack, null, result, data -> data.putInt(id, tintColor))).toList();
+      this.toolWithModifier = tools.stream().map(stack -> IDisplayModifierRecipe.withModifiers(stack, null, result, data -> data.putInt(id, tintColor))).toList();
     }
 
     @Override
@@ -264,7 +281,7 @@ public class ArmorDyeingRecipe implements ITinkerStationRecipe, IMultiRecipe<IDi
     @Override
     public List<ItemStack> getDisplayItems(int slot) {
       if (slot == 0) {
-        return dyes;
+        return this.dyes;
       }
       return Collections.emptyList();
     }

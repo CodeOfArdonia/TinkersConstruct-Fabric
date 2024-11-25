@@ -22,9 +22,12 @@ import slimeknights.tconstruct.smeltery.TinkerSmeltery;
 
 import javax.annotation.Nullable;
 
-/** Recipe to combine two items on the top of a casting table, changing the first */
+/**
+ * Recipe to combine two items on the top of a casting table, changing the first
+ */
 @RequiredArgsConstructor
 public abstract class MoldingRecipe implements ICommonRecipe<IMoldingContainer> {
+
   @Getter
   private final ResourceLocation id;
   @Getter
@@ -35,23 +38,26 @@ public abstract class MoldingRecipe implements ICommonRecipe<IMoldingContainer> 
   private final boolean patternConsumed;
   private final ItemOutput recipeOutput;
 
-	@Override
+  @Override
   public boolean matches(IMoldingContainer inv, Level worldIn) {
-    return material.test(inv.getMaterial()) && pattern.test(inv.getPattern());
+    return this.material.test(inv.getMaterial()) && this.pattern.test(inv.getPattern());
   }
 
   @Override
   public NonNullList<Ingredient> getIngredients() {
-    return NonNullList.of(Ingredient.EMPTY, material, pattern);
+    return NonNullList.of(Ingredient.EMPTY, this.material, this.pattern);
   }
 
   @Override
   public ItemStack getResultItem(RegistryAccess registryAccess) {
-    return recipeOutput.get();
+    return this.recipeOutput.get();
   }
 
-  /** Subclass for table recipes */
+  /**
+   * Subclass for table recipes
+   */
   public static class Table extends MoldingRecipe {
+
     public Table(ResourceLocation id, Ingredient material, Ingredient mold, boolean moldConsumed, ItemOutput recipeOutput) {
       super(id, material, mold, moldConsumed, recipeOutput);
     }
@@ -67,8 +73,11 @@ public abstract class MoldingRecipe implements ICommonRecipe<IMoldingContainer> 
     }
   }
 
-  /** Subclass for basin recipes */
+  /**
+   * Subclass for basin recipes
+   */
   public static class Basin extends MoldingRecipe {
+
     public Basin(ResourceLocation id, Ingredient material, Ingredient mold, boolean moldConsumed, ItemOutput recipeOutput) {
       super(id, material, mold, moldConsumed, recipeOutput);
     }
@@ -84,15 +93,21 @@ public abstract class MoldingRecipe implements ICommonRecipe<IMoldingContainer> 
     }
   }
 
-  /** Serializer factory interface */
+  /**
+   * Serializer factory interface
+   */
   @FunctionalInterface
   public interface IFactory<T extends MoldingRecipe> {
+
     T create(ResourceLocation id, Ingredient material, Ingredient mold, boolean moldConsumed, ItemOutput recipeOutput);
   }
 
-  /** Generic serializer to both types */
+  /**
+   * Generic serializer to both types
+   */
   @RequiredArgsConstructor
   public static class Serializer<T extends MoldingRecipe> extends LoggingRecipeSerializer<T> {
+
     private final IFactory<T> factory;
 
     @Override
@@ -105,7 +120,7 @@ public abstract class MoldingRecipe implements ICommonRecipe<IMoldingContainer> 
         patternConsumed = GsonHelper.getAsBoolean(json, "pattern_consumed", false);
       }
       ItemOutput output = ItemOutput.fromJson(json.get("result"));
-      return factory.create(id, material, pattern, patternConsumed, output);
+      return this.factory.create(id, material, pattern, patternConsumed, output);
     }
 
     @Nullable
@@ -115,7 +130,7 @@ public abstract class MoldingRecipe implements ICommonRecipe<IMoldingContainer> 
       Ingredient mold = Ingredient.fromNetwork(buffer);
       boolean moldConsumed = buffer.readBoolean();
       ItemOutput output = ItemOutput.read(buffer);
-      return factory.create(id, material, mold, moldConsumed, output);
+      return this.factory.create(id, material, mold, moldConsumed, output);
     }
 
     @Override

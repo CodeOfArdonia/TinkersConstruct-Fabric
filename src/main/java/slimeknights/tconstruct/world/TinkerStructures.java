@@ -12,12 +12,10 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MobSpawnSettings;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.HugeFungusConfiguration;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProviderType;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureSpawnOverride;
@@ -52,6 +50,7 @@ import java.util.Map;
  */
 @SuppressWarnings("unused")
 public final class TinkerStructures extends TinkerModule {
+
   static final Logger log = Util.getLogger("tinker_structures");
   private static final LazyRegistrar<Feature<?>> FEATURES = LazyRegistrar.create(Registries.FEATURE, TConstruct.MOD_ID);
   private static final LazyRegistrar<StructureType<?>> STRUCTURE_TYPES = LazyRegistrar.create(Registries.STRUCTURE_TYPE, TConstruct.MOD_ID);
@@ -74,32 +73,52 @@ public final class TinkerStructures extends TinkerModule {
   /*
    * Features
    */
-  /** Overworld variant of slimy trees */
+  /**
+   * Overworld variant of slimy trees
+   */
   public static final RegistryObject<SlimeTreeFeature> slimeTree = FEATURES.register("slime_tree", () -> new SlimeTreeFeature(SlimeTreeConfig.CODEC));
-  /** Nether variant of slimy trees */
+  /**
+   * Nether variant of slimy trees
+   */
   public static final RegistryObject<SlimeFungusFeature> slimeFungus = FEATURES.register("slime_fungus", () -> new SlimeFungusFeature(SlimeFungusConfig.CODEC));
 
-  /** Greenheart tree variant */
-  public static final ResourceKey<ConfiguredFeature<?,?>> earthSlimeTree = TinkerWorld.configured("earth_slime_tree");
-  /** Greenheart tree variant on islands */
-  public static final ResourceKey<ConfiguredFeature<?,?>> earthSlimeIslandTree = TinkerWorld.configured("earth_slime_island_tree");
+  /**
+   * Greenheart tree variant
+   */
+  public static final ResourceKey<ConfiguredFeature<?, ?>> earthSlimeTree = TinkerWorld.configured("earth_slime_tree");
+  /**
+   * Greenheart tree variant on islands
+   */
+  public static final ResourceKey<ConfiguredFeature<?, ?>> earthSlimeIslandTree = TinkerWorld.configured("earth_slime_island_tree");
 
-  /** Skyroot tree variant */
-  public static final ResourceKey<ConfiguredFeature<?,?>> skySlimeTree = TinkerWorld.configured("sky_slime_tree");
-  /** Skyroot tree variant on islands */
-  public static final ResourceKey<ConfiguredFeature<?,?>> skySlimeIslandTree = TinkerWorld.configured("sky_slime_island_tree");
+  /**
+   * Skyroot tree variant
+   */
+  public static final ResourceKey<ConfiguredFeature<?, ?>> skySlimeTree = TinkerWorld.configured("sky_slime_tree");
+  /**
+   * Skyroot tree variant on islands
+   */
+  public static final ResourceKey<ConfiguredFeature<?, ?>> skySlimeIslandTree = TinkerWorld.configured("sky_slime_island_tree");
 
-  /** Enderslime island tree variant */
-  public static final ResourceKey<ConfiguredFeature<?,?>> enderSlimeTree = TinkerWorld.configured("ender_slime_tree");
-  /** Enderslime island tree variant on islands */
-  public static final ResourceKey<ConfiguredFeature<?,?>> enderSlimeIslandTree = TinkerWorld.configured("ender_slime_island_tree");
+  /**
+   * Enderslime island tree variant
+   */
+  public static final ResourceKey<ConfiguredFeature<?, ?>> enderSlimeTree = TinkerWorld.configured("ender_slime_tree");
+  /**
+   * Enderslime island tree variant on islands
+   */
+  public static final ResourceKey<ConfiguredFeature<?, ?>> enderSlimeIslandTree = TinkerWorld.configured("ender_slime_island_tree");
 
-  /** Bloodshroom tree variant */
-  public static final ResourceKey<ConfiguredFeature<?,?>> bloodSlimeFungus = TinkerWorld.configured("blood_slime_fungus");
-  /** Bloodshroom island tree variant */
-  public static final ResourceKey<ConfiguredFeature<?,?>> bloodSlimeIslandFungus = TinkerWorld.configured("blood_slime_island_fungus");
+  /**
+   * Bloodshroom tree variant
+   */
+  public static final ResourceKey<ConfiguredFeature<?, ?>> bloodSlimeFungus = TinkerWorld.configured("blood_slime_fungus");
+  /**
+   * Bloodshroom island tree variant
+   */
+  public static final ResourceKey<ConfiguredFeature<?, ?>> bloodSlimeIslandFungus = TinkerWorld.configured("blood_slime_island_fungus");
   /* Deprecated ichor tree */
-  public static final ResourceKey<ConfiguredFeature<?,?>> ichorSlimeFungus = TinkerWorld.configured("ichor_slime_fungus");
+  public static final ResourceKey<ConfiguredFeature<?, ?>> ichorSlimeFungus = TinkerWorld.configured("ichor_slime_fungus");
 
   public static void bootstrapConfigured(BootstapContext<ConfiguredFeature<?, ?>> bootstapContext) {
     BlockPredicate blockPredicate = BlockPredicate.matchesTag(TinkerTags.Blocks.PLANT_REPLACEABLE);
@@ -187,8 +206,10 @@ public final class TinkerStructures extends TinkerModule {
   public static final RegistryObject<StructureType<EnderSlimeIslandStructure>> endSlimeIsland = STRUCTURE_TYPES.register("end_slime_island", () -> () -> EnderSlimeIslandStructure.CODEC);
   public static final ResourceKey<Structure> endSlimeIslandKey = registerKey("end_slime_island");
 
-  /** Creates a spawn override for a single mob */
-  private static Map<MobCategory,StructureSpawnOverride> monsterOverride(EntityType<?> entity, int min, int max) {
+  /**
+   * Creates a spawn override for a single mob
+   */
+  private static Map<MobCategory, StructureSpawnOverride> monsterOverride(EntityType<?> entity, int min, int max) {
     return Map.of(MobCategory.MONSTER, new StructureSpawnOverride(BoundingBoxType.STRUCTURE, WeightedRandomList.create(new MobSpawnSettings.SpawnerData(entity, 1, min, max))));
   }
 

@@ -15,6 +15,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class BlastingModifier extends IncrementalModifier {
+
   @Override
   public int getPriority() {
     return 125; // run before trait boosts such as dwarven
@@ -26,15 +27,15 @@ public class BlastingModifier extends IncrementalModifier {
       float blastResistance = event.getState().getBlock().getExplosionResistance();
 
       // formula makes a boost of 9 at a hardness of 3 (most ores), boost of 3 at a hardness of 4.5, and a boost of 1 at hardness of 6 (stone)
-      double boost = getScaledLevel(tool, level) * (Math.min(10f, Math.pow(3f, (6f - blastResistance)/1.5f))) * miningSpeedModifier;
+      double boost = this.getScaledLevel(tool, level) * (Math.min(10f, Math.pow(3f, (6f - blastResistance) / 1.5f))) * miningSpeedModifier;
       // factor in tool definition to prevent this being too strong on hammers
       boost *= tool.getMultiplier(ToolStats.MINING_SPEED);
-      event.setNewSpeed(event.getNewSpeed() + (float)boost);
+      event.setNewSpeed(event.getNewSpeed() + (float) boost);
     }
   }
 
   @Override
   public void addInformation(IToolStackView tool, int level, @Nullable Player player, List<Component> tooltip, TooltipKey tooltipKey, TooltipFlag tooltipFlag) {
-    addStatTooltip(tool, ToolStats.MINING_SPEED, TinkerTags.Items.HARVEST, 10 * getScaledLevel(tool, level), tooltip);
+    this.addStatTooltip(tool, ToolStats.MINING_SPEED, TinkerTags.Items.HARVEST, 10 * this.getScaledLevel(tool, level), tooltip);
   }
 }

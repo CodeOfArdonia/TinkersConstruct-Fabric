@@ -51,25 +51,38 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-/** Recipe for converting enchanted books into modifier crystals */
+/**
+ * Recipe for converting enchanted books into modifier crystals
+ */
 public class EnchantmentConvertingRecipe extends AbstractWorktableRecipe {
+
   private static final String BASE_KEY = TConstruct.makeTranslationKey("recipe", "enchantment_converting");
   private static final Component DESCRIPTION_LOST = TConstruct.makeTranslation("recipe", "enchantment_converting.description.lost");
   private static final Component DESCRIPTION_KEEP = TConstruct.makeTranslation("recipe", "enchantment_converting.description.keep");
   private static final Component NO_ENCHANTMENT = TConstruct.makeTranslation("recipe", "enchantment_converting.no_enchantments");
   private static final RecipeResult<ToolStack> TOO_FEW = RecipeResult.failure(TConstruct.makeTranslationKey("recipe", "enchantment_converting.too_few"));
 
-  /** Name of recipe, used for title */
+  /**
+   * Name of recipe, used for title
+   */
   private final String name;
-  /** Cached title component */
+  /**
+   * Cached title component
+   */
   @Getter
   private final Component title;
-  /** If true, matches enchanted books. If false, matches tools */
+  /**
+   * If true, matches enchanted books. If false, matches tools
+   */
   private final boolean matchBook;
-  /** If true, the input book/tool is returned, disenchanted */
+  /**
+   * If true, the input book/tool is returned, disenchanted
+   */
   private final boolean returnInput;
 
-  /** Modifiers valid for this recipe */
+  /**
+   * Modifiers valid for this recipe
+   */
   private final IJsonPredicate<ModifierId> modifierPredicate;
 
   private List<ModifierEntry> displayModifiers;
@@ -83,9 +96,11 @@ public class EnchantmentConvertingRecipe extends AbstractWorktableRecipe {
     this.modifierPredicate = modifierPredicate;
   }
 
-  /** Gets the enchantment map from the given stack */
-  private Map<Enchantment,Integer> getEnchantments(ItemStack stack) {
-    return EnchantmentHelper.deserializeEnchantments(matchBook ? EnchantedBookItem.getEnchantments(stack) : stack.getEnchantmentTags());
+  /**
+   * Gets the enchantment map from the given stack
+   */
+  private Map<Enchantment, Integer> getEnchantments(ItemStack stack) {
+    return EnchantmentHelper.deserializeEnchantments(this.matchBook ? EnchantedBookItem.getEnchantments(stack) : stack.getEnchantmentTags());
   }
 
 
@@ -94,13 +109,13 @@ public class EnchantmentConvertingRecipe extends AbstractWorktableRecipe {
   @Override
   public Component getDescription(@Nullable ITinkerableContainer inv) {
     // ensure we have at least one supported enchantment
-    if (inv != null && getEnchantments(inv.getTinkerableStack()).entrySet().stream().noneMatch(entry -> {
+    if (inv != null && this.getEnchantments(inv.getTinkerableStack()).entrySet().stream().noneMatch(entry -> {
       Modifier modifier = ModifierManager.INSTANCE.get(entry.getKey());
-      return modifier != null && modifierPredicate.matches(modifier.getId());
+      return modifier != null && this.modifierPredicate.matches(modifier.getId());
     })) {
       return NO_ENCHANTMENT;
     }
-    return returnInput ? DESCRIPTION_KEEP : DESCRIPTION_LOST;
+    return this.returnInput ? DESCRIPTION_KEEP : DESCRIPTION_LOST;
   }
 
 
@@ -109,7 +124,7 @@ public class EnchantmentConvertingRecipe extends AbstractWorktableRecipe {
   @Override
   public boolean matches(ITinkerableContainer inv, Level world) {
     ItemStack tool = inv.getTinkerableStack();
-    if (matchBook) {
+    if (this.matchBook) {
       if (!tool.is(Items.ENCHANTED_BOOK)) {
         return false;
       }
@@ -118,25 +133,25 @@ public class EnchantmentConvertingRecipe extends AbstractWorktableRecipe {
     } else if (!tool.getItem().isEnchantable(tool)) {
       return false;
     }
-    return ModifierRecipe.checkMatch(inv, inputs);
+    return ModifierRecipe.checkMatch(inv, this.inputs);
   }
 
   @Override
   public List<ModifierEntry> getModifierOptions(@Nullable ITinkerableContainer inv) {
     if (inv != null) {
       // map all enchantments to an equal level modifier
-      return getEnchantments(inv.getTinkerableStack()).entrySet().stream().map(entry -> {
+      return this.getEnchantments(inv.getTinkerableStack()).entrySet().stream().map(entry -> {
         Modifier modifier = ModifierManager.INSTANCE.get(entry.getKey());
-        if (modifier != null && modifierPredicate.matches(modifier.getId())) {
+        if (modifier != null && this.modifierPredicate.matches(modifier.getId())) {
           return new ModifierEntry(modifier, entry.getValue());
         }
         return null;
       }).filter(Objects::nonNull).toList();
     }
-    if (displayModifiers == null) {
-      displayModifiers = ModifierRecipeLookup.getAllRecipeModifiers().filter(modifier -> modifierPredicate.matches(modifier.getId())).map(mod -> new ModifierEntry(mod, 1)).toList();
+    if (this.displayModifiers == null) {
+      this.displayModifiers = ModifierRecipeLookup.getAllRecipeModifiers().filter(modifier -> this.modifierPredicate.matches(modifier.getId())).map(mod -> new ModifierEntry(mod, 1)).toList();
     }
-    return displayModifiers;
+    return this.displayModifiers;
   }
 
   @Override
@@ -146,7 +161,7 @@ public class EnchantmentConvertingRecipe extends AbstractWorktableRecipe {
     if (level > 1) {
       int used = -1;
       inputLoop:
-      for (SizedIngredient ingredient : inputs) {
+      for (SizedIngredient ingredient : this.inputs) {
         for (int i = 0; i < inv.getInputCount(); i++) {
           if (i != used) {
             ItemStack stack = inv.getInput(i);
@@ -172,23 +187,23 @@ public class EnchantmentConvertingRecipe extends AbstractWorktableRecipe {
   public void updateInputs(IToolStackView result, ITinkerableContainer.Mutable inv, ModifierEntry selected, boolean isServer) {
     // consume inputs once per selected item
     for (int i = 0; i < selected.getLevel(); i++) {
-      ModifierRecipe.updateInputs(inv, inputs);
+      ModifierRecipe.updateInputs(inv, this.inputs);
     }
     // give back unenchanted item if requested
-    if (returnInput && isServer) {
+    if (this.returnInput && isServer) {
       ItemStack current = inv.getTinkerableStack();
       ItemStack unenchanted;
-      if (matchBook) {
+      if (this.matchBook) {
         unenchanted = new ItemStack(Items.BOOK);
         if (current.hasCustomHoverName()) {
           unenchanted.setHoverName(current.getHoverName());
         }
       } else {
         unenchanted = current.copy();
-        EnchantmentHelper.setEnchantments(getEnchantments(unenchanted).entrySet().stream()
-                                                                      .filter(entry -> entry.getKey().isCurse())
-                                                                      .collect(Collectors.toMap(Entry::getKey, Entry::getValue)),
-                                          unenchanted);
+        EnchantmentHelper.setEnchantments(this.getEnchantments(unenchanted).entrySet().stream()
+            .filter(entry -> entry.getKey().isCurse())
+            .collect(Collectors.toMap(Entry::getKey, Entry::getValue)),
+          unenchanted);
       }
       inv.giveItem(unenchanted);
     }
@@ -210,21 +225,22 @@ public class EnchantmentConvertingRecipe extends AbstractWorktableRecipe {
   @Override
   public List<ItemStack> getInputTools() {
     // tools are cached globally, as we just display them directly
-    if (!matchBook) {
+    if (!this.matchBook) {
       return getAllEnchantableTools();
     }
     // for books, cache per recipe as we show the enchants
-    if (tools == null) {
-      Set<ModifierId> modifiers = getModifierOptions(null).stream().map(ModifierEntry::getId).collect(Collectors.toSet());
-      tools = ModifierManager.INSTANCE.getEquivalentEnchantments(modifiers::contains)
-                                      .flatMap(enchantment -> IntStream.rangeClosed(1, enchantment.getMaxLevel())
-                                                                       .mapToObj(level -> EnchantedBookItem.createForEnchantment(new EnchantmentInstance(enchantment, level))))
-                                      .toList();
+    if (this.tools == null) {
+      Set<ModifierId> modifiers = this.getModifierOptions(null).stream().map(ModifierEntry::getId).collect(Collectors.toSet());
+      this.tools = ModifierManager.INSTANCE.getEquivalentEnchantments(modifiers::contains)
+        .flatMap(enchantment -> IntStream.rangeClosed(1, enchantment.getMaxLevel())
+          .mapToObj(level -> EnchantedBookItem.createForEnchantment(new EnchantmentInstance(enchantment, level))))
+        .toList();
     }
-    return tools;
+    return this.tools;
   }
 
   public static class Serializer extends LoggingRecipeSerializer<EnchantmentConvertingRecipe> {
+
     @Override
     public EnchantmentConvertingRecipe fromJson(ResourceLocation id, JsonObject json) {
       String name = GsonHelper.getAsString(json, "name");
@@ -265,44 +281,49 @@ public class EnchantmentConvertingRecipe extends AbstractWorktableRecipe {
 
   @RequiredArgsConstructor(staticName = "converting")
   public static class Builder extends AbstractSizedIngredientRecipeBuilder<Builder> {
+
     private final String name;
     private final boolean matchBook;
     private boolean returnInput = false;
-    @Setter @Accessors(fluent = true)
+    @Setter
+    @Accessors(fluent = true)
     private IJsonPredicate<ModifierId> modifierPredicate = ModifierPredicate.ALWAYS;
 
-    /** If true, returns the unenchanted form of the item as an extra result */
+    /**
+     * If true, returns the unenchanted form of the item as an extra result
+     */
     public Builder returnInput() {
-      returnInput = true;
+      this.returnInput = true;
       return this;
     }
 
     @Override
     public void save(Consumer<FinishedRecipe> consumer) {
-      save(consumer, TConstruct.getResource(name));
+      this.save(consumer, TConstruct.getResource(this.name));
     }
 
     @Override
     public void save(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
-      if (inputs.isEmpty()) {
+      if (this.inputs.isEmpty()) {
         throw new IllegalStateException("Must have at least one input");
       }
-      ResourceLocation advancementId = buildOptionalAdvancement(id, "modifiers");
+      ResourceLocation advancementId = this.buildOptionalAdvancement(id, "modifiers");
       consumer.accept(new Finished(id, advancementId));
     }
 
     private class Finished extends SizedFinishedRecipe {
+
       public Finished(ResourceLocation ID, @Nullable ResourceLocation advancementID) {
         super(ID, advancementID);
       }
 
       @Override
       public void serializeRecipeData(JsonObject json) {
-        json.addProperty("name", name);
+        json.addProperty("name", Builder.this.name);
         super.serializeRecipeData(json);
-        json.addProperty("match_book", matchBook);
-        json.addProperty("return_unenchanted", returnInput);
-        json.add("modifier_predicate", ModifierPredicate.LOADER.serialize(modifierPredicate));
+        json.addProperty("match_book", Builder.this.matchBook);
+        json.addProperty("return_unenchanted", Builder.this.returnInput);
+        json.add("modifier_predicate", ModifierPredicate.LOADER.serialize(Builder.this.modifierPredicate));
       }
 
       @Override
@@ -314,10 +335,14 @@ public class EnchantmentConvertingRecipe extends AbstractWorktableRecipe {
 
   /* Helpers */
 
-  /** Cached list of all enchantable tools, since its item instance controlled only needs to be computed once per launch */
+  /**
+   * Cached list of all enchantable tools, since its item instance controlled only needs to be computed once per launch
+   */
   private static List<ItemStack> ALL_ENCHANTABLE_TOOLS;
 
-  /** Gets a list of all enchantable tools. This is expensive, but only needs to be done once fortunately. */
+  /**
+   * Gets a list of all enchantable tools. This is expensive, but only needs to be done once fortunately.
+   */
   private static List<ItemStack> getAllEnchantableTools() {
     if (ALL_ENCHANTABLE_TOOLS == null) {
       ALL_ENCHANTABLE_TOOLS = BuiltInRegistries.ITEM.stream().map(item -> {

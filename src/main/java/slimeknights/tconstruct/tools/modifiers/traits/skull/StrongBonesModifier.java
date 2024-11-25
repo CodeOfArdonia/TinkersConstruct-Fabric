@@ -27,9 +27,13 @@ import slimeknights.tconstruct.tools.TinkerModifiers;
 import javax.annotation.Nonnull;
 
 public class StrongBonesModifier extends TotalArmorLevelModifier {
+
   private static final TinkerDataKey<Integer> STRONG_BONES = TConstruct.createKey("strong_bones");
-  /** Key for modifiers that are boosted by drinking milk */
+  /**
+   * Key for modifiers that are boosted by drinking milk
+   */
   public static final TinkerDataKey<Integer> CALCIFIABLE = TConstruct.createKey("calcifable");
+
   public StrongBonesModifier() {
     super(STRONG_BONES, true);
     LivingEntityUseItemEvents.LIVING_USE_ITEM_FINISH.register(StrongBonesModifier::onItemFinishUse);
@@ -59,7 +63,9 @@ public class StrongBonesModifier extends TotalArmorLevelModifier {
     }
   }
 
-  /** Called when you finish drinking milk */
+  /**
+   * Called when you finish drinking milk
+   */
   private static ItemStack onItemFinishUse(LivingEntity living, @Nonnull ItemStack item, int duration, @Nonnull ItemStack result) {
     if (item.getItem() == Items.MILK_BUCKET) {
       drinkMilk(living, 1200);
@@ -70,16 +76,21 @@ public class StrongBonesModifier extends TotalArmorLevelModifier {
 
   /* Spilling effect */
 
-  /** ID for the spilling effect */
+  /**
+   * ID for the spilling effect
+   */
   public static final ResourceLocation SPILLING_EFFECT_ID = TConstruct.getResource("calcified");
 
-  /** GSON does not support anonymous classes */
+  /**
+   * GSON does not support anonymous classes
+   */
   private static class SpillingEffect implements ISpillingEffect {
+
     @Override
     public void applyEffects(FluidStack fluid, float scale, ToolAttackContext context) {
       LivingEntity target = context.getLivingTarget();
       if (target != null) {
-        drinkMilk(target, (int)(400 * scale));
+        drinkMilk(target, (int) (400 * scale));
       }
     }
 
@@ -88,9 +99,14 @@ public class StrongBonesModifier extends TotalArmorLevelModifier {
       return JsonUtils.withType(SPILLING_EFFECT_ID);
     }
   }
-  /** Singleton instance the spilling effect */
+
+  /**
+   * Singleton instance the spilling effect
+   */
   public static final ISpillingEffect SPILLING_EFFECT = new SpillingEffect();
 
-  /** Loader for the spilling effect */
+  /**
+   * Loader for the spilling effect
+   */
   public static final JsonDeserializer<ISpillingEffect> SPILLING_EFFECT_LOADER = (json, type, context) -> SPILLING_EFFECT;
 }

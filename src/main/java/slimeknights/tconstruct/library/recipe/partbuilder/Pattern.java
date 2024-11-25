@@ -21,6 +21,7 @@ import java.lang.reflect.Type;
  * This is a copy of resource location with a couple extra helpers
  */
 public class Pattern extends ResourceLocation {
+
   public static final Serializer SERIALIZER = new Serializer();
 
   public Pattern(String resourceName) {
@@ -37,8 +38,9 @@ public class Pattern extends ResourceLocation {
 
   /**
    * Creates a new modifier ID from the given string
-   * @param string  String
-   * @return  Material ID, or null if invalid
+   *
+   * @param string String
+   * @return Material ID, or null if invalid
    */
   @Nullable
   public static ModifierId tryCreate(String string) {
@@ -51,7 +53,8 @@ public class Pattern extends ResourceLocation {
 
   /**
    * Gets the display name for this pattern
-   * @return  Display name
+   *
+   * @return Display name
    */
   public Component getDisplayName() {
     return Component.translatable(Util.makeTranslationKey("pattern", this));
@@ -59,14 +62,18 @@ public class Pattern extends ResourceLocation {
 
   /**
    * Gets the texture for this pattern for rendering
-   * @return  Pattern texture
+   *
+   * @return Pattern texture
    */
   public ResourceLocation getTexture() {
-    return new ResourceLocation(getNamespace(), "gui/tinker_pattern/" + getPath());
+    return new ResourceLocation(this.getNamespace(), "gui/tinker_pattern/" + this.getPath());
   }
 
-  /** Type sensitive version of the resource location serializer */
+  /**
+   * Type sensitive version of the resource location serializer
+   */
   protected static class Serializer implements JsonDeserializer<Pattern>, JsonSerializer<Pattern> {
+
     @Override
     public Pattern deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
       return new Pattern(GsonHelper.convertToString(json, "location"));

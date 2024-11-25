@@ -23,10 +23,14 @@ import java.util.function.Function;
  * This model contains a list of items to display in the TESR, plus a single scalable fluid that can either be statically rendered or rendered in the TESR
  */
 public class MelterModel extends TankModel {
-  /** Shared loader instance */
+
+  /**
+   * Shared loader instance
+   */
   public static final Loader LOADER = new Loader();
 
   private final List<ModelItem> items;
+
   @SuppressWarnings("WeakerAccess")
   protected MelterModel(SimpleBlockModel model, @Nullable SimpleBlockModel gui, IncrementalFluidCuboid fluid, List<ModelItem> items) {
     super(model, gui, fluid, false);
@@ -34,33 +38,40 @@ public class MelterModel extends TankModel {
   }
 
   @Override
-  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location, boolean isGui3d) {
-    BakedModel baked = model.bakeModel(owner, transform, overrides, spriteGetter, location);
+  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location, boolean isGui3d) {
+    BakedModel baked = this.model.bakeModel(owner, transform, overrides, spriteGetter, location);
     // bake the GUI model if present
     BakedModel bakedGui = baked;
-    if (gui != null) {
-      bakedGui = gui.bakeModel(owner, transform, overrides, spriteGetter, location);
+    if (this.gui != null) {
+      bakedGui = this.gui.bakeModel(owner, transform, overrides, spriteGetter, location);
     }
     return new Baked(owner, transform, baked, bakedGui, this);
   }
 
-  /** Baked variant to allow access to items */
+  /**
+   * Baked variant to allow access to items
+   */
   public static final class Baked extends TankModel.Baked<MelterModel> {
+
     private Baked(BlockModel owner, ModelState transforms, BakedModel baked, BakedModel gui, MelterModel original) {
       super(owner, transforms, baked, gui, original);
     }
 
     /**
      * Gets a list of items used in inventory display
-     * @return  Item list
+     *
+     * @return Item list
      */
     public List<ModelItem> getItems() {
       return this.original.items;
     }
   }
 
-  /** Loader for this model */
+  /**
+   * Loader for this model
+   */
   public static class Loader implements IGeometryLoader<TankModel> {
+
     @Override
     public TankModel read(JsonObject modelContents, JsonDeserializationContext deserializationContext) {
       SimpleBlockModel model = SimpleBlockModel.deserialize(deserializationContext, modelContents);

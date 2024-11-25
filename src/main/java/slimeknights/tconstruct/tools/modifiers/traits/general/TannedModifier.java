@@ -7,6 +7,7 @@ import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 import javax.annotation.Nullable;
 
 public class TannedModifier extends NoLevelsModifier {
+
   @Override
   public int getPriority() {
     // higher than stoneshield, overslime, and reinforced

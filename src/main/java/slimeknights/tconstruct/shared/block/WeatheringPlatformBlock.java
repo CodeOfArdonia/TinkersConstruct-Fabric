@@ -24,8 +24,10 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 
 public class WeatheringPlatformBlock extends PlatformBlock implements WeatheringCopper {
+
   @Getter
   private final WeatherState age;
+
   public WeatheringPlatformBlock(WeatherState age, Properties props) {
     super(props);
     this.age = age;
@@ -42,7 +44,9 @@ public class WeatheringPlatformBlock extends PlatformBlock implements Weathering
     this.onRandomTick(pState, pLevel, pPos, pRandom);
   }
 
-  /** Gets the next state for weathering */
+  /**
+   * Gets the next state for weathering
+   */
   @Nullable
   private static WeatherState getNext(WeatherState original) {
     return switch (original) {
@@ -55,16 +59,18 @@ public class WeatheringPlatformBlock extends PlatformBlock implements Weathering
 
   @Override
   public boolean isRandomlyTicking(BlockState pState) {
-    return getNext(age) != null;
+    return getNext(this.age) != null;
   }
 
   @Override
   public Optional<BlockState> getNext(BlockState state) {
-    return Optional.ofNullable(getNext(age))
-                   .map(next -> TinkerCommons.copperPlatform.get(next).withPropertiesOf(state));
+    return Optional.ofNullable(getNext(this.age))
+      .map(next -> TinkerCommons.copperPlatform.get(next).withPropertiesOf(state));
   }
 
-  /** Gets the next state for weathering */
+  /**
+   * Gets the next state for weathering
+   */
   @Nullable
   private static WeatherState getPrevious(WeatherState original) {
     return switch (original) {
@@ -78,7 +84,7 @@ public class WeatheringPlatformBlock extends PlatformBlock implements Weathering
   public InteractionResult getToolModifiedState(Player player, Level world, InteractionHand hand, BlockHitResult hitResult) {
     BlockState state = world.getBlockState(hitResult.getBlockPos());
     if (player.getItemInHand(hand).is(ItemTags.AXES) && state.is(this)) {
-      WeatherState prev = getPrevious(age);
+      WeatherState prev = getPrevious(this.age);
       if (prev != null) {
         world.setBlockAndUpdate(hitResult.getBlockPos(), TinkerCommons.copperPlatform.get(prev).withPropertiesOf(state));
         return InteractionResult.SUCCESS;
@@ -97,7 +103,7 @@ public class WeatheringPlatformBlock extends PlatformBlock implements Weathering
       if (!player.isCreative()) {
         stack.shrink(1);
       }
-      level.setBlock(pos, TinkerCommons.waxedCopperPlatform.get(age).withPropertiesOf(state), 11);
+      level.setBlock(pos, TinkerCommons.waxedCopperPlatform.get(this.age).withPropertiesOf(state), 11);
       level.levelEvent(player, 3003, pos, 0);
       return InteractionResult.sidedSuccess(level.isClientSide);
     }

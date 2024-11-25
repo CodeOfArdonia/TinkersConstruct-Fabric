@@ -13,37 +13,41 @@ import slimeknights.tconstruct.smeltery.block.entity.tank.SmelteryTank;
  */
 @RequiredArgsConstructor
 public class SmelteryAlloyTank implements IMutableAlloyTank {
+
   /**
    * Handler parent
    */
   private final SmelteryTank handler;
-  /** Current temperature. Provided as a getter and setter as there are a few contexts with different source for temperature */
-  @Getter @Setter
+  /**
+   * Current temperature. Provided as a getter and setter as there are a few contexts with different source for temperature
+   */
+  @Getter
+  @Setter
   private int temperature = 0;
 
   @Override
   public int getTanks() {
-    return handler.getSlotCount();
+    return this.handler.getSlotCount();
   }
 
   @Override
   public FluidStack getFluidInTank(int tank) {
-    return handler.getFluidInTank(tank);
+    return this.handler.getFluidInTank(tank);
   }
 
   @Override
   public boolean canFit(FluidStack fluid, int removed) {
     // the fluid fits if the net gain in fluid fits in the empty space
-    return (fluid.getAmount() - removed) <= handler.getRemainingSpace();
+    return (fluid.getAmount() - removed) <= this.handler.getRemainingSpace();
   }
 
   @Override
   public FluidStack drain(int tank, FluidStack fluidStack) {
-    return new FluidStack(fluidStack.getType(), TransferUtil.extractFluid(handler, fluidStack));
+    return new FluidStack(fluidStack.getType(), TransferUtil.extractFluid(this.handler, fluidStack));
   }
 
   @Override
   public long fill(FluidStack fluidStack) {
-    return TransferUtil.insertFluid(handler, fluidStack);
+    return TransferUtil.insertFluid(this.handler, fluidStack);
   }
 }

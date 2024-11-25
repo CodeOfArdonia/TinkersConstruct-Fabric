@@ -18,11 +18,11 @@ public class TinkerDamageSourceProvider extends FabricTagProvider<DamageType> {
 
   @Override
   protected void addTags(HolderLookup.Provider arg) {
-    getOrCreateTagBuilder(DamageTypeTags.BYPASSES_ARMOR).add(TinkerDamageTypes.SELF_DESTRUCT).add(TinkerDamageTypes.PLAYER_ATTACK_BYPASS_ARMOR).add(TinkerDamageTypes.MOB_ATTACK_BYPASS_ARMOR);
-    getOrCreateTagBuilder(DamageTypeTags.IS_EXPLOSION).add(TinkerDamageTypes.SELF_DESTRUCT).add(TinkerDamageTypes.PLAYER_ATTACK_EXPLOSION).add(TinkerDamageTypes.MOB_ATTACK_EXPLOSION);
+    this.getOrCreateTagBuilder(DamageTypeTags.BYPASSES_ARMOR).add(TinkerDamageTypes.SELF_DESTRUCT).add(TinkerDamageTypes.PLAYER_ATTACK_BYPASS_ARMOR).add(TinkerDamageTypes.MOB_ATTACK_BYPASS_ARMOR);
+    this.getOrCreateTagBuilder(DamageTypeTags.IS_EXPLOSION).add(TinkerDamageTypes.SELF_DESTRUCT).add(TinkerDamageTypes.PLAYER_ATTACK_EXPLOSION).add(TinkerDamageTypes.MOB_ATTACK_EXPLOSION);
 
-    getOrCreateTagBuilder(DamageTypeTags.BYPASSES_EFFECTS).add(TinkerDamageTypes.BLEEDING).add(TinkerDamageTypes.PLAYER_ATTACK_MAGIC).add(TinkerDamageTypes.MOB_ATTACK_MAGIC);
+    this.getOrCreateTagBuilder(DamageTypeTags.BYPASSES_EFFECTS).add(TinkerDamageTypes.BLEEDING).add(TinkerDamageTypes.PLAYER_ATTACK_MAGIC).add(TinkerDamageTypes.MOB_ATTACK_MAGIC);
 
-    getOrCreateTagBuilder(DamageTypeTags.IS_FIRE).add(TinkerDamageTypes.SMELTERY_DAMAGE).add(TinkerDamageTypes.PLAYER_ATTACK_FIRE).add(TinkerDamageTypes.MOB_ATTACK_FIRE);
+    this.getOrCreateTagBuilder(DamageTypeTags.IS_FIRE).add(TinkerDamageTypes.SMELTERY_DAMAGE).add(TinkerDamageTypes.PLAYER_ATTACK_FIRE).add(TinkerDamageTypes.MOB_ATTACK_FIRE);
   }
 }

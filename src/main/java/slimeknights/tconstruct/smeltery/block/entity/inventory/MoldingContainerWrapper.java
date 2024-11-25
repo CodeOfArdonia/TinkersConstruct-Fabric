@@ -8,18 +8,22 @@ import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
 import net.minecraft.world.item.ItemStack;
 import slimeknights.tconstruct.library.recipe.molding.IMoldingContainer;
 
-/** Wrapper around an item handler for the sake of use as a molding inventory */
+/**
+ * Wrapper around an item handler for the sake of use as a molding inventory
+ */
 @RequiredArgsConstructor
 public class MoldingContainerWrapper implements IMoldingContainer {
+
   private final SlottedStorage<ItemVariant> handler;
   private final int slot;
 
-  @Getter @Setter
+  @Getter
+  @Setter
   private ItemStack pattern = ItemStack.EMPTY;
 
   @Override
   public ItemStack getMaterial() {
-    var resouce = handler.getSlot(slot);
+    var resouce = this.handler.getSlot(this.slot);
     return resouce.getResource().toStack((int) resouce.getAmount());
   }
 }

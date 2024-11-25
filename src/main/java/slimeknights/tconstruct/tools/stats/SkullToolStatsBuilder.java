@@ -16,6 +16,7 @@ import java.util.List;
  * Stat builder for slimeskull helmets
  */
 public class SkullToolStatsBuilder extends ToolStatsBuilder {
+
   private final List<SkullStats> skulls;
 
   @VisibleForTesting
@@ -24,7 +25,9 @@ public class SkullToolStatsBuilder extends ToolStatsBuilder {
     this.skulls = skulls;
   }
 
-  /** Creates a builder from the definition and materials */
+  /**
+   * Creates a builder from the definition and materials
+   */
   public static ToolStatsBuilder from(ToolDefinition toolDefinition, MaterialNBT materials) {
     ToolDefinitionData data = toolDefinition.getData();
     List<PartRequirement> requiredComponents = data.getParts();
@@ -38,8 +41,8 @@ public class SkullToolStatsBuilder extends ToolStatsBuilder {
   @Override
   protected void setStats(StatsNBT.Builder builder) {
     // add in specific stat types handled by our materials
-    builder.set(ToolStats.DURABILITY, buildDurability());
-    builder.set(ToolStats.ARMOR, buildArmor());
+    builder.set(ToolStats.DURABILITY, this.buildDurability());
+    builder.set(ToolStats.ARMOR, this.buildArmor());
   }
 
   @Override
@@ -47,13 +50,17 @@ public class SkullToolStatsBuilder extends ToolStatsBuilder {
     return stat == ToolStats.DURABILITY || stat == ToolStats.ARMOR;
   }
 
-  /** Builds durability for the tool */
+  /**
+   * Builds durability for the tool
+   */
   public float buildDurability() {
-    return Math.max(1, (float)getAverageValue(skulls, SkullStats::getDurability) + getStatOrDefault(ToolStats.DURABILITY, 0f));
+    return Math.max(1, (float) getAverageValue(this.skulls, SkullStats::getDurability) + this.getStatOrDefault(ToolStats.DURABILITY, 0f));
   }
 
-  /** Builds armor for the tool */
+  /**
+   * Builds armor for the tool
+   */
   public float buildArmor() {
-    return Math.max(0, (float)getAverageValue(skulls, SkullStats::getArmor) + getStatOrDefault(ToolStats.ARMOR, 0f));
+    return Math.max(0, (float) getAverageValue(this.skulls, SkullStats::getArmor) + this.getStatOrDefault(ToolStats.ARMOR, 0f));
   }
 }

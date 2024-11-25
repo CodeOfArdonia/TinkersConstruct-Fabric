@@ -21,9 +21,10 @@ import java.util.function.Function;
 @AllArgsConstructor
 @Getter
 public final class MaterialStatType<T extends IMaterialStats> {
+
   private final ResourceLocation identifier;
   private final Class<T> statsClass;
-  Function<FriendlyByteBuf,T> decoder;
+  Function<FriendlyByteBuf, T> decoder;
   private final T defaultStats;
   @Accessors(fluent = true)
   private final boolean canRepair;
@@ -31,13 +32,13 @@ public final class MaterialStatType<T extends IMaterialStats> {
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (o == null || this.getClass() != o.getClass()) return false;
     MaterialStatType<?> that = (MaterialStatType<?>) o;
-    return identifier.equals(that.identifier);
+    return this.identifier.equals(that.identifier);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(identifier);
+    return Objects.hash(this.identifier);
   }
 }

@@ -20,12 +20,8 @@ import slimeknights.tconstruct.library.materials.definition.MaterialVariantId;
 import slimeknights.tconstruct.library.materials.stats.MaterialStatsId;
 import slimeknights.tconstruct.library.utils.Util;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,11 +36,16 @@ import java.util.Optional;
  */
 @Log4j2
 public class MaterialRenderInfoLoader implements IEarlySafeManagerReloadListener, IdentifiableResourceReloadListener {
+
   public static final MaterialRenderInfoLoader INSTANCE = new MaterialRenderInfoLoader();
 
-  /** Folder to scan for material render info JSONS */
+  /**
+   * Folder to scan for material render info JSONS
+   */
   public static final String FOLDER = "tinkering/materials";
-  /** GSON adapter for material info deserializing */
+  /**
+   * GSON adapter for material info deserializing
+   */
   public static final Gson GSON = (new GsonBuilder())
     .registerTypeAdapter(ResourceLocation.class, new ResourceLocation.Serializer())
     .registerTypeAdapter(MaterialStatsId.class, new ResourceLocationSerializer<>(MaterialStatsId::new, TConstruct.MOD_ID))
@@ -57,46 +58,50 @@ public class MaterialRenderInfoLoader implements IEarlySafeManagerReloadListener
   /**
    * Called on mod construct to register the resource listener
    */
-  public static void addResourceListener(ResourceManagerHelper manager)  {
+  public static void addResourceListener(ResourceManagerHelper manager) {
     manager.registerReloadListener(INSTANCE);
   }
 
-  /** Map of all loaded materials */
-  private Map<MaterialVariantId,MaterialRenderInfo> renderInfos = ImmutableMap.of();
+  /**
+   * Map of all loaded materials
+   */
+  private Map<MaterialVariantId, MaterialRenderInfo> renderInfos = ImmutableMap.of();
 
   private MaterialRenderInfoLoader() {}
 
   /**
    * Gets a list of all loaded materials render infos
-   * @return  All loaded material render infos
+   *
+   * @return All loaded material render infos
    */
   public Collection<MaterialRenderInfo> getAllRenderInfos() {
-    return renderInfos.values();
+    return this.renderInfos.values();
   }
 
   /**
    * Gets the render info for the given material
-   * @param variantId  Material loaded
-   * @return  Material render info
+   *
+   * @param variantId Material loaded
+   * @return Material render info
    */
   public Optional<MaterialRenderInfo> getRenderInfo(MaterialVariantId variantId) {
     // if there is a variant, try fetching for the variant
     if (variantId.hasVariant()) {
-      MaterialRenderInfo info = renderInfos.get(variantId);
+      MaterialRenderInfo info = this.renderInfos.get(variantId);
       if (info != null) {
         return Optional.of(info);
       }
     }
     // no variant or the variant was not found? default to the material
-    return Optional.ofNullable(renderInfos.get(variantId.getId()));
+    return Optional.ofNullable(this.renderInfos.get(variantId.getId()));
   }
 
   @Override
   public void onReloadSafe(ResourceManager manager) {
     // first, we need to fetch all relevant JSON files
     int trim = FOLDER.length() + 1;
-    Map<MaterialVariantId,MaterialRenderInfo> map = new HashMap<>();
-    for(Map.Entry<ResourceLocation, Resource> entry : manager.listResources(FOLDER, (loc) -> loc.getPath().endsWith(".json")).entrySet()) {
+    Map<MaterialVariantId, MaterialRenderInfo> map = new HashMap<>();
+    for (Map.Entry<ResourceLocation, Resource> entry : manager.listResources(FOLDER, (loc) -> loc.getPath().endsWith(".json")).entrySet()) {
       // clean up ID by trimming off the extension and folder
       ResourceLocation location = entry.getKey();
       String path = location.getPath();
@@ -120,7 +125,7 @@ public class MaterialRenderInfoLoader implements IEarlySafeManagerReloadListener
           log.error("Couldn't load data file {} from {} as it's null or empty", id, location);
         } else {
           // parse it into material render info
-          MaterialRenderInfo old = map.put(id, loadRenderInfo(id, json));
+          MaterialRenderInfo old = map.put(id, this.loadRenderInfo(id, json));
           if (old != null) {
             throw new IllegalStateException("Duplicate data file ignored with ID " + id);
           }
@@ -137,9 +142,10 @@ public class MaterialRenderInfoLoader implements IEarlySafeManagerReloadListener
 
   /**
    * Gets material render info based on the given JSON
-   * @param material   Material location
-   * @param json  Render info JSON data
-   * @return  Material render info data
+   *
+   * @param material Material location
+   * @param json     Render info JSON data
+   * @return Material render info data
    */
   private MaterialRenderInfo loadRenderInfo(MaterialVariantId material, MaterialRenderInfoJson json) {
     // parse color

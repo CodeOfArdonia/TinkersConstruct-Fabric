@@ -48,6 +48,6 @@ public class CraftingStationMenuInfo implements StationMenuInfo<CraftingStationC
 
   @Override
   public DefaultCraftingDisplay<?> getDisplay() {
-    return display;
+    return this.display;
   }
 }

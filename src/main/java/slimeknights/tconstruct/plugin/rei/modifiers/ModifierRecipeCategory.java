@@ -1,7 +1,6 @@
 package slimeknights.tconstruct.plugin.rei.modifiers;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.fabricators_of_create.porting_lib.util.ForgeI18n;
 import lombok.Getter;
 import me.shedaniel.math.Point;
@@ -12,13 +11,10 @@ import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.util.ClientEntryStacks;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
-import me.shedaniel.rei.api.common.entry.EntryStack;
-import me.shedaniel.rei.api.common.util.EntryIngredients;
 import me.shedaniel.rei.api.common.util.EntryStacks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -32,7 +28,6 @@ import net.minecraft.world.item.ItemStack;
 import slimeknights.mantle.client.model.NBTKeyModel;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.client.GuiUtil;
-import slimeknights.tconstruct.library.recipe.modifiers.adding.IDisplayModifierRecipe;
 import slimeknights.tconstruct.library.tools.SlotType;
 import slimeknights.tconstruct.library.tools.SlotType.SlotCount;
 import slimeknights.tconstruct.plugin.rei.TConstructREIConstants;
@@ -49,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ModifierRecipeCategory implements TinkersCategory<ModifierRecipeDisplay> {
+
   protected static final ResourceLocation BACKGROUND_LOC = TConstruct.getResource("textures/gui/jei/tinker_station.png");
   private static final Component TITLE = TConstruct.makeTranslation("jei", "modifiers.title");
 
@@ -68,14 +64,15 @@ public class ModifierRecipeCategory implements TinkersCategory<ModifierRecipeDis
   private final String maxPrefix;
   private final WidgetHolder requirements, incremental;
   private final WidgetHolder[] slotIcons;
-  private final Map<SlotType,TextureAtlasSprite> slotTypeSprites = new HashMap<>();
+  private final Map<SlotType, TextureAtlasSprite> slotTypeSprites = new HashMap<>();
+
   public ModifierRecipeCategory() {
     this.maxPrefix = ForgeI18n.getPattern(KEY_MAX);
     this.background = new WidgetHolder(BACKGROUND_LOC, 0, 0, 128, 77);
     this.icon = EntryStacks.of(CreativeSlotItem.withSlot(new ItemStack(TinkerModifiers.creativeSlotItem), SlotType.UPGRADE));
     this.slotIcons = new WidgetHolder[6];
     for (int i = 0; i < 6; i++) {
-      slotIcons[i] = new WidgetHolder(BACKGROUND_LOC, 128 + i * 16, 0, 16, 16);
+      this.slotIcons[i] = new WidgetHolder(BACKGROUND_LOC, 128 + i * 16, 0, 16, 16);
     }
     this.requirements = new WidgetHolder(BACKGROUND_LOC, 128, 17, 16, 16);
     this.incremental = new WidgetHolder(BACKGROUND_LOC, 128, 33, 16, 16);
@@ -91,33 +88,37 @@ public class ModifierRecipeCategory implements TinkersCategory<ModifierRecipeDis
     return TITLE;
   }
 
-  /** Draws a single slot icon */
+  /**
+   * Draws a single slot icon
+   */
   private void drawSlot(Point origin, List<Widget> ingredients, ModifierRecipeDisplay recipe, int slot, int x, int y) {
     EntryIngredient stacks = recipe.getInputEntries().get(slot);
     if (stacks.isEmpty()) {
       // -1 as the item list includes the output slot, we skip that
-      ingredients.add(slotIcons[slot].build(x + 1, y + 1, origin));
+      ingredients.add(this.slotIcons[slot].build(x + 1, y + 1, origin));
     }
   }
 
-  /** Draws the icon for the given slot type */
+  /**
+   * Draws the icon for the given slot type
+   */
   private void drawSlotType(GuiGraphics graphics, @Nullable SlotType slotType, int x, int y) {
     Minecraft minecraft = Minecraft.getInstance();
     TextureAtlasSprite sprite;
-    if (slotTypeSprites.containsKey(slotType)) {
-      sprite = slotTypeSprites.get(slotType);
+    if (this.slotTypeSprites.containsKey(slotType)) {
+      sprite = this.slotTypeSprites.get(slotType);
     } else {
       ModelManager modelManager = minecraft.getModelManager();
       // gets the model for the item, its a sepcial one that gives us texture info
       BakedModel model = minecraft.getItemRenderer().getItemModelShaper().getItemModel(TinkerModifiers.creativeSlotItem.get());
       if (model != null && model.getOverrides() instanceof NBTKeyModel.Overrides) {
-        Material material = ((NBTKeyModel.Overrides)model.getOverrides()).getTexture(slotType == null ? "slotless" : slotType.getName());
+        Material material = ((NBTKeyModel.Overrides) model.getOverrides()).getTexture(slotType == null ? "slotless" : slotType.getName());
         sprite = modelManager.getAtlas(material.atlasLocation()).getSprite(material.texture());
       } else {
         // failed to use the model, use missing texture
         sprite = modelManager.getAtlas(InventoryMenu.BLOCK_ATLAS).getSprite(MissingTextureAtlasSprite.getLocation());
       }
-      slotTypeSprites.put(slotType, sprite);
+      this.slotTypeSprites.put(slotType, sprite);
     }
     RenderSystem.setShader(GameRenderer::getPositionTexShader);
     RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
@@ -131,15 +132,15 @@ public class ModifierRecipeCategory implements TinkersCategory<ModifierRecipeDis
     Font fontRenderer = Minecraft.getInstance().font;
     int max = display.getMaxLevel();
     if (max > 0) {
-      graphics.drawString(fontRenderer, maxPrefix + max, 66, 16, Color.GRAY.getRGB(), false);
+      graphics.drawString(fontRenderer, this.maxPrefix + max, 66, 16, Color.GRAY.getRGB(), false);
     }
 
     // draw slot cost
     SlotCount slots = display.getSlots();
     if (slots == null) {
-      drawSlotType(graphics, null, 110, 58);
+      this.drawSlotType(graphics, null, 110, 58);
     } else {
-      drawSlotType(graphics, slots.getType(), 110, 58);
+      this.drawSlotType(graphics, slots.getType(), 110, 58);
       String text = Integer.toString(slots.getCount());
       int x = 111 - fontRenderer.width(text);
       graphics.drawString(fontRenderer, text, x, 63, Color.GRAY.getRGB(), false);
@@ -175,20 +176,20 @@ public class ModifierRecipeCategory implements TinkersCategory<ModifierRecipeDis
   @Override
   public void addWidgets(ModifierRecipeDisplay display, List<Widget> ingredients, Point origin, Rectangle bounds) {
     // inputs
-    ingredients.add(slot( 3, 33, origin).markInput().entries(display.getInputEntries().get(0)));
-    ingredients.add(slot(25, 15, origin).markInput().entries(display.getInputEntries().get(1)));
-    ingredients.add(slot(47, 33, origin).markInput().entries(display.getInputEntries().get(2)));
-    ingredients.add(slot(43, 58, origin).markInput().entries(display.getInputEntries().get(3)));
-    ingredients.add(slot( 7, 58, origin).markInput().entries(display.getInputEntries().get(4)));
+    ingredients.add(this.slot(3, 33, origin).markInput().entries(display.getInputEntries().get(0)));
+    ingredients.add(this.slot(25, 15, origin).markInput().entries(display.getInputEntries().get(1)));
+    ingredients.add(this.slot(47, 33, origin).markInput().entries(display.getInputEntries().get(2)));
+    ingredients.add(this.slot(43, 58, origin).markInput().entries(display.getInputEntries().get(3)));
+    ingredients.add(this.slot(7, 58, origin).markInput().entries(display.getInputEntries().get(4)));
     // modifiers
-    Slot output = slot(3, 3, origin).markOutput()
+    Slot output = this.slot(3, 3, origin).markOutput()
       .entries(display.getOutputEntries().get(0));
-    ClientEntryStacks.setRenderer(output.getCurrentEntry(), modifierRenderer);
-    output.getBounds().setSize(modifierRenderer.width(), modifierRenderer.height());
+    ClientEntryStacks.setRenderer(output.getCurrentEntry(), this.modifierRenderer);
+    output.getBounds().setSize(this.modifierRenderer.width(), this.modifierRenderer.height());
     ingredients.add(output);
     // tool
-    ingredients.add(slot( 25, 38, origin).entries(display.getToolWithoutModifier()));
-    ingredients.add(slot(105, 34, origin).entries(display.getToolWithModifier()));
+    ingredients.add(this.slot(25, 38, origin).entries(display.getToolWithoutModifier()));
+    ingredients.add(this.slot(105, 34, origin).entries(display.getToolWithModifier()));
 
     // TODO: still needed?
     // if focusing on a tool, filter out other tools
@@ -207,18 +208,18 @@ public class ModifierRecipeCategory implements TinkersCategory<ModifierRecipeDis
 //      }
 //    }
 
-    drawSlot(origin, ingredients, display, 0,  2, 32);
-    drawSlot(origin, ingredients, display, 1, 24, 14);
-    drawSlot(origin, ingredients, display, 2, 46, 32);
-    drawSlot(origin, ingredients, display, 3, 42, 57);
-    drawSlot(origin, ingredients, display, 4,  6, 57);
+    this.drawSlot(origin, ingredients, display, 0, 2, 32);
+    this.drawSlot(origin, ingredients, display, 1, 24, 14);
+    this.drawSlot(origin, ingredients, display, 2, 46, 32);
+    this.drawSlot(origin, ingredients, display, 3, 42, 57);
+    this.drawSlot(origin, ingredients, display, 4, 6, 57);
 
     // draw info icons
     if (display.hasRequirements()) {
-      ingredients.add(requirements.build(66, 58, origin));
+      ingredients.add(this.requirements.build(66, 58, origin));
     }
     if (display.isIncremental()) {
-      ingredients.add(incremental.build(83, 59, origin));
+      ingredients.add(this.incremental.build(83, 59, origin));
     }
   }
 }

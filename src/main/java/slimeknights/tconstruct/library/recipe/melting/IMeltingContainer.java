@@ -9,26 +9,39 @@ import slimeknights.mantle.recipe.container.ISingleStackContainer;
 
 import java.util.Locale;
 
-/** Interface for melting inventories */
+/**
+ * Interface for melting inventories
+ */
 public interface IMeltingContainer extends ISingleStackContainer {
+
   /**
    * Gets the logic to boost an ore with the ore rate
-   * @return  Nuggets per ore
+   *
+   * @return Nuggets per ore
    */
   IOreRate getOreRate();
 
-  /** Ore rate logic in a melting container */
+  /**
+   * Ore rate logic in a melting container
+   */
   interface IOreRate {
-    /** Boosts the given integer by the rate */
+
+    /**
+     * Boosts the given integer by the rate
+     */
     long applyOreBoost(OreRateType rate, long amount);
 
-    /** Boosts the given fluid stack by the rate */
+    /**
+     * Boosts the given fluid stack by the rate
+     */
     default FluidStack applyOreBoost(OreRateType rate, FluidStack fluid) {
-      return new FluidStack(fluid, applyOreBoost(rate, fluid.getAmount()));
+      return new FluidStack(fluid, this.applyOreBoost(rate, fluid.getAmount()));
     }
   }
 
-  /** Ore rate options */
+  /**
+   * Ore rate options
+   */
   enum OreRateType {
     METAL,
     GEM;
@@ -36,12 +49,16 @@ public interface IMeltingContainer extends ISingleStackContainer {
     @Getter
     private final String name = this.name().toLowerCase(Locale.ROOT);
 
-    /** Parses an ore rate from Json */
+    /**
+     * Parses an ore rate from Json
+     */
     public static OreRateType parse(JsonObject parent, String key) {
       String name = GsonHelper.getAsString(parent, key);
       switch (name) {
-        case "metal": return METAL;
-        case "gem": return GEM;
+        case "metal":
+          return METAL;
+        case "gem":
+          return GEM;
       }
       throw new JsonSyntaxException("Unknown ore rate type " + name);
     }

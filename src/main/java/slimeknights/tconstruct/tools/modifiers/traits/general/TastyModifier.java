@@ -27,8 +27,6 @@ import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 import slimeknights.tconstruct.library.tools.nbt.ModDataNBT;
 import slimeknights.tconstruct.shared.TinkerCommons;
 
-import java.util.List;
-
 public class TastyModifier extends Modifier implements GeneralInteractionModifierHook {
 
   @Override

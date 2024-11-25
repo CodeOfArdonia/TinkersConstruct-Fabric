@@ -23,6 +23,7 @@ import slimeknights.tconstruct.library.tools.context.EquipmentChangeContext;
 import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 
 public class ZoomModifier extends NoLevelsModifier implements KeybindInteractModifierHook, GeneralInteractionModifierHook {
+
   private static final ResourceLocation ZOOM = TConstruct.getResource("zoom");
 
   @Override
@@ -99,7 +100,7 @@ public class ZoomModifier extends NoLevelsModifier implements KeybindInteractMod
 
   @Override
   public boolean onStoppedUsing(IToolStackView tool, ModifierEntry modifier, LivingEntity entity, int timeLeft) {
-    return onFinishUsing(tool, modifier, entity);
+    return this.onFinishUsing(tool, modifier, entity);
   }
 
   @Override

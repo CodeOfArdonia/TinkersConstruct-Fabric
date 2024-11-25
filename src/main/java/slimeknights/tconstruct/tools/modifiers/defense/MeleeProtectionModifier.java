@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class MeleeProtectionModifier extends AbstractProtectionModifier<ModifierMaxLevel> {
+
   private static final UUID SPEED_UUID = UUID.fromString("6f030b1e-e9e1-11ec-8fea-0242ac120002");
   private static final TinkerDataKey<ModifierMaxLevel> KEY = TConstruct.createKey("melee_protection");
 
@@ -31,7 +32,9 @@ public class MeleeProtectionModifier extends AbstractProtectionModifier<Modifier
     super(KEY);
   }
 
-  /** Checks if the damage source is blocked by this modifier */
+  /**
+   * Checks if the damage source is blocked by this modifier
+   */
   private static boolean doesApply(DamageSource source) {
     if (source.is(DamageTypeTags.BYPASSES_EFFECTS) || source.is(DamageTypeTags.IS_PROJECTILE) || source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
       return false;
@@ -76,7 +79,7 @@ public class MeleeProtectionModifier extends AbstractProtectionModifier<Modifier
   @Override
   public float getProtectionModifier(IToolStackView tool, int level, EquipmentContext context, EquipmentSlot slotType, DamageSource source, float modifierValue) {
     if (doesApply(source)) {
-      modifierValue += getScaledLevel(tool, level) * 2.5;
+      modifierValue += this.getScaledLevel(tool, level) * 2.5;
     }
     return modifierValue;
   }

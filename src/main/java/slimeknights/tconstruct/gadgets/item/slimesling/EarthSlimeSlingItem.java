@@ -17,31 +17,32 @@ public class EarthSlimeSlingItem extends BaseSlimeSlingItem {
     super(props, SlimeType.EARTH);
   }
 
-  /** Called when the player stops using an Item (stops holding the right mouse button). */
+  /**
+   * Called when the player stops using an Item (stops holding the right mouse button).
+   */
   @Override
   public void releaseUsing(ItemStack stack, Level worldIn, LivingEntity entityLiving, int timeLeft) {
-    if (!entityLiving.onGround() || !(entityLiving instanceof Player)) {
+    if (!entityLiving.onGround() || !(entityLiving instanceof Player player)) {
       return;
     }
 
     // check if player was targeting a block
-    Player player = (Player) entityLiving;
     BlockHitResult mop = getPlayerPOVHitResult(worldIn, player, ClipContext.Fluid.NONE);
     if (mop.getType() == HitResult.Type.BLOCK) {
       // we fling the inverted player look vector
-      float f = getForce(stack, timeLeft);
+      float f = this.getForce(stack, timeLeft);
       Vec3 vec = player.getLookAngle().normalize();
       player.push(vec.x * -f,
-                         vec.y * -f / 3f,
-                         vec.z * -f);
+        vec.y * -f / 3f,
+        vec.z * -f);
       SlimeBounceHandler.addBounceHandler(player);
 
       if (!worldIn.isClientSide) {
         player.getCooldowns().addCooldown(stack.getItem(), 3);
-        onSuccess(player, stack);
+        this.onSuccess(player, stack);
       }
     } else {
-      playMissSound(player);
+      this.playMissSound(player);
     }
   }
 }

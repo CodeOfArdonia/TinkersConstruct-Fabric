@@ -11,12 +11,14 @@ import slimeknights.tconstruct.library.tools.part.IMaterialItem;
 import slimeknights.tconstruct.smeltery.TinkerSmeltery;
 
 import javax.annotation.Nullable;
-import java.util.Objects;
 import java.util.function.Consumer;
 
-/** Builder for a composite part recipe, should exist for each part */
+/**
+ * Builder for a composite part recipe, should exist for each part
+ */
 @RequiredArgsConstructor(staticName = "composite")
 public class CompositeCastingRecipeBuilder extends AbstractRecipeBuilder<CompositeCastingRecipeBuilder> {
+
   private final IMaterialItem result;
   private final int itemCost;
   private final CompositeCastingRecipe.Serializer<?> serializer;
@@ -31,7 +33,7 @@ public class CompositeCastingRecipeBuilder extends AbstractRecipeBuilder<Composi
 
   @Override
   public void save(Consumer<FinishedRecipe> consumer) {
-    save(consumer, BuiltInRegistries.ITEM.getKey(result.asItem()));
+    this.save(consumer, BuiltInRegistries.ITEM.getKey(this.result.asItem()));
   }
 
   @Override
@@ -41,22 +43,23 @@ public class CompositeCastingRecipeBuilder extends AbstractRecipeBuilder<Composi
   }
 
   private class Finished extends AbstractFinishedRecipe {
+
     public Finished(ResourceLocation ID, @Nullable ResourceLocation advancementID) {
       super(ID, advancementID);
     }
 
     @Override
     public void serializeRecipeData(JsonObject json) {
-      if (!group.isEmpty()) {
-        json.addProperty("group", group);
+      if (!CompositeCastingRecipeBuilder.this.group.isEmpty()) {
+        json.addProperty("group", CompositeCastingRecipeBuilder.this.group);
       }
-      json.addProperty("result", BuiltInRegistries.ITEM.getKey(result.asItem()).toString());
-      json.addProperty("item_cost", itemCost);
+      json.addProperty("result", BuiltInRegistries.ITEM.getKey(CompositeCastingRecipeBuilder.this.result.asItem()).toString());
+      json.addProperty("item_cost", CompositeCastingRecipeBuilder.this.itemCost);
     }
 
     @Override
     public RecipeSerializer<?> getType() {
-      return serializer;
+      return CompositeCastingRecipeBuilder.this.serializer;
     }
   }
 }

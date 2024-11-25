@@ -17,13 +17,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public record ModifierEntryRenderer(int width, int height) implements EntryRenderer<ModifierEntry> {
+
   @Override
   public void render(EntryStack<ModifierEntry> entry, GuiGraphics graphics, Rectangle bounds, int mouseX, int mouseY, float delta) {
     graphics.pose().pushPose();
-    graphics.pose().translate(bounds.getCenterX() - width / 2, bounds.getCenterY() - height / 2, 0);
+    graphics.pose().translate(bounds.getCenterX() - this.width / 2, bounds.getCenterY() - this.height / 2, 0);
     Component name = entry.getValue().getModifier().getDisplayName(entry.getValue().getLevel());
     Font fontRenderer = Minecraft.getInstance().font;
-    int x = (width - fontRenderer.width(name)) / 2;
+    int x = (this.width - fontRenderer.width(name)) / 2;
     graphics.drawString(fontRenderer, name, x, 1, -1);
     graphics.pose().popPose();
   }

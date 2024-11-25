@@ -136,7 +136,7 @@ public class FuelModule implements ContainerData {
    * Gets a nonnull world instance from the parent
    */
   private Level getLevel() {
-    return Objects.requireNonNull(parent.getLevel(), "Parent tile entity has null world");
+    return Objects.requireNonNull(this.parent.getLevel(), "Parent tile entity has null world");
   }
 
   /**
@@ -147,12 +147,12 @@ public class FuelModule implements ContainerData {
    */
   @Nullable
   private MeltingFuel findRecipe(Fluid fluid) {
-    if (lastRecipe != null && lastRecipe.matches(fluid)) {
-      return lastRecipe;
+    if (this.lastRecipe != null && this.lastRecipe.matches(fluid)) {
+      return this.lastRecipe;
     }
     MeltingFuel recipe = MeltingFuelLookup.findFuel(fluid);
     if (recipe != null) {
-      lastRecipe = recipe;
+      this.lastRecipe = recipe;
     }
     return recipe;
   }
@@ -166,7 +166,7 @@ public class FuelModule implements ContainerData {
    * @return True if we have fuel
    */
   public boolean hasFuel() {
-    return fuel > 0;
+    return this.fuel > 0;
   }
 
   /**
@@ -175,18 +175,18 @@ public class FuelModule implements ContainerData {
    * @param amount Amount of fuel to consume
    */
   public void decreaseFuel(int amount) {
-    fuel = Math.max(0, fuel - amount);
-    parent.setChangedFast();
+    this.fuel = Math.max(0, this.fuel - amount);
+    this.parent.setChangedFast();
   }
 
 
   /* Fuel updating */
 
   /* Cache of objects, since they are otherwise created possibly several times */
-  private final NonNullFunction<Storage<ItemVariant>, Integer> trySolidFuelConsume = handler -> trySolidFuel(handler, true);
-  private final NonNullFunction<Storage<ItemVariant>, Integer> trySolidFuelNoConsume = handler -> trySolidFuel(handler, false);
-  private final NonNullFunction<Storage<FluidVariant>, Integer> tryLiquidFuelConsume = handler -> tryLiquidFuel(handler, true);
-  private final NonNullFunction<Storage<FluidVariant>, Integer> tryLiquidFuelNoConsume = handler -> tryLiquidFuel(handler, false);
+  private final NonNullFunction<Storage<ItemVariant>, Integer> trySolidFuelConsume = handler -> this.trySolidFuel(handler, true);
+  private final NonNullFunction<Storage<ItemVariant>, Integer> trySolidFuelNoConsume = handler -> this.trySolidFuel(handler, false);
+  private final NonNullFunction<Storage<FluidVariant>, Integer> tryLiquidFuelConsume = handler -> this.tryLiquidFuel(handler, true);
+  private final NonNullFunction<Storage<FluidVariant>, Integer> tryLiquidFuelNoConsume = handler -> this.tryLiquidFuel(handler, false);
 
   /**
    * Tries to consume fuel from the given fluid handler
@@ -205,21 +205,21 @@ public class FuelModule implements ContainerData {
           try (Transaction tx = TransferUtil.getTransaction()) {
             view.extract(view.getResource(), 1, tx);
             if (view.getResource().matches(stack) && !stack.isEmpty()) {
-              fuel += time;
-              fuelQuality = time;
-              temperature = SOLID_TEMPERATURE;
-              parent.setChangedFast();
+              this.fuel += time;
+              this.fuelQuality = time;
+              this.temperature = SOLID_TEMPERATURE;
+              this.parent.setChangedFast();
               // return the container
               ItemStack container = view.getResource().toStack((int) view.getAmount()).getRecipeRemainder();
               if (!container.isEmpty()) {
                 // if we cannot insert the container back, spit it on the ground
                 long inserted = TransferUtil.insertItem(handler, container);
                 if (inserted == 0) {
-                  Level world = getLevel();
+                  Level world = this.getLevel();
                   double x = (world.random.nextFloat() * 0.5F) + 0.25D;
                   double y = (world.random.nextFloat() * 0.5F) + 0.25D;
                   double z = (world.random.nextFloat() * 0.5F) + 0.25D;
-                  BlockPos pos = lastPos == NULL_POS ? parent.getBlockPos() : lastPos;
+                  BlockPos pos = this.lastPos == NULL_POS ? this.parent.getBlockPos() : this.lastPos;
                   ItemEntity itementity = new ItemEntity(world, pos.getX() + x, pos.getY() + y, pos.getZ() + z, container);
                   itementity.setDefaultPickUpDelay();
                   world.addFreshEntity(itementity);
@@ -244,7 +244,7 @@ public class FuelModule implements ContainerData {
    * @return Mapper function for solid fuel
    */
   private NonNullFunction<Storage<ItemVariant>, Integer> trySolidFuel(boolean consume) {
-    return consume ? trySolidFuelConsume : trySolidFuelNoConsume;
+    return consume ? this.trySolidFuelConsume : this.trySolidFuelNoConsume;
   }
 
   /**
@@ -255,7 +255,7 @@ public class FuelModule implements ContainerData {
    */
   private int tryLiquidFuel(Storage<FluidVariant> handler, boolean consume) {
     FluidStack fluid = TransferUtil.firstOrEmpty(handler);
-    MeltingFuel recipe = findRecipe(fluid.getFluid());
+    MeltingFuel recipe = this.findRecipe(fluid.getFluid());
     if (recipe != null) {
       long amount = recipe.getAmount(fluid.getFluid());
       if (fluid.getAmount() >= amount) {
@@ -267,11 +267,11 @@ public class FuelModule implements ContainerData {
               TConstruct.LOG.error("Invalid amount of fuel drained from tank");
             }
           }
-          fuel += recipe.getDuration();
-          fuelQuality = recipe.getDuration();
-          temperature = recipe.getTemperature();
-          parent.setChangedFast();
-          return temperature;
+          this.fuel += recipe.getDuration();
+          this.fuelQuality = recipe.getDuration();
+          this.temperature = recipe.getTemperature();
+          this.parent.setChangedFast();
+          return this.temperature;
         } else {
           return recipe.getTemperature();
         }
@@ -287,7 +287,7 @@ public class FuelModule implements ContainerData {
    * @return Mapper function for liquid fuel
    */
   private NonNullFunction<Storage<FluidVariant>, Integer> tryLiquidFuel(boolean consume) {
-    return consume ? tryLiquidFuelConsume : tryLiquidFuelNoConsume;
+    return consume ? this.tryLiquidFuelConsume : this.tryLiquidFuelNoConsume;
   }
 
   /**
@@ -298,24 +298,23 @@ public class FuelModule implements ContainerData {
    */
   private int tryFindFuel(BlockPos pos, boolean consume) {
     // if we find a valid cap, try to consume fuel from it
-    Storage<FluidVariant> storage = FluidStorage.SIDED.find(getLevel(), pos, null);
-    Optional<Integer> temperature = Optional.ofNullable(storage).map(tryLiquidFuel(consume));
+    Storage<FluidVariant> storage = FluidStorage.SIDED.find(this.getLevel(), pos, null);
+    Optional<Integer> temperature = Optional.ofNullable(storage).map(this.tryLiquidFuel(consume));
     if (temperature.isPresent()) {
-      itemHandler = null;
-      fluidHandler = StorageProvider.createForFluids(getLevel(), pos);
-      ;
-      tankDisplayHandlers = null;
-      lastPos = pos;
+      this.itemHandler = null;
+      this.fluidHandler = StorageProvider.createForFluids(this.getLevel(), pos);
+      this.tankDisplayHandlers = null;
+      this.lastPos = pos;
       return temperature.get();
     } else {
       // if we find a valid item cap, consume fuel from that
-      Storage<ItemVariant> itemCap = ItemStorage.SIDED.find(getLevel(), pos, null);
-      temperature = Optional.ofNullable(itemCap).map(trySolidFuel(consume));
+      Storage<ItemVariant> itemCap = ItemStorage.SIDED.find(this.getLevel(), pos, null);
+      temperature = Optional.ofNullable(itemCap).map(this.trySolidFuel(consume));
       if (temperature.isPresent()) {
-        fluidHandler = null;
-        tankDisplayHandlers = null;
-        itemHandler = StorageProvider.createForItems(getLevel(), pos);
-        lastPos = pos;
+        this.fluidHandler = null;
+        this.tankDisplayHandlers = null;
+        this.itemHandler = StorageProvider.createForItems(this.getLevel(), pos);
+        this.lastPos = pos;
         return temperature.get();
       }
     }
@@ -331,13 +330,13 @@ public class FuelModule implements ContainerData {
   public int findFuel(boolean consume) {
     // if we have a handler, try to use that if possible
     Optional<Integer> handlerTemp = Optional.empty();
-    if (fluidHandler != null) {
-      handlerTemp = getFluidStorage().map(tryLiquidFuel(consume));
-    } else if (itemHandler != null) {
-      handlerTemp = getItemStorage().map(trySolidFuel(consume));
+    if (this.fluidHandler != null) {
+      handlerTemp = this.getFluidStorage().map(this.tryLiquidFuel(consume));
+    } else if (this.itemHandler != null) {
+      handlerTemp = this.getItemStorage().map(this.trySolidFuel(consume));
       // if no handler, try to find one at the last position
-    } else if (lastPos != NULL_POS) {
-      int posTemp = tryFindFuel(lastPos, consume);
+    } else if (this.lastPos != NULL_POS) {
+      int posTemp = this.tryFindFuel(this.lastPos, consume);
       if (posTemp > 0) {
         return posTemp;
       }
@@ -349,10 +348,10 @@ public class FuelModule implements ContainerData {
     }
 
     // find a new handler among our tanks
-    for (BlockPos pos : tankSupplier.get()) {
+    for (BlockPos pos : this.tankSupplier.get()) {
       // already checked the last position above, no reason to try again
-      if (!pos.equals(lastPos)) {
-        int posTemp = tryFindFuel(pos, consume);
+      if (!pos.equals(this.lastPos)) {
+        int posTemp = this.tryFindFuel(pos, consume);
         if (posTemp > 0) {
           return posTemp;
         }
@@ -361,20 +360,20 @@ public class FuelModule implements ContainerData {
 
     // no handler found, tell client of the lack of fuel
     if (consume) {
-      temperature = 0;
+      this.temperature = 0;
     }
     return 0;
   }
 
   public Optional<Storage<FluidVariant>> getFluidStorage() {
-    Optional<Storage<FluidVariant>> optional = Optional.ofNullable(fluidHandler).map(x -> x.get(null));
-    if (optional.isEmpty()) reset();
+    Optional<Storage<FluidVariant>> optional = Optional.ofNullable(this.fluidHandler).map(x -> x.get(null));
+    if (optional.isEmpty()) this.reset();
     return optional;
   }
 
   public Optional<Storage<ItemVariant>> getItemStorage() {
-    Optional<Storage<ItemVariant>> optional = Optional.ofNullable(itemHandler).map(x -> x.get(null));
-    if (optional.isEmpty()) reset();
+    Optional<Storage<ItemVariant>> optional = Optional.ofNullable(this.itemHandler).map(x -> x.get(null));
+    if (optional.isEmpty()) this.reset();
     return optional;
   }
 
@@ -390,13 +389,13 @@ public class FuelModule implements ContainerData {
    */
   public void readFromTag(CompoundTag nbt) {
     if (nbt.contains(TAG_FUEL, Tag.TAG_ANY_NUMERIC)) {
-      fuel = nbt.getInt(TAG_FUEL);
+      this.fuel = nbt.getInt(TAG_FUEL);
     }
     if (nbt.contains(TAG_TEMPERATURE, Tag.TAG_ANY_NUMERIC)) {
-      temperature = nbt.getInt(TAG_TEMPERATURE);
+      this.temperature = nbt.getInt(TAG_TEMPERATURE);
     }
     if (nbt.contains(TAG_LAST_FUEL, Tag.TAG_ANY_NUMERIC)) {
-      lastPos = TagUtil.readPos(nbt, TAG_LAST_FUEL);
+      this.lastPos = TagUtil.readPos(nbt, TAG_LAST_FUEL);
     }
   }
 
@@ -407,11 +406,11 @@ public class FuelModule implements ContainerData {
    * @return Tag written to
    */
   public CompoundTag writeToTag(CompoundTag nbt) {
-    nbt.putInt(TAG_FUEL, fuel);
-    nbt.putInt(TAG_TEMPERATURE, temperature);
+    nbt.putInt(TAG_FUEL, this.fuel);
+    nbt.putInt(TAG_TEMPERATURE, this.temperature);
     // technically unneeded for melters, but does not hurt to add
-    if (lastPos != NULL_POS) {
-      nbt.put(TAG_LAST_FUEL, TagUtil.writePos(lastPos));
+    if (this.lastPos != NULL_POS) {
+      nbt.put(TAG_LAST_FUEL, TagUtil.writePos(this.lastPos));
     }
     return nbt;
   }
@@ -433,12 +432,12 @@ public class FuelModule implements ContainerData {
   @Override
   public int get(int index) {
     return switch (index) {
-      case FUEL -> fuel;
-      case FUEL_QUALITY -> fuelQuality;
-      case TEMPERATURE -> temperature;
-      case LAST_X -> lastPos.getX();
-      case LAST_Y -> lastPos.getY();
-      case LAST_Z -> lastPos.getZ();
+      case FUEL -> this.fuel;
+      case FUEL_QUALITY -> this.fuelQuality;
+      case TEMPERATURE -> this.temperature;
+      case LAST_X -> this.lastPos.getX();
+      case LAST_Y -> this.lastPos.getY();
+      case LAST_Z -> this.lastPos.getZ();
       default -> 0;
     };
   }
@@ -446,21 +445,21 @@ public class FuelModule implements ContainerData {
   @Override
   public void set(int index, int value) {
     switch (index) {
-      case FUEL -> fuel = value;
-      case FUEL_QUALITY -> fuelQuality = value;
-      case TEMPERATURE -> temperature = value;
+      case FUEL -> this.fuel = value;
+      case FUEL_QUALITY -> this.fuelQuality = value;
+      case TEMPERATURE -> this.temperature = value;
 
       // position sync takes three parts
       case LAST_X, LAST_Y, LAST_Z -> {
         // position sync
         switch (index) {
-          case LAST_X -> lastPos = new BlockPos(value, lastPos.getY(), lastPos.getZ());
-          case LAST_Y -> lastPos = new BlockPos(lastPos.getX(), value, lastPos.getZ());
-          case LAST_Z -> lastPos = new BlockPos(lastPos.getX(), lastPos.getY(), value);
+          case LAST_X -> this.lastPos = new BlockPos(value, this.lastPos.getY(), this.lastPos.getZ());
+          case LAST_Y -> this.lastPos = new BlockPos(this.lastPos.getX(), value, this.lastPos.getZ());
+          case LAST_Z -> this.lastPos = new BlockPos(this.lastPos.getX(), this.lastPos.getY(), value);
         }
-        fluidHandler = null;
-        itemHandler = null;
-        tankDisplayHandlers = null;
+        this.fluidHandler = null;
+        this.itemHandler = null;
+        this.tankDisplayHandlers = null;
       }
     }
   }
@@ -486,10 +485,10 @@ public class FuelModule implements ContainerData {
     // however, a valid tank is a lot more effort to find
 
     // Y of -1 is how the UI syncs null
-    BlockPos mainTank = lastPos;
+    BlockPos mainTank = this.lastPos;
     if (mainTank.getY() == NULL_POS.getY()) {
       // if no first, return no fuel info
-      positions = tankSupplier.get();
+      positions = this.tankSupplier.get();
       if (positions.isEmpty()) {
         return FuelInfo.EMPTY;
       }
@@ -498,29 +497,29 @@ public class FuelModule implements ContainerData {
     }
 
     // fetch primary fuel handler
-    if (fluidHandler == null && itemHandler == null) {
-      Storage<FluidVariant> fluidCap = FluidStorage.SIDED.find(getLevel(), mainTank, null);
+    if (this.fluidHandler == null && this.itemHandler == null) {
+      Storage<FluidVariant> fluidCap = FluidStorage.SIDED.find(this.getLevel(), mainTank, null);
       if (fluidCap != null) {
-        fluidHandler = StorageProvider.createForFluids(getLevel(), mainTank);
+        this.fluidHandler = StorageProvider.createForFluids(this.getLevel(), mainTank);
       } else {
-        Storage<ItemVariant> itemCap = ItemStorage.SIDED.find(getLevel(), mainTank, null);
+        Storage<ItemVariant> itemCap = ItemStorage.SIDED.find(this.getLevel(), mainTank, null);
         if (itemCap != null) {
-          itemHandler = StorageProvider.createForItems(getLevel(), mainTank);
+          this.itemHandler = StorageProvider.createForItems(this.getLevel(), mainTank);
         }
       }
     }
     // if its an item, stop here
-    if (itemHandler != null) {
+    if (this.itemHandler != null) {
       return FuelInfo.ITEM;
     }
 
     // determine what fluid we have and hpw many other fluids we have
-    FuelInfo info = getFluidStorage().map(handler -> {
+    FuelInfo info = this.getFluidStorage().map(handler -> {
       for (StorageView<FluidVariant> view : handler.nonEmptyViews()) {
         FluidStack fluid = new FluidStack(view);
         int temperature = 0;
         if (!fluid.isEmpty()) {
-          MeltingFuel fuel = findRecipe(fluid.getFluid());
+          MeltingFuel fuel = this.findRecipe(fluid.getFluid());
           if (fuel != null) {
             temperature = fuel.getTemperature();
           }
@@ -533,16 +532,16 @@ public class FuelModule implements ContainerData {
     // add extra fluid display
     if (!info.isEmpty()) {
       // fetch fluid handler list if missing
-      Level world = getLevel();
-      if (tankDisplayHandlers == null) {
-        tankDisplayHandlers = new ArrayList<>();
+      Level world = this.getLevel();
+      if (this.tankDisplayHandlers == null) {
+        this.tankDisplayHandlers = new ArrayList<>();
         // only need to fetch this if either case requests
-        if (positions == null) positions = tankSupplier.get();
+        if (positions == null) positions = this.tankSupplier.get();
         for (BlockPos pos : positions) {
           if (!pos.equals(mainTank)) {
             Storage<FluidVariant> handler = FluidStorage.SIDED.find(world, pos, null);
             if (handler != null) {
-              tankDisplayHandlers.add(pos);
+              this.tankDisplayHandlers.add(pos);
             }
           }
         }
@@ -550,7 +549,7 @@ public class FuelModule implements ContainerData {
 
       // add display info from each handler
       FluidStack currentFuel = info.getFluid();
-      for (BlockPos pos : tankDisplayHandlers) {
+      for (BlockPos pos : this.tankDisplayHandlers) {
         Storage<FluidVariant> handler = FluidStorage.SIDED.find(world, pos, null);
         if (handler != null) {
           // sum if empty (more capacity) or the same fluid (more amount and capacity)
@@ -563,7 +562,7 @@ public class FuelModule implements ContainerData {
             }
           }
         } else {
-          tankDisplayHandlers.remove(pos);
+          this.tankDisplayHandlers.remove(pos);
         }
       }
     }
@@ -630,7 +629,7 @@ public class FuelModule implements ContainerData {
      * Checks if this fuel info has no fluid
      */
     public boolean isEmpty() {
-      return fluid.isEmpty() || totalAmount == 0 || capacity == 0;
+      return this.fluid.isEmpty() || this.totalAmount == 0 || this.capacity == 0;
     }
   }
 }

@@ -15,9 +15,14 @@ import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 import java.util.Collections;
 import java.util.function.Predicate;
 
-/** Logic for iterating over a set of blocks */
+/**
+ * Logic for iterating over a set of blocks
+ */
 public interface IAreaOfEffectIterator extends IHaveLoader<IAreaOfEffectIterator> {
-  /** Default iterator, no blocks */
+
+  /**
+   * Default iterator, no blocks
+   */
   IAreaOfEffectIterator DEFAULT = new IAreaOfEffectIterator() {
     @Override
     public Iterable<BlockPos> getBlocks(IToolStackView tool, ItemStack stack, Player player, BlockState state, Level world, BlockPos origin, Direction sideHit, AOEMatchType matchType) {
@@ -30,31 +35,34 @@ public interface IAreaOfEffectIterator extends IHaveLoader<IAreaOfEffectIterator
     }
   };
 
-  /** Registry of all AOE loaders */
+  /**
+   * Registry of all AOE loaders
+   */
   GenericLoaderRegistry<IAreaOfEffectIterator> LOADER = new GenericLoaderRegistry<>(DEFAULT);
 
   /**
    * Gets a list of blocks that the tool can affect.
    *
-   * @param tool        tool stack
-   * @param stack       item stack for vanilla methods
-   * @param world       the current world
-   * @param player      the player using the tool
-   * @param origin      the origin block spot to start from
-   * @param sideHit     side of the block that was hit
-   * @param matchType   Type of match
+   * @param tool      tool stack
+   * @param stack     item stack for vanilla methods
+   * @param world     the current world
+   * @param player    the player using the tool
+   * @param origin    the origin block spot to start from
+   * @param sideHit   side of the block that was hit
+   * @param matchType Type of match
    * @return A list of BlockPos's that the AOE tool can affect. Note these positions will likely be mutable
    */
   Iterable<BlockPos> getBlocks(IToolStackView tool, ItemStack stack, Player player, BlockState state, Level world, BlockPos origin, Direction sideHit, AOEMatchType matchType);
 
   /**
    * Gets the predicate for whether a given position can be broken in AOE
-   * @param tool       Tool used
-   * @param stack      Item stack, for vanilla hooks
-   * @param world      Level instance
-   * @param origin     Center position
-   * @param matchType  Match logic
-   * @return  Predicate for AOE block matching
+   *
+   * @param tool      Tool used
+   * @param stack     Item stack, for vanilla hooks
+   * @param world     Level instance
+   * @param origin    Center position
+   * @param matchType Match logic
+   * @return Predicate for AOE block matching
    */
   static Predicate<BlockPos> defaultBlockPredicate(IToolStackView tool, ItemStack stack, Level world, BlockPos origin, AOEMatchType matchType) {
     // requires effectiveness
@@ -81,12 +89,18 @@ public interface IAreaOfEffectIterator extends IHaveLoader<IAreaOfEffectIterator
     }
   }
 
-  /** Match types for the AOE getter */
+  /**
+   * Match types for the AOE getter
+   */
   enum AOEMatchType {
-    /** Used when the block is being broken, typically matches only harvestable blocks
-     * When using this type, the iteratable should be fetched before breaking the block */
+    /**
+     * Used when the block is being broken, typically matches only harvestable blocks
+     * When using this type, the iteratable should be fetched before breaking the block
+     */
     BREAKING,
-    /** Used for right click interactions such as hoeing, typically matches any block (will filter later) */
+    /**
+     * Used for right click interactions such as hoeing, typically matches any block (will filter later)
+     */
     TRANSFORM
   }
 }

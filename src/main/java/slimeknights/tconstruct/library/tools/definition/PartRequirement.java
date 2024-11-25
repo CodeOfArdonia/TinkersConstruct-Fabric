@@ -10,7 +10,6 @@ import com.google.gson.JsonSerializer;
 import com.google.gson.JsonSyntaxException;
 import lombok.Data;
 import lombok.Getter;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -29,50 +28,75 @@ import javax.annotation.Nullable;
 import java.lang.reflect.Type;
 import java.util.Objects;
 
-/** Element that contains data about a single tool part */
+/**
+ * Element that contains data about a single tool part
+ */
 @Data
 public abstract class PartRequirement {
+
   public static final Serializer SERIALIZER = new Serializer();
 
-  /** Creates a new part requirement for a part */
+  /**
+   * Creates a new part requirement for a part
+   */
   public static PartRequirement ofPart(IToolPart part, int weight) {
     return new PartRequirement.ToolPart(part, weight);
   }
 
-  /** Creates a new part requirement for a stat type */
+  /**
+   * Creates a new part requirement for a stat type
+   */
   public static PartRequirement ofStat(MaterialStatsId statsId, int weight) {
     return new PartRequirement.StatType(statsId, weight);
   }
 
-  /** Weight of this part for the stat builder */
+  /**
+   * Weight of this part for the stat builder
+   */
   private final int weight;
 
-  /** Gets the part for this requirement (if present) */
+  /**
+   * Gets the part for this requirement (if present)
+   */
   @Nullable
   public abstract IToolPart getPart();
 
-  /** If true, this part requirement matches the given item */
+  /**
+   * If true, this part requirement matches the given item
+   */
   public abstract boolean matches(Item item);
 
-  /** If true, this requirement can use the given material */
+  /**
+   * If true, this requirement can use the given material
+   */
   public abstract boolean canUseMaterial(MaterialVariantId material);
 
-  /** Gets the name of this part for the given material */
+  /**
+   * Gets the name of this part for the given material
+   */
   public abstract Component nameForMaterial(MaterialVariantId material);
 
-  /** Gets the stat type for this part */
+  /**
+   * Gets the stat type for this part
+   */
   public abstract MaterialStatsId getStatType();
 
 
   /* Serializing */
 
-  /** Writes a tool definition stat object to a packet buffer */
+  /**
+   * Writes a tool definition stat object to a packet buffer
+   */
   public abstract void write(FriendlyByteBuf buffer);
 
-  /** Writes a tool definition stat object to a packet buffer */
+  /**
+   * Writes a tool definition stat object to a packet buffer
+   */
   public abstract JsonObject serialize();
 
-  /** Reads a tool definition stat object from a packet buffer */
+  /**
+   * Reads a tool definition stat object from a packet buffer
+   */
   public static PartRequirement read(FriendlyByteBuf buffer) {
     if (buffer.readBoolean()) {
       IToolPart part = RecipeHelper.readItem(buffer, IToolPart.class);
@@ -85,8 +109,11 @@ public abstract class PartRequirement {
     }
   }
 
-  /** Serializer logic */
+  /**
+   * Serializer logic
+   */
   protected static class Serializer implements JsonDeserializer<PartRequirement>, JsonSerializer<PartRequirement> {
+
     @Override
     public PartRequirement deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
       JsonObject jsonObject = GsonHelper.convertToJsonObject(json, "part");
@@ -117,10 +144,14 @@ public abstract class PartRequirement {
     }
   }
 
-  /** Implementation that contains a tool part */
+  /**
+   * Implementation that contains a tool part
+   */
   private static class ToolPart extends PartRequirement {
+
     @Getter
     private final IToolPart part;
+
     public ToolPart(IToolPart part, int weight) {
       super(weight);
       this.part = part;
@@ -128,46 +159,50 @@ public abstract class PartRequirement {
 
     @Override
     public boolean matches(Item item) {
-      return part.asItem() == item;
+      return this.part.asItem() == item;
     }
 
     @Override
     public boolean canUseMaterial(MaterialVariantId material) {
-      return part.canUseMaterial(material.getId());
+      return this.part.canUseMaterial(material.getId());
     }
 
     @Override
     public Component nameForMaterial(MaterialVariantId material) {
-      return part.withMaterial(material).getHoverName();
+      return this.part.withMaterial(material).getHoverName();
     }
 
     @Override
     public MaterialStatsId getStatType() {
-      return part.getStatType();
+      return this.part.getStatType();
     }
 
     @Override
     public void write(FriendlyByteBuf buffer) {
       buffer.writeBoolean(true);
-      RecipeHelper.writeItem(buffer, part);
-      buffer.writeVarInt(getWeight());
+      RecipeHelper.writeItem(buffer, this.part);
+      buffer.writeVarInt(this.getWeight());
     }
 
     @Override
     public JsonObject serialize() {
       JsonObject jsonObject = new JsonObject();
-      jsonObject.addProperty("item", Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(part.asItem())).toString());
-      if (getWeight() != 1) {
-        jsonObject.addProperty("weight", getWeight());
+      jsonObject.addProperty("item", Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(this.part.asItem())).toString());
+      if (this.getWeight() != 1) {
+        jsonObject.addProperty("weight", this.getWeight());
       }
       return jsonObject;
     }
   }
 
-  /** Implementation specifying a stat type with no part */
+  /**
+   * Implementation specifying a stat type with no part
+   */
   private static class StatType extends PartRequirement {
+
     @Getter
     private final MaterialStatsId statType;
+
     public StatType(MaterialStatsId statType, int weight) {
       super(weight);
       this.statType = statType;
@@ -186,7 +221,7 @@ public abstract class PartRequirement {
 
     @Override
     public boolean canUseMaterial(MaterialVariantId material) {
-      return MaterialRegistry.getInstance().getMaterialStats(material.getId(), statType).isPresent();
+      return MaterialRegistry.getInstance().getMaterialStats(material.getId(), this.statType).isPresent();
     }
 
     @Override
@@ -197,16 +232,16 @@ public abstract class PartRequirement {
     @Override
     public void write(FriendlyByteBuf buffer) {
       buffer.writeBoolean(false);
-      buffer.writeResourceLocation(statType);
-      buffer.writeVarInt(getWeight());
+      buffer.writeResourceLocation(this.statType);
+      buffer.writeVarInt(this.getWeight());
     }
 
     @Override
     public JsonObject serialize() {
       JsonObject jsonObject = new JsonObject();
-      jsonObject.addProperty("stat", statType.toString());
-      if (getWeight() != 1) {
-        jsonObject.addProperty("weight", getWeight());
+      jsonObject.addProperty("stat", this.statType.toString());
+      if (this.getWeight() != 1) {
+        jsonObject.addProperty("weight", this.getWeight());
       }
       return jsonObject;
     }

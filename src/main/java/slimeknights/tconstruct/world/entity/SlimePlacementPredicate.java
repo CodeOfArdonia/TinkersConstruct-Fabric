@@ -12,9 +12,12 @@ import net.minecraft.world.entity.monster.Slime;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Block;
 
-/** Placement predicate using a slime type */
+/**
+ * Placement predicate using a slime type
+ */
 @RequiredArgsConstructor
 public class SlimePlacementPredicate<T extends Slime> implements SpawnPredicate<T> {
+
   private final TagKey<Block> tag;
 
   @Override
@@ -25,6 +28,6 @@ public class SlimePlacementPredicate<T extends Slime> implements SpawnPredicate<
     if (reason == MobSpawnType.SPAWNER) {
       return true;
     }
-    return world.getBlockState(pos.below()).is(tag);
+    return world.getBlockState(pos.below()).is(this.tag);
   }
 }

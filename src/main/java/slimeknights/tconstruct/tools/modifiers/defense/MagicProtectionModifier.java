@@ -23,8 +23,12 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class MagicProtectionModifier extends AbstractProtectionModifier<ModifierMaxLevel> {
-  /** Entity data key for the data associated with this modifier */
+
+  /**
+   * Entity data key for the data associated with this modifier
+   */
   private static final TinkerDataKey<ModifierMaxLevel> MAGIC_DATA = TConstruct.createKey("magic_protection");
+
   public MagicProtectionModifier() {
     super(MAGIC_DATA);
     PotionEvents.POTION_ADDED.register(MagicProtectionModifier::onPotionStart);
@@ -33,7 +37,7 @@ public class MagicProtectionModifier extends AbstractProtectionModifier<Modifier
   @Override
   public float getProtectionModifier(IToolStackView tool, int level, EquipmentContext context, EquipmentSlot slotType, DamageSource source, float modifierValue) {
     if (!source.is(DamageTypeTags.BYPASSES_EFFECTS) && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY) && source.is(DamageTypes.MAGIC)) {
-      modifierValue += getScaledLevel(tool, level) * 2.5f;
+      modifierValue += this.getScaledLevel(tool, level) * 2.5f;
     }
     return modifierValue;
   }
@@ -58,7 +62,7 @@ public class MagicProtectionModifier extends AbstractProtectionModifier<Modifier
           float max = magicData.getMax();
           if (max > 0) {
             // decrease duration by 5% per level
-            int duration = (int)(newEffect.getDuration() * (1 - (max * 0.05f)));
+            int duration = (int) (newEffect.getDuration() * (1 - (max * 0.05f)));
             if (duration < 0) {
               duration = 0;
             }

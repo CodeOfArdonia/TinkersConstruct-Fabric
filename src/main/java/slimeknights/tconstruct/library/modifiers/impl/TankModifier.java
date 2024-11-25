@@ -34,20 +34,31 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.BiFunction;
 
-/** Modifier containing the standard tank, extend if you want to share this tank */
+/**
+ * Modifier containing the standard tank, extend if you want to share this tank
+ */
 @RequiredArgsConstructor
 public class TankModifier extends Modifier {
+
   private static final String FILLED_KEY = TConstruct.makeTranslationKey("modifier", "tank.filled");
   private static final String CAPACITY_KEY = TConstruct.makeTranslationKey("modifier", "tank.capacity");
 
-  /** Volatile NBT string indicating which modifier is in charge of logic for the one tank */
+  /**
+   * Volatile NBT string indicating which modifier is in charge of logic for the one tank
+   */
   private static final ResourceLocation OWNER = TConstruct.getResource("tank_owner");
-  /** Volatile NBT integer indicating the tank's max capacity */
+  /**
+   * Volatile NBT integer indicating the tank's max capacity
+   */
   private static final ResourceLocation CAPACITY = TConstruct.getResource("tank_capacity");
-  /** Persistent NBT compound containing the fluid in the tank */
+  /**
+   * Persistent NBT compound containing the fluid in the tank
+   */
   private static final ResourceLocation FLUID = TConstruct.getResource("tank_fluid");
 
-  /** Helper function to parse a fluid from NBT */
+  /**
+   * Helper function to parse a fluid from NBT
+   */
   public static final BiFunction<CompoundTag, String, FluidStack> PARSE_FLUID = (nbt, key) -> FluidStack.loadFluidStackFromNBT(nbt.getCompound(key));
 
   private ModifierTank tank;
@@ -56,44 +67,44 @@ public class TankModifier extends Modifier {
   @Override
   protected void registerHooks(Builder hookBuilder) {
     super.registerHooks(hookBuilder);
-    tank = new ModifierTank();
-    hookBuilder.addHook(tank, ToolFluidCapability.HOOK);
+    this.tank = new ModifierTank();
+    hookBuilder.addHook(this.tank, ToolFluidCapability.HOOK);
   }
 
   @Override
   public void addVolatileData(ToolRebuildContext context, int level, ModDataNBT volatileData) {
     // set owner first
-    ResourceLocation ownerKey = getOwnerKey();
+    ResourceLocation ownerKey = this.getOwnerKey();
     if (ownerKey != null && !volatileData.contains(ownerKey, Tag.TAG_STRING)) {
-      volatileData.putString(ownerKey, getId().toString());
+      volatileData.putString(ownerKey, this.getId().toString());
     }
-    ToolFluidCapability.addTanks(context, this, volatileData, tank);
-    if (capacity > 0) {
-      addCapacity(volatileData, capacity * level);
+    ToolFluidCapability.addTanks(context, this, volatileData, this.tank);
+    if (this.capacity > 0) {
+      this.addCapacity(volatileData, this.capacity * level);
     }
   }
 
   @Override
   public void addInformation(IToolStackView tool, int level, @Nullable Player player, List<Component> tooltip, TooltipKey tooltipKey, TooltipFlag tooltipFlag) {
-    if (isOwner(tool)) {
-      FluidStack current = getFluid(tool);
+    if (this.isOwner(tool)) {
+      FluidStack current = this.getFluid(tool);
       if (!current.isEmpty()) {
         tooltip.add(Component.translatable(FILLED_KEY, current.getAmount(), current.getDisplayName()));
       }
-      tooltip.add(Component.translatable(CAPACITY_KEY, getCapacity(tool)));
+      tooltip.add(Component.translatable(CAPACITY_KEY, this.getCapacity(tool)));
     }
   }
 
   @Override
   public ValidatedResult validate(IToolStackView tool, int level) {
     // ensure we don't have too much fluid if the capacity changed, if level is 0 there will be a new owner
-    if (level > 0 && isOwner(tool)) {
-      FluidStack fluidStack = getFluid(tool);
+    if (level > 0 && this.isOwner(tool)) {
+      FluidStack fluidStack = this.getFluid(tool);
       if (!fluidStack.isEmpty()) {
-        int capacity = getCapacity(tool);
+        int capacity = this.getCapacity(tool);
         if (fluidStack.getAmount() > capacity) {
           fluidStack.setAmount(capacity);
-          setFluid(tool, fluidStack);
+          this.setFluid(tool, fluidStack);
         }
       }
     }
@@ -106,24 +117,30 @@ public class TankModifier extends Modifier {
     ModDataNBT persistentData = tool.getPersistentData();
     // if no one claims the tank, it either belonged to us or another removed modifier, so clean up data
     if (!persistentData.contains(OWNER, Tag.TAG_STRING)) {
-      persistentData.remove(getFluidKey());
+      persistentData.remove(this.getFluidKey());
     }
   }
 
   /* Resource location keys */
 
-  /** Overridable method to change the owner key */
+  /**
+   * Overridable method to change the owner key
+   */
   @Nullable
   public ResourceLocation getOwnerKey() {
     return OWNER;
   }
 
-  /** Overridable method to change the capacity key */
+  /**
+   * Overridable method to change the capacity key
+   */
   public ResourceLocation getCapacityKey() {
     return CAPACITY;
   }
 
-  /** Overridable method to change the fluid key */
+  /**
+   * Overridable method to change the fluid key
+   */
   public ResourceLocation getFluidKey() {
     return FLUID;
   }
@@ -131,47 +148,61 @@ public class TankModifier extends Modifier {
 
   /* Helpers */
 
-  /** Checks if the given modifier is the owner of the tank */
+  /**
+   * Checks if the given modifier is the owner of the tank
+   */
   public boolean isOwner(IModDataView volatileData) {
-    ResourceLocation key = getOwnerKey();
+    ResourceLocation key = this.getOwnerKey();
     if (key == null) {
       return true;
     }
-    return getId().toString().equals(volatileData.getString(key));
+    return this.getId().toString().equals(volatileData.getString(key));
   }
 
-  /** Checks if the given modifier is the owner of the tank */
+  /**
+   * Checks if the given modifier is the owner of the tank
+   */
   public boolean isOwner(IToolStackView tool) {
-    return isOwner(tool.getVolatileData());
+    return this.isOwner(tool.getVolatileData());
   }
 
-  /** Gets the capacity of the tank */
+  /**
+   * Gets the capacity of the tank
+   */
   public int getCapacity(IModDataView volatileData) {
-    return volatileData.getInt(getCapacityKey());
+    return volatileData.getInt(this.getCapacityKey());
   }
 
-  /** Gets the capacity of the tank */
+  /**
+   * Gets the capacity of the tank
+   */
   public int getCapacity(IToolStackView tool) {
-    return tool.getVolatileData().getInt(getCapacityKey());
+    return tool.getVolatileData().getInt(this.getCapacityKey());
   }
 
-  /** Adds the given capacity into volatile NBT */
+  /**
+   * Adds the given capacity into volatile NBT
+   */
   public void addCapacity(ModDataNBT volatileNBT, long amount) {
-    ResourceLocation key = getCapacityKey();
+    ResourceLocation key = this.getCapacityKey();
     if (volatileNBT.contains(key, Tag.TAG_ANY_NUMERIC)) {
       amount += volatileNBT.getInt(key);
     }
     volatileNBT.putLong(key, amount);
   }
 
-  /** Gets the fluid in the tank */
+  /**
+   * Gets the fluid in the tank
+   */
   public FluidStack getFluid(IToolStackView tool) {
-    return tool.getPersistentData().get(getFluidKey(), PARSE_FLUID);
+    return tool.getPersistentData().get(this.getFluidKey(), PARSE_FLUID);
   }
 
-  /** Sets the fluid in the tank */
+  /**
+   * Sets the fluid in the tank
+   */
   public FluidStack setFluid(ContainerItemContext context, IToolStackView tool, FluidStack fluid, TransactionContext tx) {
-    int capacity = getCapacity(tool);
+    int capacity = this.getCapacity(tool);
     if (fluid.getAmount() > capacity) {
       fluid.setAmount(capacity);
     }
@@ -179,7 +210,7 @@ public class TankModifier extends Modifier {
 
     ToolStack toolStackCopy = ToolStack.copyFrom(newStack);
 
-    toolStackCopy.getPersistentData().put(getFluidKey(), fluid.writeToNBT(new CompoundTag()));
+    toolStackCopy.getPersistentData().put(this.getFluidKey(), fluid.writeToNBT(new CompoundTag()));
 
     newStack.setTag(toolStackCopy.getNbt());
 
@@ -188,119 +219,128 @@ public class TankModifier extends Modifier {
     return fluid;
   }
 
-  /** Sets the fluid in the tank */
+  /**
+   * Sets the fluid in the tank
+   */
   public FluidStack setFluid(IToolStackView tool, FluidStack fluid) {
     if (fluid.isEmpty()) {
-      tool.getPersistentData().remove(getFluidKey());
+      tool.getPersistentData().remove(this.getFluidKey());
       return fluid;
     }
-    int capacity = getCapacity(tool);
+    int capacity = this.getCapacity(tool);
     if (fluid.getAmount() > capacity) {
       fluid.setAmount(capacity);
     }
-    tool.getPersistentData().put(getFluidKey(), fluid.writeToNBT(new CompoundTag()));
+    tool.getPersistentData().put(this.getFluidKey(), fluid.writeToNBT(new CompoundTag()));
     return fluid;
   }
 
   /**
    * Fills the tool with the given resource
-   * @param tool       Tool stack
-   * @param current    Current tank contents
-   * @param resource   Resource to insert
-   * @param amount     Amount to insert, overrides resource amount
-   * @return  Fluid after filling, or empty if nothing changed
+   *
+   * @param tool     Tool stack
+   * @param current  Current tank contents
+   * @param resource Resource to insert
+   * @param amount   Amount to insert, overrides resource amount
+   * @return Fluid after filling, or empty if nothing changed
    */
   public FluidStack fill(ContainerItemContext context, IToolStackView tool, FluidStack current, FluidStack resource, long amount, TransactionContext tx) {
-    int capacity = getCapacity(tool);
+    int capacity = this.getCapacity(tool);
     if (current.isEmpty()) {
       // cap fluid at capacity, store in tool
       resource.setAmount(Math.min(amount, capacity));
-      return setFluid(context, tool, resource, tx);
+      return this.setFluid(context, tool, resource, tx);
     } else if (current.isFluidEqual(resource)) {
       // boost fluid by amount and store
       current.setAmount(Math.min(current.getAmount() + amount, capacity));
-      return setFluid(context, tool, current, tx);
+      return this.setFluid(context, tool, current, tx);
     }
     return FluidStack.EMPTY;
   }
 
   /**
    * Fills the tool with the given resource
-   * @param tool       Tool stack
-   * @param current    Current tank contents
-   * @param resource   Resource to insert
-   * @param amount     Amount to insert, overrides resource amount
-   * @return  Fluid after filling, or empty if nothing changed
+   *
+   * @param tool     Tool stack
+   * @param current  Current tank contents
+   * @param resource Resource to insert
+   * @param amount   Amount to insert, overrides resource amount
+   * @return Fluid after filling, or empty if nothing changed
    */
   public FluidStack fill(IToolStackView tool, FluidStack current, FluidStack resource, long amount) {
-    int capacity = getCapacity(tool);
+    int capacity = this.getCapacity(tool);
     if (current.isEmpty()) {
       // cap fluid at capacity, store in tool
       resource.setAmount(Math.min(amount, capacity));
-      return setFluid(tool, resource);
+      return this.setFluid(tool, resource);
     } else if (current.isFluidEqual(resource)) {
       // boost fluid by amount and store
       current.setAmount(Math.min(current.getAmount() + amount, capacity));
-      return setFluid(tool, current);
+      return this.setFluid(tool, current);
     }
     return FluidStack.EMPTY;
   }
 
   /**
    * Drains the given amount from the tool
-   * @param tool     Tool
-   * @param current  Existing fluid
-   * @param amount   Amount to drain
-   * @return  New fluid
+   *
+   * @param tool    Tool
+   * @param current Existing fluid
+   * @param amount  Amount to drain
+   * @return New fluid
    */
   public FluidStack drain(ContainerItemContext context, IToolStackView tool, FluidStack current, long amount, TransactionContext tx) {
     if (current.getAmount() < amount) {
-      return setFluid(context, tool, FluidStack.EMPTY, tx);
+      return this.setFluid(context, tool, FluidStack.EMPTY, tx);
     } else {
       current.shrink(amount);
-      return setFluid(context, tool, current, tx);
+      return this.setFluid(context, tool, current, tx);
     }
   }
 
   /**
    * Drains the given amount from the tool
-   * @param tool     Tool
-   * @param current  Existing fluid
-   * @param amount   Amount to drain
-   * @return  New fluid
+   *
+   * @param tool    Tool
+   * @param current Existing fluid
+   * @param amount  Amount to drain
+   * @return New fluid
    */
   public FluidStack drain(IToolStackView tool, FluidStack current, long amount) {
     if (current.getAmount() < amount) {
-      return setFluid(tool, FluidStack.EMPTY);
+      return this.setFluid(tool, FluidStack.EMPTY);
     } else {
       current.shrink(amount);
-      return setFluid(tool, current);
+      return this.setFluid(tool, current);
     }
   }
 
-  /** Shared tank implementation of the fluid modifier */
+  /**
+   * Shared tank implementation of the fluid modifier
+   */
   public class ModifierTank implements IFluidModifier, FluidModifierHook {
+
     @Override
     public int getTanks(IModDataView volatileData) {
-      return isOwner(volatileData) ? 1 : 0;
+      return TankModifier.this.isOwner(volatileData) ? 1 : 0;
     }
 
     @Override
     public FluidStack getFluidInTank(IToolStackView tool, int level, int tank) {
-      return isOwner(tool) ? getFluid(tool) : FluidStack.EMPTY;
+      return TankModifier.this.isOwner(tool) ? TankModifier.this.getFluid(tool) : FluidStack.EMPTY;
     }
 
     @Override
     public long getTankCapacity(IToolStackView tool, int level, int tank) {
-      return isOwner(tool) ? getCapacity(tool) : 0;
+      return TankModifier.this.isOwner(tool) ? TankModifier.this.getCapacity(tool) : 0;
     }
 
     @Override
     public long fill(ContainerItemContext context, IToolStackView tool, int level, FluidVariant resource, long maxAmount, TransactionContext tx) {
-      if (!resource.isBlank() && isOwner(tool)) {
+      if (!resource.isBlank() && TankModifier.this.isOwner(tool)) {
         // must not be too full
-        FluidStack current = getFluid(tool);
-        long remaining = getCapacity(tool) - current.getAmount();
+        FluidStack current = TankModifier.this.getFluid(tool);
+        long remaining = TankModifier.this.getCapacity(tool) - current.getAmount();
         if (remaining <= 0) {
           return 0;
         }
@@ -320,9 +360,9 @@ public class TankModifier extends Modifier {
 
     @Override
     public long drain(ContainerItemContext context, IToolStackView tool, int level, FluidVariant resource, long maxAmount, TransactionContext tx) {
-      if (!resource.isBlank() && isOwner(tool)) {
+      if (!resource.isBlank() && TankModifier.this.isOwner(tool)) {
         // fluid type mismatches
-        FluidStack current = getFluid(tool);
+        FluidStack current = TankModifier.this.getFluid(tool);
         if (current.isEmpty() || !current.isFluidEqual(resource)) {
           return 0;
         }
@@ -340,7 +380,7 @@ public class TankModifier extends Modifier {
 
     @Override
     public int getTanks(IToolContext tool, Modifier modifier) {
-      return getTanks(tool.getVolatileData());
+      return this.getTanks(tool.getVolatileData());
     }
 
     @Override
@@ -350,27 +390,27 @@ public class TankModifier extends Modifier {
 
     @Override
     public FluidStack getFluidInTank(IToolStackView tool, ModifierEntry modifier, int tank) {
-      return getFluidInTank(tool, modifier.getLevel(), tank);
+      return this.getFluidInTank(tool, modifier.getLevel(), tank);
     }
 
     @Override
     public long getTankCapacity(IToolStackView tool, ModifierEntry modifier, int tank) {
-      return getTankCapacity(tool, modifier.getLevel(), tank);
+      return this.getTankCapacity(tool, modifier.getLevel(), tank);
     }
 
     @Override
     public boolean isFluidValid(IToolStackView tool, ModifierEntry modifier, int tank, FluidStack fluid) {
-      return isFluidValid(tool, modifier.getLevel(), tank, fluid);
+      return this.isFluidValid(tool, modifier.getLevel(), tank, fluid);
     }
 
     @Override
     public long fill(ContainerItemContext context, IToolStackView tool, ModifierEntry modifier, FluidVariant resource, long maxAmount, TransactionContext tx) {
-      return fill(context, tool, modifier.getLevel(), resource, maxAmount, tx);
+      return this.fill(context, tool, modifier.getLevel(), resource, maxAmount, tx);
     }
 
     @Override
     public long drain(ContainerItemContext context, IToolStackView tool, ModifierEntry modifier, FluidVariant resource, long maxAmount, TransactionContext tx) {
-      return drain(context, tool, modifier.getLevel(), resource, maxAmount, tx);
+      return this.drain(context, tool, modifier.getLevel(), resource, maxAmount, tx);
     }
   }
 }

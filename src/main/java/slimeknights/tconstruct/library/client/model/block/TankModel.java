@@ -6,16 +6,15 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import io.github.fabricators_of_create.porting_lib.models.TransformTypeDependentItemBakedModel;
 import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
 import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
-import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTank;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
 import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel;
-import net.fabricmc.fabric.api.renderer.v1.model.WrapperBakedModel;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachedBlockView;
 import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
@@ -63,9 +62,12 @@ import java.util.function.Supplier;
 @Log4j2
 @AllArgsConstructor
 public class TankModel implements IUnbakedGeometry<TankModel> {
+
   protected static final ResourceLocation BAKE_LOCATION = TConstruct.getResource("dynamic_model_baking");
 
-  /** Shared loader instance */
+  /**
+   * Shared loader instance
+   */
   public static final Loader LOADER = new Loader();
 
   protected final SimpleBlockModel model;
@@ -76,26 +78,31 @@ public class TankModel implements IUnbakedGeometry<TankModel> {
 
   @Override
   public void resolveParents(Function<ResourceLocation, UnbakedModel> modelGetter, BlockModel owner) {
-    model.resolveParents(modelGetter, owner);
-    if (gui != null) {
-      gui.resolveParents(modelGetter, owner);
+    this.model.resolveParents(modelGetter, owner);
+    if (this.gui != null) {
+      this.gui.resolveParents(modelGetter, owner);
     }
   }
 
   @Override
-  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location, boolean isGui3d) {
-    BakedModel baked = model.bakeModel(owner, transform, overrides, spriteGetter, location);
+  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location, boolean isGui3d) {
+    BakedModel baked = this.model.bakeModel(owner, transform, overrides, spriteGetter, location);
     // bake the GUI model if present
     BakedModel bakedGui = baked;
-    if (gui != null) {
-      bakedGui = gui.bakeModel(owner, transform, overrides, spriteGetter, location);
+    if (this.gui != null) {
+      bakedGui = this.gui.bakeModel(owner, transform, overrides, spriteGetter, location);
     }
     return new Baked<>(owner, transform, baked, bakedGui, this);
   }
 
-  /** Override to add the fluid part to the item model */
+  /**
+   * Override to add the fluid part to the item model
+   */
   private static class FluidPartOverride extends ItemOverrides {
-    /** Shared override instance, since the logic is not model dependent */
+
+    /**
+     * Shared override instance, since the logic is not model dependent
+     */
     public static final FluidPartOverride INSTANCE = new FluidPartOverride();
 
     @Override
@@ -120,9 +127,11 @@ public class TankModel implements IUnbakedGeometry<TankModel> {
    * Wrapper that swaps the model for the GUI
    */
   private static class BakedGuiUniqueModel extends ForwardingBakedModel implements TransformTypeDependentItemBakedModel {
+
     private final BakedModel gui;
+
     public BakedGuiUniqueModel(BakedModel base, BakedModel gui) {
-      wrapped = base;
+      this.wrapped = base;
       this.gui = gui;
     }
 
@@ -131,29 +140,31 @@ public class TankModel implements IUnbakedGeometry<TankModel> {
     @Override
     public BakedModel applyTransform(ItemDisplayContext cameraTransformType, PoseStack mat, boolean leftHanded, DefaultTransform defaultTransform) {
       if (cameraTransformType == ItemDisplayContext.GUI) {
-        if(gui instanceof TransformTypeDependentItemBakedModel)
-          return ((TransformTypeDependentItemBakedModel)gui).applyTransform(cameraTransformType, mat, leftHanded, defaultTransform);
-        gui.getTransforms().getTransform(cameraTransformType).apply(leftHanded, mat);
-        return gui;
+        if (this.gui instanceof TransformTypeDependentItemBakedModel)
+          return ((TransformTypeDependentItemBakedModel) this.gui).applyTransform(cameraTransformType, mat, leftHanded, defaultTransform);
+        this.gui.getTransforms().getTransform(cameraTransformType).apply(leftHanded, mat);
+        return this.gui;
       }
-      if(wrapped instanceof TransformTypeDependentItemBakedModel)
-        return ((TransformTypeDependentItemBakedModel)wrapped).applyTransform(cameraTransformType, mat, leftHanded, defaultTransform);
-      wrapped.getTransforms().getTransform(cameraTransformType).apply(leftHanded, mat);
-      return wrapped;
+      if (this.wrapped instanceof TransformTypeDependentItemBakedModel)
+        return ((TransformTypeDependentItemBakedModel) this.wrapped).applyTransform(cameraTransformType, mat, leftHanded, defaultTransform);
+      this.wrapped.getTransforms().getTransform(cameraTransformType).apply(leftHanded, mat);
+      return this.wrapped;
     }
   }
 
   /**
    * Baked variant to load in the custom overrides
-   * @param <T>  Parent model type, used to make this easier to extend
+   *
+   * @param <T> Parent model type, used to make this easier to extend
    */
   @SuppressWarnings("removal")
   public static class Baked<T extends TankModel> extends BakedGuiUniqueModel {
+
     private final BlockModel owner;
     private final ModelState originalTransforms;
     @SuppressWarnings("WeakerAccess")
     protected final T original;
-    private final Cache<FluidStack,BakedModel> cache = CacheBuilder
+    private final Cache<FluidStack, BakedModel> cache = CacheBuilder
       .newBuilder()
       .maximumSize(64)
       .build();
@@ -173,50 +184,52 @@ public class TankModel implements IUnbakedGeometry<TankModel> {
 
     /**
      * Bakes the model with the given fluid element
-     * @param owner        Owner for baking, should include the fluid texture
-     * @param baseModel    Base model for original elements
-     * @param fluid        Fluid element for baking
-     * @param color        Color for the fluid part
-     * @param luminosity   Luminosity for the fluid part
-     * @return  Baked model
+     *
+     * @param owner      Owner for baking, should include the fluid texture
+     * @param baseModel  Base model for original elements
+     * @param fluid      Fluid element for baking
+     * @param color      Color for the fluid part
+     * @param luminosity Luminosity for the fluid part
+     * @return Baked model
      */
     private BakedModel bakeWithFluid(BlockModel owner, SimpleBlockModel baseModel, BlockElement fluid, int color, int luminosity) {
       // setup for baking, using dynamic location and sprite getter
-      Function<Material,TextureAtlasSprite> spriteGetter = Material::sprite;
+      Function<Material, TextureAtlasSprite> spriteGetter = Material::sprite;
       TextureAtlasSprite particle = spriteGetter.apply(owner.getMaterial("particle"));
       SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(owner.hasAmbientOcclusion(), owner.getGuiLight().lightLikeBlock(), true, owner.getTransforms(), ItemOverrides.EMPTY).particle(particle);
       // first, add all regular elements
       for (BlockElement element : baseModel.getElements()) {
-        SimpleBlockModel.bakePart(builder, owner, element, originalTransforms, spriteGetter, BAKE_LOCATION);
+        SimpleBlockModel.bakePart(builder, owner, element, this.originalTransforms, spriteGetter, BAKE_LOCATION);
       }
       // next, add in the fluid
-      ColoredBlockModel.bakePart(builder, owner, fluid, color, luminosity, originalTransforms, spriteGetter, BAKE_LOCATION);
+      ColoredBlockModel.bakePart(builder, owner, fluid, color, luminosity, this.originalTransforms, spriteGetter, BAKE_LOCATION);
       return builder.build();
     }
 
     /**
      * Gets the model with the fluid part added
-     * @param stack  Fluid stack to add
-     * @return  Model with the fluid part
+     *
+     * @param stack Fluid stack to add
+     * @return Model with the fluid part
      */
     private BakedModel getModel(FluidStack stack) {
       // fetch fluid data
       var sprites = FluidVariantRendering.getSprites(stack.getType());
       int color = FluidVariantRendering.getColor(stack.getType());
       int luminosity = FluidVariantAttributes.getLuminance(stack.getType());
-      Map<String,Material> textures = ImmutableMap.of(
+      Map<String, Material> textures = ImmutableMap.of(
         "fluid", new Material(sprites[0].atlasLocation(), sprites[0].contents().name()),
         "flowing_fluid", new Material(sprites[1].atlasLocation(), sprites[1].contents().name()));
-      BlockModel textured = new ExtraTextureConfiguration(owner, textures);
+      BlockModel textured = new ExtraTextureConfiguration(this.owner, textures);
 
       // add fluid part
-      BlockElement fluid = original.fluid.getPart(stack.getAmount(), FluidVariantAttributes.isLighterThanAir(stack.getType()));
+      BlockElement fluid = this.original.fluid.getPart(stack.getAmount(), FluidVariantAttributes.isLighterThanAir(stack.getType()));
       // bake the model
-      BakedModel baked = bakeWithFluid(textured, original.model, fluid, color, luminosity);
+      BakedModel baked = this.bakeWithFluid(textured, this.original.model, fluid, color, luminosity);
 
       // if we have GUI, bake a GUI variant
-      if (original.gui != null) {
-        baked = new BakedGuiUniqueModel(baked, bakeWithFluid(textured, original.gui, fluid, color, 0));
+      if (this.original.gui != null) {
+        baked = new BakedGuiUniqueModel(baked, this.bakeWithFluid(textured, this.original.gui, fluid, color, 0));
       }
 
       // return what we ended up with
@@ -225,14 +238,14 @@ public class TankModel implements IUnbakedGeometry<TankModel> {
 
     /**
      * Gets a cached model with the fluid part added
-     * @param fluid  Scaled contained fluid
-     * @return  Cached model
+     *
+     * @param fluid Scaled contained fluid
+     * @return Cached model
      */
     private BakedModel getCachedModel(FluidStack fluid) {
       try {
-        return cache.get(fluid, () -> getModel(fluid));
-      }
-      catch(ExecutionException e) {
+        return this.cache.get(fluid, () -> this.getModel(fluid));
+      } catch (ExecutionException e) {
         log.error(e);
         return this;
       }
@@ -240,29 +253,29 @@ public class TankModel implements IUnbakedGeometry<TankModel> {
 
     /**
      * Gets a cached model with the fluid part added
-     * @param fluid     Fluid contained
-     * @param capacity  Tank capacity
-     * @return  Cached model
+     *
+     * @param fluid    Fluid contained
+     * @param capacity Tank capacity
+     * @return Cached model
      */
     private BakedModel getCachedModel(FluidStack fluid, long capacity) {
-      int increments = original.fluid.getIncrements();
-      return getCachedModel(new FluidStack(fluid, ChannelBlockEntity.clampL(fluid.getAmount() * increments / capacity, 1, increments)));
+      int increments = this.original.fluid.getIncrements();
+      return this.getCachedModel(new FluidStack(fluid, ChannelBlockEntity.clampL(fluid.getAmount() * increments / capacity, 1, increments)));
     }
-
 
 
     @Override
     public void emitBlockQuads(BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, RenderContext context) {
-      if(blockView instanceof RenderAttachedBlockView renderAttachedBlockView && renderAttachedBlockView.getBlockEntityRenderAttachment(pos) instanceof IModelData data) {
-        if ((original.forceModelFluid || Config.CLIENT.tankFluidModel.get()) && data.hasProperty(ModelProperties.FLUID_TANK)) {
+      if (blockView instanceof RenderAttachedBlockView renderAttachedBlockView && renderAttachedBlockView.getBlockEntityRenderAttachment(pos) instanceof IModelData data) {
+        if ((this.original.forceModelFluid || Config.CLIENT.tankFluidModel.get()) && data.hasProperty(ModelProperties.FLUID_TANK)) {
           FluidTank tank = data.getData(ModelProperties.FLUID_TANK);
           if (tank != null && !tank.getFluid().isEmpty()) {
-            ((FabricBakedModel)getCachedModel(tank.getFluid(), tank.getCapacity())).emitBlockQuads(blockView, state, pos, randomSupplier, context);
+            this.getCachedModel(tank.getFluid(), tank.getCapacity()).emitBlockQuads(blockView, state, pos, randomSupplier, context);
             return;
           }
         }
       }
-      ((FabricBakedModel)wrapped).emitBlockQuads(blockView, state, pos, randomSupplier, context);
+      this.wrapped.emitBlockQuads(blockView, state, pos, randomSupplier, context);
     }
 
     @Override
@@ -272,14 +285,17 @@ public class TankModel implements IUnbakedGeometry<TankModel> {
 
     /**
      * Gets the fluid location
-     * @return  Fluid location data
+     *
+     * @return Fluid location data
      */
     public IncrementalFluidCuboid getFluid() {
-      return original.fluid;
+      return this.original.fluid;
     }
   }
 
-  /** Loader for this model */
+  /**
+   * Loader for this model
+   */
   public static class Loader implements IGeometryLoader<TankModel> {
 
     @Override

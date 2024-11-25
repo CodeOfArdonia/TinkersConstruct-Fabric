@@ -21,13 +21,14 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import java.util.function.Supplier;
 
 public record EmptyBottleIntoWater(Supplier<Item> empty, CauldronInteraction fallback) implements CauldronInteraction {
+
   @Override
   public InteractionResult interact(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, ItemStack stack) {
     if (state.getValue(LayeredCauldronBlock.LEVEL) == 3 || PotionUtils.getPotion(stack) != Potions.WATER) {
-      return fallback.interact(state, level, pos, player, hand, stack);
+      return this.fallback.interact(state, level, pos, player, hand, stack);
     }
     if (!level.isClientSide) {
-      player.setItemInHand(hand, ItemUtils.createFilledResult(stack, player, new ItemStack(empty.get())));
+      player.setItemInHand(hand, ItemUtils.createFilledResult(stack, player, new ItemStack(this.empty.get())));
       player.awardStat(Stats.USE_CAULDRON);
       player.awardStat(Stats.ITEM_USED.get(stack.getItem()));
       level.setBlockAndUpdate(pos, state.cycle(LayeredCauldronBlock.LEVEL));

@@ -14,7 +14,10 @@ import slimeknights.tconstruct.tools.stats.HeadMaterialStats;
  * TODO: rename class
  */
 public class ContentMaterial extends AbstractMaterialContent {
-  /** Page ID for using this index directly */
+
+  /**
+   * Page ID for using this index directly
+   */
   public static final ResourceLocation ID = TConstruct.getResource("toolmaterial");
 
   public ContentMaterial(MaterialVariantId materialVariant, boolean detailed) {
@@ -38,7 +41,7 @@ public class ContentMaterial extends AbstractMaterialContent {
 
   @Override
   protected String getTextKey(MaterialId material) {
-    return String.format(detailed ? "material.%s.%s.encyclopedia" : "material.%s.%s.flavor", material.getNamespace(), material.getPath());
+    return String.format(this.detailed ? "material.%s.%s.encyclopedia" : "material.%s.%s.flavor", material.getNamespace(), material.getPath());
   }
 
   @Override

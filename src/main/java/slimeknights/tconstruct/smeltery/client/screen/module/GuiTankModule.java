@@ -24,7 +24,10 @@ import java.util.function.BiConsumer;
  * Module handling the melter tank UI display
  */
 public class GuiTankModule {
-  /** Tooltip for when the capacity is 0, it breaks some stuff */
+
+  /**
+   * Tooltip for when the capacity is 0, it breaks some stuff
+   */
   private static final Component NO_CAPACITY = Component.translatable(Mantle.makeDescriptionId("gui", "fluid.millibucket"), 0).withStyle(ChatFormatting.GRAY);
 
   private static final int TANK_INDEX = 0;
@@ -32,7 +35,7 @@ public class GuiTankModule {
   private final SlottedStorage<FluidVariant> tank;
   @Getter
   private final int x, y, width, height;
-  private final BiConsumer<Long,List<Component>> formatter;
+  private final BiConsumer<Long, List<Component>> formatter;
 
   public GuiTankModule(AbstractContainerScreen<?> screen, SlottedStorage<FluidVariant> tank, int x, int y, int width, int height, ResourceLocation tooltipId) {
     this.screen = screen;
@@ -46,80 +49,85 @@ public class GuiTankModule {
 
   /**
    * Checks if the tank is hovered over
-   * @param checkX  Screen relative mouse X
-   * @param checkY  Screen relative mouse Y
-   * @return  True if hovered
+   *
+   * @param checkX Screen relative mouse X
+   * @param checkY Screen relative mouse Y
+   * @return True if hovered
    */
   private boolean isHovered(int checkX, int checkY) {
-    return GuiUtil.isHovered(checkX, checkY, x - 1, y - 1, width + 2, height + 2);
+    return GuiUtil.isHovered(checkX, checkY, this.x - 1, this.y - 1, this.width + 2, this.height + 2);
   }
 
   /**
    * Gets the height of the fluid in pixels
-   * @return  Fluid height
+   *
+   * @return Fluid height
    */
   private long getFluidHeight() {
-    long capacity =  tank.getSlot(TANK_INDEX).getCapacity();
+    long capacity = this.tank.getSlot(TANK_INDEX).getCapacity();
     if (capacity == 0) {
-      return height;
+      return this.height;
     }
-    return height * tank.getSlot(TANK_INDEX).getAmount() / capacity;
+    return this.height * this.tank.getSlot(TANK_INDEX).getAmount() / capacity;
   }
 
   /**
    * Draws the tank
-   * @param graphics  Gui graphics instance
+   *
+   * @param graphics Gui graphics instance
    */
   public void draw(GuiGraphics graphics) {
-    GuiUtil.renderFluidTank(graphics.pose(), screen, new FluidStack(tank.getSlot(TANK_INDEX)), tank.getSlot(TANK_INDEX).getCapacity(), x, y, width, height, 100);
+    GuiUtil.renderFluidTank(graphics.pose(), this.screen, new FluidStack(this.tank.getSlot(TANK_INDEX)), this.tank.getSlot(TANK_INDEX).getCapacity(), this.x, this.y, this.width, this.height, 100);
   }
 
   /**
    * Highlights the hovered fluid
-   * @param graphics  Gui graphics instance
-   * @param checkX    Mouse X position, screen relative
-   * @param checkY    Mouse Y position, screen relative
+   *
+   * @param graphics Gui graphics instance
+   * @param checkX   Mouse X position, screen relative
+   * @param checkY   Mouse Y position, screen relative
    */
   public void highlightHoveredFluid(GuiGraphics graphics, int checkX, int checkY) {
     // highlight hovered fluid
-    if (isHovered(checkX, checkY)) {
-      long fluidHeight = getFluidHeight();
-      long middle = y + height - fluidHeight;
+    if (this.isHovered(checkX, checkY)) {
+      long fluidHeight = this.getFluidHeight();
+      long middle = this.y + this.height - fluidHeight;
 
       // highlight just fluid
       if (checkY > middle) {
-        GuiUtil.renderHighlight(graphics, x, (int) middle, width, (int) fluidHeight);
+        GuiUtil.renderHighlight(graphics, this.x, (int) middle, this.width, (int) fluidHeight);
       } else {
         // or highlight empty
-        GuiUtil.renderHighlight(graphics, x, y, width, (int) (height - fluidHeight));
+        GuiUtil.renderHighlight(graphics, this.x, this.y, this.width, (int) (this.height - fluidHeight));
       }
     }
   }
 
   /**
    * Renders the tooltip for hovering over the tank
-   * @param graphics  Gui graphics instance
-   * @param mouseX    Global mouse X position
-   * @param mouseY    Global mouse Y position
+   *
+   * @param graphics Gui graphics instance
+   * @param mouseX   Global mouse X position
+   * @param mouseY   Global mouse Y position
    */
   public void renderTooltip(GuiGraphics graphics, int mouseX, int mouseY) {
-    int checkX = mouseX - screen.leftPos;
-    int checkY = mouseY - screen.topPos;
+    int checkX = mouseX - this.screen.leftPos;
+    int checkY = mouseY - this.screen.topPos;
 
-    if (isHovered(checkX, checkY)) {
-      FluidStack fluid = new FluidStack(tank.getSlot(TANK_INDEX));
+    if (this.isHovered(checkX, checkY)) {
+      FluidStack fluid = new FluidStack(this.tank.getSlot(TANK_INDEX));
       long amount = fluid.getAmount();
-      long capacity = tank.getSlot(TANK_INDEX).getCapacity();
+      long capacity = this.tank.getSlot(TANK_INDEX).getCapacity();
 
       // if hovering over the fluid, display with name
       final List<Component> tooltip;
-      if (capacity > 0 && checkY > (y + height) - getFluidHeight()) {
+      if (capacity > 0 && checkY > (this.y + this.height) - this.getFluidHeight()) {
         tooltip = FluidTooltipHandler.getFluidTooltip(fluid);
       } else {
         // function to call for amounts
         BiConsumer<Long, List<Component>> formatter = Screen.hasShiftDown()
-                                                              ? FluidTooltipHandler.BUCKET_FORMATTER
-                                                              : this.formatter;
+          ? FluidTooltipHandler.BUCKET_FORMATTER
+          : this.formatter;
 
         // add tooltips
         tooltip = new ArrayList<>();
@@ -138,20 +146,21 @@ public class GuiTankModule {
       }
 
       // TODO: renderComponentTooltip->renderTooltip
-      graphics.renderComponentTooltip(Screens.getTextRenderer(screen), tooltip, mouseX, mouseY);
+      graphics.renderComponentTooltip(Screens.getTextRenderer(this.screen), tooltip, mouseX, mouseY);
     }
   }
 
   /**
    * Gets the fluid stack under the mouse
-   * @param checkX  X position to check
-   * @param checkY  Y position to check
-   * @return  Fluid stack under mouse
+   *
+   * @param checkX X position to check
+   * @param checkY Y position to check
+   * @return Fluid stack under mouse
    */
   @Nullable
   public FluidStack getIngreientUnderMouse(int checkX, int checkY) {
-    if (isHovered(checkX, checkY) && checkY > (y + height) - getFluidHeight()) {
-      return new FluidStack(tank.getSlot(TANK_INDEX));
+    if (this.isHovered(checkX, checkY) && checkY > (this.y + this.height) - this.getFluidHeight()) {
+      return new FluidStack(this.tank.getSlot(TANK_INDEX));
     }
     return null;
   }

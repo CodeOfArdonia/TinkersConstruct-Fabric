@@ -11,12 +11,16 @@ import slimeknights.tconstruct.tools.stats.HeadMaterialStats;
 
 import java.util.Set;
 
-/** @deprecated use {@link TierRangeMaterialSectionTransformer} */
+/**
+ * @deprecated use {@link TierRangeMaterialSectionTransformer}
+ */
 @Deprecated
 public class TieredMaterialSectionTransformer extends AbstractMaterialSectionTransformer {
+
   private static final Set<MaterialStatsId> VISIBLE_STATS = ImmutableSet.of(HeadMaterialStats.ID, HandleMaterialStats.ID, ExtraMaterialStats.ID);
 
   private final int materialTier;
+
   public TieredMaterialSectionTransformer(String sectionName, int materialTier, boolean detailed) {
     super(sectionName, detailed);
     this.materialTier = materialTier;

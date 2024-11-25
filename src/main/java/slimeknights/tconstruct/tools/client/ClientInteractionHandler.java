@@ -25,10 +25,15 @@ import slimeknights.tconstruct.tools.network.InteractWithAirPacket;
  */
 @Environment(EnvType.CLIENT)
 public class ClientInteractionHandler {
-  /** If true, next offhand interaction should be canceled, used since we cannot tell Forge to break the hand loop from the main hand */
+
+  /**
+   * If true, next offhand interaction should be canceled, used since we cannot tell Forge to break the hand loop from the main hand
+   */
   private static boolean cancelNextOffhand = false;
 
-  /** Implements the client side of chestplate {@link slimeknights.tconstruct.library.modifiers.hook.interaction.GeneralInteractionModifierHook#onToolUse(IToolStackView, ModifierEntry, Player, InteractionHand, InteractionSource)} */
+  /**
+   * Implements the client side of chestplate {@link slimeknights.tconstruct.library.modifiers.hook.interaction.GeneralInteractionModifierHook#onToolUse(IToolStackView, ModifierEntry, Player, InteractionHand, InteractionSource)}
+   */
   static void chestplateToolUse(Player player, InteractionHand hand) {
     // not sure if anyone sets the result, but just in case listen to it so they can stop us running
 //    if (event.getCancellationResult() != InteractionResult.PASS) {
@@ -54,7 +59,9 @@ public class ClientInteractionHandler {
     }
   }
 
-  /** Prevents an empty right click from running the offhand */
+  /**
+   * Prevents an empty right click from running the offhand
+   */
   static InteractionResult preventDoubleInteract(Minecraft mc, HitResult hit, InteractionHand hand) {
     if (cancelNextOffhand) {
       cancelNextOffhand = false;
@@ -71,7 +78,9 @@ public class ClientInteractionHandler {
     PlayerInteractionEvents.LEFT_CLICK_EMPTY.register(ClientInteractionHandler::leftClickAir);
   }
 
-  /** Implements the client side of left click interaction for {@link slimeknights.tconstruct.library.modifiers.hook.interaction.GeneralInteractionModifierHook#onToolUse(IToolStackView, ModifierEntry, Player, InteractionHand, InteractionSource)} */
+  /**
+   * Implements the client side of left click interaction for {@link slimeknights.tconstruct.library.modifiers.hook.interaction.GeneralInteractionModifierHook#onToolUse(IToolStackView, ModifierEntry, Player, InteractionHand, InteractionSource)}
+   */
   static void leftClickAir(PlayerInteractionEvents.LeftClickEmpty event) {
     // not sure if anyone sets the result, but just in case listen to it so they can stop us running
     if (event.getCancellationResult() != InteractionResult.PASS) {

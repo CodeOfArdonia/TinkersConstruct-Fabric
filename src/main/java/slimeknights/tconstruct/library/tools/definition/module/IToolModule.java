@@ -26,10 +26,15 @@ import java.util.Map.Entry;
  * Base interface for modules within the tool definition data
  */
 public interface IToolModule extends IHaveLoader<IToolModule> {
-  /** Loader instance for any modules loadable in tools */
+
+  /**
+   * Loader instance for any modules loadable in tools
+   */
   GenericLoaderRegistry<IToolModule> LOADER = new GenericLoaderRegistry<>();
 
-  /** Reads the module map from the buffer */
+  /**
+   * Reads the module map from the buffer
+   */
   static ModifierHookMap read(FriendlyByteBuf buffer) {
     int size = buffer.readVarInt();
     ModifierHookMap.Builder builder = new ModifierHookMap.Builder();
@@ -45,7 +50,9 @@ public interface IToolModule extends IHaveLoader<IToolModule> {
     return builder.build();
   }
 
-  /** Writes the module map to the buffer */
+  /**
+   * Writes the module map to the buffer
+   */
   static void write(ModifierHookMap modules, FriendlyByteBuf buffer) {
     // need to filter first else the count will be wrong and break the buffer
     Collection<Entry<ModifierHook<?>, Object>> entries = modules.getAllModules().entrySet().stream().filter(entry -> entry.getValue() instanceof IToolModule).toList();
@@ -56,7 +63,9 @@ public interface IToolModule extends IHaveLoader<IToolModule> {
     }
   }
 
-  /** Logic to serialize and deserialize tool actions */
+  /**
+   * Logic to serialize and deserialize tool actions
+   */
   enum Serializer implements JsonSerializer<ModifierHookMap>, JsonDeserializer<ModifierHookMap> {
     INSTANCE;
 
@@ -64,7 +73,7 @@ public interface IToolModule extends IHaveLoader<IToolModule> {
     public ModifierHookMap deserialize(JsonElement element, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
       JsonObject json = GsonHelper.convertToJsonObject(element, "modules");
       ModifierHookMap.Builder builder = new ModifierHookMap.Builder();
-      for (Entry<String,JsonElement> entry : json.entrySet()) {
+      for (Entry<String, JsonElement> entry : json.entrySet()) {
         ResourceLocation hookName = ResourceLocation.tryParse(entry.getKey());
         if (hookName == null) {
           throw new JsonSyntaxException("Invalid hook name " + entry.getKey());

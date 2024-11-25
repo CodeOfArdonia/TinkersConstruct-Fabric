@@ -18,10 +18,11 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class FireProtectionModifier extends IncrementalModifier {
+
   @Override
   public void addRawData(IToolStackView tool, int level, RestrictedCompoundTag tag) {
     // only get the fire boost if you have a full level
-    EnchantmentModifier.addEnchantmentData(tag, Enchantments.FIRE_PROTECTION, (int)Math.floor(getEffectiveLevel(tool, level)));
+    EnchantmentModifier.addEnchantmentData(tag, Enchantments.FIRE_PROTECTION, (int) Math.floor(this.getEffectiveLevel(tool, level)));
   }
 
   @Override
@@ -33,7 +34,7 @@ public class FireProtectionModifier extends IncrementalModifier {
   public float getProtectionModifier(IToolStackView tool, int level, EquipmentContext context, EquipmentSlot slotType, DamageSource source, float modifierValue) {
     if (!source.is(DamageTypeTags.BYPASSES_EFFECTS) && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY) && source.is(DamageTypeTags.IS_FIRE)) {
       // we already got floored level * 2 boost from the vanilla enchantment, so cancel that out
-      float scaledLevel = getEffectiveLevel(tool, level);
+      float scaledLevel = this.getEffectiveLevel(tool, level);
       modifierValue += scaledLevel * 2.5f - Math.floor(scaledLevel) * 2f;
     }
     return modifierValue;

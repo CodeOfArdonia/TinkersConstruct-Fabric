@@ -16,10 +16,14 @@ import slimeknights.tconstruct.world.worldgen.islands.variants.IIslandVariant;
 
 import java.util.Optional;
 
-/** Base logic for all island variants */
+/**
+ * Base logic for all island variants
+ */
 public abstract class AbstractIslandStructure extends Structure {
-  protected static final String[] SIZES = new String[] { "0x1x0", "2x2x4", "4x1x6", "8x1x11", "11x1x11" };
+
+  protected static final String[] SIZES = new String[]{"0x1x0", "2x2x4", "4x1x6", "8x1x11", "11x1x11"};
   protected final IIslandSettings iIslandSettings;
+
   public AbstractIslandStructure(Structure.StructureSettings structureSettings, IIslandSettings settings) {
     super(structureSettings);
     this.iIslandSettings = settings;
@@ -39,7 +43,7 @@ public abstract class AbstractIslandStructure extends Structure {
     RandomSource random = RandomSource.create(chunkPos.x + chunkPos.z * 0x9E7F71L);
     ChunkGenerator generator = context.chunkGenerator();
     Rotation rotation = Rotation.getRandom(random);
-    int height = iIslandSettings.getHeight(context.chunkPos(), generator, context.heightAccessor(), rotation, random, context.randomState());
+    int height = this.iIslandSettings.getHeight(context.chunkPos(), generator, context.heightAccessor(), rotation, random, context.randomState());
 
     // biome check
     BlockPos targetPos = context.chunkPos().getMiddleBlockPosition(height);
@@ -47,18 +51,25 @@ public abstract class AbstractIslandStructure extends Structure {
     // find variant
     return Optional.of(new GenerationStub(targetPos, builder -> {
       RandomSource rand = context.random();
-      IIslandVariant variant = iIslandSettings.getVariant(rand);
+      IIslandVariant variant = this.iIslandSettings.getVariant(rand);
       Mirror mirror = Util.getRandom(Mirror.values(), rand);
       builder.addPiece(new SlimeIslandPiece(context.structureTemplateManager(), variant, Util.getRandom(SIZES, rand), targetPos, variant.getTreeFeature(rand, context.registryAccess()), rotation, mirror));
     }));
   }
 
-  /** Interface allowing configuring the abstract island */
+  /**
+   * Interface allowing configuring the abstract island
+   */
   protected interface IIslandSettings {
-    /** Gets the variant of this island */
+
+    /**
+     * Gets the variant of this island
+     */
     IIslandVariant getVariant(RandomSource random);
 
-    /** Gets the height to generate this island */
+    /**
+     * Gets the height to generate this island
+     */
     default int getHeight(ChunkPos chunkPos, ChunkGenerator generator, LevelHeightAccessor pLevel, Rotation rotation, RandomSource random, RandomState randomState) {
       int xOffset;
       int yOffset;

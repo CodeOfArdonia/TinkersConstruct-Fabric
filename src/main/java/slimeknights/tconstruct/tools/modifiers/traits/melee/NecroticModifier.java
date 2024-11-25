@@ -26,6 +26,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class NecroticModifier extends Modifier implements ProjectileHitModifierHook {
+
   private static final Component LIFE_STEAL = TConstruct.makeTranslation("modifier", "necrotic.lifesteal");
 
   @Override
@@ -57,7 +58,7 @@ public class NecroticModifier extends Modifier implements ProjectileHitModifierH
         if (projectile instanceof AbstractArrow arrow && arrow.isCritArrow()) {
           // we don't actually know how much damage will be dealt, so just guess by using the standard formula
           // to prevent healing too much, limit by the target's health. Will let you life steal ignoring armor, but eh, only so much we can do efficiently
-          attacker.heal((float)(percent * Math.min(target.getHealth(), arrow.getBaseDamage() * arrow.getDeltaMovement().length())));
+          attacker.heal((float) (percent * Math.min(target.getHealth(), arrow.getBaseDamage() * arrow.getDeltaMovement().length())));
           attacker.level().playSound(null, attacker.getX(), attacker.getY(), attacker.getZ(), Sounds.NECROTIC_HEAL.getSound(), SoundSource.PLAYERS, 1.0f, 1.0f);
         }
       }
@@ -69,7 +70,7 @@ public class NecroticModifier extends Modifier implements ProjectileHitModifierH
   public void addInformation(IToolStackView tool, int level, @Nullable Player player, List<Component> tooltip, TooltipKey tooltipKey, TooltipFlag tooltipFlag) {
     float lifesteal = 0.05f * level;
     if (lifesteal > 0) {
-      tooltip.add(applyStyle(Component.literal(Util.PERCENT_FORMAT.format(lifesteal) + " ").append(LIFE_STEAL)));
+      tooltip.add(this.applyStyle(Component.literal(Util.PERCENT_FORMAT.format(lifesteal) + " ").append(LIFE_STEAL)));
     }
   }
 }

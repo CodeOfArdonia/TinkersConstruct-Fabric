@@ -7,9 +7,12 @@ import slimeknights.tconstruct.library.materials.definition.IMaterial;
 import slimeknights.tconstruct.library.materials.definition.MaterialVariantId;
 import slimeknights.tconstruct.tools.stats.SkullStats;
 
-/** @deprecated use {@link TierRangeMaterialSectionTransformer} */
+/**
+ * @deprecated use {@link TierRangeMaterialSectionTransformer}
+ */
 @Deprecated
 public class SkullMaterialSectionTransformer extends AbstractMaterialSectionTransformer {
+
   public SkullMaterialSectionTransformer(String sectionName, boolean detailed) {
     super(sectionName, detailed);
   }
@@ -21,6 +24,6 @@ public class SkullMaterialSectionTransformer extends AbstractMaterialSectionTran
 
   @Override
   protected AbstractMaterialContent getPageContent(MaterialVariantId material) {
-    return new ContentMaterialSkull(material, detailed);
+    return new ContentMaterialSkull(material, this.detailed);
   }
 }

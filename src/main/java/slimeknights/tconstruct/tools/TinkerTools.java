@@ -1,5 +1,6 @@
 package slimeknights.tconstruct.tools;
 
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import io.github.fabricators_of_create.porting_lib.util.ItemPredicateRegistry;
 import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
@@ -12,13 +13,10 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ArrowItem;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
-import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import slimeknights.mantle.registration.object.EnumObject;
 import slimeknights.mantle.registration.object.ItemObject;
-import slimeknights.mantle.util.SupplierCreativeTab;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.common.TinkerModule;
 import slimeknights.tconstruct.common.TinkerTabs;
@@ -90,16 +88,19 @@ import slimeknights.tconstruct.tools.menu.ToolContainerMenu;
  * Contains all complete tool items
  */
 public final class TinkerTools extends TinkerModule {
+
   public TinkerTools() {
     SlotType.init();
     BlockSideHitListener.init();
     ModifierLootingHandler.init();
     RandomMaterial.init();
-    commonSetup();
-    registerRecipeSerializers();
+    this.commonSetup();
+    this.registerRecipeSerializers();
   }
 
-  /** Loot function type for tool add data */
+  /**
+   * Loot function type for tool add data
+   */
   public static final RegistryObject<LootItemFunctionType> lootAddToolData = LOOT_FUNCTIONS.register("add_tool_data", () -> new LootItemFunctionType(AddToolDataFunction.SERIALIZER));
 
   /*
@@ -134,10 +135,10 @@ public final class TinkerTools extends TinkerModule {
   public static final ItemObject<ModifiableItem> ichorStaff = ITEMS.register("ichor_staff", () -> new ModifiableStaffItem(TOOL, ToolDefinitions.ICHOR_STAFF, TinkerTabs.TAB_TOOLS));
 
   // armor
-  public static final EnumObject<ArmorSlotType,ModifiableArmorItem> travelersGear = ITEMS.registerEnum("travelers", ArmorSlotType.values(), type -> new TravelersGearItem(ArmorDefinitions.TRAVELERS, type, TOOL, TinkerTabs.TAB_TOOLS));
-  public static final EnumObject<ArmorSlotType,ModifiableArmorItem> plateArmor = ITEMS.registerEnum("plate", ArmorSlotType.values(), type -> new PlateArmorItem(ArmorDefinitions.PLATE, type, TOOL, TinkerTabs.TAB_TOOLS));
-  public static final EnumObject<ArmorSlotType,ModifiableArmorItem> slimesuit = new EnumObject.Builder<ArmorSlotType,ModifiableArmorItem>(ArmorSlotType.class)
-    .putAll(ITEMS.registerEnum("slime", new ArmorSlotType[] {ArmorSlotType.BOOTS, ArmorSlotType.LEGGINGS}, type -> new SlimesuitItem(ArmorDefinitions.SLIMESUIT, type, TOOL, TinkerTabs.TAB_TOOLS)))
+  public static final EnumObject<ArmorSlotType, ModifiableArmorItem> travelersGear = ITEMS.registerEnum("travelers", ArmorSlotType.values(), type -> new TravelersGearItem(ArmorDefinitions.TRAVELERS, type, TOOL, TinkerTabs.TAB_TOOLS));
+  public static final EnumObject<ArmorSlotType, ModifiableArmorItem> plateArmor = ITEMS.registerEnum("plate", ArmorSlotType.values(), type -> new PlateArmorItem(ArmorDefinitions.PLATE, type, TOOL, TinkerTabs.TAB_TOOLS));
+  public static final EnumObject<ArmorSlotType, ModifiableArmorItem> slimesuit = new EnumObject.Builder<ArmorSlotType, ModifiableArmorItem>(ArmorSlotType.class)
+    .putAll(ITEMS.registerEnum("slime", new ArmorSlotType[]{ArmorSlotType.BOOTS, ArmorSlotType.LEGGINGS}, type -> new SlimesuitItem(ArmorDefinitions.SLIMESUIT, type, TOOL, TinkerTabs.TAB_TOOLS)))
     .put(ArmorSlotType.CHESTPLATE, ITEMS.register("slime_chestplate", () -> new SlimelytraItem(ArmorDefinitions.SLIMESUIT, TOOL, TinkerTabs.TAB_TOOLS)))
     .put(ArmorSlotType.HELMET, ITEMS.register("slime_helmet", () -> new SlimeskullItem(ArmorDefinitions.SLIMESUIT, TOOL, TinkerTabs.TAB_TOOLS)))
     .build();
@@ -156,13 +157,13 @@ public final class TinkerTools extends TinkerModule {
   /* Entities */
   public static final RegistryObject<EntityType<IndestructibleItemEntity>> indestructibleItem = ENTITIES.register("indestructible_item", () ->
     FabricEntityTypeBuilder.<IndestructibleItemEntity>create(MobCategory.MISC, IndestructibleItemEntity::new)
-                      .dimensions(EntityDimensions.fixed(0.25F, 0.25F))
-                      .fireImmune());
+      .dimensions(EntityDimensions.fixed(0.25F, 0.25F))
+      .fireImmune());
   public static final RegistryObject<EntityType<CrystalshotEntity>> crystalshotEntity = ENTITIES.register("crystalshot", () ->
     FabricEntityTypeBuilder.<CrystalshotEntity>create(MobCategory.MISC, CrystalshotEntity::new)
-                      .dimensions(EntityDimensions.fixed(0.5F, 0.5F))
-                      .trackRangeChunks(4)
-                      .trackedUpdateRate(20));
+      .dimensions(EntityDimensions.fixed(0.5F, 0.5F))
+      .trackRangeChunks(4)
+      .trackedUpdateRate(20));
 
   /* Containers */
   public static final RegistryObject<MenuType<ToolContainerMenu>> toolContainer = MENUS.register("tool_container", ToolContainerMenu::forClient);

@@ -27,9 +27,14 @@ import slimeknights.tconstruct.tools.modifiers.ability.armor.WettingModifier;
 
 import javax.annotation.Nullable;
 
-/** Modifier to handle spilling recipes */
+/**
+ * Modifier to handle spilling recipes
+ */
 public class SpillingModifier extends WettingModifier implements EntityInteractionModifierHook {
-  /** Overridable method to create the attack context */
+
+  /**
+   * Overridable method to create the attack context
+   */
   @Override
   public ToolAttackContext createContext(LivingEntity self, @Nullable Player player, @Nullable Entity attacker, FluidStack fluid) {
     assert attacker != null;
@@ -37,7 +42,9 @@ public class SpillingModifier extends WettingModifier implements EntityInteracti
     return new ToolAttackContext(self, player, InteractionHand.MAIN_HAND, attacker, attacker instanceof LivingEntity living ? living : null, false, 1.0f, false);
   }
 
-  /** Checks if the modifier triggers */
+  /**
+   * Checks if the modifier triggers
+   */
   @Override
   protected boolean doesTrigger(DamageSource source, boolean isDirectDamage) {
     return source.getEntity() != null && isDirectDamage;
@@ -51,7 +58,7 @@ public class SpillingModifier extends WettingModifier implements EntityInteracti
         spawnParticles(context.getTarget(), fluid);
         Player player = context.getPlayerAttacker();
         if (player == null || !player.isCreative()) {
-          setFluid(tool, remaining);
+          this.setFluid(tool, remaining);
         }
       }
     }
@@ -60,7 +67,7 @@ public class SpillingModifier extends WettingModifier implements EntityInteracti
   @Override
   public int afterEntityHit(IToolStackView tool, int level, ToolAttackContext context, float damageDealt) {
     if (damageDealt > 0 && context.isFullyCharged()) {
-      spillFluid(tool, level, context, getFluid(tool));
+      this.spillFluid(tool, level, context, this.getFluid(tool));
     }
     return 0;
   }
@@ -68,7 +75,7 @@ public class SpillingModifier extends WettingModifier implements EntityInteracti
   @Override
   public InteractionResult beforeEntityUse(IToolStackView tool, ModifierEntry modifier, Player player, Entity target, InteractionHand hand, InteractionSource source) {    // melee items get spilling via attack, non melee interact to use it
     if (source != InteractionSource.ARMOR && !tool.hasTag(TinkerTags.Items.MELEE) && tool.getDefinitionData().getModule(ToolModuleHooks.INTERACTION).canInteract(tool, modifier.getId(), source)) {
-      FluidStack fluid = getFluid(tool);
+      FluidStack fluid = this.getFluid(tool);
       if (!fluid.isEmpty()) {
         SpillingFluid recipe = SpillingFluidManager.INSTANCE.find(fluid.getFluid());
         if (recipe.hasEffects()) {
@@ -79,7 +86,7 @@ public class SpillingModifier extends WettingModifier implements EntityInteracti
             FluidStack remaining = recipe.applyEffects(fluid.copy(), level, context);
             spawnParticles(target, fluid);
             if (!player.isCreative()) {
-              setFluid(tool, remaining);
+              this.setFluid(tool, remaining);
             }
 
             // expanded logic, they do not consume fluid, you get some splash for free
@@ -101,7 +108,7 @@ public class SpillingModifier extends WettingModifier implements EntityInteracti
           }
 
           // cooldown based on attack speed/draw speed. both are on the same scale and default to 1, we don't care which one the tool uses
-          player.getCooldowns().addCooldown(tool.getItem(), (int)(20 / (tool.getStats().get(ToolStats.ATTACK_SPEED) * ConditionalStatModifierHook.getModifiedStat(tool, player, ToolStats.DRAW_SPEED))));
+          player.getCooldowns().addCooldown(tool.getItem(), (int) (20 / (tool.getStats().get(ToolStats.ATTACK_SPEED) * ConditionalStatModifierHook.getModifiedStat(tool, player, ToolStats.DRAW_SPEED))));
           return InteractionResult.SUCCESS;
         }
       }

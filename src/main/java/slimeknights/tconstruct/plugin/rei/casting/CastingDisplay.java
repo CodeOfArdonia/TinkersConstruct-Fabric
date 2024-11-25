@@ -26,12 +26,12 @@ public class CastingDisplay implements Display {
 
   @Override
   public List<EntryIngredient> getInputEntries() {
-    return input;
+    return this.input;
   }
 
   @Override
   public List<EntryIngredient> getOutputEntries() {
-    return output;
+    return this.output;
   }
 
   @Override
@@ -40,14 +40,14 @@ public class CastingDisplay implements Display {
   }
 
   public IDisplayableCastingRecipe getRecipe() {
-    return recipe;
+    return this.recipe;
   }
 
   public boolean hasCast() {
-    return recipe.hasCast();
+    return this.recipe.hasCast();
   }
 
   public boolean isConsumed() {
-    return recipe.isConsumed();
+    return this.recipe.isConsumed();
   }
 }

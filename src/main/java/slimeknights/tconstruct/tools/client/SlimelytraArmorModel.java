@@ -23,16 +23,27 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-/** Model to render elytra wings as a chestplate */
+/**
+ * Model to render elytra wings as a chestplate
+ */
 public class SlimelytraArmorModel extends Model {
-  /** Singleton model instance, all data is passed in via setters */
-  private static final SlimelytraArmorModel INSTANCE = new SlimelytraArmorModel();
-  /** Cache of wing texture names */
-  private static final Map<String,RenderType> WING_RENDER_CACHE = new HashMap<>();
-  /** Function to get leg names */
-  private static final Function<String,RenderType> WING_GETTER = mat -> RenderType.entityCutoutNoCullZOffset(new ResourceLocation(SlimesuitItem.makeArmorTexture(mat, "wings")));
 
-  /** Called on resource reload to clear the model caches */
+  /**
+   * Singleton model instance, all data is passed in via setters
+   */
+  private static final SlimelytraArmorModel INSTANCE = new SlimelytraArmorModel();
+  /**
+   * Cache of wing texture names
+   */
+  private static final Map<String, RenderType> WING_RENDER_CACHE = new HashMap<>();
+  /**
+   * Function to get leg names
+   */
+  private static final Function<String, RenderType> WING_GETTER = mat -> RenderType.entityCutoutNoCullZOffset(new ResourceLocation(SlimesuitItem.makeArmorTexture(mat, "wings")));
+
+  /**
+   * Called on resource reload to clear the model caches
+   */
   public static final IdentifiableISafeManagerReloadListener RELOAD_LISTENER = new IdentifiableISafeManagerReloadListener(TConstruct.getResource("slime_elytra_cache")) {
     @Override
     public void onReloadSafe(ResourceManager manager) {
@@ -43,24 +54,33 @@ public class SlimelytraArmorModel extends Model {
 
   /**
    * Gets the model for a given entity
-   * @param living     Entity instance
-   * @param baseModel  Base model
-   * @return  Model for the entity
+   *
+   * @param living    Entity instance
+   * @param baseModel Base model
+   * @return Model for the entity
    */
   public static Model getModel(LivingEntity living, ItemStack stack, HumanoidModel<?> baseModel) {
     INSTANCE.setup(baseModel, living, stack);
     return INSTANCE;
   }
 
-  /** Base elytra model to render */
+  /**
+   * Base elytra model to render
+   */
   @Nullable
   private ElytraModel<LivingEntity> elytraModel;
-  /** Base armor model to render */
+  /**
+   * Base armor model to render
+   */
   @Nullable
   private HumanoidModel<?> base;
-  /** Material name for rendering */
+  /**
+   * Material name for rendering
+   */
   private String material = MaterialIds.enderslime.toString();
-  /** If true, applies the enchantment glint to extra layers */
+  /**
+   * If true, applies the enchantment glint to extra layers
+   */
   private boolean hasGlint = false;
 
   public SlimelytraArmorModel() {
@@ -68,33 +88,35 @@ public class SlimelytraArmorModel extends Model {
   }
 
   private ElytraModel<LivingEntity> getElytraModel() {
-    if (elytraModel == null) {
-      elytraModel = new ElytraModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.ELYTRA));
+    if (this.elytraModel == null) {
+      this.elytraModel = new ElytraModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.ELYTRA));
     }
-    return elytraModel;
+    return this.elytraModel;
   }
 
   @Override
   public void renderToBuffer(PoseStack matrixStackIn, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
-    if (base != null) {
-      base.renderToBuffer(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+    if (this.base != null) {
+      this.base.renderToBuffer(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
       if (ArmorModelHelper.buffer != null) {
         matrixStackIn.pushPose();
         matrixStackIn.translate(0.0D, 0.0D, 0.125D);
-        VertexConsumer elytraBuffer = ItemRenderer.getArmorFoilBuffer(ArmorModelHelper.buffer, WING_RENDER_CACHE.computeIfAbsent(material, WING_GETTER), false, hasGlint);
-        getElytraModel().renderToBuffer(matrixStackIn, elytraBuffer, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+        VertexConsumer elytraBuffer = ItemRenderer.getArmorFoilBuffer(ArmorModelHelper.buffer, WING_RENDER_CACHE.computeIfAbsent(this.material, WING_GETTER), false, this.hasGlint);
+        this.getElytraModel().renderToBuffer(matrixStackIn, elytraBuffer, packedLightIn, packedOverlayIn, red, green, blue, alpha);
         matrixStackIn.popPose();
       }
     }
   }
 
-  /** Called before the model is rendered to set the base model and the elytra entity data */
+  /**
+   * Called before the model is rendered to set the base model and the elytra entity data
+   */
   private void setup(HumanoidModel<?> base, LivingEntity living, ItemStack stack) {
     this.base = base;
-    ElytraModel<LivingEntity> elytraModel = getElytraModel();
+    ElytraModel<LivingEntity> elytraModel = this.getElytraModel();
     elytraModel.setupAnim(living, 0, 0, 0, 0, 0);
     ArmorModelHelper.copyProperties(base, elytraModel);
-    material = SlimesuitItem.getMaterial(stack);
-    hasGlint = stack.hasFoil();
+    this.material = SlimesuitItem.getMaterial(stack);
+    this.hasGlint = stack.hasFoil();
   }
 }

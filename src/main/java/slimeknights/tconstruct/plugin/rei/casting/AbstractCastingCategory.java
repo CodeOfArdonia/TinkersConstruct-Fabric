@@ -1,6 +1,5 @@
 package slimeknights.tconstruct.plugin.rei.casting;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import dev.architectury.fluid.FluidStack;
 import lombok.Getter;
 import me.shedaniel.math.Point;
@@ -35,6 +34,7 @@ import java.util.Collections;
 import java.util.List;
 
 public abstract class AbstractCastingCategory implements TinkersCategory<CastingDisplay>, IRecipeTooltipReplacement {
+
   private static final String KEY_COOLING_TIME = TConstruct.makeTranslationKey("jei", "time");
   private static final String KEY_CAST_KEPT = TConstruct.makeTranslationKey("jei", "casting.cast_kept");
   private static final String KEY_CAST_CONSUMED = TConstruct.makeTranslationKey("jei", "casting.cast_consumed");
@@ -72,7 +72,7 @@ public abstract class AbstractCastingCategory implements TinkersCategory<Casting
 
   @Override
   public List<Component> getTooltipStrings(CastingDisplay display, List<Widget> widgets, double mouseX, double mouseY) {
-    if (display.hasCast() && GuiUtil.isHovered((int)mouseX, (int)mouseY, 63, 39, 13, 11)) {
+    if (display.hasCast() && GuiUtil.isHovered((int) mouseX, (int) mouseY, 63, 39, 13, 11)) {
       return Collections.singletonList(Component.translatable(display.isConsumed() ? KEY_CAST_CONSUMED : KEY_CAST_KEPT));
     }
     return Collections.emptyList();
@@ -85,36 +85,36 @@ public abstract class AbstractCastingCategory implements TinkersCategory<Casting
     // items
     List<ItemStack> casts = recipe.getCastItems();
     if (!casts.isEmpty()) {
-      ingredients.add(slot(38, 19, origin).markInput().entries(EntryIngredients.ofItemStacks(casts)).disableBackground());
+      ingredients.add(this.slot(38, 19, origin).markInput().entries(EntryIngredients.ofItemStacks(casts)).disableBackground());
     }
-    ingredients.add(slot(93, 18, origin).markOutput().entry(EntryStacks.of(recipe.getOutput())).disableBackground());
+    ingredients.add(this.slot(93, 18, origin).markOutput().entry(EntryStacks.of(recipe.getOutput())).disableBackground());
 
     // fluids
     // tank fluids
     long capacity = FluidValues.METAL_BLOCK;
-    Slot input = slot(3, 3, origin).markInput()
+    Slot input = this.slot(3, 3, origin).markInput()
       .disableBackground()
       .entries(EntryIngredients.of(VanillaEntryTypes.FLUID, TinkersCategory.toREIFluids(recipe.getFluids())));
     input.getEntries().forEach(entryStack -> ClientEntryStacks.setFluidRenderRatio(entryStack.cast(), entryStack.<FluidStack>castValue().getAmount() / (float) capacity));
     input.getBounds().setSize(34, 34);
     ingredients.add(input);
-    ingredients.add(tankOverlay.build(3, 3, origin));
+    ingredients.add(this.tankOverlay.build(3, 3, origin));
     // pouring fluid
     int h = 11;
     if (!display.hasCast()) {
       h += 16;
     }
-    Slot renderInput = slot(43, 8, origin)
+    Slot renderInput = this.slot(43, 8, origin)
       .disableBackground()
       .entries(EntryIngredients.of(VanillaEntryTypes.FLUID, TinkersCategory.toREIFluids(recipe.getFluids())));
     renderInput.getBounds().setSize(8, h + 2);
     ingredients.add(renderInput);
 
-    ingredients.add(new ArrowWidget(point(58, 18, origin), BACKGROUND_LOC, 117, 32).animationDurationTicks(Math.max(1, recipe.getCoolingTime())));
-    ingredients.add(block.build(38, 35, origin));
+    ingredients.add(new ArrowWidget(this.point(58, 18, origin), BACKGROUND_LOC, 117, 32).animationDurationTicks(Math.max(1, recipe.getCoolingTime())));
+    ingredients.add(this.block.build(38, 35, origin));
 
     if (display.hasCast()) {
-      ingredients.add((display.isConsumed() ? castConsumed : castKept).build(63, 39, origin));
+      ingredients.add((display.isConsumed() ? this.castConsumed : this.castKept).build(63, 39, origin));
     }
   }
 

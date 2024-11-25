@@ -19,22 +19,35 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-/** This item applies the correct texture for a given material */
+/**
+ * This item applies the correct texture for a given material
+ */
 public class SlimesuitItem extends ModifiableArmorItem implements ArmorTextureItem {
-  /** Cache of armor texture names */
-  private static final Map<String,String> ARMOR_TEXTURE_CACHE = new HashMap<>();
-  /** Cache of leg texture names */
-  private static final Map<String,String> LEG_TEXTURE_CACHE = new HashMap<>();
-  /** Function to get armor names */
-  private static final Function<String,String> ARMOR_GETTER = mat -> makeArmorTexture(mat, "layer_1");
-  /** Function to get leg names */
-  private static final Function<String,String> LEG_GETTER = mat -> makeArmorTexture(mat, "layer_2");
+
+  /**
+   * Cache of armor texture names
+   */
+  private static final Map<String, String> ARMOR_TEXTURE_CACHE = new HashMap<>();
+  /**
+   * Cache of leg texture names
+   */
+  private static final Map<String, String> LEG_TEXTURE_CACHE = new HashMap<>();
+  /**
+   * Function to get armor names
+   */
+  private static final Function<String, String> ARMOR_GETTER = mat -> makeArmorTexture(mat, "layer_1");
+  /**
+   * Function to get leg names
+   */
+  private static final Function<String, String> LEG_GETTER = mat -> makeArmorTexture(mat, "layer_2");
 
   public SlimesuitItem(ModifiableArmorMaterial material, ArmorSlotType slotType, Properties properties, ResourceKey<CreativeModeTab> tab) {
     super(material, slotType, properties, tab);
   }
 
-  /** Gets the material from a given stack */
+  /**
+   * Gets the material from a given stack
+   */
   public static String getMaterial(ItemStack stack) {
     if (ModifierUtil.getModifierLevel(stack, TinkerModifiers.golden.getId()) > 0) {
       return MaterialIds.gold.toString();
@@ -46,7 +59,9 @@ public class SlimesuitItem extends ModifiableArmorItem implements ArmorTextureIt
     return key;
   }
 
-  /** Creates the texture for a regular armor texture */
+  /**
+   * Creates the texture for a regular armor texture
+   */
   public static String makeArmorTexture(String material, String texture) {
     ResourceLocation location = ResourceLocation.tryParse(material);
     if (location == null) {

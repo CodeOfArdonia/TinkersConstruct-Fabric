@@ -7,6 +7,7 @@ import slimeknights.tconstruct.tools.logic.InteractionHandler;
 import slimeknights.tconstruct.tools.logic.ToolEvents;
 
 public class FabricEvents {
+
   public static void init() {
     FluidEvents.onFurnaceFuel();
     ToolEvents.init();
@@ -14,7 +15,7 @@ public class FabricEvents {
     AchievementEvents.init();
     InteractionHandler.init();
   }
-  
+
 //  private static class Client {
 //    @Environment(EnvType.CLIENT)
 //    private static void init() {

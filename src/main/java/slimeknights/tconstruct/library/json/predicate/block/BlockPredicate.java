@@ -13,20 +13,32 @@ import static slimeknights.mantle.data.GenericLoaderRegistry.SingletonLoader.sin
 
 /**
  * Simple serializable block predicate
+ *
  * @deprecated use {@link slimeknights.mantle.data.predicate.block.BlockPredicate}
  */
 @Deprecated
 public interface BlockPredicate extends IJsonPredicate<BlockState> {
-  /** Loader for block state predicates */
-  GenericLoaderRegistry<IJsonPredicate<BlockState>> LOADER = new GenericLoaderRegistry<>(true);
-  /** Loader for inverted conditions */
-  InvertedJsonPredicate.Loader<BlockState> INVERTED = new InvertedJsonPredicate.Loader<>(LOADER);
-  /** Loader for and conditions */
-  NestedJsonPredicateLoader<BlockState,AndJsonPredicate<BlockState>> AND = AndJsonPredicate.createLoader(LOADER, INVERTED);
-  /** Loader for or conditions */
-  NestedJsonPredicateLoader<BlockState,OrJsonPredicate<BlockState>> OR = OrJsonPredicate.createLoader(LOADER, INVERTED);
 
-  /** Gets an inverted condition */
+  /**
+   * Loader for block state predicates
+   */
+  GenericLoaderRegistry<IJsonPredicate<BlockState>> LOADER = new GenericLoaderRegistry<>(true);
+  /**
+   * Loader for inverted conditions
+   */
+  InvertedJsonPredicate.Loader<BlockState> INVERTED = new InvertedJsonPredicate.Loader<>(LOADER);
+  /**
+   * Loader for and conditions
+   */
+  NestedJsonPredicateLoader<BlockState, AndJsonPredicate<BlockState>> AND = AndJsonPredicate.createLoader(LOADER, INVERTED);
+  /**
+   * Loader for or conditions
+   */
+  NestedJsonPredicateLoader<BlockState, OrJsonPredicate<BlockState>> OR = OrJsonPredicate.createLoader(LOADER, INVERTED);
+
+  /**
+   * Gets an inverted condition
+   */
   @Override
   default IJsonPredicate<BlockState> inverted() {
     return INVERTED.create(this);
@@ -35,7 +47,9 @@ public interface BlockPredicate extends IJsonPredicate<BlockState> {
 
   /* Singleton */
 
-  /** Predicate that matches blocks with no harvest tool */
+  /**
+   * Predicate that matches blocks with no harvest tool
+   */
   BlockPredicate REQUIRES_TOOL = singleton(loader -> new BlockPredicate() {
     @Override
     public boolean matches(BlockState input) {

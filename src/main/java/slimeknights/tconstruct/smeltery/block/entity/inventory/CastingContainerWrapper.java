@@ -16,6 +16,7 @@ import javax.annotation.Nullable;
  */
 @RequiredArgsConstructor
 public class CastingContainerWrapper implements ICastingContainer {
+
   private final CastingBlockEntity tile;
   @Setter
   private FluidStack fluid;
@@ -23,8 +24,8 @@ public class CastingContainerWrapper implements ICastingContainer {
 
   @Override
   public ItemStack getStack() {
-    ItemStack stack = tile.getItem(switchSlots ? CastingBlockEntity.OUTPUT : CastingBlockEntity.INPUT);
-    if (stack.is(tile.getEmptyCastTag())) {
+    ItemStack stack = this.tile.getItem(this.switchSlots ? CastingBlockEntity.OUTPUT : CastingBlockEntity.INPUT);
+    if (stack.is(this.tile.getEmptyCastTag())) {
       return ItemStack.EMPTY;
     }
     return stack;
@@ -32,22 +33,26 @@ public class CastingContainerWrapper implements ICastingContainer {
 
   @Override
   public Fluid getFluid() {
-    return fluid.getFluid();
+    return this.fluid.getFluid();
   }
 
   @Nullable
   @Override
   public CompoundTag getFluidTag() {
-    return fluid.getTag();
+    return this.fluid.getTag();
   }
 
-  /** Uses the input for input (default) */
+  /**
+   * Uses the input for input (default)
+   */
   public void useInput() {
-    switchSlots = false;
+    this.switchSlots = false;
   }
 
-  /** Uses the output for input (for multistep casting) */
+  /**
+   * Uses the output for input (for multistep casting)
+   */
   public void useOutput() {
-    switchSlots = true;
+    this.switchSlots = true;
   }
 }

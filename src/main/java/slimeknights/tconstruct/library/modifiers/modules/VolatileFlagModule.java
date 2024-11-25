@@ -16,12 +16,13 @@ import java.util.List;
  * Module that just sets a boolean flag to true on a tool
  */
 public record VolatileFlagModule(ResourceLocation flag) implements VolatileDataModifierHook, ModifierModule {
+
   private static final List<ModifierHook<?>> DEFAULT_HOOKS = List.of(TinkerHooks.VOLATILE_DATA);
   public static final IGenericLoader<VolatileFlagModule> LOADER = new GenericResourceLocationLoader<>("flag", VolatileFlagModule::new, VolatileFlagModule::flag);
 
   @Override
   public void addVolatileData(ToolRebuildContext context, ModifierEntry modifier, ModDataNBT volatileData) {
-    volatileData.putBoolean(flag, true);
+    volatileData.putBoolean(this.flag, true);
   }
 
   @Override

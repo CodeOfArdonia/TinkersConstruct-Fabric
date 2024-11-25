@@ -35,37 +35,64 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/** Shared logic between modifier and incremental modifier recipes */
+/**
+ * Shared logic between modifier and incremental modifier recipes
+ */
 public abstract class AbstractModifierRecipe implements ITinkerStationRecipe, IDisplayModifierRecipe {
-  /** Error for when the tool is at the max modifier level */
+
+  /**
+   * Error for when the tool is at the max modifier level
+   */
   protected static final String KEY_MAX_LEVEL = TConstruct.makeTranslationKey("recipe", "modifier.max_level");
-  /** Error for when the tool has too few upgrade slots */
+  /**
+   * Error for when the tool has too few upgrade slots
+   */
   protected static final String KEY_NOT_ENOUGH_SLOTS = TConstruct.makeTranslationKey("recipe", "modifier.not_enough_slots");
-  /** Error for when the tool has too few upgrade slots from a single slot */
+  /**
+   * Error for when the tool has too few upgrade slots from a single slot
+   */
   protected static final String KEY_NOT_ENOUGH_SLOT = TConstruct.makeTranslationKey("recipe", "modifier.not_enough_slot");
-  /** Generic requirements error, for if a proper error is missing */
+  /**
+   * Generic requirements error, for if a proper error is missing
+   */
   protected static final ValidatedResult REQUIREMENTS_ERROR = ModifierRecipeLookup.DEFAULT_ERROR;
 
   @Getter
   private final ResourceLocation id;
-  /** Ingredient representing the required tool, typically a tag */
+  /**
+   * Ingredient representing the required tool, typically a tag
+   */
   protected final Ingredient toolRequirement;
-  /** Max size of the tool for this modifier. If the tool size is smaller, the stack will reduce by less */
+  /**
+   * Max size of the tool for this modifier. If the tool size is smaller, the stack will reduce by less
+   */
   protected final int maxToolSize;
-  /** Modifiers that must match for this recipe */
+  /**
+   * Modifiers that must match for this recipe
+   */
   protected final ModifierMatch requirements;
-  /** Error message to display if the requirements do not match */
+  /**
+   * Error message to display if the requirements do not match
+   */
   protected final String requirementsError;
-  /** Modifier this recipe is adding */
+  /**
+   * Modifier this recipe is adding
+   */
   protected final ModifierEntry result;
-  /** Maximum level of this modifier allowed */
+  /**
+   * Maximum level of this modifier allowed
+   */
   @Getter
   private final int maxLevel;
-  /** Gets the slots required by this recipe. If null, no slots required */
+  /**
+   * Gets the slots required by this recipe. If null, no slots required
+   */
   @Getter
   @Nullable
   private final SlotCount slots;
-  /** If true, this recipe can be applied using modifier crystals */
+  /**
+   * If true, this recipe can be applied using modifier crystals
+   */
   protected final boolean allowCrystal;
 
   protected AbstractModifierRecipe(ResourceLocation id, Ingredient toolRequirement, int maxToolSize, ModifierMatch requirements,
@@ -83,7 +110,9 @@ public abstract class AbstractModifierRecipe implements ITinkerStationRecipe, ID
     ModifierRecipeLookup.addRequirements(toolRequirement, result, requirements, requirementsError);
   }
 
-  /** @deprecated use {@link #AbstractModifierRecipe(ResourceLocation, Ingredient, int, ModifierMatch, String, ModifierEntry, int, SlotCount, boolean)} */
+  /**
+   * @deprecated use {@link #AbstractModifierRecipe(ResourceLocation, Ingredient, int, ModifierMatch, String, ModifierEntry, int, SlotCount, boolean)}
+   */
   @Deprecated
   protected AbstractModifierRecipe(ResourceLocation id, Ingredient toolRequirement, int maxToolSize, ModifierMatch requirements,
                                    String requirementsError, ModifierEntry result, int maxLevel, @Nullable SlotCount slots) {
@@ -93,91 +122,106 @@ public abstract class AbstractModifierRecipe implements ITinkerStationRecipe, ID
   @Override
   public abstract ValidatedResult getValidatedResult(ITinkerStationContainer inv, RegistryAccess registryAccess);
 
-  /** @deprecated use {@link #getValidatedResult(ITinkerStationContainer)} */
-  @Override @Deprecated
+  /**
+   * @deprecated use {@link #getValidatedResult(ITinkerStationContainer)}
+   */
+  @Override
+  @Deprecated
   public ItemStack getResultItem(RegistryAccess access) {
     return ItemStack.EMPTY;
   }
 
   @Override
   public int shrinkToolSlotBy() {
-    return maxToolSize;
+    return this.maxToolSize;
   }
 
   /* JEI display */
-  /** Cache of input items shared between result and input */
+  /**
+   * Cache of input items shared between result and input
+   */
   @Nullable
   private List<ItemStack> toolInputs = null;
 
-  /** Gets or builds the list of tool inputs */
+  /**
+   * Gets or builds the list of tool inputs
+   */
   List<ItemStack> getToolInputs() {
-    if (toolInputs == null) {
-      toolInputs = Arrays.stream(this.toolRequirement.getItems()).map(stack -> {
+    if (this.toolInputs == null) {
+      this.toolInputs = Arrays.stream(this.toolRequirement.getItems()).map(stack -> {
         if (stack.getItem() instanceof IModifiableDisplay) {
-          return ((IModifiableDisplay)stack.getItem()).getRenderTool();
+          return ((IModifiableDisplay) stack.getItem()).getRenderTool();
         }
         return stack;
       }).collect(Collectors.toList());
     }
-    return toolInputs;
+    return this.toolInputs;
   }
 
-  /** Cache of display tool inputs */
+  /**
+   * Cache of display tool inputs
+   */
   private List<ItemStack> displayInputs = null;
 
-  /** Cache of display output */
+  /**
+   * Cache of display output
+   */
   List<ItemStack> toolWithModifier = null;
 
-  /** Display result, may be a higher level than real result */
+  /**
+   * Display result, may be a higher level than real result
+   */
   private ModifierEntry displayResult;
 
   @Override
   public ModifierEntry getDisplayResult() {
-    if (displayResult == null) {
+    if (this.displayResult == null) {
       // if the recipe has a minimum level of this modifier, add that min level to the display result
-      int min = requirements.getMinLevel(result.getId());
+      int min = this.requirements.getMinLevel(this.result.getId());
       if (min > 0) {
-        displayResult = new ModifierEntry(result.getId(), result.getLevel() + min);
+        this.displayResult = new ModifierEntry(this.result.getId(), this.result.getLevel() + min);
       } else {
-        displayResult = result;
+        this.displayResult = this.result;
       }
     }
-    return displayResult;
+    return this.displayResult;
   }
 
   @Override
   public List<ItemStack> getToolWithoutModifier() {
-    if (displayInputs == null) {
-      displayInputs = getToolInputs().stream().map(stack -> IDisplayModifierRecipe.withModifiers(stack, requirements, null)).collect(Collectors.toList());
+    if (this.displayInputs == null) {
+      this.displayInputs = this.getToolInputs().stream().map(stack -> IDisplayModifierRecipe.withModifiers(stack, this.requirements, null)).collect(Collectors.toList());
     }
-    return displayInputs;
+    return this.displayInputs;
   }
 
   @Override
   public List<ItemStack> getToolWithModifier() {
-    if (toolWithModifier == null) {
-      toolWithModifier = getToolInputs().stream().map(stack -> IDisplayModifierRecipe.withModifiers(stack, requirements, result)).collect(Collectors.toList());
+    if (this.toolWithModifier == null) {
+      this.toolWithModifier = this.getToolInputs().stream().map(stack -> IDisplayModifierRecipe.withModifiers(stack, this.requirements, this.result)).collect(Collectors.toList());
     }
-    return toolWithModifier;
+    return this.toolWithModifier;
   }
 
   @Override
   public boolean hasRequirements() {
-    return requirements != ModifierMatch.ALWAYS;
+    return this.requirements != ModifierMatch.ALWAYS;
   }
 
   @Override
   public String getRequirementsError() {
-    if (requirementsError.isEmpty()) {
+    if (this.requirementsError.isEmpty()) {
       return ModifierRecipeLookup.DEFAULT_ERROR_KEY;
     }
-    return requirementsError;
+    return this.requirementsError;
   }
 
 
   /* Helpers */
 
-  /** Checks if the inventory contains a crystal */
+  /**
+   * Checks if the inventory contains a crystal
+   */
   public static boolean matchesCrystal(ITinkerStationContainer container, ModifierEntry match) {
     boolean found = false;
     for (int i = 0; i < container.getInputCount(); i++) {
@@ -199,13 +243,17 @@ public abstract class AbstractModifierRecipe implements ITinkerStationRecipe, ID
     return found;
   }
 
-  /** Checks if the inventory contains a crystal */
+  /**
+   * Checks if the inventory contains a crystal
+   */
   protected boolean matchesCrystal(ITinkerStationContainer container) {
-    return allowCrystal && matchesCrystal(container, result);
+    return this.allowCrystal && matchesCrystal(container, this.result);
   }
 
 
-  /** Gets the modifiers list for a tool, ignoring partial levels from incremental modifiers */
+  /**
+   * Gets the modifiers list for a tool, ignoring partial levels from incremental modifiers
+   */
   public static List<ModifierEntry> getModifiersIgnoringPartial(ToolStack toolStack) {
     ImmutableList.Builder<ModifierEntry> finalList = ImmutableList.builder();
     IModDataView persistentData = toolStack.getPersistentData();
@@ -229,20 +277,23 @@ public abstract class AbstractModifierRecipe implements ITinkerStationRecipe, ID
     return finalList.build();
   }
 
-  /** Validates just the modifier requirements */
+  /**
+   * Validates just the modifier requirements
+   */
   protected ValidatedResult validateRequirements(ToolStack tool) {
     // validate modifier prereqs, skip building fancy list for always
-    if (requirements != ModifierMatch.ALWAYS && !requirements.test(getModifiersIgnoringPartial(tool))) {
-      return requirementsError.isEmpty() ? REQUIREMENTS_ERROR : ValidatedResult.failure(requirementsError);
+    if (this.requirements != ModifierMatch.ALWAYS && !this.requirements.test(getModifiersIgnoringPartial(tool))) {
+      return this.requirementsError.isEmpty() ? REQUIREMENTS_ERROR : ValidatedResult.failure(this.requirementsError);
     }
     return ValidatedResult.PASS;
   }
 
   /**
    * Validate tool has the right number of slots, called internally by {@link #validatePrerequisites(ToolStack)}
-   * @param tool   Tool instance
-   * @param slots  Required slots
-   * @return  Validated result with error, or pass if no error
+   *
+   * @param tool  Tool instance
+   * @param slots Required slots
+   * @return Validated result with error, or pass if no error
    */
   protected static ValidatedResult checkSlots(IToolStackView tool, @Nullable SlotCount slots) {
     if (slots != null) {
@@ -260,39 +311,47 @@ public abstract class AbstractModifierRecipe implements ITinkerStationRecipe, ID
 
   /**
    * Validates that this tool meets the modifier requirements, is not too high of a level, and has enough upgrade/ability slots
-   * @param tool           Tool stack instance   TODO change type to view
-   * @return  Validated result with error, or pass if no error
+   *
+   * @param tool Tool stack instance   TODO change type to view
+   * @return Validated result with error, or pass if no error
    */
   protected ValidatedResult validatePrerequisites(ToolStack tool) {
-    ValidatedResult requirements = validateRequirements(tool);
+    ValidatedResult requirements = this.validateRequirements(tool);
     if (requirements.hasError()) {
       return requirements;
     }
     // max level of modifier
-    if (maxLevel != 0 && tool.getUpgrades().getLevel(result.getId()) + result.getLevel() > maxLevel) {
-      return ValidatedResult.failure(KEY_MAX_LEVEL, result.getModifier().getDisplayName(), maxLevel);
+    if (this.maxLevel != 0 && tool.getUpgrades().getLevel(this.result.getId()) + this.result.getLevel() > this.maxLevel) {
+      return ValidatedResult.failure(KEY_MAX_LEVEL, this.result.getModifier().getDisplayName(), this.maxLevel);
     }
-    return checkSlots(tool, slots);
+    return checkSlots(tool, this.slots);
   }
 
-  /** Shared serializer logic */
+  /**
+   * Shared serializer logic
+   */
   public static abstract class Serializer<T extends AbstractModifierRecipe> extends LoggingRecipeSerializer<T> {
+
     /**
      * Reads any remaining data from the modifier recipe
      * TODO 1.19: add allowCrystal
-     * @return  Full recipe instance
+     *
+     * @return Full recipe instance
      */
     public abstract T fromJson(ResourceLocation id, JsonObject json, Ingredient toolRequirement, int maxToolSize, ModifierMatch requirements,
-                           String requirementsError, ModifierEntry result, int maxLevel, @Nullable SlotCount slots);
+                               String requirementsError, ModifierEntry result, int maxLevel, @Nullable SlotCount slots);
 
     /**
      * Reads any remaining data from the modifier recipe
-     * @return  Full recipe instance
+     *
+     * @return Full recipe instance
      */
     public abstract T fromNetwork(ResourceLocation id, FriendlyByteBuf buffer, Ingredient toolRequirement, int maxToolSize, ModifierMatch requirements,
-                  String requirementsError, ModifierEntry result, int maxLevel, @Nullable SlotCount slots);
+                                  String requirementsError, ModifierEntry result, int maxLevel, @Nullable SlotCount slots);
 
-    /** Reads the result from the object */
+    /**
+     * Reads the result from the object
+     */
     protected ModifierEntry readResult(JsonObject json) {
       return ModifierEntry.fromJson(GsonHelper.getAsJsonObject(json, "result"));
     }
@@ -308,7 +367,7 @@ public abstract class AbstractModifierRecipe implements ITinkerStationRecipe, ID
         requirements = ModifierMatch.deserialize(reqJson);
         requirementsError = GsonHelper.getAsString(reqJson, "error", "");
       }
-      ModifierEntry result = readResult(json);
+      ModifierEntry result = this.readResult(json);
       int maxLevel = GsonHelper.getAsInt(json, "max_level", 0);
       if (maxLevel < 0) {
         throw new JsonSyntaxException("max must be non-negative");
@@ -330,7 +389,7 @@ public abstract class AbstractModifierRecipe implements ITinkerStationRecipe, ID
           TConstruct.LOG.warn("Using deprecated modifier recipe key ability_slots for recipe " + id);
         }
       }
-      return fromJson(id, json, toolRequirement, maxToolSize, requirements, requirementsError, result, maxLevel, slots);
+      return this.fromJson(id, json, toolRequirement, maxToolSize, requirements, requirementsError, result, maxLevel, slots);
     }
 
     @Override
@@ -342,10 +401,12 @@ public abstract class AbstractModifierRecipe implements ITinkerStationRecipe, ID
       ModifierEntry result = ModifierEntry.read(buffer);
       int maxLevel = buffer.readVarInt();
       SlotCount slots = SlotCount.read(buffer);
-      return fromNetwork(id, buffer, toolRequirement, maxToolSize, requirements, requirementsError, result, maxLevel, slots);
+      return this.fromNetwork(id, buffer, toolRequirement, maxToolSize, requirements, requirementsError, result, maxLevel, slots);
     }
 
-    /** Writes relevant packet data. When overriding, call super first for consistency with {@link #fromJson(ResourceLocation, JsonObject)} */
+    /**
+     * Writes relevant packet data. When overriding, call super first for consistency with {@link #fromJson(ResourceLocation, JsonObject)}
+     */
     @Override
     protected void toNetworkSafe(FriendlyByteBuf buffer, T recipe) {
       recipe.toolRequirement.toNetwork(buffer);
@@ -360,6 +421,6 @@ public abstract class AbstractModifierRecipe implements ITinkerStationRecipe, ID
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + '{' + id + '}';
+    return this.getClass().getSimpleName() + '{' + this.id + '}';
   }
 }

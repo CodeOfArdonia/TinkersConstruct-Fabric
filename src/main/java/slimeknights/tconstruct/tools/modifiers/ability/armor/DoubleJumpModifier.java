@@ -15,6 +15,7 @@ import slimeknights.tconstruct.library.tools.capability.TinkerDataCapability;
 import slimeknights.tconstruct.library.tools.capability.TinkerDataCapability.TinkerDataKey;
 
 public class DoubleJumpModifier extends TotalArmorLevelModifier {
+
   private static final ResourceLocation JUMPS = TConstruct.getResource("jumps");
   private static final TinkerDataKey<Integer> EXTRA_JUMPS = TConstruct.createKey("extra_jumps");
 
@@ -29,24 +30,25 @@ public class DoubleJumpModifier extends TotalArmorLevelModifier {
   @Override
   public Component getDisplayName(int level) {
     if (level == 1) {
-      if (levelOneName == null) {
-        levelOneName = applyStyle(Component.translatable(getTranslationKey() + ".double"));
+      if (this.levelOneName == null) {
+        this.levelOneName = this.applyStyle(Component.translatable(this.getTranslationKey() + ".double"));
       }
-      return levelOneName;
+      return this.levelOneName;
     }
     if (level == 2) {
-      if (levelTwoName == null) {
-        levelTwoName = applyStyle(Component.translatable(getTranslationKey() + ".triple"));
+      if (this.levelTwoName == null) {
+        this.levelTwoName = this.applyStyle(Component.translatable(this.getTranslationKey() + ".triple"));
       }
-      return levelTwoName;
+      return this.levelTwoName;
     }
     return super.getDisplayName(level);
   }
 
   /**
    * Causes the player to jump an extra time, if possible
-   * @param entity  Entity instance who wishes to jump again
-   * @return  True if the entity jumpped, false if not
+   *
+   * @param entity Entity instance who wishes to jump again
+   * @return True if the entity jumpped, false if not
    */
   public static boolean extraJump(Player entity) {
     // validate preconditions, no using when swimming, elytra, or on the ground
@@ -73,7 +75,9 @@ public class DoubleJumpModifier extends TotalArmorLevelModifier {
     return false;
   }
 
-  /** Event handler to reset the number of times we have jumpped in mid air */
+  /**
+   * Event handler to reset the number of times we have jumpped in mid air
+   */
   private static void onLand(FallEvent event) {
     PersistentDataCapability.CAPABILITY.maybeGet(event.getEntity()).ifPresent(data -> data.remove(JUMPS));
   }

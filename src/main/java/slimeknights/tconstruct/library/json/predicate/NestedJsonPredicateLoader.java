@@ -13,31 +13,38 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-/** Loader for AND and OR predicates */
+/**
+ * Loader for AND and OR predicates
+ */
 @RequiredArgsConstructor
 public class NestedJsonPredicateLoader<I, T extends IJsonPredicate<I>> implements IGenericLoader<T> {
+
   private final GenericLoaderRegistry<IJsonPredicate<I>> loader;
   private final InvertedJsonPredicate.Loader<I> inverter;
-  private final BiFunction<NestedJsonPredicateLoader<I,T>,List<IJsonPredicate<I>>,T> constructor;
-  private final Function<T,List<IJsonPredicate<I>>> getter;
+  private final BiFunction<NestedJsonPredicateLoader<I, T>, List<IJsonPredicate<I>>, T> constructor;
+  private final Function<T, List<IJsonPredicate<I>>> getter;
 
-  /** Creates a new instance of the relevant predicate */
+  /**
+   * Creates a new instance of the relevant predicate
+   */
   @SafeVarargs
   public final T create(IJsonPredicate<I>... children) {
     if (children.length < 2) {
       throw new IllegalStateException("Too few children for nested predicate loader");
     }
-    return constructor.apply(this, ImmutableList.copyOf(children));
+    return this.constructor.apply(this, ImmutableList.copyOf(children));
   }
 
-  /** Inverts the given nested predicate condition */
+  /**
+   * Inverts the given nested predicate condition
+   */
   InvertedJsonPredicate<I> invert(T instance) {
-    return inverter.create(instance);
+    return this.inverter.create(instance);
   }
 
   @Override
   public T deserialize(JsonObject json) {
-    return constructor.apply(this, JsonHelper.parseList(json, "predicates", (e, s) -> loader.deserialize(e)));
+    return this.constructor.apply(this, JsonHelper.parseList(json, "predicates", (e, s) -> this.loader.deserialize(e)));
   }
 
   @Override
@@ -45,26 +52,26 @@ public class NestedJsonPredicateLoader<I, T extends IJsonPredicate<I>> implement
     int max = buffer.readVarInt();
     ImmutableList.Builder<IJsonPredicate<I>> builder = ImmutableList.builder();
     for (int i = 0; i < max; i++) {
-      builder.add(loader.fromNetwork(buffer));
+      builder.add(this.loader.fromNetwork(buffer));
     }
-    return constructor.apply(this, builder.build());
+    return this.constructor.apply(this, builder.build());
   }
 
   @Override
   public void serialize(T object, JsonObject json) {
     JsonArray array = new JsonArray();
-    for (IJsonPredicate<I> predicate : getter.apply(object)) {
-      array.add(loader.serialize(predicate));
+    for (IJsonPredicate<I> predicate : this.getter.apply(object)) {
+      array.add(this.loader.serialize(predicate));
     }
     json.add("predicates", array);
   }
 
   @Override
   public void toNetwork(T object, FriendlyByteBuf buffer) {
-    List<IJsonPredicate<I>> list = getter.apply(object);
+    List<IJsonPredicate<I>> list = this.getter.apply(object);
     buffer.writeVarInt(list.size());
     for (IJsonPredicate<I> predicate : list) {
-      loader.toNetwork(predicate, buffer);
+      this.loader.toNetwork(predicate, buffer);
     }
   }
 }

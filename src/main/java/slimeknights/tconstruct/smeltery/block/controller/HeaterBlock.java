@@ -17,6 +17,7 @@ import javax.annotation.Nullable;
  * Class for solid fuel heater for the melter
  */
 public class HeaterBlock extends ControllerBlock {
+
   public HeaterBlock(Properties builder) {
     super(builder);
   }
@@ -57,7 +58,7 @@ public class HeaterBlock extends ControllerBlock {
       double z = pos.getZ() + 0.5D;
       double frontOffset = 0.52D;
       double sideOffset = rand.nextDouble() * 0.6D - 0.3D;
-      spawnFireParticles(world, state, x, y, z, frontOffset, sideOffset);
+      this.spawnFireParticles(world, state, x, y, z, frontOffset, sideOffset);
     }
   }
 }

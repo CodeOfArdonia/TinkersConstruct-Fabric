@@ -8,7 +8,9 @@ import net.minecraft.world.item.ArmorItem;
 
 import java.util.Locale;
 
-/** Enum to aid in armor registraton */
+/**
+ * Enum to aid in armor registraton
+ */
 @RequiredArgsConstructor
 @Getter
 public enum ArmorSlotType implements StringRepresentable {
@@ -18,10 +20,12 @@ public enum ArmorSlotType implements StringRepresentable {
   HELMET(ArmorItem.Type.HELMET);
 
   private final ArmorItem.Type armorType;
-  private final String serializedName = toString().toLowerCase(Locale.ROOT);
-  private final int index = ordinal();
+  private final String serializedName = this.toString().toLowerCase(Locale.ROOT);
+  private final int index = this.ordinal();
 
-  /** Gets an equipment slot for the given armor slot */
+  /**
+   * Gets an equipment slot for the given armor slot
+   */
   public static ArmorSlotType fromType(ArmorItem.Type slotType) {
     return switch (slotType) {
       case BOOTS -> BOOTS;

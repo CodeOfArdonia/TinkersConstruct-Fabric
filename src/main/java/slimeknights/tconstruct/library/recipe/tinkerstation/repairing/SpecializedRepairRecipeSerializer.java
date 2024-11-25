@@ -18,13 +18,14 @@ import javax.annotation.Nullable;
  */
 @RequiredArgsConstructor
 public class SpecializedRepairRecipeSerializer<T extends Recipe<?> & ISpecializedRepairRecipe> extends LoggingRecipeSerializer<T> {
+
   private final IFactory<T> factory;
 
   @Override
   public T fromJson(ResourceLocation id, JsonObject json) {
     Ingredient tool = Ingredient.fromJson(JsonHelper.getElement(json, "tool"));
     MaterialId repairMaterial = MaterialId.fromJson(json, "repair_material");
-    return factory.create(id, tool, repairMaterial);
+    return this.factory.create(id, tool, repairMaterial);
   }
 
   @Nullable
@@ -32,7 +33,7 @@ public class SpecializedRepairRecipeSerializer<T extends Recipe<?> & ISpecialize
   protected T fromNetworkSafe(ResourceLocation id, FriendlyByteBuf buffer) {
     Ingredient tool = Ingredient.fromNetwork(buffer);
     MaterialId repairMaterial = new MaterialId(buffer.readUtf(Short.MAX_VALUE));
-    return factory.create(id, tool, repairMaterial);
+    return this.factory.create(id, tool, repairMaterial);
   }
 
   @Override
@@ -41,18 +42,28 @@ public class SpecializedRepairRecipeSerializer<T extends Recipe<?> & ISpecialize
     buffer.writeUtf(recipe.getRepairMaterial().toString());
   }
 
-  /** Interface for serializing the recipe */
+  /**
+   * Interface for serializing the recipe
+   */
   public interface ISpecializedRepairRecipe {
-    /** Gets the tool ingredient from the recipe */
+
+    /**
+     * Gets the tool ingredient from the recipe
+     */
     Ingredient getTool();
 
-    /** Gets the material ID from the recipe */
+    /**
+     * Gets the material ID from the recipe
+     */
     MaterialId getRepairMaterial();
   }
 
-  /** Factory constructor for this serializer */
+  /**
+   * Factory constructor for this serializer
+   */
   @FunctionalInterface
   public interface IFactory<T extends Recipe<?> & ISpecializedRepairRecipe> {
+
     T create(ResourceLocation id, Ingredient tool, MaterialId repairMaterial);
   }
 }

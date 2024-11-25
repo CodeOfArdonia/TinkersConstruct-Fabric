@@ -32,6 +32,7 @@ import java.util.function.Consumer;
  */
 @RequiredArgsConstructor(staticName = "modifier")
 public class MultilevelModifierRecipeBuilder extends AbstractRecipeBuilder<MultilevelModifierRecipeBuilder> {
+
   private final ModifierId result;
   private final List<LevelEntry> levels = new ArrayList<>();
   // inputs
@@ -48,9 +49,10 @@ public class MultilevelModifierRecipeBuilder extends AbstractRecipeBuilder<Multi
 
   /**
    * Sets the list of tools this modifier can be applied to
-   * @param tools    Modifier tools list
-   * @param maxSize  Max stack size this recipe applies to
-   * @return  Builder instance
+   *
+   * @param tools   Modifier tools list
+   * @param maxSize Max stack size this recipe applies to
+   * @return Builder instance
    */
   public MultilevelModifierRecipeBuilder setTools(Ingredient tools, int maxSize) {
     this.tools = tools;
@@ -60,17 +62,19 @@ public class MultilevelModifierRecipeBuilder extends AbstractRecipeBuilder<Multi
 
   /**
    * Sets the list of tools this modifier can be applied to
-   * @param tools  Modifier tools list
-   * @return  Builder instance
+   *
+   * @param tools Modifier tools list
+   * @return Builder instance
    */
   public MultilevelModifierRecipeBuilder setTools(Ingredient tools) {
-    return setTools(tools, ITinkerStationRecipe.DEFAULT_TOOL_STACK_SIZE);
+    return this.setTools(tools, ITinkerStationRecipe.DEFAULT_TOOL_STACK_SIZE);
   }
 
   /**
    * Sets the tag for applicable tools
-   * @param tag  Tag
-   * @return  Builder instance
+   *
+   * @param tag Tag
+   * @return Builder instance
    */
   public MultilevelModifierRecipeBuilder setTools(TagKey<Item> tag) {
     return this.setTools(Ingredient.of(tag));
@@ -78,8 +82,9 @@ public class MultilevelModifierRecipeBuilder extends AbstractRecipeBuilder<Multi
 
   /**
    * Adds an input to the recipe
-   * @param ingredient  Input
-   * @return  Builder instance
+   *
+   * @param ingredient Input
+   * @return Builder instance
    */
   public MultilevelModifierRecipeBuilder addInput(SizedIngredient ingredient) {
     this.inputs.add(ingredient);
@@ -88,67 +93,74 @@ public class MultilevelModifierRecipeBuilder extends AbstractRecipeBuilder<Multi
 
   /**
    * Adds an input to the recipe
-   * @param ingredient  Input
-   * @return  Builder instance
+   *
+   * @param ingredient Input
+   * @return Builder instance
    */
   public MultilevelModifierRecipeBuilder addInput(Ingredient ingredient) {
-    return addInput(SizedIngredient.of(ingredient));
+    return this.addInput(SizedIngredient.of(ingredient));
   }
 
   /**
    * Adds an input with the given amount, does not affect the salvage builder
-   * @param item    Item
-   * @param amount  Amount
-   * @return  Builder instance
+   *
+   * @param item   Item
+   * @param amount Amount
+   * @return Builder instance
    */
   public MultilevelModifierRecipeBuilder addInput(ItemLike item, int amount) {
-    return addInput(SizedIngredient.fromItems(amount, item));
+    return this.addInput(SizedIngredient.fromItems(amount, item));
   }
 
   /**
    * Adds an input with a size of 1, does not affect the salvage builder
-   * @param item    Item
-   * @return  Builder instance
+   *
+   * @param item Item
+   * @return Builder instance
    */
   public MultilevelModifierRecipeBuilder addInput(ItemLike item) {
-    return addInput(item, 1);
+    return this.addInput(item, 1);
   }
 
   /**
    * Adds an input to the recipe
-   * @param tag     Tag input
-   * @param amount  Amount required
-   * @return  Builder instance
+   *
+   * @param tag    Tag input
+   * @param amount Amount required
+   * @return Builder instance
    */
   public MultilevelModifierRecipeBuilder addInput(TagKey<Item> tag, int amount) {
-    return addInput(SizedIngredient.fromTag(tag, amount));
+    return this.addInput(SizedIngredient.fromTag(tag, amount));
   }
 
   /**
    * Adds an input to the recipe
-   * @param tag     Tag input
-   * @return  Builder instance
+   *
+   * @param tag Tag input
+   * @return Builder instance
    */
   public MultilevelModifierRecipeBuilder addInput(TagKey<Item> tag) {
-    return addInput(tag, 1);
+    return this.addInput(tag, 1);
   }
 
 
   /**
    * Allows using modifier crystals to apply this modifier
-   * @return  Builder instance
+   *
+   * @return Builder instance
    */
   public MultilevelModifierRecipeBuilder allowCrystal() {
-    allowCrystal = true;
+    this.allowCrystal = true;
     return this;
   }
 
   /**
    * Disallows using modifier crystals to apply this modifier
-   * @return  Builder instance
+   *
+   * @return Builder instance
    */
   public MultilevelModifierRecipeBuilder disallowCrystal() {
-    allowCrystal = false;
+    this.allowCrystal = false;
     return this;
   }
 
@@ -157,8 +169,9 @@ public class MultilevelModifierRecipeBuilder extends AbstractRecipeBuilder<Multi
 
   /**
    * Sets the modifier requirements for this recipe
-   * @param requirements  Modifier requirements
-   * @return  Builder instance
+   *
+   * @param requirements Modifier requirements
+   * @return Builder instance
    */
   public MultilevelModifierRecipeBuilder setRequirements(ModifierMatch requirements) {
     this.requirements = requirements;
@@ -167,65 +180,82 @@ public class MultilevelModifierRecipeBuilder extends AbstractRecipeBuilder<Multi
 
   /**
    * Sets the modifier requirements error for when it does not matcH
-   * @param requirementsError  Requirements error lang key
-   * @return  Builder instance
+   *
+   * @param requirementsError Requirements error lang key
+   * @return Builder instance
    */
   public MultilevelModifierRecipeBuilder setRequirementsError(String requirementsError) {
     this.requirementsError = requirementsError;
     return this;
   }
 
-  /** Base logic for adding a level */
+  /**
+   * Base logic for adding a level
+   */
   private MultilevelModifierRecipeBuilder addLevelRange(@Nullable SlotCount slots, int minLevel, int maxLevel) {
     if (minLevel > maxLevel) {
       throw new JsonSyntaxException("minLevel must be less than or equal to maxLevel");
     }
-    if (!levels.isEmpty() && minLevel <= levels.get(levels.size() - 1).maxLevel()) {
+    if (!this.levels.isEmpty() && minLevel <= this.levels.get(this.levels.size() - 1).maxLevel()) {
       throw new JsonSyntaxException("Level range must be greater than previous range");
     }
     this.levels.add(new LevelEntry(slots, minLevel, maxLevel));
     return this;
   }
 
-  /** Adds a level range for the given type and count */
+  /**
+   * Adds a level range for the given type and count
+   */
   public MultilevelModifierRecipeBuilder addLevelRange(SlotType slot, int slotCount, int minLevel, int maxLevel) {
-    return addLevelRange(new SlotCount(slot, slotCount), minLevel, maxLevel);
+    return this.addLevelRange(new SlotCount(slot, slotCount), minLevel, maxLevel);
   }
 
-  /** Adds a level for the given type and count */
+  /**
+   * Adds a level for the given type and count
+   */
   public MultilevelModifierRecipeBuilder addLevel(SlotType slot, int slotCount, int level) {
-    return addLevelRange(slot, slotCount, level, level);
+    return this.addLevelRange(slot, slotCount, level, level);
   }
 
-  /** Adds a level for the given type and count */
+  /**
+   * Adds a level for the given type and count
+   */
   public MultilevelModifierRecipeBuilder addMinLevel(SlotType slot, int slotCount, int level) {
-    return addLevelRange(slot, slotCount, level, Short.MAX_VALUE);
+    return this.addLevelRange(slot, slotCount, level, Short.MAX_VALUE);
   }
 
-  /** Adds slotless at the given level range */
+  /**
+   * Adds slotless at the given level range
+   */
   public MultilevelModifierRecipeBuilder addLevelRange(int minLevel, int maxLevel) {
-    return addLevelRange(null, minLevel, maxLevel);
+    return this.addLevelRange(null, minLevel, maxLevel);
   }
 
-  /** Adds slotless at the given level */
+  /**
+   * Adds slotless at the given level
+   */
   public MultilevelModifierRecipeBuilder addLevel(int level) {
-    return addLevelRange(level, level);
+    return this.addLevelRange(level, level);
   }
 
-  /** Adds slotless at the given level */
+  /**
+   * Adds slotless at the given level
+   */
   public MultilevelModifierRecipeBuilder addMinLevel(int level) {
-    return addLevelRange(level, Short.MAX_VALUE);
+    return this.addLevelRange(level, Short.MAX_VALUE);
   }
 
 
   /* Saving */
 
-  /** Saves all salvage recipes for this recipe */
+  /**
+   * Saves all salvage recipes for this recipe
+   */
   public MultilevelModifierRecipeBuilder saveSalvage(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
-    if (levels.isEmpty()) {
+    if (this.levels.isEmpty()) {
       throw new IllegalStateException("Must have at least 1 level");
     }
-    for (LevelEntry levelEntry : levels) {
+    for (LevelEntry levelEntry : this.levels) {
       if (levelEntry.slots() != null) {
         consumer.accept(new FinishedSalvage(
           new ResourceLocation(id.getNamespace(), id.getPath() + "_level_" + levelEntry.minLevel()),
@@ -237,66 +267,71 @@ public class MultilevelModifierRecipeBuilder extends AbstractRecipeBuilder<Multi
 
   @Override
   public void save(Consumer<FinishedRecipe> consumerIn) {
-    save(consumerIn, result);
+    this.save(consumerIn, this.result);
   }
 
   @Override
   public void save(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
-    if (inputs.isEmpty() && !allowCrystal) {
+    if (this.inputs.isEmpty() && !this.allowCrystal) {
       throw new IllegalStateException("Must either have at least 1 input or allow crystal");
     }
-    if (levels.isEmpty()) {
+    if (this.levels.isEmpty()) {
       throw new IllegalStateException("Must have at least 1 level");
     }
-    if (!inputs.isEmpty() && requirementsError.isEmpty() && levels.size() > 1) {
+    if (!this.inputs.isEmpty() && this.requirementsError.isEmpty() && this.levels.size() > 1) {
       throw new IllegalStateException("Must set requirements error if inputs are set");
     }
-    ResourceLocation advancementId = buildOptionalAdvancement(id, "modifiers");
+    ResourceLocation advancementId = this.buildOptionalAdvancement(id, "modifiers");
     consumer.accept(new FinishedAdding(id, advancementId));
   }
 
-  /** Writes common JSON elements */
+  /**
+   * Writes common JSON elements
+   */
   private void writeCommon(JsonObject json) {
-    Ingredient ingredient = tools;
-    if (tools == Ingredient.EMPTY) {
+    Ingredient ingredient = this.tools;
+    if (this.tools == Ingredient.EMPTY) {
       ingredient = Ingredient.of(TinkerTags.Items.MODIFIABLE);
     }
     json.add("tools", ingredient.toJson());
-    if (maxToolSize != ITinkerStationRecipe.DEFAULT_TOOL_STACK_SIZE) {
-      json.addProperty("max_tool_size", maxToolSize);
+    if (this.maxToolSize != ITinkerStationRecipe.DEFAULT_TOOL_STACK_SIZE) {
+      json.addProperty("max_tool_size", this.maxToolSize);
     }
   }
 
-  /** Recipe for modifier adding */
+  /**
+   * Recipe for modifier adding
+   */
   private class FinishedAdding extends AbstractFinishedRecipe {
+
     public FinishedAdding(ResourceLocation id, @Nullable ResourceLocation advancementId) {
       super(id, advancementId);
     }
 
     @Override
     public void serializeRecipeData(JsonObject json) {
-      if (!inputs.isEmpty()) {
+      if (!MultilevelModifierRecipeBuilder.this.inputs.isEmpty()) {
         JsonArray array = new JsonArray();
-        for (SizedIngredient ingredient : inputs) {
+        for (SizedIngredient ingredient : MultilevelModifierRecipeBuilder.this.inputs) {
           array.add(ingredient.serialize());
         }
         json.add("inputs", array);
       }
-      json.addProperty("allow_crystal", allowCrystal);
-      writeCommon(json);
-      if (requirements != ModifierMatch.ALWAYS) {
-        JsonObject reqJson = requirements.serialize();
-        reqJson.addProperty("error", requirementsError);
+      json.addProperty("allow_crystal", MultilevelModifierRecipeBuilder.this.allowCrystal);
+      MultilevelModifierRecipeBuilder.this.writeCommon(json);
+      if (MultilevelModifierRecipeBuilder.this.requirements != ModifierMatch.ALWAYS) {
+        JsonObject reqJson = MultilevelModifierRecipeBuilder.this.requirements.serialize();
+        reqJson.addProperty("error", MultilevelModifierRecipeBuilder.this.requirementsError);
         json.add("requirements", reqJson);
-      } else if (!requirementsError.isEmpty()) {
-        json.addProperty("level_error", requirementsError);
+      } else if (!MultilevelModifierRecipeBuilder.this.requirementsError.isEmpty()) {
+        json.addProperty("level_error", MultilevelModifierRecipeBuilder.this.requirementsError);
       }
       JsonArray levelArray = new JsonArray();
-      for (LevelEntry levelEntry : levels) {
+      for (LevelEntry levelEntry : MultilevelModifierRecipeBuilder.this.levels) {
         levelArray.add(levelEntry.serialize());
       }
       json.add("levels", levelArray);
-      json.addProperty("result", result.toString());
+      json.addProperty("result", MultilevelModifierRecipeBuilder.this.result.toString());
     }
 
     @Override
@@ -305,8 +340,11 @@ public class MultilevelModifierRecipeBuilder extends AbstractRecipeBuilder<Multi
     }
   }
 
-  /** Recipe for modifier salvage */
+  /**
+   * Recipe for modifier salvage
+   */
   private class FinishedSalvage extends AbstractFinishedRecipe {
+
     private final SlotCount slots;
     private final int minLevel;
     private final int maxLevel;
@@ -320,14 +358,14 @@ public class MultilevelModifierRecipeBuilder extends AbstractRecipeBuilder<Multi
 
     @Override
     public void serializeRecipeData(JsonObject json) {
-      writeCommon(json);
+      MultilevelModifierRecipeBuilder.this.writeCommon(json);
       JsonObject slotJson = new JsonObject();
-      slotJson.addProperty(slots.getType().getName(), slots.getCount());
+      slotJson.addProperty(this.slots.getType().getName(), this.slots.getCount());
       json.add("slots", slotJson);
-      json.addProperty("modifier", result.toString());
-      json.addProperty("min_level", minLevel);
-      if (maxLevel != Short.MAX_VALUE) {
-        json.addProperty("max_level", maxLevel);
+      json.addProperty("modifier", MultilevelModifierRecipeBuilder.this.result.toString());
+      json.addProperty("min_level", this.minLevel);
+      if (this.maxLevel != Short.MAX_VALUE) {
+        json.addProperty("max_level", this.maxLevel);
       }
     }
 

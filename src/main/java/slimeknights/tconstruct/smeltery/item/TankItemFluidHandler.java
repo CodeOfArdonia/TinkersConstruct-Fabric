@@ -16,19 +16,24 @@ import slimeknights.tconstruct.smeltery.block.entity.component.TankBlockEntity;
  */
 @RequiredArgsConstructor
 public class TankItemFluidHandler implements SingleSlotStorage<FluidVariant> {
+
   @Getter
   private final ContainerItemContext container;
 
-  /** Gets the tank on the stack */
+  /**
+   * Gets the tank on the stack
+   */
   private FluidTank getTank() {
-    return TankItem.getFluidTank(container.getItemVariant().toStack());
+    return TankItem.getFluidTank(this.container.getItemVariant().toStack());
   }
 
-  /** Updates the container from the given tank */
+  /**
+   * Updates the container from the given tank
+   */
   private void updateContainer(FluidTank tank, TransactionContext tx) {
-    ItemStack newStack = container.getItemVariant().toStack();
+    ItemStack newStack = this.container.getItemVariant().toStack();
     TankItem.setTank(newStack, tank);
-    container.exchange(ItemVariant.of(newStack), 1, tx);
+    this.container.exchange(ItemVariant.of(newStack), 1, tx);
   }
 
 //  @Override
@@ -38,41 +43,41 @@ public class TankItemFluidHandler implements SingleSlotStorage<FluidVariant> {
 
   @Override
   public long getCapacity() {
-    return TankBlockEntity.getCapacity(container.getItemVariant().getItem());
+    return TankBlockEntity.getCapacity(this.container.getItemVariant().getItem());
   }
 
   @Override
   public long insert(FluidVariant resource, long maxAmount, TransactionContext transaction) {
-    FluidTank tank = getTank();
+    FluidTank tank = this.getTank();
     long didFill = tank.insert(resource, maxAmount, transaction);
     if (didFill > 0) {
-      updateContainer(tank, transaction);
+      this.updateContainer(tank, transaction);
     }
     return didFill;
   }
 
   @Override
   public long extract(FluidVariant resource, long maxAmount, TransactionContext transaction) {
-    FluidTank tank = getTank();
+    FluidTank tank = this.getTank();
     long didDrain = tank.extract(resource, maxAmount, transaction);
     if (!(didDrain <= 0)) {
-      updateContainer(tank, transaction);
+      this.updateContainer(tank, transaction);
     }
     return didDrain;
   }
 
   @Override
   public boolean isResourceBlank() {
-    return getResource().isBlank();
+    return this.getResource().isBlank();
   }
 
   @Override
   public FluidVariant getResource() {
-    return getTank().getResource();
+    return this.getTank().getResource();
   }
 
   @Override
   public long getAmount() {
-    return getTank().getAmount();
+    return this.getTank().getAmount();
   }
 }

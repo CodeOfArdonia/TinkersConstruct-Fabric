@@ -20,8 +20,11 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class HasteModifier extends IncrementalArmorLevelModifier {
+
   private static final Component MINING_SPEED = TConstruct.makeTranslation("modifier", "fake_attribute.mining_speed");
-  /** Player modifier data key for haste */
+  /**
+   * Player modifier data key for haste
+   */
   public static final TinkerDataKey<Float> HASTE = TConstruct.createKey("haste");
 
   private static final ModifierLevelDisplay NAME = new UniqueForLevels(5);
@@ -37,15 +40,15 @@ public class HasteModifier extends IncrementalArmorLevelModifier {
 
   @Override
   public void addToolStats(ToolRebuildContext context, int level, ModifierStatsBuilder builder) {
-    ToolStats.MINING_SPEED.add(builder, 4 * getEffectiveLevel(context, level));
+    ToolStats.MINING_SPEED.add(builder, 4 * this.getEffectiveLevel(context, level));
   }
 
   @Override
   public void addInformation(IToolStackView tool, int level, @Nullable Player player, List<Component> tooltip, TooltipKey tooltipKey, TooltipFlag tooltipFlag) {
     if (tool.hasTag(TinkerTags.Items.ARMOR)) {
-      double boost = 0.1 * getScaledLevel(tool, level);
+      double boost = 0.1 * this.getScaledLevel(tool, level);
       if (boost != 0) {
-        tooltip.add(applyStyle(Component.literal(Util.PERCENT_BOOST_FORMAT.format(boost)).append(" ").append(MINING_SPEED)));
+        tooltip.add(this.applyStyle(Component.literal(Util.PERCENT_BOOST_FORMAT.format(boost)).append(" ").append(MINING_SPEED)));
       }
     }
   }

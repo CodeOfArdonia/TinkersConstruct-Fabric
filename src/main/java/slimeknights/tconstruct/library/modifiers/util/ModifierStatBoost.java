@@ -26,11 +26,12 @@ import java.util.Locale;
  * Stat boost to apply
  */
 public sealed interface ModifierStatBoost {
+
   /**
    * Checks if all tags match
    */
   default boolean matchesTags(ToolRebuildContext context) {
-    for (TagKey<Item> key : tagRequirements()) {
+    for (TagKey<Item> key : this.tagRequirements()) {
       if (!context.hasTag(key)) {
         return false;
       }
@@ -58,7 +59,7 @@ public sealed interface ModifierStatBoost {
    * Converts this to JSON
    */
   default JsonObject toJson() {
-    return toJson(new JsonObject());
+    return this.toJson(new JsonObject());
   }
 
   /**
@@ -97,7 +98,9 @@ public sealed interface ModifierStatBoost {
     return StatUpdate.fromNetwork(buffer, stat, tagRequirements.build());
   }
 
-  /** Record representing a single stat boost */
+  /**
+   * Record representing a single stat boost
+   */
   enum BoostType {
     ADD {
       @Override
@@ -125,12 +128,16 @@ public sealed interface ModifierStatBoost {
     };
 
     @Getter
-    private final String name = name().toLowerCase(Locale.ROOT);
+    private final String name = this.name().toLowerCase(Locale.ROOT);
 
-    /** Applies this boost type for the given values */
+    /**
+     * Applies this boost type for the given values
+     */
     public abstract void apply(ModifierStatsBuilder builder, INumericToolStat<?> stat, float value, float level);
 
-    /** Gets the boost type for the given name */
+    /**
+     * Gets the boost type for the given name
+     */
     @Nullable
     public static BoostType byName(String name) {
       for (BoostType type : BoostType.values()) {
@@ -142,7 +149,9 @@ public sealed interface ModifierStatBoost {
     }
   }
 
-  /** Writes the tag keys to JSON */
+  /**
+   * Writes the tag keys to JSON
+   */
   private static void serializeTags(JsonObject json, List<TagKey<Item>> tagRequirements) {
     if (!tagRequirements.isEmpty()) {
       JsonArray array = new JsonArray();
@@ -153,26 +162,34 @@ public sealed interface ModifierStatBoost {
     }
   }
 
-  /** Record representing a single stat boost */
-  record StatBoost(INumericToolStat<?> stat, BoostType type, float amount, List<TagKey<Item>> tagRequirements) implements ModifierStatBoost {
-    /** Applies the given boost */
+  /**
+   * Record representing a single stat boost
+   */
+  record StatBoost(INumericToolStat<?> stat, BoostType type, float amount,
+                   List<TagKey<Item>> tagRequirements) implements ModifierStatBoost {
+
+    /**
+     * Applies the given boost
+     */
     @Override
     public void apply(ToolRebuildContext context, float level, ModifierStatsBuilder builder) {
-      if (matchesTags(context)) {
-        type.apply(builder, stat, amount, level);
+      if (this.matchesTags(context)) {
+        this.type.apply(builder, this.stat, this.amount, level);
       }
     }
 
     @Override
     public JsonObject toJson(JsonObject json) {
-      json.addProperty("stat", stat.getName().toString());
-      json.addProperty("operation", type.getName());
-      json.addProperty("value", amount);
-      serializeTags(json, tagRequirements);
+      json.addProperty("stat", this.stat.getName().toString());
+      json.addProperty("operation", this.type.getName());
+      json.addProperty("value", this.amount);
+      serializeTags(json, this.tagRequirements);
       return json;
     }
 
-    /** Parses this from JSON */
+    /**
+     * Parses this from JSON
+     */
     public static StatBoost fromJson(JsonObject json, INumericToolStat<?> stat, List<TagKey<Item>> tagRequirements) {
       String typeName;
       // TODO 1.19: remove type key entirely, assuming this
@@ -189,19 +206,23 @@ public sealed interface ModifierStatBoost {
       return new StatBoost(stat, boostType, amount, tagRequirements);
     }
 
-    /** Writes this to the network */
+    /**
+     * Writes this to the network
+     */
     @Override
     public void toNetwork(FriendlyByteBuf buffer) {
-      buffer.writeUtf(stat.getName().toString());
-      buffer.writeVarInt(tagRequirements.size());
-      for (TagKey<Item> key : tagRequirements) {
+      buffer.writeUtf(this.stat.getName().toString());
+      buffer.writeVarInt(this.tagRequirements.size());
+      for (TagKey<Item> key : this.tagRequirements) {
         buffer.writeResourceLocation(key.location());
       }
-      buffer.writeEnum(type);
-      buffer.writeFloat(amount);
+      buffer.writeEnum(this.type);
+      buffer.writeFloat(this.amount);
     }
 
-    /** Reads the stat boost from the network */
+    /**
+     * Reads the stat boost from the network
+     */
     public static StatBoost fromNetwork(FriendlyByteBuf buffer, INumericToolStat<?> stat, List<TagKey<Item>> tagRequirement) {
       BoostType type = buffer.readEnum(BoostType.class);
       float amount = buffer.readFloat();
@@ -209,39 +230,48 @@ public sealed interface ModifierStatBoost {
     }
   }
 
-  /** Performs a generic stat update */
+  /**
+   * Performs a generic stat update
+   */
   record StatUpdate<T>(IToolStat<T> stat, T value, List<TagKey<Item>> tagRequirements) implements ModifierStatBoost {
+
     @Override
     public void apply(ToolRebuildContext context, float level, ModifierStatsBuilder builder) {
-      stat.update(builder, value);
+      this.stat.update(builder, this.value);
     }
 
     @Override
     public JsonObject toJson(JsonObject json) {
-      json.addProperty("stat", stat.getName().toString());
-      json.add("value", stat.serialize(value));
-      serializeTags(json, tagRequirements);
+      json.addProperty("stat", this.stat.getName().toString());
+      json.add("value", this.stat.serialize(this.value));
+      serializeTags(json, this.tagRequirements);
       return json;
     }
 
-    /** Parses the stat update from JSON */
+    /**
+     * Parses the stat update from JSON
+     */
     public static <T> StatUpdate<T> fromJson(JsonObject json, IToolStat<T> stat, List<TagKey<Item>> tagRequirements) {
       T value = stat.deserialize(JsonHelper.getElement(json, "value"));
       return new StatUpdate<>(stat, value, tagRequirements);
     }
 
-    /** Writes this to the network */
+    /**
+     * Writes this to the network
+     */
     @Override
     public void toNetwork(FriendlyByteBuf buffer) {
-      buffer.writeUtf(stat.getName().toString());
-      buffer.writeVarInt(tagRequirements.size());
-      for (TagKey<Item> tag : tagRequirements) {
+      buffer.writeUtf(this.stat.getName().toString());
+      buffer.writeVarInt(this.tagRequirements.size());
+      for (TagKey<Item> tag : this.tagRequirements) {
         buffer.writeResourceLocation(tag.location());
       }
-      stat.toNetwork(buffer, value);
+      this.stat.toNetwork(buffer, this.value);
     }
 
-    /** Reads this from the network */
+    /**
+     * Reads this from the network
+     */
     public static <T> StatUpdate<T> fromNetwork(FriendlyByteBuf buffer, IToolStat<T> stat, List<TagKey<Item>> tagRequirements) {
       T value = stat.fromNetwork(buffer);
       return new StatUpdate<>(stat, value, tagRequirements);

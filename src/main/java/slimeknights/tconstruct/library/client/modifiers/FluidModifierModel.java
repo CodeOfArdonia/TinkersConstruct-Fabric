@@ -22,7 +22,10 @@ import java.util.function.Function;
  */
 @SuppressWarnings("removal")
 public class FluidModifierModel extends NormalModifierModel {
-  /** Constant unbaked model instance, as they are all the same */
+
+  /**
+   * Constant unbaked model instance, as they are all the same
+   */
   public static final IUnbakedModifierModel UNBAKED_INSTANCE = (smallGetter, largeGetter) -> {
     Material smallTexture = smallGetter.apply("");
     Material largeTexture = largeGetter.apply("");
@@ -34,7 +37,9 @@ public class FluidModifierModel extends NormalModifierModel {
     return null;
   };
 
-  /** Textures to show */
+  /**
+   * Textures to show
+   */
   protected final Material[] fluidTextures;
 
   protected FluidModifierModel(@Nullable Material smallTexture, @Nullable Material largeTexture, Material[] fluidTextures) {
@@ -43,8 +48,8 @@ public class FluidModifierModel extends NormalModifierModel {
   }
 
   public FluidModifierModel(@Nullable Material smallTexture, @Nullable Material largeTexture,
-														@Nullable Material smallFull, @Nullable Material largeFull) {
-    this(smallTexture, largeTexture, new Material[] { smallFull, largeFull });
+                            @Nullable Material smallFull, @Nullable Material largeFull) {
+    this(smallTexture, largeTexture, new Material[]{smallFull, largeFull});
   }
 
   @Nullable
@@ -62,11 +67,11 @@ public class FluidModifierModel extends NormalModifierModel {
 
   @Nullable
   protected Material getTemplate(TankModifier tank, IToolStackView tool, FluidStack fluid, boolean isLarge) {
-    return fluidTextures[(isLarge ? 1 : 0)];
+    return this.fluidTextures[(isLarge ? 1 : 0)];
   }
 
   @Override
-  public Mesh getQuads(IToolStackView tool, ModifierEntry entry, Function<Material,TextureAtlasSprite> spriteGetter, Transformation transforms, boolean isLarge, int startTintIndex, @Nullable ItemLayerPixels pixels) {
+  public Mesh getQuads(IToolStackView tool, ModifierEntry entry, Function<Material, TextureAtlasSprite> spriteGetter, Transformation transforms, boolean isLarge, int startTintIndex, @Nullable ItemLayerPixels pixels) {
     // first, determine stored fluid
     Mesh quads = super.getQuads(tool, entry, spriteGetter, transforms, isLarge, startTintIndex, pixels);
     // modifier must be tank
@@ -76,7 +81,7 @@ public class FluidModifierModel extends NormalModifierModel {
       // must have fluid
       if (!fluid.isEmpty()) {
         // must have texture for the proper state
-        Material template = getTemplate(tank, tool, fluid, isLarge);
+        Material template = this.getTemplate(tank, tool, fluid, isLarge);
         if (template != null) {
           // finally, build (mostly based on bucket model)
 //          ImmutableList.Builder<BakedQuad> builder = ImmutableList.builder();
@@ -94,6 +99,8 @@ public class FluidModifierModel extends NormalModifierModel {
     return quads;
   }
 
-  /** Cache key for the model */
+  /**
+   * Cache key for the model
+   */
   private record FluidModifierCacheKey(Modifier modifier, Fluid fluid) {}
 }

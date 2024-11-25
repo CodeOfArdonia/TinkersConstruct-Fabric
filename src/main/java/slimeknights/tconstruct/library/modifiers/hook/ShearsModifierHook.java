@@ -13,15 +13,21 @@ import java.util.function.Function;
  * Interface that allows another modifier to hook into the shears modifier. Use with {@link slimeknights.tconstruct.library.modifiers.Modifier#getHook(ModifierHook)})}
  */
 public interface ShearsModifierHook {
-  /** Default behavior of no action */
+
+  /**
+   * Default behavior of no action
+   */
   ShearsModifierHook EMPTY = (tool, modifier, player, entity, isTarget) -> {};
 
-  /** Merger that runs all hooks */
-  Function<Collection<ShearsModifierHook>,ShearsModifierHook> ALL_MERGER = AllMerger::new;
+  /**
+   * Merger that runs all hooks
+   */
+  Function<Collection<ShearsModifierHook>, ShearsModifierHook> ALL_MERGER = AllMerger::new;
 
 
   /**
    * Called after a block is successfully harvested
+   *
    * @param tool     Tool used in harvesting
    * @param modifier Entry calling this hook
    * @param player   Player shearing
@@ -31,11 +37,14 @@ public interface ShearsModifierHook {
   void afterShearEntity(IToolStackView tool, ModifierEntry modifier, Player player, Entity entity, boolean isTarget);
 
 
-  /** Merger that runs all hooks */
+  /**
+   * Merger that runs all hooks
+   */
   record AllMerger(Collection<ShearsModifierHook> modules) implements ShearsModifierHook {
+
     @Override
     public void afterShearEntity(IToolStackView tool, ModifierEntry modifier, Player player, Entity entity, boolean isTarget) {
-      for (ShearsModifierHook module : modules) {
+      for (ShearsModifierHook module : this.modules) {
         module.afterShearEntity(tool, modifier, player, entity, isTarget);
       }
     }

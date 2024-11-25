@@ -22,17 +22,22 @@ import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Same as tag harvest, but applies additional modifiers to the break speed */
+/**
+ * Same as tag harvest, but applies additional modifiers to the break speed
+ */
 public class ModifiedHarvestLogic extends TagHarvestLogic {
 
   public static final Loader LOADER = new Loader();
   private final SpeedModifier[] speedModifiers;
+
   protected ModifiedHarvestLogic(TagKey<Block> tag, SpeedModifier[] speedModifiers) {
     super(tag);
     this.speedModifiers = speedModifiers;
   }
 
-  /** Creates a builder for this logic */
+  /**
+   * Creates a builder for this logic
+   */
   public static Builder builder(TagKey<Block> tag) {
     return new Builder(tag);
   }
@@ -45,7 +50,7 @@ public class ModifiedHarvestLogic extends TagHarvestLogic {
   @Override
   public float getDestroySpeed(IToolStackView tool, BlockState state) {
     float speed = super.getDestroySpeed(tool, state);
-    for (SpeedModifier modifier : speedModifiers) {
+    for (SpeedModifier modifier : this.speedModifiers) {
       if (modifier.predicate.matches(state)) {
         return Math.max(1, speed * modifier.modifier);
       }
@@ -53,46 +58,62 @@ public class ModifiedHarvestLogic extends TagHarvestLogic {
     return speed;
   }
 
-  /** Builder for the logic */
+  /**
+   * Builder for the logic
+   */
   @SuppressWarnings("unused")
   @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
   public static class Builder {
+
     private final TagKey<Block> tag;
     private final List<SpeedModifier> speedModifiers = new ArrayList<>();
 
-    /** Base method to add a modifier */
+    /**
+     * Base method to add a modifier
+     */
     public Builder addModifier(float modifier, IJsonPredicate<BlockState> predicate) {
-      speedModifiers.add(new SpeedModifier(modifier, predicate));
+      this.speedModifiers.add(new SpeedModifier(modifier, predicate));
       return this;
     }
 
-    /** Adds a modifier when the block matches a tag */
+    /**
+     * Adds a modifier when the block matches a tag
+     */
     public Builder tagModifier(TagKey<Block> tag, float modifier) {
-      return addModifier(modifier, new TagBlockPredicate(tag));
+      return this.addModifier(modifier, new TagBlockPredicate(tag));
     }
 
-    /** Adds a modifier when the block does not match a tag */
+    /**
+     * Adds a modifier when the block does not match a tag
+     */
     public Builder notTagModifier(TagKey<Block> tag, float modifier) {
-      return addModifier(modifier, new TagBlockPredicate(tag).inverted());
+      return this.addModifier(modifier, new TagBlockPredicate(tag).inverted());
     }
 
-    /** Adds a modifier when the block matches a tag */
+    /**
+     * Adds a modifier when the block matches a tag
+     */
     public Builder blockModifier(float modifier, Block... blocks) {
-      return addModifier(modifier, new SetBlockPredicate(ImmutableSet.copyOf(blocks)));
+      return this.addModifier(modifier, new SetBlockPredicate(ImmutableSet.copyOf(blocks)));
     }
 
-    /** Adds a modifier when the block matches a tag */
+    /**
+     * Adds a modifier when the block matches a tag
+     */
     public Builder notBlockModifier(float modifier, Block... blocks) {
-      return addModifier(modifier, new SetBlockPredicate(ImmutableSet.copyOf(blocks)).inverted());
+      return this.addModifier(modifier, new SetBlockPredicate(ImmutableSet.copyOf(blocks)).inverted());
     }
 
-    /** Builds the modifier */
+    /**
+     * Builds the modifier
+     */
     public ModifiedHarvestLogic build() {
-      return new ModifiedHarvestLogic(tag, speedModifiers.toArray(new SpeedModifier[0]));
+      return new ModifiedHarvestLogic(this.tag, this.speedModifiers.toArray(new SpeedModifier[0]));
     }
   }
 
   private static class Loader implements IGenericLoader<ModifiedHarvestLogic> {
+
     @Override
     public ModifiedHarvestLogic deserialize(JsonObject json) {
       TagKey<Block> tag = TagKey.create(Registries.BLOCK, JsonHelper.getResourceLocation(json, "effective"));
@@ -130,34 +151,45 @@ public class ModifiedHarvestLogic extends TagHarvestLogic {
     }
   }
 
-  /** Speed modifier to apply to a block */
+  /**
+   * Speed modifier to apply to a block
+   */
   @RequiredArgsConstructor
   private static class SpeedModifier {
+
     protected final float modifier;
     protected final IJsonPredicate<BlockState> predicate;
 
-    /** Writes this object to JSON */
+    /**
+     * Writes this object to JSON
+     */
     public JsonObject toJson() {
       JsonObject json = new JsonObject();
-      json.addProperty("modifier", modifier);
-      json.add("predicate", BlockPredicate.LOADER.serialize(predicate));
+      json.addProperty("modifier", this.modifier);
+      json.add("predicate", BlockPredicate.LOADER.serialize(this.predicate));
       return json;
     }
 
-    /** Writes this object to the network */
+    /**
+     * Writes this object to the network
+     */
     public void toNetwork(FriendlyByteBuf buffer) {
-      buffer.writeFloat(modifier);
-      BlockPredicate.LOADER.toNetwork(predicate, buffer);
+      buffer.writeFloat(this.modifier);
+      BlockPredicate.LOADER.toNetwork(this.predicate, buffer);
     }
 
-    /** Parses a speed modifier from JSON */
+    /**
+     * Parses a speed modifier from JSON
+     */
     private static SpeedModifier fromJson(JsonObject json) {
       float modifier = GsonHelper.getAsFloat(json, "modifier");
       IJsonPredicate<BlockState> predicate = BlockPredicate.LOADER.deserialize(GsonHelper.getAsJsonObject(json, "predicate"));
       return new SpeedModifier(modifier, predicate);
     }
 
-    /** Parses a speed modifier from the packet buffer */
+    /**
+     * Parses a speed modifier from the packet buffer
+     */
     private static SpeedModifier fromNetwork(FriendlyByteBuf buffer) {
       float modifier = buffer.readFloat();
       IJsonPredicate<BlockState> predicate = BlockPredicate.LOADER.fromNetwork(buffer);

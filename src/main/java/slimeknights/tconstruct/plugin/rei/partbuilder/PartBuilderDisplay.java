@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class PartBuilderDisplay implements Display {
+
   private final IDisplayPartBuilderRecipe recipe;
   private final List<EntryIngredient> input, output;
 
@@ -25,19 +26,19 @@ public class PartBuilderDisplay implements Display {
   }
 
   public MaterialVariant getMaterial() {
-    return recipe.getMaterial();
+    return this.recipe.getMaterial();
   }
 
   public int getCost() {
-    return recipe.getCost();
+    return this.recipe.getCost();
   }
 
   public List<ItemStack> getPatternItems() {
-    return recipe.getPatternItems();
+    return this.recipe.getPatternItems();
   }
 
   public Pattern getPattern() {
-    return recipe.getPattern();
+    return this.recipe.getPattern();
   }
 
   @Override

@@ -13,6 +13,7 @@ import slimeknights.tconstruct.library.tools.stat.FloatToolStat;
 import slimeknights.tconstruct.library.tools.stat.ToolStats;
 
 public class AirborneModifier extends NoLevelsModifier implements ConditionalStatModifierHook {
+
   @Override
   public int getPriority() {
     return 75; // runs after other modifiers

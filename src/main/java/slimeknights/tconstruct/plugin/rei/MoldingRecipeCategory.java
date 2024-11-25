@@ -21,8 +21,11 @@ import slimeknights.tconstruct.smeltery.TinkerSmeltery;
 import java.util.Collections;
 import java.util.List;
 
-/** Recipe category for molding casts */
+/**
+ * Recipe category for molding casts
+ */
 public class MoldingRecipeCategory implements TinkersCategory<MoldingRecipeDisplay> {
+
   private static final ResourceLocation BACKGROUND_LOC = TConstruct.getResource("textures/gui/jei/casting.png");
   private static final Component TITLE = TConstruct.makeTranslation("jei", "molding.title");
   private static final Component TOOLTIP_PATTERN_CONSUMED = Component.translatable(TConstruct.makeTranslationKey("jei", "molding.pattern_consumed"));
@@ -32,6 +35,7 @@ public class MoldingRecipeCategory implements TinkersCategory<MoldingRecipeDispl
   @Getter
   private final Renderer icon;
   private final WidgetHolder table, basin, downArrow, upArrow;
+
   public MoldingRecipeCategory() {
     this.background = new WidgetHolder(BACKGROUND_LOC, 0, 55, 70, 57);
     this.icon = EntryStacks.of(TinkerSmeltery.blankSandCast.get());
@@ -53,7 +57,7 @@ public class MoldingRecipeCategory implements TinkersCategory<MoldingRecipeDispl
 
   @Override
   public List<Component> getTooltipStrings(MoldingRecipeDisplay recipe, List<Widget> slots, double mouseX, double mouseY) {
-    if (recipe.isPatternConsumed() && !recipe.getPattern().isEmpty() && GuiUtil.isHovered((int)mouseX, (int)mouseY, 50, 7, 18, 18)) {
+    if (recipe.isPatternConsumed() && !recipe.getPattern().isEmpty() && GuiUtil.isHovered((int) mouseX, (int) mouseY, 50, 7, 18, 18)) {
       return Collections.singletonList(TOOLTIP_PATTERN_CONSUMED);
     }
     return Collections.emptyList();
@@ -62,31 +66,31 @@ public class MoldingRecipeCategory implements TinkersCategory<MoldingRecipeDispl
   @Override
   public void addWidgets(MoldingRecipeDisplay display, List<Widget> ingredients, Point origin, Rectangle bounds) {
     // basic input output
-    ingredients.add(slot(3, 24, origin).markInput().entries(display.getInputEntries().get(0)));
-    ingredients.add(slot(51, 24, origin).markOutput().entries(display.getOutputEntries().get(0)));
+    ingredients.add(this.slot(3, 24, origin).markInput().entries(display.getInputEntries().get(0)));
+    ingredients.add(this.slot(51, 24, origin).markOutput().entries(display.getOutputEntries().get(0)));
 
     // if we have a mold, we are pressing into the table, so draw pressed item on input and output
     Ingredient pattern = display.getPattern();
     if (!pattern.isEmpty()) {
-      Slot inputSlot = slot(3, 1, origin).markInput().entries(EntryIngredients.ofIngredient(pattern));
+      Slot inputSlot = this.slot(3, 1, origin).markInput().entries(EntryIngredients.ofIngredient(pattern));
       ingredients.add(inputSlot);
       if (!display.isPatternConsumed()) {
-        Slot preservedSlot = slot(51, 8, origin).entries(EntryIngredients.ofIngredient(pattern));
+        Slot preservedSlot = this.slot(51, 8, origin).entries(EntryIngredients.ofIngredient(pattern));
 //        builder.createFocusLink(inputSlot, preservedSlot);
         ingredients.add(preservedSlot);
       }
     }
 
     // draw the main block
-    WidgetHolder block = display.getType() == TinkerRecipeTypes.MOLDING_BASIN.get() ? basin : table;
+    WidgetHolder block = display.getType() == TinkerRecipeTypes.MOLDING_BASIN.get() ? this.basin : this.table;
     ingredients.add(block.build(3, 40, origin));
 
     // if no mold, we "pickup" the item, so draw no table
     if (!display.getPattern().isEmpty()) {
       ingredients.add(block.build(51, 40, origin));
-      ingredients.add(downArrow.build(8, 17, origin));
+      ingredients.add(this.downArrow.build(8, 17, origin));
     } else {
-      ingredients.add(upArrow.build(8, 17, origin));
+      ingredients.add(this.upArrow.build(8, 17, origin));
     }
   }
 }

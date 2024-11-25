@@ -1,6 +1,5 @@
 package slimeknights.tconstruct.tables.client.inventory.module;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import lombok.Getter;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -18,7 +17,7 @@ import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.client.RenderUtils;
 import slimeknights.tconstruct.tables.client.inventory.widget.BorderWidget;
 
-public class SideInventoryScreen<P extends MultiModuleScreen<?>, C extends AbstractContainerMenu> extends ModuleScreen<P,C> {
+public class SideInventoryScreen<P extends MultiModuleScreen<?>, C extends AbstractContainerMenu> extends ModuleScreen<P, C> {
 
   protected ScalableElementScreen overlap = GenericScreen.overlap;
   protected ElementScreen overlapTopLeft = GenericScreen.overlapTopLeft;
@@ -54,7 +53,7 @@ public class SideInventoryScreen<P extends MultiModuleScreen<?>, C extends Abstr
   protected int xOffset;
   protected boolean connected;
 
-  protected SliderWidget slider = new SliderWidget(sliderNormal, sliderHigh, sliderLow, sliderTop, sliderBottom, sliderBackground);
+  protected SliderWidget slider = new SliderWidget(this.sliderNormal, this.sliderHigh, this.sliderLow, this.sliderTop, this.sliderBottom, this.sliderBackground);
 
   public SideInventoryScreen(P parent, C container, Inventory playerInventory, Component title, int slotCount, int columns) {
     this(parent, container, playerInventory, title, slotCount, columns, false, false);
@@ -76,8 +75,7 @@ public class SideInventoryScreen<P extends MultiModuleScreen<?>, C extends Abstr
         this.border.cornerTopLeft = this.overlapTopLeft;
         this.border.borderLeft = this.overlap;
         this.border.cornerBottomLeft = this.overlapBottomLeft;
-      }
-      else {
+      } else {
         this.border.cornerTopRight = this.overlapTopRight;
         this.border.borderRight = this.overlap;
         this.border.cornerBottomRight = this.overlapBottomRight;
@@ -132,8 +130,7 @@ public class SideInventoryScreen<P extends MultiModuleScreen<?>, C extends Abstr
     if (this.getDisplayedRows() < this.getTotalRows()) {
       this.slider.enable();
       this.imageWidth = this.columns * this.slot.w + this.slider.width + 2 * this.border.w;
-    }
-    else {
+    } else {
       this.slider.disable();
       this.imageWidth = this.columns * this.slot.w + this.border.w * 2;
     }
@@ -146,16 +143,14 @@ public class SideInventoryScreen<P extends MultiModuleScreen<?>, C extends Abstr
       if (this.yOffset == 0) {
         if (this.right) {
           this.border.cornerTopLeft = this.overlapTop;
-        }
-        else {
+        } else {
           this.border.cornerTopRight = this.overlapTop;
         }
       }
 
       this.xOffset = (this.border.w - 1) * (this.right ? -1 : 1);
       this.leftPos += this.xOffset;
-    }
-    else {
+    } else {
       this.xOffset = 0;
     }
 
@@ -181,7 +176,7 @@ public class SideInventoryScreen<P extends MultiModuleScreen<?>, C extends Abstr
   }
 
   private int getDisplayedRows() {
-    return slider.height / slot.h;
+    return this.slider.height / this.slot.h;
   }
 
   private int getTotalRows() {
@@ -214,12 +209,12 @@ public class SideInventoryScreen<P extends MultiModuleScreen<?>, C extends Abstr
   // updates slot visibility
   protected void updateSlots() {
     this.firstSlotId = this.slider.getValue() * this.columns;
-    this.lastSlotId = Math.min(this.slotCount, this.firstSlotId + getDisplayedRows() * this.columns);
+    this.lastSlotId = Math.min(this.slotCount, this.firstSlotId + this.getDisplayedRows() * this.columns);
 
     int xd = this.border.w + this.xOffset;
     int yd = this.border.h + this.yOffset;
 
-    if (shouldDrawName()) {
+    if (this.shouldDrawName()) {
       yd += this.textBackground.h;
     }
 
@@ -235,12 +230,10 @@ public class SideInventoryScreen<P extends MultiModuleScreen<?>, C extends Abstr
 
         if (this.right) {
           slot.x += this.parent.realWidth;
-        }
-        else {
+        } else {
           slot.x -= this.imageWidth;
         }
-      }
-      else {
+      } else {
         slot.x = 0;
         slot.y = 0;
       }

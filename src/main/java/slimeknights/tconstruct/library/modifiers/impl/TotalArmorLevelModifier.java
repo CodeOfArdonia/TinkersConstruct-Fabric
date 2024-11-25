@@ -8,9 +8,12 @@ import slimeknights.tconstruct.library.tools.context.EquipmentChangeContext;
 import slimeknights.tconstruct.library.tools.helper.ModifierUtil;
 import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 
-/** Modifier that keeps track of the total armor level in persistent data */
+/**
+ * Modifier that keeps track of the total armor level in persistent data
+ */
 @RequiredArgsConstructor
 public class TotalArmorLevelModifier extends Modifier {
+
   private final TinkerDataKey<Integer> key;
   private final boolean allowBroken;
   private final boolean singleUse;
@@ -25,7 +28,7 @@ public class TotalArmorLevelModifier extends Modifier {
 
   @Override
   public Component getDisplayName(int level) {
-    if (singleUse) {
+    if (this.singleUse) {
       return super.getDisplayName();
     }
     return super.getDisplayName(level);
@@ -33,11 +36,11 @@ public class TotalArmorLevelModifier extends Modifier {
 
   @Override
   public void onEquip(IToolStackView tool, int level, EquipmentChangeContext context) {
-    ModifierUtil.addTotalArmorModifierLevel(tool, context, key, level, allowBroken);
+    ModifierUtil.addTotalArmorModifierLevel(tool, context, this.key, level, this.allowBroken);
   }
 
   @Override
   public void onUnequip(IToolStackView tool, int level, EquipmentChangeContext context) {
-    ModifierUtil.addTotalArmorModifierLevel(tool, context, key, -level, allowBroken);
+    ModifierUtil.addTotalArmorModifierLevel(tool, context, this.key, -level, this.allowBroken);
   }
 }

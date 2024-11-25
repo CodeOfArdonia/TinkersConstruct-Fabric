@@ -9,15 +9,14 @@ import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureType;
-import net.minecraft.world.level.levelgen.structure.structures.BuriedTreasureStructure;
 import slimeknights.tconstruct.world.TinkerStructures;
 import slimeknights.tconstruct.world.worldgen.islands.variants.IIslandVariant;
 import slimeknights.tconstruct.world.worldgen.islands.variants.IslandVariants;
 
-import java.util.Random;
-
 public class EarthSlimeIslandStructure extends AbstractIslandStructure {
+
   public static final Codec<EarthSlimeIslandStructure> CODEC = simpleCodec(EarthSlimeIslandStructure::new);
+
   public EarthSlimeIslandStructure(Structure.StructureSettings structureSettings) {
     super(structureSettings, new IIslandSettings() {
       @Override

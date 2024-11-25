@@ -34,8 +34,11 @@ import java.awt.*;
 import java.util.Collections;
 import java.util.List;
 
-/** Shared base logic for the two casting recipe types */
+/**
+ * Shared base logic for the two casting recipe types
+ */
 public abstract class AbstractCastingCategory implements IRecipeCategory<IDisplayableCastingRecipe>, IRecipeTooltipReplacement {
+
   private static final String KEY_COOLING_TIME = TConstruct.makeTranslationKey("jei", "time");
   private static final String KEY_CAST_KEPT = TConstruct.makeTranslationKey("jei", "casting.cast_kept");
   private static final String KEY_CAST_CONSUMED = TConstruct.makeTranslationKey("jei", "casting.cast_consumed");
@@ -49,7 +52,7 @@ public abstract class AbstractCastingCategory implements IRecipeCategory<IDispla
   private final IDrawable castConsumed;
   private final IDrawable castKept;
   private final IDrawable block;
-  private final LoadingCache<Integer,IDrawableAnimated> cachedArrows;
+  private final LoadingCache<Integer, IDrawableAnimated> cachedArrows;
 
   protected AbstractCastingCategory(IGuiHelper guiHelper, Block icon, IDrawable block) {
     this.background = guiHelper.createDrawable(BACKGROUND_LOC, 0, 0, 117, 54);
@@ -73,10 +76,10 @@ public abstract class AbstractCastingCategory implements IRecipeCategory<IDispla
 
   @Override
   public void draw(IDisplayableCastingRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
-    cachedArrows.getUnchecked(Math.max(1, recipe.getCoolingTime())).draw(graphics, 58, 18);
-    block.draw(graphics, 38, 35);
+    this.cachedArrows.getUnchecked(Math.max(1, recipe.getCoolingTime())).draw(graphics, 58, 18);
+    this.block.draw(graphics, 38, 35);
     if (recipe.hasCast()) {
-      (recipe.isConsumed() ? castConsumed : castKept).draw(graphics, 63, 39);
+      (recipe.isConsumed() ? this.castConsumed : this.castKept).draw(graphics, 63, 39);
     }
 
     int coolingTime = recipe.getCoolingTime() / 20;
@@ -88,7 +91,7 @@ public abstract class AbstractCastingCategory implements IRecipeCategory<IDispla
 
   @Override
   public List<Component> getTooltipStrings(IDisplayableCastingRecipe recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
-    if (recipe.hasCast() && GuiUtil.isHovered((int)mouseX, (int)mouseY, 63, 39, 13, 11)) {
+    if (recipe.hasCast() && GuiUtil.isHovered((int) mouseX, (int) mouseY, 63, 39, 13, 11)) {
       return Collections.singletonList(Component.translatable(recipe.isConsumed() ? KEY_CAST_CONSUMED : KEY_CAST_KEPT));
     }
     return Collections.emptyList();
@@ -107,19 +110,19 @@ public abstract class AbstractCastingCategory implements IRecipeCategory<IDispla
     // tank fluids
     long capacity = FluidValues.METAL_BLOCK;
     builder.addSlot(RecipeIngredientRole.INPUT, 3, 3)
-           .addTooltipCallback(this)
-           .setFluidRenderer(capacity, false, 32, 32)
-           .setOverlay(tankOverlay, 0, 0)
-           .addIngredients(JEITypes.FLUID_STACK, recipe.getFluids());
+      .addTooltipCallback(this)
+      .setFluidRenderer(capacity, false, 32, 32)
+      .setOverlay(this.tankOverlay, 0, 0)
+      .addIngredients(JEITypes.FLUID_STACK, recipe.getFluids());
     // pouring fluid
     int h = 11;
     if (!recipe.hasCast()) {
       h += 16;
     }
     builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 43, 8)
-           .addTooltipCallback(this)
-           .setFluidRenderer(1L, false, 6, h)
-           .addIngredients(JEITypes.FLUID_STACK, recipe.getFluids());
+      .addTooltipCallback(this)
+      .setFluidRenderer(1L, false, 6, h)
+      .addIngredients(JEITypes.FLUID_STACK, recipe.getFluids());
   }
 
   @Override

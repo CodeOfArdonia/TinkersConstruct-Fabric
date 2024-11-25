@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FluidStackRenderer implements IIngredientRenderer<FluidStack> {
+
   private static final Logger LOGGER = LogManager.getLogger();
 
   private static final NumberFormat nf = NumberFormat.getIntegerInstance();
@@ -69,7 +70,7 @@ public class FluidStackRenderer implements IIngredientRenderer<FluidStack> {
   public void render(GuiGraphics graphics, FluidStack fluidStack) {
     RenderSystem.enableBlend();
 
-    drawFluid(graphics, width, height, fluidStack);
+    this.drawFluid(graphics, this.width, this.height, fluidStack);
 
     RenderSystem.setShaderColor(1, 1, 1, 1);
 
@@ -88,7 +89,7 @@ public class FluidStackRenderer implements IIngredientRenderer<FluidStack> {
     int fluidColor = FluidVariantRendering.getColor(fluidStack.getType());
 
     long amount = fluidStack.getAmount();
-    long scaledAmount = (amount * height) / capacity;
+    long scaledAmount = (amount * height) / this.capacity;
     if (amount > 0 && scaledAmount < MIN_FLUID_HEIGHT) {
       scaledAmount = MIN_FLUID_HEIGHT;
     }
@@ -172,10 +173,10 @@ public class FluidStackRenderer implements IIngredientRenderer<FluidStack> {
       long amount = fluidStack.getAmount();
       long milliBuckets = (amount * 1000) / 1000;
 
-      if (tooltipMode == TooltipMode.SHOW_AMOUNT_AND_CAPACITY) {
-        MutableComponent amountString = Component.translatable("jei.tooltip.liquid.amount.with.capacity", nf.format(milliBuckets), nf.format(capacity));
+      if (this.tooltipMode == TooltipMode.SHOW_AMOUNT_AND_CAPACITY) {
+        MutableComponent amountString = Component.translatable("jei.tooltip.liquid.amount.with.capacity", nf.format(milliBuckets), nf.format(this.capacity));
         tooltip.add(amountString.withStyle(ChatFormatting.GRAY));
-      } else if (tooltipMode == TooltipMode.SHOW_AMOUNT) {
+      } else if (this.tooltipMode == TooltipMode.SHOW_AMOUNT) {
         MutableComponent amountString = Component.translatable("jei.tooltip.liquid.amount", nf.format(milliBuckets));
         tooltip.add(amountString.withStyle(ChatFormatting.GRAY));
       }
@@ -188,11 +189,11 @@ public class FluidStackRenderer implements IIngredientRenderer<FluidStack> {
 
   @Override
   public int getWidth() {
-    return width;
+    return this.width;
   }
 
   @Override
   public int getHeight() {
-    return height;
+    return this.height;
   }
 }

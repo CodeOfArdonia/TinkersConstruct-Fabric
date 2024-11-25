@@ -9,7 +9,6 @@ import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.recipe.FluidValues;
@@ -19,8 +18,11 @@ import slimeknights.tconstruct.plugin.jei.TConstructJEIConstants;
 import slimeknights.tconstruct.plugin.jei.fabric.JEITypes;
 import slimeknights.tconstruct.smeltery.TinkerSmeltery;
 
-/** Extension of melting for byproducts, but ditchs solid fuels */
+/**
+ * Extension of melting for byproducts, but ditchs solid fuels
+ */
 public class FoundryCategory extends AbstractMeltingCategory {
+
   private static final Component TITLE = TConstruct.makeTranslation("jei", "foundry.title");
 
   @Getter
@@ -51,8 +53,8 @@ public class FoundryCategory extends AbstractMeltingCategory {
 
     // fuel
     builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 4, 4)
-           .addTooltipCallback(FUEL_TOOLTIP)
-           .setFluidRenderer(1L, false, 12, 32)
-           .addIngredients(JEITypes.FLUID_STACK, MeltingFuelHandler.getUsableFuels(recipe.getTemperature()));
+      .addTooltipCallback(FUEL_TOOLTIP)
+      .setFluidRenderer(1L, false, 12, 32)
+      .addIngredients(JEITypes.FLUID_STACK, MeltingFuelHandler.getUsableFuels(recipe.getTemperature()));
   }
 }

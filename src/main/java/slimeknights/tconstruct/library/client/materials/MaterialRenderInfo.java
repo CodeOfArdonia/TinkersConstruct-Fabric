@@ -18,29 +18,38 @@ import java.util.function.Predicate;
  */
 @RequiredArgsConstructor
 public class MaterialRenderInfo {
-  /** ID of this render info */
+
+  /**
+   * ID of this render info
+   */
   @Getter
   private final MaterialVariantId identifier;
-  @Nullable @Getter
+  @Nullable
+  @Getter
   private final ResourceLocation texture;
   @Getter
   private final String[] fallbacks;
-  /** color used to tint quads of this texture when the fallback is used */
+  /**
+   * color used to tint quads of this texture when the fallback is used
+   */
   @Getter
   private final int vertexColor;
-  /** Extra light to add to the material, allows some materials to appear to glow slightly */
+  /**
+   * Extra light to add to the material, allows some materials to appear to glow slightly
+   */
   @Getter
   private final int luminosity;
 
   /**
    * Tries to get a sprite for the given texture
-   * @param base           Base texture
-   * @param suffix         Sprite suffix
-   * @param spriteGetter   Logic to get the sprite
-   * @return  Sprite if valid, null if missing
+   *
+   * @param base         Base texture
+   * @param suffix       Sprite suffix
+   * @param spriteGetter Logic to get the sprite
+   * @return Sprite if valid, null if missing
    */
   @Nullable
-  private TextureAtlasSprite trySprite(Material base, String suffix, Function<Material,TextureAtlasSprite> spriteGetter) {
+  private TextureAtlasSprite trySprite(Material base, String suffix, Function<Material, TextureAtlasSprite> spriteGetter) {
     TextureAtlasSprite sprite = spriteGetter.apply(getMaterial(base.texture(), suffix));
     if (!MissingTextureAtlasSprite.getLocation().equals(sprite.contents().name())) {
       return sprite;
@@ -50,45 +59,48 @@ public class MaterialRenderInfo {
 
   /**
    * Gets the texture for this render material
-   * @param base          Base texture
-   * @param spriteGetter  Logic to get a sprite
-   * @return  Pair of the sprite, and a boolean indicating whether the sprite should be tinted
+   *
+   * @param base         Base texture
+   * @param spriteGetter Logic to get a sprite
+   * @return Pair of the sprite, and a boolean indicating whether the sprite should be tinted
    */
-  public TintedSprite getSprite(Material base, Function<Material,TextureAtlasSprite> spriteGetter) {
+  public TintedSprite getSprite(Material base, Function<Material, TextureAtlasSprite> spriteGetter) {
     TextureAtlasSprite sprite;
-    if (texture != null) {
-      sprite = trySprite(base, getSuffix(texture), spriteGetter);
+    if (this.texture != null) {
+      sprite = this.trySprite(base, getSuffix(this.texture), spriteGetter);
       if (sprite != null) {
         return new TintedSprite(sprite, -1);
       }
     }
-    for (String fallback : fallbacks) {
-      sprite = trySprite(base, fallback, spriteGetter);
+    for (String fallback : this.fallbacks) {
+      sprite = this.trySprite(base, fallback, spriteGetter);
       if (sprite != null) {
-        return new TintedSprite(sprite, vertexColor);
+        return new TintedSprite(sprite, this.vertexColor);
       }
     }
-    return new TintedSprite(spriteGetter.apply(base), vertexColor);
+    return new TintedSprite(spriteGetter.apply(base), this.vertexColor);
   }
 
   /**
    * Gets all dependencies for this render info
-   * @param textures  Texture consumer
-   * @param base      Base texture, will be used to generate texture names
+   *
+   * @param textures Texture consumer
+   * @param base     Base texture, will be used to generate texture names
    */
   public void getTextureDependencies(Predicate<Material> textures, Material base) {
-    if (texture != null) {
-      textures.test(getMaterial(base.texture(), getSuffix(texture)));
+    if (this.texture != null) {
+      textures.test(getMaterial(base.texture(), getSuffix(this.texture)));
     }
-    for (String fallback : fallbacks) {
+    for (String fallback : this.fallbacks) {
       textures.test(getMaterial(base.texture(), fallback));
     }
   }
 
   /**
    * Converts a material ID into a sprite suffix
-   * @param material  Material ID
-   * @return  Sprite name
+   *
+   * @param material Material ID
+   * @return Sprite name
    */
   public static String getSuffix(ResourceLocation material) {
     // namespace will only be minecraft for a texture override, so this lets you select to always use an untinted base texture as the materials texture
@@ -100,9 +112,10 @@ public class MaterialRenderInfo {
 
   /**
    * Gets a material for the given resource locations
-   * @param texture   Texture path
-   * @param suffix    Material or fallback suffix name
-   * @return  Material instance
+   *
+   * @param texture Texture path
+   * @param suffix  Material or fallback suffix name
+   * @return Material instance
    */
   private static Material getMaterial(ResourceLocation texture, String suffix) {
     return new Material(TextureAtlas.LOCATION_BLOCKS, new ResourceLocation(texture.getNamespace(), texture.getPath() + "_" + suffix));

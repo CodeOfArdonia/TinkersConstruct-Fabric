@@ -17,11 +17,14 @@ import slimeknights.tconstruct.library.tools.stat.ToolStats;
 import java.util.Collections;
 import java.util.List;
 
-/** Internal stat type to make a material repairable without making it a head material. Only required if you use no other repairable material stat type */
+/**
+ * Internal stat type to make a material repairable without making it a head material. Only required if you use no other repairable material stat type
+ */
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @ToString
 public class RepairKitStats extends BaseMaterialStats implements IRepairableMaterialStats {
+
   public static final MaterialStatsId ID = new MaterialStatsId(TConstruct.getResource("repair_kit"));
   private static final List<Component> DESCRIPTION = ImmutableList.of(ToolStats.DURABILITY.getDescription());
   public static final RepairKitStats DEFAULT = new RepairKitStats(1);

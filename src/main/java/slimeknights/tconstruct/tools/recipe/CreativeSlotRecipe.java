@@ -29,14 +29,16 @@ import javax.annotation.Nullable;
  */
 @RequiredArgsConstructor
 public class CreativeSlotRecipe implements ITinkerStationRecipe, IModifierRecipe {
+
   @Getter
   private final ResourceLocation id;
 
   /**
    * Finds the slot type from the inventory
-   * @param inv             Inventory
-   * @param stopAfterFirst  If true, stops after the first item is found
-   * @return  Slot type found, or null if invalid
+   *
+   * @param inv            Inventory
+   * @param stopAfterFirst If true, stops after the first item is found
+   * @return Slot type found, or null if invalid
    */
   @Nullable
   private SlotType findSlotType(ITinkerStationContainer inv, boolean stopAfterFirst) {
@@ -68,7 +70,7 @@ public class CreativeSlotRecipe implements ITinkerStationRecipe, IModifierRecipe
     if (!inv.getTinkerableStack().is(TinkerTags.Items.MODIFIABLE)) {
       return false;
     }
-    return findSlotType(inv, false) != null;
+    return this.findSlotType(inv, false) != null;
   }
 
   @Override
@@ -92,7 +94,7 @@ public class CreativeSlotRecipe implements ITinkerStationRecipe, IModifierRecipe
     }
 
     // find the input
-    SlotType slotType = findSlotType(inv, true);
+    SlotType slotType = this.findSlotType(inv, true);
     if (slotType != null) {
       String name = slotType.getName();
       slots.putInt(name, slots.getInt(name) + 1);
@@ -113,7 +115,9 @@ public class CreativeSlotRecipe implements ITinkerStationRecipe, IModifierRecipe
     return TinkerModifiers.creativeSlot.get();
   }
 
-  /** @deprecated Use {@link #assemble(ITinkerStationContainer, RegistryAccess)} */
+  /**
+   * @deprecated Use {@link #assemble(ITinkerStationContainer, RegistryAccess)}
+   */
   @Deprecated
   @Override
   public ItemStack getResultItem(RegistryAccess registryAccess) {

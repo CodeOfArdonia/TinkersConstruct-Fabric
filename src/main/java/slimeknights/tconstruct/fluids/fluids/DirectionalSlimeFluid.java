@@ -19,6 +19,7 @@ import slimeknights.tconstruct.world.TinkerWorld;
 import slimeknights.tconstruct.world.block.SlimeGrassBlock;
 
 public abstract class DirectionalSlimeFluid extends SimpleDirectionalFluid {
+
   protected DirectionalSlimeFluid(SimpleDirectionalFluid.Properties properties) {
     super(properties);
   }

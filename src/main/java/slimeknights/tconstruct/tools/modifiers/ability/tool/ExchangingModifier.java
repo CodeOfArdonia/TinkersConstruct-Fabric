@@ -19,6 +19,7 @@ import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 import slimeknights.tconstruct.library.utils.Util;
 
 public class ExchangingModifier extends NoLevelsModifier {
+
   @Override
   public int getPriority() {
     // super low because we need to run after the shears ability modifier, and any other similar hooks

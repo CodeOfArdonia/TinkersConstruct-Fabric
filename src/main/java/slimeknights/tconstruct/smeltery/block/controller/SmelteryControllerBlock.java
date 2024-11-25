@@ -19,6 +19,7 @@ import slimeknights.tconstruct.smeltery.block.entity.controller.SmelteryBlockEnt
 import javax.annotation.Nullable;
 
 public class SmelteryControllerBlock extends HeatingControllerBlock {
+
   public SmelteryControllerBlock(Properties properties) {
     super(properties);
   }
@@ -59,7 +60,7 @@ public class SmelteryControllerBlock extends HeatingControllerBlock {
       double z = pos.getZ() + 0.5D;
       double frontOffset = 0.52D;
       double sideOffset = rand.nextDouble() * 0.6D - 0.3D;
-      spawnFireParticles(world, state, x, y, z, frontOffset, sideOffset);
+      this.spawnFireParticles(world, state, x, y, z, frontOffset, sideOffset);
     }
   }
 

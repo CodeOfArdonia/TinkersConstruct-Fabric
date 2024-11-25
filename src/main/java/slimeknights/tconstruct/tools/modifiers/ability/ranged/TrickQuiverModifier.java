@@ -28,14 +28,21 @@ import javax.annotation.Nullable;
 import java.util.function.Predicate;
 
 public class TrickQuiverModifier extends InventoryMenuModifier implements BowAmmoModifierHook {
+
   private static final ResourceLocation INVENTORY_KEY = TConstruct.getResource("trick_quiver");
   private static final ResourceLocation SELECTED_SLOT = TConstruct.getResource("trick_quiver_selected");
   private static final Pattern TRICK_ARROW = new Pattern(TConstruct.getResource("tipped_arrow"));
-  /** Message when disabling the trick quiver */
+  /**
+   * Message when disabling the trick quiver
+   */
   private static final Component DISABLED = TConstruct.makeTranslation("modifier", "trick_quiver.disabled");
-  /** Message displayed when the selected slot is empty */
+  /**
+   * Message displayed when the selected slot is empty
+   */
   private static final String EMPTY = TConstruct.makeTranslationKey("modifier", "trick_quiver.empty");
-  /** Message to display selected slot */
+  /**
+   * Message to display selected slot
+   */
   private static final String SELECTED = TConstruct.makeTranslationKey("modifier", "trick_quiver.selected");
 
   public TrickQuiverModifier() {
@@ -78,14 +85,14 @@ public class TrickQuiverModifier extends InventoryMenuModifier implements BowAmm
   @Override
   public ItemStack findAmmo(IToolStackView tool, ModifierEntry modifier, LivingEntity shooter, ItemStack standardAmmo, Predicate<ItemStack> ammoPredicate) {
     // if selected is too big (disabled), will automatially return nothing
-    return getStack(tool, modifier, tool.getPersistentData().getInt(SELECTED_SLOT));
+    return this.getStack(tool, modifier, tool.getPersistentData().getInt(SELECTED_SLOT));
   }
 
   @Override
   public void shrinkAmmo(IToolStackView tool, ModifierEntry modifier, LivingEntity shooter, ItemStack ammo, int needed) {
     // assume no one else touched our selected slot, good assumption
     ammo.shrink(needed);
-    setStack(tool, modifier, tool.getPersistentData().getInt(SELECTED_SLOT), ammo);
+    this.setStack(tool, modifier, tool.getPersistentData().getInt(SELECTED_SLOT), ammo);
   }
 
   @Override
@@ -94,7 +101,7 @@ public class TrickQuiverModifier extends InventoryMenuModifier implements BowAmm
       if (!player.level().isClientSide) {
         // first, increment the number
         ModDataNBT data = tool.getPersistentData();
-        int totalSlots = getSlots(tool, modifier.getLevel());
+        int totalSlots = this.getSlots(tool, modifier.getLevel());
         // support going 1 above max to disable the trick arrows
         int newSelected = (data.getInt(SELECTED_SLOT) + 1) % (totalSlots + 1);
         data.putInt(SELECTED_SLOT, newSelected);
@@ -103,7 +110,7 @@ public class TrickQuiverModifier extends InventoryMenuModifier implements BowAmm
         if (newSelected == totalSlots) {
           player.displayClientMessage(DISABLED, true);
         } else {
-          ItemStack selectedStack = getStack(tool, modifier, newSelected);
+          ItemStack selectedStack = this.getStack(tool, modifier, newSelected);
           if (selectedStack.isEmpty()) {
             player.displayClientMessage(Component.translatable(EMPTY, newSelected + 1), true);
           } else {

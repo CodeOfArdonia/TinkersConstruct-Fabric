@@ -17,25 +17,30 @@ import slimeknights.tconstruct.library.utils.JsonUtils;
  * Effect to increase or decrease the players breath
  */
 public record AddBreathSpillingEffect(int amount) implements ISpillingEffect {
-  /** ID of this effect */
+
+  /**
+   * ID of this effect
+   */
   public static final ResourceLocation ID = TConstruct.getResource("add_breath");
 
   @Override
   public void applyEffects(FluidStack fluid, float scale, ToolAttackContext context) {
     LivingEntity target = context.getLivingTarget();
     if (target != null) {
-      target.setAirSupply(Mth.clamp(target.getAirSupply() + amount, 0, target.getMaxAirSupply()));
+      target.setAirSupply(Mth.clamp(target.getAirSupply() + this.amount, 0, target.getMaxAirSupply()));
     }
   }
 
   @Override
   public JsonObject serialize(JsonSerializationContext context) {
     JsonObject json = JsonUtils.withType(ID);
-    json.addProperty("amount", amount);
+    json.addProperty("amount", this.amount);
     return json;
   }
 
-  /** Loader instance */
+  /**
+   * Loader instance
+   */
   public static final JsonDeserializer<AddBreathSpillingEffect> LOADER = (element, type, context) ->
     new AddBreathSpillingEffect(GsonHelper.getAsInt(element.getAsJsonObject(), "amount"));
 }

@@ -13,23 +13,29 @@ import slimeknights.mantle.recipe.ingredient.FluidIngredient;
 import slimeknights.tconstruct.library.recipe.TinkerRecipeTypes;
 import slimeknights.tconstruct.smeltery.TinkerSmeltery;
 
-/** Extension of item recipe that sets the result block to the input block */
+/**
+ * Extension of item recipe that sets the result block to the input block
+ */
 public abstract class RetexturedCastingRecipe extends ItemCastingRecipe {
+
   public RetexturedCastingRecipe(RecipeType<?> type, ResourceLocation id, String group, Ingredient cast, FluidIngredient fluid, ItemOutput result, int coolingTime, boolean consumed, boolean switchSlots) {
     super(type, id, group, cast, fluid, result, coolingTime, consumed, switchSlots);
   }
 
   @Override
   public ItemStack assemble(ICastingContainer inv, RegistryAccess registryAccess) {
-    ItemStack result = getResultItem(registryAccess).copy();
-    if (inv.getStack().getItem() instanceof BlockItem blockItem ) {
+    ItemStack result = this.getResultItem(registryAccess).copy();
+    if (inv.getStack().getItem() instanceof BlockItem blockItem) {
       return RetexturedBlockItem.setTexture(result, blockItem.getBlock());
     }
     return result;
   }
 
-  /** Subclass for basin recipes */
+  /**
+   * Subclass for basin recipes
+   */
   public static class Basin extends RetexturedCastingRecipe {
+
     public Basin(ResourceLocation id, String group, Ingredient cast, FluidIngredient fluid, ItemOutput result, int coolingTime, boolean consumed, boolean switchSlots) {
       super(TinkerRecipeTypes.CASTING_BASIN.get(), id, group, cast, fluid, result, coolingTime, consumed, switchSlots);
     }
@@ -40,8 +46,11 @@ public abstract class RetexturedCastingRecipe extends ItemCastingRecipe {
     }
   }
 
-  /** Subclass for table recipes */
+  /**
+   * Subclass for table recipes
+   */
   public static class Table extends RetexturedCastingRecipe {
+
     public Table(ResourceLocation id, String group, Ingredient cast, FluidIngredient fluid, ItemOutput result, int coolingTime, boolean consumed, boolean switchSlots) {
       super(TinkerRecipeTypes.CASTING_TABLE.get(), id, group, cast, fluid, result, coolingTime, consumed, switchSlots);
     }

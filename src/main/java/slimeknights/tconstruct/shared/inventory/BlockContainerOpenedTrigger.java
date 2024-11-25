@@ -19,8 +19,11 @@ import slimeknights.tconstruct.TConstruct;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
-/** Criteria that triggers when a container is opened */
+/**
+ * Criteria that triggers when a container is opened
+ */
 public class BlockContainerOpenedTrigger extends SimpleCriterionTrigger<BlockContainerOpenedTrigger.Instance> {
+
   private static final ResourceLocation ID = TConstruct.getResource("block_container_opened");
 
   @Override
@@ -38,15 +41,19 @@ public class BlockContainerOpenedTrigger extends SimpleCriterionTrigger<BlockCon
     return new Instance(contextPredicate, type);
   }
 
-  /** Triggers this criteria */
+  /**
+   * Triggers this criteria
+   */
   public void trigger(@Nullable BlockEntity tileEntity, @Nullable Inventory inv) {
     if (tileEntity != null && inv != null && inv.player instanceof ServerPlayer) {
-      this.trigger((ServerPlayer)inv.player, instance -> instance.test(tileEntity.getType()));
+      this.trigger((ServerPlayer) inv.player, instance -> instance.test(tileEntity.getType()));
     }
   }
 
   public static class Instance extends AbstractCriterionTriggerInstance {
+
     private final BlockEntityType<?> type;
+
     public Instance(ContextAwarePredicate playerCondition, BlockEntityType<?> type) {
       super(ID, playerCondition);
       this.type = type;
@@ -56,7 +63,9 @@ public class BlockContainerOpenedTrigger extends SimpleCriterionTrigger<BlockCon
       return new Instance(ContextAwarePredicate.ANY, type);
     }
 
-    /** Tests if this instance matches */
+    /**
+     * Tests if this instance matches
+     */
     public boolean test(BlockEntityType<?> type) {
       return this.type == type;
     }
@@ -64,7 +73,7 @@ public class BlockContainerOpenedTrigger extends SimpleCriterionTrigger<BlockCon
     @Override
     public JsonObject serializeToJson(SerializationContext conditions) {
       JsonObject json = super.serializeToJson(conditions);
-      json.addProperty("type", Objects.requireNonNull(BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(type)).toString());
+      json.addProperty("type", Objects.requireNonNull(BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(this.type)).toString());
       return json;
     }
   }

@@ -14,7 +14,6 @@ import slimeknights.tconstruct.library.tools.part.IMaterialItem;
 import slimeknights.tconstruct.tables.TinkerTables;
 
 import javax.annotation.Nullable;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -23,6 +22,7 @@ import java.util.function.Consumer;
 @Accessors(chain = true)
 @RequiredArgsConstructor(staticName = "partRecipe")
 public class PartRecipeBuilder extends AbstractRecipeBuilder<PartRecipeBuilder> {
+
   private final IMaterialItem output;
   private final int outputAmount;
   @Setter
@@ -34,8 +34,9 @@ public class PartRecipeBuilder extends AbstractRecipeBuilder<PartRecipeBuilder> 
 
   /**
    * Creates a new part recipe that outputs a single item
-   * @param output  Output item
-   * @return  Builder instance
+   *
+   * @param output Output item
+   * @return Builder instance
    */
   public static PartRecipeBuilder partRecipe(IMaterialItem output) {
     return partRecipe(output, 1);
@@ -62,25 +63,26 @@ public class PartRecipeBuilder extends AbstractRecipeBuilder<PartRecipeBuilder> 
   }
 
   private class Result extends AbstractFinishedRecipe {
+
     public Result(ResourceLocation ID, @Nullable ResourceLocation advancementID) {
       super(ID, advancementID);
     }
 
     @Override
     public void serializeRecipeData(JsonObject json) {
-      if (!group.isEmpty()) {
-        json.addProperty("group", group);
+      if (!PartRecipeBuilder.this.group.isEmpty()) {
+        json.addProperty("group", PartRecipeBuilder.this.group);
       }
-      json.addProperty("pattern", pattern.toString());
-      if (patternItem != null) {
-        json.add("pattern_item", patternItem.toJson());
+      json.addProperty("pattern", PartRecipeBuilder.this.pattern.toString());
+      if (PartRecipeBuilder.this.patternItem != null) {
+        json.add("pattern_item", PartRecipeBuilder.this.patternItem.toJson());
       }
-      json.addProperty("cost", cost);
+      json.addProperty("cost", PartRecipeBuilder.this.cost);
 
       JsonObject jsonOutput = new JsonObject();
-      jsonOutput.addProperty("item", BuiltInRegistries.ITEM.getKey(output.asItem()).toString());
-      if (outputAmount > 1) {
-        jsonOutput.addProperty("count", outputAmount);
+      jsonOutput.addProperty("item", BuiltInRegistries.ITEM.getKey(PartRecipeBuilder.this.output.asItem()).toString());
+      if (PartRecipeBuilder.this.outputAmount > 1) {
+        jsonOutput.addProperty("count", PartRecipeBuilder.this.outputAmount);
       }
       json.add("result", jsonOutput);
     }

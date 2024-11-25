@@ -26,9 +26,12 @@ import java.util.Set;
  */
 @RequiredArgsConstructor
 public class VeiningAOEIterator implements IAreaOfEffectIterator {
+
   public static final Loader LOADER = new Loader();
 
-  /** Max distance from the starting block to vein, min of 0 */
+  /**
+   * Max distance from the starting block to vein, min of 0
+   */
   private final int maxDistance;
 
   @Override
@@ -39,83 +42,91 @@ public class VeiningAOEIterator implements IAreaOfEffectIterator {
   @Override
   public Iterable<BlockPos> getBlocks(IToolStackView tool, ItemStack stack, Player player, BlockState state, Level world, BlockPos origin, Direction sideHit, AOEMatchType matchType) {
     int expanded = tool.getModifierLevel(TinkerModifiers.expanded.getId());
-    return calculate(state, world, origin, maxDistance + expanded);
+    return calculate(state, world, origin, this.maxDistance + expanded);
   }
 
   /**
    * Calculates the blocks for veining
    *
-   * @param state        State being mined
-   * @param world        World instance
-   * @param origin       Position origin
-   * @param maxDistance  Max distance to vein
-   * @return  Iterator for veining
+   * @param state       State being mined
+   * @param world       World instance
+   * @param origin      Position origin
+   * @param maxDistance Max distance to vein
+   * @return Iterator for veining
    */
   public static Iterable<BlockPos> calculate(BlockState state, Level world, BlockPos origin, int maxDistance) {
     return () -> new VeiningIterator(world, origin, state.getBlock(), maxDistance);
   }
 
-  /** Iterator that navigates block and other similar blocks */
+  /**
+   * Iterator that navigates block and other similar blocks
+   */
   private static class VeiningIterator extends AbstractIterator<BlockPos> {
+
     private final Set<BlockPos> visited = new HashSet<>();
     private final Queue<DistancePos> queue = new ArrayDeque<>();
 
     private final Level world;
     private final Block target;
     private final int maxDistance;
+
     private VeiningIterator(Level world, BlockPos origin, Block target, int maxDistance) {
       this.world = world;
       this.target = target;
       this.maxDistance = maxDistance;
       // make use of origin
-      visited.add(origin);
+      this.visited.add(origin);
       if (maxDistance > 0) {
         // start off the queue with the position in each direction
-        enqueueNeighbors(origin, 1);
+        this.enqueueNeighbors(origin, 1);
       }
     }
 
     /**
      * Enqueues all neighbors of this position
-     * @param pos       Position
-     * @param distance  Distance for neighbors
+     *
+     * @param pos      Position
+     * @param distance Distance for neighbors
      */
     private void enqueueNeighbors(BlockPos pos, int distance) {
       for (Direction direction : Direction.values()) {
         BlockPos offset = pos.relative(direction);
-        if (!visited.contains(offset)) {
-          visited.add(offset); // mark position visited to prevent adding again before we get to it
-          queue.add(new DistancePos(offset, distance));
+        if (!this.visited.contains(offset)) {
+          this.visited.add(offset); // mark position visited to prevent adding again before we get to it
+          this.queue.add(new DistancePos(offset, distance));
         }
       }
     }
 
     @Override
     protected BlockPos computeNext() {
-      while (!queue.isEmpty()) {
+      while (!this.queue.isEmpty()) {
         // grab the next queued position to check
-        DistancePos distancePos = queue.remove();
+        DistancePos distancePos = this.queue.remove();
         BlockPos pos = distancePos.pos;
         // must be a valid block
-        if (world.getBlockState(pos).is(target)) {
+        if (this.world.getBlockState(pos).is(this.target)) {
           // if not at max distance yet, add blocks on all sides
           int distance = distancePos.distance;
-          if (distance < maxDistance) {
-            enqueueNeighbors(pos, distance + 1);
+          if (distance < this.maxDistance) {
+            this.enqueueNeighbors(pos, distance + 1);
           }
           // finally, return the position
           return pos;
         }
       }
       // queue ran out of data
-      return endOfData();
+      return this.endOfData();
     }
   }
 
-  /** Helper data class */
+  /**
+   * Helper data class
+   */
   private record DistancePos(BlockPos pos, int distance) {}
 
   private static class Loader implements IGenericLoader<VeiningAOEIterator> {
+
     @Override
     public VeiningAOEIterator deserialize(JsonObject json) {
       int maxDistance = JsonUtils.getIntMin(json, "max_distance", 0);

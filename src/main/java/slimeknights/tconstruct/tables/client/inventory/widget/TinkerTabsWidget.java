@@ -2,7 +2,6 @@ package slimeknights.tconstruct.tables.client.inventory.widget;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.fabric.api.block.BlockPickInteractionAware;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.Minecraft;
@@ -35,6 +34,7 @@ import slimeknights.tconstruct.tables.network.StationTabPacket;
 import java.util.List;
 
 public class TinkerTabsWidget implements Renderable, GuiEventListener, NarratableEntry {
+
   private static final ResourceLocation TAB_IMAGE = TConstruct.getResource("textures/gui/icons.png");
   protected static final ElementScreen TAB_ELEMENT = new ElementScreen(0, 18, 26, 30, 256, 256);
   protected static final ElementScreen ACTIVE_TAB_L_ELEMENT = new ElementScreen(26, 18, 26, 30, 256, 256);
@@ -68,12 +68,12 @@ public class TinkerTabsWidget implements Renderable, GuiEventListener, Narratabl
     this.tabs.setPosition(this.leftPos, this.topPos);
 
     tabs.stream().map(Pair::getLeft).forEach(this.tabs::addTab);
-    tabData = tabs.stream().map(Pair::getRight).toList();
+    this.tabData = tabs.stream().map(Pair::getRight).toList();
 
     // preselect the correct tab
     BlockEntity blockEntity = this.parent.getTileEntity();
     if (blockEntity != null)
-      selectTabForPos(blockEntity.getBlockPos());
+      this.selectTabForPos(blockEntity.getBlockPos());
   }
 
   private static List<Pair<ItemStack, BlockPos>> collectTabs(Minecraft minecraft, TabbedContainerMenu<?> menu) {
@@ -135,7 +135,7 @@ public class TinkerTabsWidget implements Renderable, GuiEventListener, Narratabl
 
   @Override
   public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-    if (isMouseOver(mouseX, mouseY)) {
+    if (this.isMouseOver(mouseX, mouseY)) {
       this.tabs.handleMouseClicked((int) mouseX, (int) mouseY, mouseButton);
       return true;
     }
@@ -172,27 +172,27 @@ public class TinkerTabsWidget implements Renderable, GuiEventListener, Narratabl
     // new selection
     if (sel != this.tabs.selected) {
       if (0 <= this.tabs.selected && this.tabs.selected < this.tabData.size())
-        onNewTabSelection(this.tabData.get(this.tabs.selected));
+        this.onNewTabSelection(this.tabData.get(this.tabs.selected));
     }
 
-    renterTooltip(graphics, mouseX, mouseY);
+    this.renterTooltip(graphics, mouseX, mouseY);
   }
 
   protected void renterTooltip(GuiGraphics graphics, int mouseX, int mouseY) {
     // highlighted tooltip
-    Level world = Screens.getClient(parent).level;
+    Level world = Screens.getClient(this.parent).level;
     if (this.tabs.highlighted > -1 && world != null) {
       BlockPos pos = this.tabData.get(this.tabs.highlighted);
       Component title;
       BlockEntity te = world.getBlockEntity(pos);
       if (te instanceof MenuProvider) {
-        title = ((MenuProvider)te).getDisplayName();
+        title = ((MenuProvider) te).getDisplayName();
       } else {
         title = world.getBlockState(pos).getBlock().getName();
       }
 
       // TODO: renderComponentTooltip->renderTooltip
-      graphics.renderComponentTooltip(Screens.getTextRenderer(parent), Lists.newArrayList(title), mouseX, mouseY);
+      graphics.renderComponentTooltip(Screens.getTextRenderer(this.parent), Lists.newArrayList(title), mouseX, mouseY);
     }
   }
 

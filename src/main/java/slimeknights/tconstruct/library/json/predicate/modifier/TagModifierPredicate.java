@@ -13,13 +13,14 @@ import slimeknights.tconstruct.library.modifiers.ModifierManager;
  */
 @RequiredArgsConstructor
 public class TagModifierPredicate implements ModifierPredicate {
-  public static final TagPredicateLoader<Modifier,TagModifierPredicate> LOADER = new TagPredicateLoader<>(ModifierManager.REGISTRY_KEY, TagModifierPredicate::new, c -> c.tag);
+
+  public static final TagPredicateLoader<Modifier, TagModifierPredicate> LOADER = new TagPredicateLoader<>(ModifierManager.REGISTRY_KEY, TagModifierPredicate::new, c -> c.tag);
 
   private final TagKey<Modifier> tag;
 
   @Override
   public boolean matches(ModifierId modifier) {
-    return ModifierManager.isInTag(modifier, tag);
+    return ModifierManager.isInTag(modifier, this.tag);
   }
 
   @Override

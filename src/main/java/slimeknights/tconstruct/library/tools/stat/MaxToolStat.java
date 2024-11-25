@@ -25,6 +25,7 @@ import java.util.function.IntFunction;
  */
 @AllArgsConstructor
 public class MaxToolStat implements IToolStat<Integer> {
+
   @Getter
   private final ToolStatId name;
   private final int defaultValue;
@@ -38,12 +39,12 @@ public class MaxToolStat implements IToolStat<Integer> {
 
   @Override
   public boolean supports(Item item) {
-    return tag == null || RegistryHelper.contains(tag, item);
+    return this.tag == null || RegistryHelper.contains(this.tag, item);
   }
 
   @Override
   public Integer getDefaultValue() {
-    return defaultValue;
+    return this.defaultValue;
   }
 
   @Override
@@ -58,8 +59,9 @@ public class MaxToolStat implements IToolStat<Integer> {
 
   /**
    * Sets the tier to the new tier, keeping the largest
-   * @param builder  Builder
-   * @param value    Value
+   *
+   * @param builder Builder
+   * @param value   Value
    */
   @Override
   public void update(ModifierStatsBuilder builder, Integer value) {
@@ -68,14 +70,14 @@ public class MaxToolStat implements IToolStat<Integer> {
 
   @Override
   public Integer build(Object builder, Integer value) {
-    return Math.max(value, ((TierBuilder)builder).tier);
+    return Math.max(value, ((TierBuilder) builder).tier);
   }
 
   @Nullable
   @Override
   public Integer read(Tag tag) {
     if (TagUtil.isNumeric(tag)) {
-      return ((NumericTag)tag).getAsInt();
+      return ((NumericTag) tag).getAsInt();
     }
     return null;
   }
@@ -88,7 +90,7 @@ public class MaxToolStat implements IToolStat<Integer> {
 
   @Override
   public Integer deserialize(JsonElement json) {
-    return GsonHelper.convertToInt(json, getName().toString());
+    return GsonHelper.convertToInt(json, this.getName().toString());
   }
 
   @Override
@@ -108,16 +110,19 @@ public class MaxToolStat implements IToolStat<Integer> {
 
   @Override
   public Component formatValue(Integer number) {
-    return Component.translatable(Util.makeTranslationKey("tool_stat", getName())).append(displayName.apply(number));
+    return Component.translatable(Util.makeTranslationKey("tool_stat", this.getName())).append(this.displayName.apply(number));
   }
 
   @Override
   public String toString() {
-    return "TierToolStat{" + name + '}';
+    return "TierToolStat{" + this.name + '}';
   }
 
-  /** Internal int storage, basically just a int wrapper */
+  /**
+   * Internal int storage, basically just a int wrapper
+   */
   protected static class TierBuilder {
+
     private int tier = 0;
   }
 }

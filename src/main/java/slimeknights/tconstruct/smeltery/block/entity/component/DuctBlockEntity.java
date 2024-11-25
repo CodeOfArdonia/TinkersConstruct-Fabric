@@ -34,6 +34,7 @@ import javax.annotation.Nullable;
  * Filtered drain tile entity
  */
 public class DuctBlockEntity extends SmelteryFluidIO implements MenuProvider, SidedStorageBlockEntity, CustomUpdateTagHandlingBlockEntity {
+
   private static final String TAG_ITEM = "item";
   private static final Component TITLE = TConstruct.makeTranslation("gui", "duct");
 
@@ -68,21 +69,23 @@ public class DuctBlockEntity extends SmelteryFluidIO implements MenuProvider, Si
   @Nonnull
   @Override
   public Storage<ItemVariant> getItemStorage(@org.jetbrains.annotations.Nullable Direction direction) {
-    return itemHandler;
+    return this.itemHandler;
   }
 
   @Override
   protected Storage<FluidVariant> makeWrapper(SlottedStorage<FluidVariant> capability) {
-    return new DuctTankWrapper(capability, itemHandler);
+    return new DuctTankWrapper(capability, this.itemHandler);
   }
 
-  /** Updates the fluid in model data */
+  /**
+   * Updates the fluid in model data
+   */
   public void updateFluid() {
-    getModelData().setData(IDisplayFluidListener.PROPERTY, IDisplayFluidListener.normalizeFluid(itemHandler.getFluid()));
+    this.getModelData().setData(IDisplayFluidListener.PROPERTY, IDisplayFluidListener.normalizeFluid(this.itemHandler.getFluid()));
 //    requestModelDataUpdate(); TODO: PORT?
-    assert level != null;
-    BlockState state = getBlockState();
-    level.sendBlockUpdated(worldPosition, state, state, 48);
+    assert this.level != null;
+    BlockState state = this.getBlockState();
+    this.level.sendBlockUpdated(this.worldPosition, state, state, 48);
   }
 
 
@@ -97,21 +100,21 @@ public class DuctBlockEntity extends SmelteryFluidIO implements MenuProvider, Si
   public void load(CompoundTag tags) {
     super.load(tags);
     if (tags.contains(TAG_ITEM, Tag.TAG_COMPOUND)) {
-      itemHandler.readFromNBT(tags.getCompound(TAG_ITEM));
+      this.itemHandler.readFromNBT(tags.getCompound(TAG_ITEM));
     }
   }
 
   @Override
   public void handleUpdateTag(CompoundTag tag) {
     CustomUpdateTagHandlingBlockEntity.super.handleUpdateTag(tag);
-    if (level != null && level.isClientSide) {
-      updateFluid();
+    if (this.level != null && this.level.isClientSide) {
+      this.updateFluid();
     }
   }
 
   @Override
   public void saveSynced(CompoundTag tags) {
     super.saveSynced(tags);
-    tags.put(TAG_ITEM, itemHandler.writeToNBT());
+    tags.put(TAG_ITEM, this.itemHandler.writeToNBT());
   }
 }

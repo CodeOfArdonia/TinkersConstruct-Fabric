@@ -14,39 +14,47 @@ import slimeknights.tconstruct.TConstruct;
 
 import java.lang.reflect.Type;
 
-/** Sprite transformer that applies the given color mapping to recolor each pixel */
+/**
+ * Sprite transformer that applies the given color mapping to recolor each pixel
+ */
 @RequiredArgsConstructor
 public class RecolorSpriteTransformer implements ISpriteTransformer {
+
   public static final ResourceLocation NAME = TConstruct.getResource("recolor_sprite");
   public static final Deserializer DESERIALIZER = new Deserializer();
 
-  /** Color mapping to apply */
+  /**
+   * Color mapping to apply
+   */
   private final IColorMapping colorMapping;
 
   @Override
   public void transform(NativeImage image) {
     for (int x = 0; x < image.getWidth(); x++) {
       for (int y = 0; y < image.getHeight(); y++) {
-        image.setPixelRGBA(x, y, colorMapping.mapColor(image.getPixelRGBA(x, y)));
+        image.setPixelRGBA(x, y, this.colorMapping.mapColor(image.getPixelRGBA(x, y)));
       }
     }
   }
 
   @Override
   public int getFallbackColor() {
-    return colorMapping.mapColor(0xFFD8D8D8); // 216 on the greyscale, second color in most of our palettes
+    return this.colorMapping.mapColor(0xFFD8D8D8); // 216 on the greyscale, second color in most of our palettes
   }
 
   @Override
   public JsonObject serialize(JsonSerializationContext context) {
     JsonObject object = new JsonObject();
     object.addProperty("type", NAME.toString());
-    object.add("color_mapping", context.serialize(colorMapping));
+    object.add("color_mapping", context.serialize(this.colorMapping));
     return object;
   }
 
-  /** Serializer for a recolor sprite transformer */
+  /**
+   * Serializer for a recolor sprite transformer
+   */
   protected static class Deserializer implements JsonDeserializer<RecolorSpriteTransformer> {
+
     @Override
     public RecolorSpriteTransformer deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
       JsonObject object = json.getAsJsonObject();

@@ -21,16 +21,20 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Objects;
 
-/** Helpers for a few JSON related tasks */
+/**
+ * Helpers for a few JSON related tasks
+ */
 public class JsonUtils {
+
   private JsonUtils() {}
 
   /**
    * Reads an integer with a minimum value
-   * @param json  Json
-   * @param key   Key to read
-   * @param min   Minimum and default value
-   * @return  Read int
+   *
+   * @param json Json
+   * @param key  Key to read
+   * @param min  Minimum and default value
+   * @return Read int
    * @throws JsonSyntaxException if the key is not an int or below the min
    */
   public static int getIntMin(JsonObject json, String key, int min) {
@@ -43,10 +47,11 @@ public class JsonUtils {
 
   /**
    * Reads an integer with a minimum value
-   * @param json  Json element to parse as an integer
-   * @param key   Key to read
-   * @param min   Minimum
-   * @return  Read int
+   *
+   * @param json Json element to parse as an integer
+   * @param key  Key to read
+   * @param min  Minimum
+   * @return Read int
    * @throws JsonSyntaxException if the key is not an int or below the min
    */
   public static int getIntMin(JsonElement json, String key, int min) {
@@ -57,65 +62,84 @@ public class JsonUtils {
     return value;
   }
 
-  /** @deprecated use {@link JsonHelper#convertToEntry(Registry, JsonElement, String)} */
+  /**
+   * @deprecated use {@link JsonHelper#convertToEntry(Registry, JsonElement, String)}
+   */
   @Deprecated
   public static <T> T convertToEntry(Registry<T> registry, JsonElement element, String key) {
     return JsonHelper.convertToEntry(registry, element, key);
   }
 
-  /** @deprecated use {@link JsonHelper#getAsEntry(Registry, JsonObject, String)} */
+  /**
+   * @deprecated use {@link JsonHelper#getAsEntry(Registry, JsonObject, String)}
+   */
   @Deprecated
   public static <T> T getAsEntry(Registry<T> registry, JsonObject parent, String key) {
     return JsonHelper.getAsEntry(registry, parent, key);
   }
 
-  /** @deprecated use {@link JsonHelper#getJson(Resource)} */
+  /**
+   * @deprecated use {@link JsonHelper#getJson(Resource)}
+   */
   @Deprecated
   @Nullable
   public static JsonObject getJson(Resource resource) {
     return JsonHelper.getJson(resource);
   }
 
-  /** @deprecated use {@link JsonHelper#convertToEnum(JsonElement, String, Class)} */
+  /**
+   * @deprecated use {@link JsonHelper#convertToEnum(JsonElement, String, Class)}
+   */
   @Deprecated
   public static <T extends Enum<T>> T convertToEnum(JsonElement element, String key, Class<T> enumClass) {
     return JsonHelper.convertToEnum(element, key, enumClass);
   }
 
-  /** @deprecated use {@link JsonHelper#getAsEnum(JsonObject, String, Class)} */
+  /**
+   * @deprecated use {@link JsonHelper#getAsEnum(JsonObject, String, Class)}
+   */
   @Deprecated
   public static <T extends Enum<T>> T getAsEnum(JsonObject json, String key, Class<T> enumClass) {
     return JsonHelper.getAsEnum(json, key, enumClass);
   }
 
-  /** @deprecated use {@link JsonHelper#getFileInAllDomainsAndPacks(ResourceManager, String, String)} */
+  /**
+   * @deprecated use {@link JsonHelper#getFileInAllDomainsAndPacks(ResourceManager, String, String)}
+   */
   @Deprecated
   public static List<JsonObject> getFileInAllDomainsAndPacks(ResourceManager manager, String path) {
     return JsonHelper.getFileInAllDomainsAndPacks(manager, path, null);
   }
 
-  /** Called when the player logs in to send packets */
+  /**
+   * Called when the player logs in to send packets
+   */
   public static void syncPackets(ServerPlayer targetedPlayer, boolean joined, ISimplePacket... packets) {
     JsonHelper.syncPackets(targetedPlayer, joined, TinkerNetwork.getInstance(), packets);
   }
 
-  /** Creates a JSON object with the given key set to a resource location */
+  /**
+   * Creates a JSON object with the given key set to a resource location
+   */
   public static JsonObject withLocation(String key, ResourceLocation value) {
     JsonObject json = new JsonObject();
     json.addProperty(key, value.toString());
     return json;
   }
 
-  /** Creates a JSON object with the given type set, makes using {@link slimeknights.mantle.data.GenericRegisteredSerializer} eaiser */
+  /**
+   * Creates a JSON object with the given type set, makes using {@link slimeknights.mantle.data.GenericRegisteredSerializer} eaiser
+   */
   public static JsonObject withType(ResourceLocation type) {
     return withLocation("type", type);
   }
 
   /**
    * Reads the result from the given JSON
-   * @param element  element to parse
+   *
+   * @param element element to parse
    * @param name    Tag name
-   * @return  Item stack result
+   * @return Item stack result
    * @throws com.google.gson.JsonSyntaxException If the syntax is invalid
    */
   public static ItemStack convertToItemStack(JsonElement element, String name) {
@@ -128,9 +152,10 @@ public class JsonUtils {
 
   /**
    * Reads the result from the given JSON
-   * @param parent  Parent JSON
-   * @param name    Tag name
-   * @return  Item stack result
+   *
+   * @param parent Parent JSON
+   * @param name   Tag name
+   * @return Item stack result
    * @throws com.google.gson.JsonSyntaxException If the syntax is invalid
    */
   public static ItemStack getAsItemStack(JsonObject parent, String name) {
@@ -139,8 +164,9 @@ public class JsonUtils {
 
   /**
    * Serializes the given result to JSON
-   * @param result  Result
-   * @return  JSON element
+   *
+   * @param result Result
+   * @return JSON element
    */
   public static JsonElement serializeItemStack(ItemStack result) {
     // if the item has NBT, write both, else write just the name

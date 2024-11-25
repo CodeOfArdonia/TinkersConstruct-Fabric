@@ -1,4 +1,3 @@
-
 package slimeknights.tconstruct.common.data.loot;
 
 import io.github.fabricators_of_create.porting_lib.data.ModdedLootTableProvider;
@@ -24,7 +23,7 @@ public class TConstructLootTableProvider extends ModdedLootTableProvider {
   }
 
   @Override
-  protected void validate(Map<ResourceLocation,LootTable> map, ValidationContext validationtracker) {
+  protected void validate(Map<ResourceLocation, LootTable> map, ValidationContext validationtracker) {
     map.forEach((loc, table) -> table.validate(validationtracker));
     // Remove vanilla's tables, which we also loaded so we can redirect stuff to them.
     // This ensures the remaining generator logic doesn't write those to files.

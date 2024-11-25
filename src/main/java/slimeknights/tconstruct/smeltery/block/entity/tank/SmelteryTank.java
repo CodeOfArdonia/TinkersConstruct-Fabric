@@ -31,20 +31,27 @@ import java.util.ListIterator;
  */
 @SuppressWarnings("UnstableApiUsage")
 public class SmelteryTank<T extends MantleBlockEntity & ISmelteryTankHandler> extends SnapshotParticipant<SmelteryTank.FluidSnapshot> implements SlottedStorage<FluidVariant> {
+
   private final T parent;
-  /** Fluids actually contained in the tank */
+  /**
+   * Fluids actually contained in the tank
+   */
   @Getter
   private List<FluidStack> fluids;
-  /** Maximum capacity of the smeltery */
+  /**
+   * Maximum capacity of the smeltery
+   */
   private long capacity;
-  /** Current amount of fluid in the tank */
+  /**
+   * Current amount of fluid in the tank
+   */
   @Getter
   private long contained;
 
   public SmelteryTank(T parent) {
-    fluids = Lists.newArrayList();
-    capacity = 0;
-    contained = 0;
+    this.fluids = Lists.newArrayList();
+    this.capacity = 0;
+    this.contained = 0;
     this.parent = parent;
   }
 
@@ -52,10 +59,10 @@ public class SmelteryTank<T extends MantleBlockEntity & ISmelteryTankHandler> ex
    * Called when the fluids change to sync to client
    */
   public void syncFluids() {
-    Level world = parent.getLevel();
+    Level world = this.parent.getLevel();
     if (world != null && !world.isClientSide) {
-      BlockPos pos = parent.getBlockPos();
-      TinkerNetwork.getInstance().sendToClientsAround(new SmelteryTankUpdatePacket(pos, fluids), world, pos);
+      BlockPos pos = this.parent.getBlockPos();
+      TinkerNetwork.getInstance().sendToClientsAround(new SmelteryTankUpdatePacket(pos, this.fluids), world, pos);
     }
   }
 
@@ -64,7 +71,8 @@ public class SmelteryTank<T extends MantleBlockEntity & ISmelteryTankHandler> ex
 
   /**
    * Updates the maximum tank capacity
-   * @param maxCapacity  New max capacity
+   *
+   * @param maxCapacity New max capacity
    */
   public void setCapacity(long maxCapacity) {
     this.capacity = maxCapacity;
@@ -72,21 +80,23 @@ public class SmelteryTank<T extends MantleBlockEntity & ISmelteryTankHandler> ex
 
   /**
    * Gets the maximum amount of space in the smeltery tank
-   * @return  Tank capacity
+   *
+   * @return Tank capacity
    */
   public long getCapacity() {
-    return capacity;
+    return this.capacity;
   }
 
   /**
    * Gets the amount of empty space in the tank
-   * @return  Remaining space in the tank
+   *
+   * @return Remaining space in the tank
    */
   public long getRemainingSpace() {
-    if (contained >= capacity) {
+    if (this.contained >= this.capacity) {
       return 0;
     }
-    return capacity - contained;
+    return this.capacity - this.contained;
   }
 
 
@@ -94,23 +104,23 @@ public class SmelteryTank<T extends MantleBlockEntity & ISmelteryTankHandler> ex
 
   @Override
   public int getSlotCount() {
-    if (contained < capacity) {
-      return fluids.size() + 1;
+    if (this.contained < this.capacity) {
+      return this.fluids.size() + 1;
     }
-    return fluids.size();
+    return this.fluids.size();
   }
 
   @Override
   public SingleSlotStorage<FluidVariant> getSlot(int slot) {
-    return new FluidStackSlot(getFluidInTank(slot), slot);
+    return new FluidStackSlot(this.getFluidInTank(slot), slot);
   }
 
   @Nonnull
   public FluidStack getFluidInTank(int tank) {
-    if (tank < 0 || tank >= fluids.size()) {
+    if (tank < 0 || tank >= this.fluids.size()) {
       return FluidStack.EMPTY;
     }
-    return fluids.get(tank);
+    return this.fluids.get(tank);
   }
 
   public long getTankCapacity(int tank) {
@@ -118,24 +128,25 @@ public class SmelteryTank<T extends MantleBlockEntity & ISmelteryTankHandler> ex
       return 0;
     }
     // index of the tank size means the "empty" segment
-    long remaining = capacity - contained;
-    if (tank == fluids.size()) {
+    long remaining = this.capacity - this.contained;
+    if (tank == this.fluids.size()) {
       return remaining;
     }
     // any valid index, return the amount contained and the extra space
-    return fluids.get(tank).getAmount() + remaining;
+    return this.fluids.get(tank).getAmount() + remaining;
   }
 
   /**
    * Moves the fluid with the passed index to the beginning/bottom of the fluid tank stack
-   * @param index  Index to move
+   *
+   * @param index Index to move
    */
   public void moveFluidToBottom(int index) {
-    if (index < fluids.size()) {
-      FluidStack fluid = fluids.get(index);
-      fluids.remove(index);
-      fluids.add(0, fluid);
-      parent.notifyFluidsChanged(FluidChange.CHANGED, FluidStack.EMPTY);
+    if (index < this.fluids.size()) {
+      FluidStack fluid = this.fluids.get(index);
+      this.fluids.remove(index);
+      this.fluids.add(0, fluid);
+      this.parent.notifyFluidsChanged(FluidChange.CHANGED, FluidStack.EMPTY);
     }
   }
 
@@ -145,30 +156,30 @@ public class SmelteryTank<T extends MantleBlockEntity & ISmelteryTankHandler> ex
   @Override
   public long insert(FluidVariant resource, long maxAmount, TransactionContext transaction) {
     // if full or nothing being filled, do nothing
-    if (contained >= capacity || maxAmount <= 0 || resource.isBlank()) {
+    if (this.contained >= this.capacity || maxAmount <= 0 || resource.isBlank()) {
       return 0;
     }
 
     // determine how much we can fill
-    long usable = Math.min(capacity - contained, maxAmount);
+    long usable = Math.min(this.capacity - this.contained, maxAmount);
     // could be negative if the smeltery size changes then you try filling it
     if (usable <= 0) {
       return 0;
     }
 
-    updateSnapshots(transaction);
+    this.updateSnapshots(transaction);
 
     // add contained fluid amount
-    contained += usable;
+    this.contained += usable;
 
     // check if we already have the given liquid
-    for (FluidStack fluid : fluids) {
+    for (FluidStack fluid : this.fluids) {
       if (fluid.isFluidEqual(resource)) {
         // yup. add it
         fluid.grow(usable);
         transaction.addOuterCloseCallback((result) -> {
           if (result.wasCommitted())
-            parent.notifyFluidsChanged(FluidChange.CHANGED, fluid);
+            this.parent.notifyFluidsChanged(FluidChange.CHANGED, fluid);
         });
         return usable;
       }
@@ -176,10 +187,10 @@ public class SmelteryTank<T extends MantleBlockEntity & ISmelteryTankHandler> ex
 
     // not present yet, add it
     var fluid = new FluidStack(resource, usable);
-    fluids.add(fluid);
+    this.fluids.add(fluid);
     transaction.addOuterCloseCallback((result) -> {
       if (result.wasCommitted())
-        parent.notifyFluidsChanged(FluidChange.ADDED, fluid);
+        this.parent.notifyFluidsChanged(FluidChange.ADDED, fluid);
     });
     return usable;
   }
@@ -187,7 +198,7 @@ public class SmelteryTank<T extends MantleBlockEntity & ISmelteryTankHandler> ex
   @Override
   public long extract(FluidVariant resource, long maxAmount, TransactionContext transaction) {
     // search for the resource
-    ListIterator<FluidStack> iter = fluids.listIterator();
+    ListIterator<FluidStack> iter = this.fluids.listIterator();
     while (iter.hasNext()) {
       FluidStack fluid = iter.next();
       if (fluid.isFluidEqual(resource)) {
@@ -199,20 +210,20 @@ public class SmelteryTank<T extends MantleBlockEntity & ISmelteryTankHandler> ex
         ret.setAmount(drainable);
 
         // update tank if executing
-        updateSnapshots(transaction);
+        this.updateSnapshots(transaction);
         fluid.shrink(drainable);
-        contained -= drainable;
+        this.contained -= drainable;
         // if now empty, remove from the list
         if (fluid.getAmount() <= 0) {
           iter.remove();
           transaction.addOuterCloseCallback((result) -> {
             if (result.wasCommitted())
-              parent.notifyFluidsChanged(FluidChange.REMOVED, fluid);
+              this.parent.notifyFluidsChanged(FluidChange.REMOVED, fluid);
           });
         } else {
           transaction.addOuterCloseCallback((result) -> {
             if (result.wasCommitted())
-              parent.notifyFluidsChanged(FluidChange.CHANGED, fluid);
+              this.parent.notifyFluidsChanged(FluidChange.CHANGED, fluid);
           });
         }
 
@@ -231,58 +242,63 @@ public class SmelteryTank<T extends MantleBlockEntity & ISmelteryTankHandler> ex
 
   /**
    * Updates fluids in the tank, typically from a packet
-   * @param fluids  List of fluids
+   *
+   * @param fluids List of fluids
    */
   public void setFluids(List<FluidStack> fluids) {
-    FluidStack oldFirst = getFluidInTank(0);
+    FluidStack oldFirst = this.getFluidInTank(0);
     this.fluids.clear();
     this.fluids.addAll(fluids);
-    contained = fluids.stream().mapToLong(FluidStack::getAmount).reduce(0, Long::sum);
-    FluidStack newFirst = getFluidInTank(0);
+    this.contained = fluids.stream().mapToLong(FluidStack::getAmount).reduce(0, Long::sum);
+    FluidStack newFirst = this.getFluidInTank(0);
     if (!oldFirst.isFluidEqual(newFirst)) {
-      parent.notifyFluidsChanged(FluidChange.ORDER_CHANGED, newFirst);
+      this.parent.notifyFluidsChanged(FluidChange.ORDER_CHANGED, newFirst);
     }
   }
 
-  /** Writes the tank to NBT */
+  /**
+   * Writes the tank to NBT
+   */
   public CompoundTag write(CompoundTag nbt) {
     ListTag list = new ListTag();
-    for (FluidStack liquid : fluids) {
+    for (FluidStack liquid : this.fluids) {
       CompoundTag fluidTag = new CompoundTag();
       liquid.writeToNBT(fluidTag);
       list.add(fluidTag);
     }
     nbt.put(TAG_FLUIDS, list);
-    nbt.putLong(TAG_CAPACITY, capacity);
+    nbt.putLong(TAG_CAPACITY, this.capacity);
     return nbt;
   }
 
-  /** Reads the tank from NBT */
+  /**
+   * Reads the tank from NBT
+   */
   public void read(CompoundTag tag) {
     ListTag list = tag.getList(TAG_FLUIDS, Tag.TAG_COMPOUND);
-    fluids.clear();
-    contained = 0;
+    this.fluids.clear();
+    this.contained = 0;
     for (int i = 0; i < list.size(); i++) {
       CompoundTag fluidTag = list.getCompound(i);
       FluidStack fluid = FluidStack.loadFluidStackFromNBT(fluidTag);
       if (!fluid.isEmpty()) {
-        fluids.add(fluid);
-        contained += fluid.getAmount();
+        this.fluids.add(fluid);
+        this.contained += fluid.getAmount();
       }
     }
-    capacity = tag.getLong(TAG_CAPACITY);
+    this.capacity = tag.getLong(TAG_CAPACITY);
   }
 
   @Override
   public Iterator<StorageView<FluidVariant>> iterator() {
-    return (Iterator) getSlots().iterator();
+    return (Iterator) this.getSlots().iterator();
   }
 
   @Override
   protected FluidSnapshot createSnapshot() {
     List<FluidStack> cachedFluids = new ArrayList<>();
-    for (int i = 0; i < fluids.size(); i++) {
-      cachedFluids.add(i, fluids.get(i).copy());
+    for (int i = 0; i < this.fluids.size(); i++) {
+      cachedFluids.add(i, this.fluids.get(i).copy());
     }
     return new FluidSnapshot(this.contained, cachedFluids);
   }
@@ -303,65 +319,65 @@ public class SmelteryTank<T extends MantleBlockEntity & ISmelteryTankHandler> ex
     @Override
     public long insert(FluidVariant resource, long maxAmount, TransactionContext transaction) {
       // if full or nothing being filled, do nothing
-      if (contained >= capacity || maxAmount <= 0 || resource.isBlank()) {
+      if (SmelteryTank.this.contained >= SmelteryTank.this.capacity || maxAmount <= 0 || resource.isBlank()) {
         return 0;
       }
 
       // determine how much we can fill
-      long usable = Math.min(capacity - contained, maxAmount);
+      long usable = Math.min(SmelteryTank.this.capacity - SmelteryTank.this.contained, maxAmount);
       // could be negative if the smeltery size changes then you try filling it
       if (usable <= 0) {
         return 0;
       }
 
-      updateSnapshots(transaction);
+      this.updateSnapshots(transaction);
 
       // add contained fluid amount
-      contained += usable;
+      SmelteryTank.this.contained += usable;
 
       // check if we already have the given liquid
-      if (fluid.isFluidEqual(resource)) {
+      if (this.fluid.isFluidEqual(resource)) {
         // yup. add it
-        fluid.grow(usable);
+        this.fluid.grow(usable);
         transaction.addOuterCloseCallback((result) -> {
           if (result.wasCommitted())
-            parent.notifyFluidsChanged(FluidChange.CHANGED, fluid);
+            SmelteryTank.this.parent.notifyFluidsChanged(FluidChange.CHANGED, this.fluid);
         });
         return usable;
       }
 
       // not present yet, add it
       var fluid = new FluidStack(resource, usable);
-      fluids.add(fluid);
+      SmelteryTank.this.fluids.add(fluid);
       transaction.addOuterCloseCallback((result) -> {
         if (result.wasCommitted())
-          parent.notifyFluidsChanged(FluidChange.ADDED, fluid);
+          SmelteryTank.this.parent.notifyFluidsChanged(FluidChange.ADDED, fluid);
       });
       return usable;
     }
 
     @Override
     public long extract(FluidVariant resource, long maxAmount, TransactionContext transaction) {
-      if (fluid.isFluidEqual(resource)) {
+      if (this.fluid.isFluidEqual(resource)) {
         // if found, determine how much we can drain
-        long drainable = Math.min(maxAmount, fluid.getAmount());
+        long drainable = Math.min(maxAmount, this.fluid.getAmount());
 
         // copy contained fluid to return for accuracy
-        FluidStack ret = fluid.copy();
+        FluidStack ret = this.fluid.copy();
         ret.setAmount(drainable);
 
         // update tank if executing
-        updateSnapshots(transaction);
-        fluid.shrink(drainable);
-        contained -= drainable;
+        this.updateSnapshots(transaction);
+        this.fluid.shrink(drainable);
+        SmelteryTank.this.contained -= drainable;
         // if now empty, remove from the list
         transaction.addOuterCloseCallback((result) -> {
           if (result.wasCommitted()) {
-            if (fluid.getAmount() <= 0) {
-              SmelteryTank.this.fluids.remove(slot);
-              parent.notifyFluidsChanged(FluidChange.REMOVED, fluid);
+            if (this.fluid.getAmount() <= 0) {
+              SmelteryTank.this.fluids.remove(this.slot);
+              SmelteryTank.this.parent.notifyFluidsChanged(FluidChange.REMOVED, this.fluid);
             } else {
-              parent.notifyFluidsChanged(FluidChange.CHANGED, fluid);
+              SmelteryTank.this.parent.notifyFluidsChanged(FluidChange.CHANGED, this.fluid);
             }
           }
         });

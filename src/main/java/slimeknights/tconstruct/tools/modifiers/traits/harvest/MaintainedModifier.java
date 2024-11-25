@@ -21,22 +21,32 @@ import slimeknights.tconstruct.library.utils.TooltipKey;
 import javax.annotation.Nullable;
 import java.util.List;
 
-/** Well maintained for Tinkers Bronze */
+/**
+ * Well maintained for Tinkers Bronze
+ */
 public class MaintainedModifier extends Modifier implements ConditionalStatModifierHook {
+
   private static final Component MINING_SPEED = TConstruct.makeTranslation("modifier", "maintained.mining_speed");
   private static final Component VELOCITY = TConstruct.makeTranslation("modifier", "maintained.velocity");
-  /** Total boost when at full durability */
+  /**
+   * Total boost when at full durability
+   */
   private static final float MINING_AT_FULL = 6;
-  /** Min durability to get boost */
+  /**
+   * Min durability to get boost
+   */
   private static final float MIN_BOOST_PERCENT = 0.5f;
-  /** Total boost when at full durability */
+  /**
+   * Total boost when at full durability
+   */
   private static final float VELOCITY_AT_FULL = 0.05f;
 
   /**
    * Gets the total bonus for this tool at the given durabiity
-   * @param tool   Tool instance
-   * @param level  Tool levle
-   * @return  Total boost
+   *
+   * @param tool  Tool instance
+   * @param level Tool levle
+   * @return Total boost
    */
   private static float getTotalBoost(IToolStackView tool, int level) {
     int durability = tool.getCurrentDurability();
@@ -64,10 +74,10 @@ public class MaintainedModifier extends Modifier implements ConditionalStatModif
       }
       if (boost > 0.01f) {
         if (harvest) {
-          addFlatBoost(MINING_SPEED, boost * MINING_AT_FULL * tool.getMultiplier(ToolStats.MINING_SPEED), tooltip);
+          this.addFlatBoost(MINING_SPEED, boost * MINING_AT_FULL * tool.getMultiplier(ToolStats.MINING_SPEED), tooltip);
 
         } else {
-          addFlatBoost(VELOCITY, boost * VELOCITY_AT_FULL * tool.getMultiplier(ToolStats.VELOCITY), tooltip);
+          this.addFlatBoost(VELOCITY, boost * VELOCITY_AT_FULL * tool.getMultiplier(ToolStats.VELOCITY), tooltip);
         }
       }
     }

@@ -10,6 +10,7 @@ import slimeknights.tconstruct.library.recipe.SimpleRecipeSerializer;
 import java.util.function.Consumer;
 
 public class SpecialRecipeBuilder {
+
   final SimpleRecipeSerializer<?> serializer;
 
   public SpecialRecipeBuilder(SimpleRecipeSerializer<?> serializer) {

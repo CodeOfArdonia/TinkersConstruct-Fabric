@@ -25,19 +25,23 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 
-/** General item helper functions */
+/**
+ * General item helper functions
+ */
 public class ModifiableItemUtil {
+
   private static final UUID[] HELD_ARMOR_UUID = new UUID[]{UUID.fromString("00a1a5fe-43b5-4849-8660-de9aa497736a"), UUID.fromString("6776fd7e-4b22-4cdf-a0bc-bb8d2ad1f0bf")};
 
   private ModifiableItemUtil() {}
 
   /**
    * Gets attribute modifiers for a weapon with melee capability
-   * @param tool  Tool instance
-   * @param slot  Held slot
-   * @return  Map of attribute modifiers
+   *
+   * @param tool Tool instance
+   * @param slot Held slot
+   * @return Map of attribute modifiers
    */
-  public static Multimap<Attribute,AttributeModifier> getMeleeAttributeModifiers(IToolStackView tool, EquipmentSlot slot) {
+  public static Multimap<Attribute, AttributeModifier> getMeleeAttributeModifiers(IToolStackView tool, EquipmentSlot slot) {
     ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
     if (!tool.isBroken()) {
       // base stats
@@ -67,7 +71,7 @@ public class ModifiableItemUtil {
         }
 
         // grab attributes from modifiers, only do for hands (other slots would just be weird)
-        BiConsumer<net.minecraft.world.entity.ai.attributes.Attribute,AttributeModifier> attributeConsumer = builder::put;
+        BiConsumer<net.minecraft.world.entity.ai.attributes.Attribute, AttributeModifier> attributeConsumer = builder::put;
         for (ModifierEntry entry : tool.getModifierList()) {
           entry.getHook(TinkerHooks.ATTRIBUTES).addAttributes(tool, entry, slot, attributeConsumer);
         }
@@ -78,10 +82,11 @@ public class ModifiableItemUtil {
 
   /**
    * Logic to prevent reanimation on tools when properties such as autorepair change
-   * @param oldStack      Old stack instance
-   * @param newStack      New stack instance
-   * @param slotChanged   If true, a slot changed
-   * @return  True if a reequip animation should be triggered
+   *
+   * @param oldStack    Old stack instance
+   * @param newStack    New stack instance
+   * @param slotChanged If true, a slot changed
+   * @return True if a reequip animation should be triggered
    */
   public static boolean shouldCauseReequip(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
     if (oldStack == newStack) {
@@ -105,7 +110,7 @@ public class ModifiableItemUtil {
     }
 
     // if the attributes changed, reequip
-    Multimap<Attribute,AttributeModifier> attributesNew = newStack.getAttributeModifiers(EquipmentSlot.MAINHAND);
+    Multimap<Attribute, AttributeModifier> attributesNew = newStack.getAttributeModifiers(EquipmentSlot.MAINHAND);
     Multimap<Attribute, AttributeModifier> attributesOld = oldStack.getAttributeModifiers(EquipmentSlot.MAINHAND);
     if (attributesNew.size() != attributesOld.size()) {
       return true;
@@ -128,11 +133,12 @@ public class ModifiableItemUtil {
 
   /**
    * Handles ticking a modifiable item that works when held. Armor uses different logic
-   * @param stack       Modifiable stack
-   * @param worldIn     World instance
-   * @param entityIn    Entity holding the tool
-   * @param itemSlot    Slot with the tool
-   * @param isSelected  If true, the tool is selected
+   *
+   * @param stack      Modifiable stack
+   * @param worldIn    World instance
+   * @param entityIn   Entity holding the tool
+   * @param itemSlot   Slot with the tool
+   * @param isSelected If true, the tool is selected
    */
   public static void heldInventoryTick(ItemStack stack, Level worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
     // don't care about non-living, they skip most tool context

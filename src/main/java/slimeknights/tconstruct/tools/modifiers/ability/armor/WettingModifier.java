@@ -22,27 +22,36 @@ import slimeknights.tconstruct.shared.particle.FluidParticleData;
 
 import javax.annotation.Nullable;
 
-/** Modifier to handle spilling recipes onto self when attacked */
+/**
+ * Modifier to handle spilling recipes onto self when attacked
+ */
 @SuppressWarnings("removal")
 public class WettingModifier extends TankModifier {
+
   public WettingModifier() {
     super(FluidConstants.BUCKET);
   }
 
-  /** Spawns particles at the given entity */
+  /**
+   * Spawns particles at the given entity
+   */
   public static void spawnParticles(Entity target, FluidStack fluid) {
     if (target.level() instanceof ServerLevel serverLevel) {
       serverLevel.sendParticles(new FluidParticleData(TinkerCommons.fluidParticle.get(), fluid), target.getX(), target.getY(0.5), target.getZ(), 10, 0.1, 0.2, 0.1, 0.2);
     }
   }
 
-  /** Overridable method to create the attack context and spawn particles */
+  /**
+   * Overridable method to create the attack context and spawn particles
+   */
   public ToolAttackContext createContext(LivingEntity self, @Nullable Player player, @Nullable Entity attacker, FluidStack fluid) {
     spawnParticles(self, fluid);
     return new ToolAttackContext(self, player, InteractionHand.MAIN_HAND, self, self, false, 1.0f, false);
   }
 
-  /** Checks if the modifier triggers */
+  /**
+   * Checks if the modifier triggers
+   */
   protected boolean doesTrigger(DamageSource source, boolean isDirectDamage) {
     return !source.is(DamageTypeTags.BYPASSES_EFFECTS) && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY);
   }
@@ -50,18 +59,18 @@ public class WettingModifier extends TankModifier {
   @Override
   public void onAttacked(IToolStackView tool, int level, EquipmentContext context, EquipmentSlot slotType, DamageSource source, float amount, boolean isDirectDamage) {
     Entity attacker = source.getEntity();
-    if (doesTrigger(source, isDirectDamage)) {
+    if (this.doesTrigger(source, isDirectDamage)) {
       // 25% chance of working per level, 50% per level on shields
       if (RANDOM.nextInt(slotType.getType() == Type.HAND ? 2 : 4) < level) {
-        FluidStack fluid = getFluid(tool);
+        FluidStack fluid = this.getFluid(tool);
         if (!fluid.isEmpty()) {
           LivingEntity self = context.getEntity();
           Player player = self instanceof Player p ? p : null;
           SpillingFluid recipe = SpillingFluidManager.INSTANCE.find(fluid.getFluid());
           if (recipe.hasEffects()) {
-            FluidStack remaining = recipe.applyEffects(fluid, level, createContext(self, player, attacker, fluid));
+            FluidStack remaining = recipe.applyEffects(fluid, level, this.createContext(self, player, attacker, fluid));
             if (player == null || !player.isCreative()) {
-              setFluid(tool, remaining);
+              this.setFluid(tool, remaining);
             }
           }
         }

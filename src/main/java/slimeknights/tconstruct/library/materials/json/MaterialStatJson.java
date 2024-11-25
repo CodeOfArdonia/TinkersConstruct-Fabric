@@ -14,13 +14,14 @@ import java.util.Map;
  */
 @RequiredArgsConstructor
 public class MaterialStatJson {
+
   @Nullable
-  private final Map<ResourceLocation,JsonElement> stats;
+  private final Map<ResourceLocation, JsonElement> stats;
 
   public Map<ResourceLocation, JsonElement> getStats() {
-    if (stats == null) {
+    if (this.stats == null) {
       return Collections.emptyMap();
     }
-    return stats;
+    return this.stats;
   }
 }

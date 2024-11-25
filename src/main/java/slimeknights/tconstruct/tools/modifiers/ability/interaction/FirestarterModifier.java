@@ -51,9 +51,14 @@ import java.util.Collections;
  */
 @RequiredArgsConstructor
 public class FirestarterModifier extends InteractionModifier.NoLevels implements EntityInteractionModifierHook, BlockInteractionModifierHook {
-  /** Generic action for the sake of people who want compat but do not want to request a specific action */
+
+  /**
+   * Generic action for the sake of people who want compat but do not want to request a specific action
+   */
   private static final ToolAction LIGHT_FIRE = ToolAction.get("light_fire");
-  /** Compat with mods adding custom campfires */
+  /**
+   * Compat with mods adding custom campfires
+   */
   private static final ToolAction LIGHT_CAMPFIRE = ToolAction.get("light_campfire");
 
   @Getter
@@ -67,7 +72,7 @@ public class FirestarterModifier extends InteractionModifier.NoLevels implements
 
   @Override
   public boolean shouldDisplay(boolean advanced) {
-    return priority > Short.MIN_VALUE;
+    return this.priority > Short.MIN_VALUE;
   }
 
   @Override
@@ -93,7 +98,9 @@ public class FirestarterModifier extends InteractionModifier.NoLevels implements
     return InteractionResult.PASS;
   }
 
-  /** Ignites the given block */
+  /**
+   * Ignites the given block
+   */
   private static boolean ignite(IToolStackView tool, Level world, BlockPos pos, BlockState state, Direction sideHit, Direction horizontalFacing, @Nullable Player player) {
     // campfires first
     if (CampfireBlock.canLight(state) || CandleBlock.canLight(state) || CandleCakeBlock.canLight(state)) {
@@ -126,7 +133,7 @@ public class FirestarterModifier extends InteractionModifier.NoLevels implements
       return InteractionResult.PASS;
     }
     if (context.getLevel().getBlockState(context.getClickedPos()).is(BlockTags.CANDLE_CAKES)) {
-      return afterBlockUse(tool, modifier, context, source);
+      return this.afterBlockUse(tool, modifier, context, source);
     }
     return InteractionResult.PASS;
   }
@@ -190,7 +197,7 @@ public class FirestarterModifier extends InteractionModifier.NoLevels implements
   @Nullable
   @Override
   public Boolean removeBlock(IToolStackView tool, int level, ToolHarvestContext context) {
-    if (context.getState().is(Blocks.FIRE) && tool.getDefinitionData().getModule(ToolModuleHooks.INTERACTION).canInteract(tool, getId(), InteractionSource.LEFT_CLICK)) {
+    if (context.getState().is(Blocks.FIRE) && tool.getDefinitionData().getModule(ToolModuleHooks.INTERACTION).canInteract(tool, this.getId(), InteractionSource.LEFT_CLICK)) {
       return false;
     }
     return null;

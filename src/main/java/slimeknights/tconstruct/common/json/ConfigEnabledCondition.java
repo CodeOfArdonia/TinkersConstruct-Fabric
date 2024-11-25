@@ -4,6 +4,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSyntaxException;
+import io.github.fabricators_of_create.porting_lib.config.ModConfigSpec.BooleanValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
@@ -13,7 +14,6 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.Serializer;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
-import io.github.fabricators_of_create.porting_lib.config.ModConfigSpec.BooleanValue;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.common.config.Config;
 import slimeknights.tconstruct.shared.TinkerCommons;
@@ -25,10 +25,11 @@ import java.util.function.BooleanSupplier;
 
 @AllArgsConstructor
 public class ConfigEnabledCondition implements ConditionJsonProvider, LootItemCondition {
+
   public static final ResourceLocation ID = TConstruct.getResource("config");
   public static final ConfigSerializer SERIALIZER = new ConfigSerializer();
   /* Map of config names to condition cache */
-  public static final Map<String,ConfigEnabledCondition> PROPS = new HashMap<>();
+  public static final Map<String, ConfigEnabledCondition> PROPS = new HashMap<>();
 
   @Getter
   private final String configName;
@@ -42,16 +43,16 @@ public class ConfigEnabledCondition implements ConditionJsonProvider, LootItemCo
   @SuppressWarnings("removal")
   @Override
   public void writeParameters(JsonObject json) {
-    json.addProperty("prop", configName);
+    json.addProperty("prop", this.configName);
   }
 
   public boolean test() {
-    return supplier.getAsBoolean();
+    return this.supplier.getAsBoolean();
   }
 
   @Override
   public boolean test(LootContext lootContext) {
-    return supplier.getAsBoolean();
+    return this.supplier.getAsBoolean();
   }
 
   public static boolean test(JsonObject json) {
@@ -66,6 +67,7 @@ public class ConfigEnabledCondition implements ConditionJsonProvider, LootItemCo
   }
 
   private static class ConfigSerializer implements Serializer<ConfigEnabledCondition> {
+
     @Override
     public void serialize(JsonObject json, ConfigEnabledCondition condition, JsonSerializationContext context) {
       json.addProperty("prop", condition.configName);
@@ -84,6 +86,7 @@ public class ConfigEnabledCondition implements ConditionJsonProvider, LootItemCo
 
   /**
    * Adds a condition
+   *
    * @param prop     Property name
    * @param supplier Boolean supplier
    * @return Added condition
@@ -96,6 +99,7 @@ public class ConfigEnabledCondition implements ConditionJsonProvider, LootItemCo
 
   /**
    * Adds a condition
+   *
    * @param prop     Property name
    * @param supplier Config value
    * @return Added condition

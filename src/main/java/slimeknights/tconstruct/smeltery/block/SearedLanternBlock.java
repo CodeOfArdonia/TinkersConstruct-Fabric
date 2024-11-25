@@ -28,8 +28,10 @@ import javax.annotation.Nullable;
 
 @SuppressWarnings("removal")
 public class SearedLanternBlock extends LanternBlock implements ITankBlock, EntityBlock, BlockPickInteractionAware, LightEmissiveBlock {
+
   @Getter
   private final long capacity;
+
   public SearedLanternBlock(Properties properties, int capacity) {
     super(properties);
     this.capacity = capacity;

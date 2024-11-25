@@ -9,6 +9,7 @@ import slimeknights.tconstruct.tables.block.entity.table.TinkerStationBlockEntit
 import javax.annotation.Nullable;
 
 public class TinkerStationBlock extends RetexturedTableBlock {
+
   @Getter
   private final int slotCount;
 
@@ -20,6 +21,6 @@ public class TinkerStationBlock extends RetexturedTableBlock {
   @Nullable
   @Override
   public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
-    return new TinkerStationBlockEntity(pPos, pState, getSlotCount());
+    return new TinkerStationBlockEntity(pPos, pState, this.getSlotCount());
   }
 }

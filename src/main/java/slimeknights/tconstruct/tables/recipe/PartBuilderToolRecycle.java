@@ -40,24 +40,37 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-/** Recipe to break a tool into tool parts */
+/**
+ * Recipe to break a tool into tool parts
+ */
 @RequiredArgsConstructor
 public class PartBuilderToolRecycle implements IPartBuilderRecipe {
-  /** Title for the screen */
+
+  /**
+   * Title for the screen
+   */
   private static final Component TOOL_RECYCLING = TConstruct.makeTranslation("recipe", "tool_recycling");
-  /** General instructions for recycling */
+  /**
+   * General instructions for recycling
+   */
   private static final List<Component> INSTRUCTIONS = Collections.singletonList(TConstruct.makeTranslation("recipe", "tool_recycling.info"));
-  /** Error for trying to recycle a tool that cannot be */
+  /**
+   * Error for trying to recycle a tool that cannot be
+   */
   private static final List<Component> NO_MODIFIERS = Collections.singletonList(TConstruct.makeTranslation("recipe", "tool_recycling.no_modifiers").withStyle(ChatFormatting.RED));
 
-  /** Should never be needed, but just in case better than null */
+  /**
+   * Should never be needed, but just in case better than null
+   */
   private static final Pattern ERROR = new Pattern(TConstruct.MOD_ID, "missingno");
   @Getter
   private final ResourceLocation id;
   private final SizedIngredient toolRequirement;
   private final Ingredient pattern;
 
-  /** @deprecated use {@link #PartBuilderToolRecycle(ResourceLocation, SizedIngredient, Ingredient)} */
+  /**
+   * @deprecated use {@link #PartBuilderToolRecycle(ResourceLocation, SizedIngredient, Ingredient)}
+   */
   @Deprecated
   public PartBuilderToolRecycle(ResourceLocation id, Ingredient pattern) {
     this(id, SizedIngredient.fromTag(TinkerTags.Items.MULTIPART_TOOL), pattern);
@@ -71,12 +84,12 @@ public class PartBuilderToolRecycle implements IPartBuilderRecipe {
   @Override
   public Stream<Pattern> getPatterns(IPartBuilderContainer inv) {
     return ToolStack.from(inv.getStack()).getDefinition().getData().getParts().stream()
-               .map(PartRequirement::getPart)
-               .filter(Objects::nonNull)
-               .map(part -> BuiltInRegistries.ITEM.getKey(part.asItem()))
-               .filter(Objects::nonNull)
-               .distinct()
-               .map(Pattern::new);
+      .map(PartRequirement::getPart)
+      .filter(Objects::nonNull)
+      .map(part -> BuiltInRegistries.ITEM.getKey(part.asItem()))
+      .filter(Objects::nonNull)
+      .distinct()
+      .map(Pattern::new);
   }
 
   @Override
@@ -86,17 +99,17 @@ public class PartBuilderToolRecycle implements IPartBuilderRecipe {
 
   @Override
   public int getItemsUsed(IPartBuilderContainer inv) {
-    return toolRequirement.getAmountNeeded();
+    return this.toolRequirement.getAmountNeeded();
   }
 
   @Override
   public boolean partialMatch(IPartBuilderContainer inv) {
-    return pattern.test(inv.getPatternStack()) && toolRequirement.test(inv.getStack());
+    return this.pattern.test(inv.getPatternStack()) && this.toolRequirement.test(inv.getStack());
   }
 
   @Override
   public boolean matches(IPartBuilderContainer inv, Level pLevel) {
-    return partialMatch(inv) && ToolStack.from(inv.getStack()).getUpgrades().isEmpty();
+    return this.partialMatch(inv) && ToolStack.from(inv.getStack()).getUpgrades().isEmpty();
   }
 
   @Override
@@ -157,7 +170,9 @@ public class PartBuilderToolRecycle implements IPartBuilderRecipe {
     return parts.get(index).withMaterial(tool.getMaterial(indices.getInt(index)).getVariant());
   }
 
-  /** @deprecated use {@link #assemble(IPartBuilderContainer, Pattern, RegistryAccess)} */
+  /**
+   * @deprecated use {@link #assemble(IPartBuilderContainer, Pattern, RegistryAccess)}
+   */
   @Deprecated
   @Override
   public ItemStack getResultItem(RegistryAccess registryAccess) {
@@ -180,8 +195,11 @@ public class PartBuilderToolRecycle implements IPartBuilderRecipe {
     return ModifierUtil.hasUpgrades(inv.getStack()) ? NO_MODIFIERS : INSTRUCTIONS;
   }
 
-  /** Serializer instance */
+  /**
+   * Serializer instance
+   */
   public static class Serializer extends LoggingRecipeSerializer<PartBuilderToolRecycle> {
+
     @Override
     public PartBuilderToolRecycle fromJson(ResourceLocation id, JsonObject json) {
       SizedIngredient tools;
@@ -208,12 +226,15 @@ public class PartBuilderToolRecycle implements IPartBuilderRecipe {
 
   @RequiredArgsConstructor
   public static class Finished implements FinishedRecipe {
+
     @Getter
     private final ResourceLocation id;
     private final SizedIngredient tools;
     private final Ingredient pattern;
 
-    /** @deprecated use {@link #Finished(ResourceLocation, SizedIngredient, Ingredient)} */
+    /**
+     * @deprecated use {@link #Finished(ResourceLocation, SizedIngredient, Ingredient)}
+     */
     @Deprecated
     public Finished(ResourceLocation id, Ingredient pattern) {
       this(id, SizedIngredient.fromTag(TinkerTags.Items.MULTIPART_TOOL), pattern);
@@ -221,8 +242,8 @@ public class PartBuilderToolRecycle implements IPartBuilderRecipe {
 
     @Override
     public void serializeRecipeData(JsonObject json) {
-      json.add("tools", tools.serialize());
-      json.add("pattern", pattern.toJson());
+      json.add("tools", this.tools.serialize());
+      json.add("pattern", this.pattern.toJson());
     }
 
     @Override

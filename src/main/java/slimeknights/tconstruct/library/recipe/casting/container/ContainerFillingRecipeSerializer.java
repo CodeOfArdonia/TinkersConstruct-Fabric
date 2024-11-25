@@ -13,10 +13,12 @@ import javax.annotation.Nullable;
 
 /**
  * Serializer for {@link ContainerFillingRecipe}
- * @param <T>  Recipe output class type
+ *
+ * @param <T> Recipe output class type
  */
 @AllArgsConstructor
 public class ContainerFillingRecipeSerializer<T extends ContainerFillingRecipe> extends LoggingRecipeSerializer<T> {
+
   private final ContainerFillingRecipeSerializer.IFactory<T> factory;
 
   @Override
@@ -45,9 +47,11 @@ public class ContainerFillingRecipeSerializer<T extends ContainerFillingRecipe> 
 
   /**
    * Interface representing a container filling recipe constructor
-   * @param <T>  Recipe class type
+   *
+   * @param <T> Recipe class type
    */
   public interface IFactory<T extends ContainerFillingRecipe> {
+
     T create(ResourceLocation idIn, String groupIn, int fluidAmount, Item resultIn);
   }
 }

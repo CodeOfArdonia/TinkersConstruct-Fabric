@@ -24,7 +24,9 @@ import net.minecraft.world.phys.HitResult;
  * Item that can fill a bottle on right click
  */
 public class BottleItem extends Item {
+
   private final ItemLike potion;
+
   public BottleItem(ItemLike potion, Properties props) {
     super(props);
     this.potion = potion;
@@ -44,7 +46,7 @@ public class BottleItem extends Item {
         level.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.BOTTLE_FILL, SoundSource.NEUTRAL, 1.0F, 1.0F);
         level.gameEvent(player, GameEvent.FLUID_PICKUP, pos);
         player.awardStat(Stats.ITEM_USED.get(this));
-        return InteractionResultHolder.sidedSuccess(ItemUtils.createFilledResult(current, player, PotionUtils.setPotion(new ItemStack(potion), Potions.WATER)), level.isClientSide());
+        return InteractionResultHolder.sidedSuccess(ItemUtils.createFilledResult(current, player, PotionUtils.setPotion(new ItemStack(this.potion), Potions.WATER)), level.isClientSide());
       }
     }
     return InteractionResultHolder.pass(current);

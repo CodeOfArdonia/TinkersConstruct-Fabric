@@ -18,6 +18,7 @@ import slimeknights.tconstruct.library.tools.nbt.NamespacedNBT;
 import javax.annotation.Nullable;
 
 public class FieryModifier extends IncrementalModifier implements ProjectileLaunchModifierHook, ProjectileHitModifierHook {
+
   @Override
   protected void registerHooks(Builder hookBuilder) {
     hookBuilder.addHook(this, TinkerHooks.PROJECTILE_LAUNCH, TinkerHooks.PROJECTILE_HIT);
@@ -46,7 +47,7 @@ public class FieryModifier extends IncrementalModifier implements ProjectileLaun
   public int afterEntityHit(IToolStackView tool, int level, ToolAttackContext context, float damageDealt) {
     LivingEntity target = context.getLivingTarget();
     if (target != null) {
-      target.setSecondsOnFire(Math.round(getEffectiveLevel(tool, level) * 5));
+      target.setSecondsOnFire(Math.round(this.getEffectiveLevel(tool, level) * 5));
     }
     return 0;
   }
@@ -54,12 +55,12 @@ public class FieryModifier extends IncrementalModifier implements ProjectileLaun
   @Override
   public void onProjectileLaunch(IToolStackView tool, ModifierEntry modifier, LivingEntity shooter, Projectile projectile, @Nullable AbstractArrow arrow, NamespacedNBT persistentData, boolean primary) {
     projectile.setSecondsOnFire(Math.round(modifier.getEffectiveLevel(tool) * 20));
-    persistentData.putFloat(getId(), modifier.getEffectiveLevel(tool));
+    persistentData.putFloat(this.getId(), modifier.getEffectiveLevel(tool));
   }
 
   @Override
   public boolean onProjectileHitEntity(ModifierNBT modifiers, NamespacedNBT persistentData, ModifierEntry modifier, Projectile projectile, EntityHitResult hit, @Nullable LivingEntity attacker, @Nullable LivingEntity target) {
-    hit.getEntity().setSecondsOnFire(Math.round(persistentData.getFloat(getId()) * 5));
+    hit.getEntity().setSecondsOnFire(Math.round(persistentData.getFloat(this.getId()) * 5));
     return false;
   }
 }

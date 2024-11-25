@@ -9,6 +9,7 @@ import slimeknights.tconstruct.library.tools.context.EquipmentContext;
 import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 
 public class WildfireModifier extends NoLevelsModifier {
+
   @Override
   public void attackWithArmor(IToolStackView tool, int level, EquipmentContext context, EquipmentSlot slotType, LivingEntity target, DamageSource source, float amount, boolean isDirectDamage) {
     if (isDirectDamage && !source.is(DamageTypeTags.IS_PROJECTILE)) {

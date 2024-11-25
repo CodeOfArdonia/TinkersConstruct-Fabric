@@ -30,12 +30,12 @@ public class AlloyDisplay implements Display {
 
   @Override
   public List<EntryIngredient> getInputEntries() {
-    return input;
+    return this.input;
   }
 
   @Override
   public List<EntryIngredient> getOutputEntries() {
-    return output;
+    return this.output;
   }
 
   @Override
@@ -44,10 +44,10 @@ public class AlloyDisplay implements Display {
   }
 
   public int getTemperature() {
-    return recipe.getTemperature();
+    return this.recipe.getTemperature();
   }
 
   public AlloyRecipe getRecipe() {
-    return recipe;
+    return this.recipe;
   }
 }

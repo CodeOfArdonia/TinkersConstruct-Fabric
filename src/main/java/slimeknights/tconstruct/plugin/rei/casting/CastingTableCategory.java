@@ -8,6 +8,7 @@ import slimeknights.tconstruct.plugin.rei.widgets.WidgetHolder;
 import slimeknights.tconstruct.smeltery.TinkerSmeltery;
 
 public class CastingTableCategory extends AbstractCastingCategory {
+
   private static final Component TITLE = TConstruct.makeTranslation("jei", "casting.table");
 
   public CastingTableCategory() {

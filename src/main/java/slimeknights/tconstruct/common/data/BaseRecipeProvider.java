@@ -12,6 +12,7 @@ import java.util.function.Consumer;
  * Shared logic for each module's recipe provider
  */
 public abstract class BaseRecipeProvider extends FabricRecipeProvider implements /*IConditionBuilder,*/ IRecipeHelper {
+
   public BaseRecipeProvider(FabricDataOutput output) {
     super(output);
     TConstruct.sealTinkersClass(this, "BaseRecipeProvider", "BaseRecipeProvider is trivial to recreate and directly extending can lead to addon recipes polluting our namespace.");

@@ -10,6 +10,7 @@ import slimeknights.tconstruct.library.tools.definition.ToolDefinition;
 import slimeknights.tconstruct.library.tools.item.ModifiableItem;
 
 public class ModifiableSwordItem extends ModifiableItem {
+
   public ModifiableSwordItem(Properties properties, ToolDefinition toolDefinition, ResourceKey<CreativeModeTab> tab) {
     super(properties, toolDefinition, tab);
   }

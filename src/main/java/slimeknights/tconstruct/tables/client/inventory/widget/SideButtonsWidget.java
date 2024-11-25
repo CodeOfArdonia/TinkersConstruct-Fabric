@@ -54,9 +54,9 @@ public class SideButtonsWidget<T extends Button> implements Renderable, GuiEvent
   public void setButtonPositions() {
     for (int i = 0; i < this.buttons.size(); i++) {
       T button = this.buttons.get(i);
-      int x = (i % columns) * (button.getWidth() + SPACING);
-      int y = (i / columns) * (button.getHeight() + SPACING);
-      button.setPosition(leftPos + x, topPos + y);
+      int x = (i % this.columns) * (button.getWidth() + SPACING);
+      int y = (i / this.columns) * (button.getHeight() + SPACING);
+      button.setPosition(this.leftPos + x, this.topPos + y);
     }
   }
 
@@ -89,9 +89,9 @@ public class SideButtonsWidget<T extends Button> implements Renderable, GuiEvent
   }
 
   public boolean handleMouseReleased(double mouseX, double mouseY, int state) {
-    if (clickedButton != null) {
-      clickedButton.mouseReleased(mouseX, mouseY, state);
-      clickedButton = null;
+    if (this.clickedButton != null) {
+      this.clickedButton.mouseReleased(mouseX, mouseY, state);
+      this.clickedButton = null;
       return true;
     }
 

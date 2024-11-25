@@ -19,12 +19,15 @@ import slimeknights.tconstruct.tools.TinkerModifiers;
 import javax.annotation.Nullable;
 
 public class LaceratingModifier extends Modifier implements ProjectileHitModifierHook {
+
   @Override
   protected void registerHooks(Builder hookBuilder) {
     hookBuilder.addHook(this, TinkerHooks.PROJECTILE_HIT);
   }
 
-  /** Applies the effect to the target */
+  /**
+   * Applies the effect to the target
+   */
   private static void applyEffect(LivingEntity target, int level) {
     // potions are 0 indexed instead of 1 indexed
     // 81 ticks will do about 5 damage at level 1

@@ -17,15 +17,24 @@ import net.minecraft.util.GsonHelper;
 import javax.annotation.Nullable;
 import java.util.function.Predicate;
 
-/** Extended implementation of {@link net.minecraft.advancements.criterion.NBTPredicate} that is usable in recipes */
+/**
+ * Extended implementation of {@link net.minecraft.advancements.criterion.NBTPredicate} that is usable in recipes
+ */
 @RequiredArgsConstructor
 public class TagPredicate implements Predicate<CompoundTag> {
-  /** Internal GSON instance */
+
+  /**
+   * Internal GSON instance
+   */
   private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-  /** Instance that matches any NBT */
+  /**
+   * Instance that matches any NBT
+   */
   public static final TagPredicate ANY = new TagPredicate(null);
 
-  /** Tag to match against */
+  /**
+   * Tag to match against
+   */
   @Nullable
   private final CompoundTag tag;
 
@@ -34,25 +43,31 @@ public class TagPredicate implements Predicate<CompoundTag> {
     return NbtUtils.compareNbt(this.tag, toTest, true);
   }
 
-  /** Serializes this into JSON */
+  /**
+   * Serializes this into JSON
+   */
   public JsonElement serialize() {
-    if (tag == null) {
+    if (this.tag == null) {
       return JsonNull.INSTANCE;
     }
-    return new JsonPrimitive(tag.toString());
+    return new JsonPrimitive(this.tag.toString());
   }
 
-  /** Writes this to the packet buffer */
+  /**
+   * Writes this to the packet buffer
+   */
   public void write(FriendlyByteBuf buffer) {
-    if (tag != null) {
+    if (this.tag != null) {
       buffer.writeBoolean(true);
-      buffer.writeNbt(tag);
+      buffer.writeNbt(this.tag);
     } else {
       buffer.writeBoolean(false);
     }
   }
 
-  /** Reads a predicate from JSON */
+  /**
+   * Reads a predicate from JSON
+   */
   public static TagPredicate deserialize(JsonElement element) {
     if (!element.isJsonNull()) {
       try {
@@ -71,7 +86,9 @@ public class TagPredicate implements Predicate<CompoundTag> {
     }
   }
 
-  /** Reads a predicate from a packet buffer */
+  /**
+   * Reads a predicate from a packet buffer
+   */
   public static TagPredicate read(FriendlyByteBuf buffer) {
     CompoundTag tag = null;
     if (buffer.readBoolean()) {

@@ -1,12 +1,9 @@
 package slimeknights.tconstruct.world.item;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.NonNullList;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -23,13 +20,17 @@ import slimeknights.tconstruct.world.block.SlimeVineBlock.VineStage;
 import javax.annotation.Nullable;
 
 public class SlimeGrassSeedItem extends TooltipItem {
+
   private final SlimeType foliage;
+
   public SlimeGrassSeedItem(Properties properties, SlimeType foliage) {
     super(properties);
     this.foliage = foliage;
   }
 
-  /** Gets the slime type for the given block */
+  /**
+   * Gets the slime type for the given block
+   */
   @Nullable
   private static SlimeType getSlimeType(Block block) {
     for (SlimeType type : SlimeType.values()) {
@@ -40,12 +41,16 @@ public class SlimeGrassSeedItem extends TooltipItem {
     return null;
   }
 
-  /** Gets the vines associated with these seeds */
+  /**
+   * Gets the vines associated with these seeds
+   */
   @Nullable
   private Block getVines() {
-    switch (foliage) {
-      case SKY:   return TinkerWorld.skySlimeVine.get();
-      case ENDER: return TinkerWorld.enderSlimeVine.get();
+    switch (this.foliage) {
+      case SKY:
+        return TinkerWorld.skySlimeVine.get();
+      case ENDER:
+        return TinkerWorld.enderSlimeVine.get();
     }
     return null;
   }
@@ -59,7 +64,7 @@ public class SlimeGrassSeedItem extends TooltipItem {
 
     // try vines first
     if (state.getBlock() == Blocks.VINE) {
-      Block slimyVines = getVines();
+      Block slimyVines = this.getVines();
       if (slimyVines != null) {
         // copy over the directions
         newState = slimyVines.defaultBlockState().setValue(SlimeVineBlock.STAGE, VineStage.START);
@@ -75,7 +80,7 @@ public class SlimeGrassSeedItem extends TooltipItem {
     if (newState == null) {
       SlimeType type = getSlimeType(state.getBlock());
       if (type != null) {
-        newState = TinkerWorld.slimeGrass.get(type).get(foliage).defaultBlockState();
+        newState = TinkerWorld.slimeGrass.get(type).get(this.foliage).defaultBlockState();
       } else {
         return InteractionResult.PASS;
       }

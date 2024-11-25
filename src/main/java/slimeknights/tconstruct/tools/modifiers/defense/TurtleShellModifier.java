@@ -22,6 +22,7 @@ import java.util.UUID;
 import java.util.function.BiConsumer;
 
 public class TurtleShellModifier extends IncrementalModifier {
+
   private static final UUID[] UUIDS = {
     UUID.fromString("62a1c224-50e5-11ec-bf63-0242ac130002"),
     UUID.fromString("62a1c4a4-50e5-11ec-bf63-0242ac130002"),
@@ -30,8 +31,8 @@ public class TurtleShellModifier extends IncrementalModifier {
   };
 
   @Override
-  public void addAttributes(IToolStackView tool, int level, EquipmentSlot slot, BiConsumer<Attribute,AttributeModifier> consumer) {
-    consumer.accept(PortingLibAttributes.SWIM_SPEED, new AttributeModifier(UUIDS[slot.getIndex()], "tconstruct.modifier.armor_power." + slot.getName(), 0.05f * getScaledLevel(tool, level), Operation.MULTIPLY_TOTAL));
+  public void addAttributes(IToolStackView tool, int level, EquipmentSlot slot, BiConsumer<Attribute, AttributeModifier> consumer) {
+    consumer.accept(PortingLibAttributes.SWIM_SPEED, new AttributeModifier(UUIDS[slot.getIndex()], "tconstruct.modifier.armor_power." + slot.getName(), 0.05f * this.getScaledLevel(tool, level), Operation.MULTIPLY_TOTAL));
   }
 
   @Override
@@ -40,7 +41,7 @@ public class TurtleShellModifier extends IncrementalModifier {
       LivingEntity entity = context.getEntity();
       // helmet/chest boost if eyes in water, legs/boots boost if feet in water
       if ((slotType == EquipmentSlot.HEAD || slotType == EquipmentSlot.CHEST) ? entity.wasEyeInWater : entity.isInWater()) {
-        modifierValue += getScaledLevel(tool, level) * 2.5f;
+        modifierValue += this.getScaledLevel(tool, level) * 2.5f;
       }
     }
     return modifierValue;

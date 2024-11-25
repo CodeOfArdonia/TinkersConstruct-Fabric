@@ -1,14 +1,11 @@
 package slimeknights.tconstruct.library.client.modifiers;
 
-import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonObject;
 import com.mojang.math.Transformation;
 import net.fabricmc.fabric.api.renderer.v1.mesh.Mesh;
-import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.util.GsonHelper;
-//import slimeknights.mantle.client.model.util.MantleItemLayerModel;
 import slimeknights.mantle.client.model.util.MantleItemLayerModel;
 import slimeknights.mantle.util.ItemLayerPixels;
 import slimeknights.mantle.util.JsonHelper;
@@ -22,20 +19,29 @@ import java.util.function.Function;
  * Default modifier model loader, loads a single texture from the standard path
  */
 public class NormalModifierModel implements IBakedModifierModel {
-  /** Constant unbaked model instance, as they are all the same */
+
+  /**
+   * Constant unbaked model instance, as they are all the same
+   */
   public static final IUnbakedModifierModel UNBAKED_INSTANCE = new Unbaked(-1, 0);
 
-  /** Textures to show */
+  /**
+   * Textures to show
+   */
   private final Material[] textures;
-  /** Color to apply to the texture */
+  /**
+   * Color to apply to the texture
+   */
   private final int color;
-  /** Luminosity to apply to the texture */
+  /**
+   * Luminosity to apply to the texture
+   */
   private final int luminosity;
 
   public NormalModifierModel(@Nullable Material smallTexture, @Nullable Material largeTexture, int color, int luminosity) {
     this.color = color;
     this.luminosity = luminosity;
-    this.textures = new Material[]{ smallTexture, largeTexture };
+    this.textures = new Material[]{smallTexture, largeTexture};
   }
 
   public NormalModifierModel(@Nullable Material smallTexture, @Nullable Material largeTexture) {
@@ -43,19 +49,20 @@ public class NormalModifierModel implements IBakedModifierModel {
   }
 
   @Override
-  public Mesh getQuads(IToolStackView tool, ModifierEntry entry, Function<Material,TextureAtlasSprite> spriteGetter, Transformation transforms, boolean isLarge, int startTintIndex, @Nullable ItemLayerPixels pixels) {
+  public Mesh getQuads(IToolStackView tool, ModifierEntry entry, Function<Material, TextureAtlasSprite> spriteGetter, Transformation transforms, boolean isLarge, int startTintIndex, @Nullable ItemLayerPixels pixels) {
     int index = isLarge ? 1 : 0;
-    return MantleItemLayerModel.getQuadsForSprite(color, -1, spriteGetter.apply(textures[index]), transforms, luminosity, pixels);
+    return MantleItemLayerModel.getQuadsForSprite(this.color, -1, spriteGetter.apply(this.textures[index]), transforms, this.luminosity, pixels);
   }
 
   private record Unbaked(int color, int luminosity) implements IUnbakedModifierModel {
+
     @Nullable
     @Override
-    public IBakedModifierModel forTool(Function<String,Material> smallGetter, Function<String,Material> largeGetter) {
+    public IBakedModifierModel forTool(Function<String, Material> smallGetter, Function<String, Material> largeGetter) {
       Material smallTexture = smallGetter.apply("");
       Material largeTexture = largeGetter.apply("");
       if (smallTexture != null || largeTexture != null) {
-        return new NormalModifierModel(smallTexture, largeTexture, color, luminosity);
+        return new NormalModifierModel(smallTexture, largeTexture, this.color, this.luminosity);
       }
       return null;
     }

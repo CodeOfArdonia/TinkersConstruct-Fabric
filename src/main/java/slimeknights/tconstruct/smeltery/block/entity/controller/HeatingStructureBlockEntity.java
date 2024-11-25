@@ -88,7 +88,7 @@ public abstract class HeatingStructureBlockEntity extends NameableBlockEntity im
   /**
    * Sub module to detect the multiblock for this structure
    */
-  private final HeatingStructureMultiblock<?> multiblock = createMultiblock();
+  private final HeatingStructureMultiblock<?> multiblock = this.createMultiblock();
 
   /**
    * Position of the block causing the structure to not form
@@ -128,13 +128,13 @@ public abstract class HeatingStructureBlockEntity extends NameableBlockEntity im
    * Inventory handling melting items
    */
   @Getter
-  protected final MeltingModuleInventory meltingInventory = createMeltingInventory();
+  protected final MeltingModuleInventory meltingInventory = this.createMeltingInventory();
 
   /**
    * Fuel module
    */
   @Getter
-  protected final FuelModule fuelModule = new FuelModule(this, () -> structure != null ? structure.getTanks() : Collections.emptyList());
+  protected final FuelModule fuelModule = new FuelModule(this, () -> this.structure != null ? this.structure.getTanks() : Collections.emptyList());
   /**
    * Current fuel consumption rate
    */
@@ -144,7 +144,7 @@ public abstract class HeatingStructureBlockEntity extends NameableBlockEntity im
   /**
    * Module handling entity interaction
    */
-  protected final EntityMeltingModule entityModule = new EntityMeltingModule(this, tank, this::canMeltEntities, this::insertIntoInventory, () -> structure == null ? null : structure.getBounds());
+  protected final EntityMeltingModule entityModule = new EntityMeltingModule(this, this.tank, this::canMeltEntities, this::insertIntoInventory, () -> this.structure == null ? null : this.structure.getBounds());
 
 
   /* Instance data, this data is not written to Tag */
@@ -212,9 +212,9 @@ public abstract class HeatingStructureBlockEntity extends NameableBlockEntity im
    */
   private void updateErrorPos() {
     BlockPos oldErrorPos = this.errorPos;
-    this.errorPos = multiblock.getLastResult().getPos();
-    if (!Objects.equals(oldErrorPos, errorPos)) {
-      TinkerNetwork.getInstance().sendToClientsAround(new StructureErrorPositionPacket(worldPosition, errorPos), level, worldPosition);
+    this.errorPos = this.multiblock.getLastResult().getPos();
+    if (!Objects.equals(oldErrorPos, this.errorPos)) {
+      TinkerNetwork.getInstance().sendToClientsAround(new StructureErrorPositionPacket(this.worldPosition, this.errorPos), this.level, this.worldPosition);
     }
   }
 
@@ -222,22 +222,22 @@ public abstract class HeatingStructureBlockEntity extends NameableBlockEntity im
    * Handles the client tick
    */
   protected void clientTick(Level level, BlockPos pos, BlockState state) {
-    if (errorVisibleFor > 0) {
-      errorVisibleFor--;
+    if (this.errorVisibleFor > 0) {
+      this.errorVisibleFor--;
     }
-    if (!addedDrainListeners) {
-      addedDrainListeners = true;
-      if (structure != null) {
-        structure.forEachContained(sPos -> {
+    if (!this.addedDrainListeners) {
+      this.addedDrainListeners = true;
+      if (this.structure != null) {
+        this.structure.forEachContained(sPos -> {
           if (level.getBlockEntity(sPos) instanceof IDisplayFluidListener listener) {
-            fluidDisplayListeners.add(new WeakReference<>(listener));
+            this.fluidDisplayListeners.add(new WeakReference<>(listener));
           }
         });
         // if we have listeners and a fluid, send a first update
-        if (!fluidDisplayListeners.isEmpty()) {
-          FluidStack fluid = IDisplayFluidListener.normalizeFluid(tank.getFluidInTank(0));
+        if (!this.fluidDisplayListeners.isEmpty()) {
+          FluidStack fluid = IDisplayFluidListener.normalizeFluid(this.tank.getFluidInTank(0));
           if (!fluid.isEmpty()) {
-            updateListeners(fluid);
+            this.updateListeners(fluid);
           }
         }
       }
@@ -249,8 +249,8 @@ public abstract class HeatingStructureBlockEntity extends NameableBlockEntity im
    */
   protected void serverTick(Level level, BlockPos pos, BlockState state) {
     if (level.isClientSide) {
-      if (errorVisibleFor > 0) {
-        errorVisibleFor--;
+      if (this.errorVisibleFor > 0) {
+        this.errorVisibleFor--;
       }
       return;
     }
@@ -260,48 +260,48 @@ public abstract class HeatingStructureBlockEntity extends NameableBlockEntity im
     }
 
     // run structure update if requested
-    if (structureUpdateQueued) {
-      checkStructure();
-      structureUpdateQueued = false;
+    if (this.structureUpdateQueued) {
+      this.checkStructure();
+      this.structureUpdateQueued = false;
     }
 
     // if we have a structure, run smeltery logic
-    if (structure != null && state.getValue(SmelteryControllerBlock.IN_STRUCTURE)) {
+    if (this.structure != null && state.getValue(SmelteryControllerBlock.IN_STRUCTURE)) {
       // every 15 seconds, check above the smeltery to try to expand
-      if (tick == 0) {
-        expandCounter++;
-        if (expandCounter >= 10 && structure.getInnerY() < multiblock.getMaxHeight()) {
-          expandCounter = 0;
+      if (this.tick == 0) {
+        this.expandCounter++;
+        if (this.expandCounter >= 10 && this.structure.getInnerY() < this.multiblock.getMaxHeight()) {
+          this.expandCounter = 0;
           // instead of rechecking the whole structure, just recheck the layer above and queue an update if its usable
-          if (multiblock.canExpand(structure, level)) {
-            updateStructure();
+          if (this.multiblock.canExpand(this.structure, level)) {
+            this.updateStructure();
           } else {
-            updateErrorPos();
+            this.updateErrorPos();
           }
         }
-      } else if (tick % 4 == 0) {
+      } else if (this.tick % 4 == 0) {
         // check the next inside position to see if its a valid inner block every other tick
-        if (!multiblock.isInnerBlock(level, structure.getNextInsideCheck())) {
-          updateStructure();
+        if (!this.multiblock.isInnerBlock(level, this.structure.getNextInsideCheck())) {
+          this.updateStructure();
         }
       }
 
       // main heating logic
-      heat();
+      this.heat();
 
       // fluid update sync every four ticks, whether it has tanks or not
-      if (tick % 4 == 3) {
-        if (fluidUpdateQueued) {
-          fluidUpdateQueued = false;
-          tank.syncFluids();
+      if (this.tick % 4 == 3) {
+        if (this.fluidUpdateQueued) {
+          this.fluidUpdateQueued = false;
+          this.tank.syncFluids();
         }
       }
-    } else if (tick == 0) {
-      updateStructure();
+    } else if (this.tick == 0) {
+      this.updateStructure();
     }
 
     // update tick timer
-    tick = (tick + 1) % 20;
+    this.tick = (this.tick + 1) % 20;
   }
 
   /**
@@ -310,15 +310,15 @@ public abstract class HeatingStructureBlockEntity extends NameableBlockEntity im
    * @param stack Item to drop
    */
   protected void dropItem(ItemStack stack) {
-    assert level != null;
-    if (!level.isClientSide && !stack.isEmpty()) {
-      double x = (double) (level.random.nextFloat() * 0.5F) + 0.25D;
-      double y = (double) (level.random.nextFloat() * 0.5F) + 0.25D;
-      double z = (double) (level.random.nextFloat() * 0.5F) + 0.25D;
-      BlockPos pos = this.worldPosition.relative(getBlockState().getValue(ControllerBlock.FACING));
-      ItemEntity itementity = new ItemEntity(level, (double) pos.getX() + x, (double) pos.getY() + y, (double) pos.getZ() + z, stack);
+    assert this.level != null;
+    if (!this.level.isClientSide && !stack.isEmpty()) {
+      double x = (double) (this.level.random.nextFloat() * 0.5F) + 0.25D;
+      double y = (double) (this.level.random.nextFloat() * 0.5F) + 0.25D;
+      double z = (double) (this.level.random.nextFloat() * 0.5F) + 0.25D;
+      BlockPos pos = this.worldPosition.relative(this.getBlockState().getValue(ControllerBlock.FACING));
+      ItemEntity itementity = new ItemEntity(this.level, (double) pos.getX() + x, (double) pos.getY() + y, (double) pos.getZ() + z, stack);
       itementity.setDefaultPickUpDelay();
-      level.addFreshEntity(itementity);
+      this.level.addFreshEntity(itementity);
     }
   }
 
@@ -328,7 +328,7 @@ public abstract class HeatingStructureBlockEntity extends NameableBlockEntity im
   @Nonnull
   @Override
   public Storage<ItemVariant> getItemStorage(@Nullable Direction direction) {
-    return meltingInventory;
+    return this.meltingInventory;
   }
 
   /* Structure */
@@ -337,7 +337,7 @@ public abstract class HeatingStructureBlockEntity extends NameableBlockEntity im
    * Marks the smeltery for a structure check
    */
   public void updateStructure() {
-    structureUpdateQueued = true;
+    this.structureUpdateQueued = true;
   }
 
   /**
@@ -353,74 +353,74 @@ public abstract class HeatingStructureBlockEntity extends NameableBlockEntity im
    * Attempts to locate a valid smeltery structure
    */
   protected void checkStructure() {
-    if (level == null || level.isClientSide) {
+    if (this.level == null || this.level.isClientSide) {
       return;
     }
-    boolean wasFormed = getBlockState().getValue(ControllerBlock.IN_STRUCTURE);
-    StructureData oldStructure = structure;
-    StructureData newStructure = multiblock.detectMultiblock(level, worldPosition, getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING));
+    boolean wasFormed = this.getBlockState().getValue(ControllerBlock.IN_STRUCTURE);
+    StructureData oldStructure = this.structure;
+    StructureData newStructure = this.multiblock.detectMultiblock(this.level, this.worldPosition, this.getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING));
 
     // update block state
     boolean formed = newStructure != null;
     if (formed != wasFormed) {
-      level.setBlockAndUpdate(worldPosition, getBlockState().setValue(ControllerBlock.IN_STRUCTURE, formed));
+      this.level.setBlockAndUpdate(this.worldPosition, this.getBlockState().setValue(ControllerBlock.IN_STRUCTURE, formed));
     }
 
     // structure info updates
     if (formed) {
       // sync size to the client
       TinkerNetwork.getInstance().sendToClientsAround(
-        new StructureUpdatePacket(worldPosition, newStructure.getMinPos(), newStructure.getMaxPos(), newStructure.getTanks()), level, worldPosition);
+        new StructureUpdatePacket(this.worldPosition, newStructure.getMinPos(), newStructure.getMaxPos(), newStructure.getTanks()), this.level, this.worldPosition);
 
       // update tank capability, do first for update listeners on the drain blocks
-      if (fluidCapability == null) {
-        fluidCapability = tank;
+      if (this.fluidCapability == null) {
+        this.fluidCapability = this.tank;
       }
 
       // set master positions
       newStructure.assignMaster(this, oldStructure);
-      setStructure(newStructure);
+      this.setStructure(newStructure);
     } else {
       // remove tank capability
-      if (fluidCapability != null) {
-        fluidCapability = null;
+      if (this.fluidCapability != null) {
+        this.fluidCapability = null;
       }
 
       // clear positions
       if (oldStructure != null) {
         oldStructure.clearMaster(this);
       }
-      setStructure(null);
+      this.setStructure(null);
     }
 
     // update the error position, we do on both success and failure for the sake of expanding positions
-    updateErrorPos();
+    this.updateErrorPos();
 
     // clear expand counter either way
-    expandCounter = 0;
+    this.expandCounter = 0;
   }
 
   /**
    * Called when the controller is broken to invalidate the master in all servants
    */
   public void invalidateStructure() {
-    if (structure != null) {
-      structure.clearMaster(this);
-      structure = null;
-      errorPos = null;
+    if (this.structure != null) {
+      this.structure.clearMaster(this);
+      this.structure = null;
+      this.errorPos = null;
     }
   }
 
   @Override
   public void notifyChange(IServantLogic servant, BlockPos pos, BlockState state) {
     // structure invalid? can ignore this, will automatically check later
-    if (structure == null) {
+    if (this.structure == null) {
       return;
     }
 
-    assert level != null;
-    if (multiblock.shouldUpdate(level, structure, pos, state)) {
-      updateStructure();
+    assert this.level != null;
+    if (this.multiblock.shouldUpdate(this.level, this.structure, pos, state)) {
+      this.updateStructure();
     }
   }
 
@@ -428,21 +428,21 @@ public abstract class HeatingStructureBlockEntity extends NameableBlockEntity im
    * Gets the last result from this multiblock
    */
   public MultiblockResult getStructureResult() {
-    return multiblock.getLastResult();
+    return this.multiblock.getLastResult();
   }
 
   /* Tank */
 
   @Override
   public void updateFluidsFromPacket(List<FluidStack> fluids) {
-    tank.setFluids(fluids);
+    this.tank.setFluids(fluids);
   }
 
   /**
    * Updates all fluid display listeners
    */
   private void updateListeners(FluidStack fluid) {
-    Iterator<WeakReference<IDisplayFluidListener>> iterator = fluidDisplayListeners.iterator();
+    Iterator<WeakReference<IDisplayFluidListener>> iterator = this.fluidDisplayListeners.iterator();
     while (iterator.hasNext()) {
       IDisplayFluidListener listener = iterator.next().get();
       if (listener == null) {
@@ -459,50 +459,50 @@ public abstract class HeatingStructureBlockEntity extends NameableBlockEntity im
    * @param fluid Fluid
    */
   private void updateDisplayFluid(FluidStack fluid) {
-    if (level != null && level.isClientSide) {
+    if (this.level != null && this.level.isClientSide) {
       // update ourself
       fluid = IDisplayFluidListener.normalizeFluid(fluid);
-      modelData.setData(IDisplayFluidListener.PROPERTY, fluid);
-      BlockState state = getBlockState();
-      level.sendBlockUpdated(worldPosition, state, state, 48);
-      updateListeners(fluid);
+      this.modelData.setData(IDisplayFluidListener.PROPERTY, fluid);
+      BlockState state = this.getBlockState();
+      this.level.sendBlockUpdated(this.worldPosition, state, state, 48);
+      this.updateListeners(fluid);
     }
   }
 
   @Override
   public void addDisplayListener(IDisplayFluidListener listener) {
     boolean have = false;
-    for (WeakReference<IDisplayFluidListener> existing : fluidDisplayListeners) {
+    for (WeakReference<IDisplayFluidListener> existing : this.fluidDisplayListeners) {
       if (existing.get() == listener) {
         have = true;
         break;
       }
     }
     if (!have) {
-      fluidDisplayListeners.add(new WeakReference<>(listener));
+      this.fluidDisplayListeners.add(new WeakReference<>(listener));
     }
-    listener.notifyDisplayFluidUpdated(IDisplayFluidListener.normalizeFluid(tank.getFluidInTank(0)));
+    listener.notifyDisplayFluidUpdated(IDisplayFluidListener.normalizeFluid(this.tank.getFluidInTank(0)));
   }
 
   @Override
   public void notifyFluidsChanged(FluidChange type, FluidStack fluid) {
     if (type == FluidChange.ORDER_CHANGED) {
-      updateDisplayFluid(fluid);
+      this.updateDisplayFluid(fluid);
     } else {
       // mark that fluids need an update on the client
-      fluidUpdateQueued = true;
+      this.fluidUpdateQueued = true;
       this.setChangedFast();
     }
   }
 
   @Override
   public AABB getRenderBoundingBox() {
-    if (structure != null) {
-      return structure.getBounds();
-    } else if (defaultBounds == null) {
-      defaultBounds = new AABB(worldPosition, worldPosition.offset(1, 1, 1));
+    if (this.structure != null) {
+      return this.structure.getBounds();
+    } else if (this.defaultBounds == null) {
+      this.defaultBounds = new AABB(this.worldPosition, this.worldPosition.offset(1, 1, 1));
     }
-    return defaultBounds;
+    return this.defaultBounds;
   }
 
   /* Heating helpers */
@@ -513,10 +513,10 @@ public abstract class HeatingStructureBlockEntity extends NameableBlockEntity im
    * @return True if we can melt entities
    */
   private boolean canMeltEntities() {
-    if (fuelModule.hasFuel()) {
+    if (this.fuelModule.hasFuel()) {
       return true;
     }
-    return fuelModule.findFuel(false) > 0;
+    return this.fuelModule.findFuel(false) > 0;
   }
 
   /**
@@ -526,7 +526,7 @@ public abstract class HeatingStructureBlockEntity extends NameableBlockEntity im
    */
   private ItemStack insertIntoInventory(ItemStack stack) {
     try (Transaction t = TransferUtil.getTransaction()) {
-      long inserted = StorageUtil.tryInsertStacking(meltingInventory, ItemVariant.of(stack), stack.getCount(), t);
+      long inserted = StorageUtil.tryInsertStacking(this.meltingInventory, ItemVariant.of(stack), stack.getCount(), t);
       t.commit();
       return ItemHandlerHelper.copyStackWithSize(stack, (int) (stack.getCount() - inserted));
     }
@@ -548,14 +548,14 @@ public abstract class HeatingStructureBlockEntity extends NameableBlockEntity im
    * @param maxPos Max structure position
    */
   public void setStructureSize(BlockPos minPos, BlockPos maxPos, List<BlockPos> tanks) {
-    setStructure(multiblock.createClient(minPos, maxPos, tanks));
-    fuelModule.clearCachedDisplayListeners();
-    if (structure == null) {
-      fluidDisplayListeners.clear();
+    this.setStructure(this.multiblock.createClient(minPos, maxPos, tanks));
+    this.fuelModule.clearCachedDisplayListeners();
+    if (this.structure == null) {
+      this.fluidDisplayListeners.clear();
     } else {
-      fluidDisplayListeners.removeIf(reference -> {
+      this.fluidDisplayListeners.removeIf(reference -> {
         IDisplayFluidListener listener = reference.get();
-        return listener == null || !structure.contains(listener.getListenerPos());
+        return listener == null || !this.structure.contains(listener.getListenerPos());
       });
     }
   }
@@ -575,7 +575,7 @@ public abstract class HeatingStructureBlockEntity extends NameableBlockEntity im
    * If true, the error position should be visible
    */
   public boolean isHighlightError() {
-    return errorVisibleFor > 0;
+    return this.errorVisibleFor > 0;
   }
 
   /**
@@ -587,9 +587,9 @@ public abstract class HeatingStructureBlockEntity extends NameableBlockEntity im
    * If true, debug blocks should show in the TESR to the given player
    */
   public boolean showDebugBlockBorder(Player player) {
-    return isDebugItem(player.getMainHandItem())
-      || isDebugItem(player.getOffhandItem())
-      || isDebugItem(player.getItemBySlot(EquipmentSlot.HEAD));
+    return this.isDebugItem(player.getMainHandItem())
+      || this.isDebugItem(player.getOffhandItem())
+      || this.isDebugItem(player.getItemBySlot(EquipmentSlot.HEAD));
   }
 
 
@@ -597,15 +597,15 @@ public abstract class HeatingStructureBlockEntity extends NameableBlockEntity im
 
   @Override
   public String getTextureName() {
-    return RetexturedHelper.getTextureName(texture);
+    return RetexturedHelper.getTextureName(this.texture);
   }
 
   @Override
   public void updateTexture(String name) {
-    Block oldTexture = texture;
-    texture = RetexturedHelper.getBlock(name);
-    if (oldTexture != texture) {
-      setChangedFast();
+    Block oldTexture = this.texture;
+    this.texture = RetexturedHelper.getBlock(name);
+    if (oldTexture != this.texture) {
+      this.setChangedFast();
       RetexturedHelper.onTextureUpdated(this);
     }
   }
@@ -623,28 +623,28 @@ public abstract class HeatingStructureBlockEntity extends NameableBlockEntity im
   public void load(CompoundTag nbt) {
     super.load(nbt);
     if (nbt.contains(TAG_TANK, Tag.TAG_COMPOUND)) {
-      tank.read(nbt.getCompound(TAG_TANK));
-      FluidStack first = tank.getFluidInTank(0);
+      this.tank.read(nbt.getCompound(TAG_TANK));
+      FluidStack first = this.tank.getFluidInTank(0);
       if (!first.isEmpty()) {
-        updateDisplayFluid(first);
+        this.updateDisplayFluid(first);
       }
     }
     if (nbt.contains(TAG_INVENTORY, Tag.TAG_COMPOUND)) {
-      meltingInventory.readFromTag(nbt.getCompound(TAG_INVENTORY));
+      this.meltingInventory.readFromTag(nbt.getCompound(TAG_INVENTORY));
     }
     if (nbt.contains(TAG_STRUCTURE, Tag.TAG_COMPOUND)) {
-      setStructure(multiblock.readFromTag(nbt.getCompound(TAG_STRUCTURE)));
-      if (structure != null) {
-        fluidCapability = tank;
+      this.setStructure(this.multiblock.readFromTag(nbt.getCompound(TAG_STRUCTURE)));
+      if (this.structure != null) {
+        this.fluidCapability = this.tank;
       }
     }
     // only exists to be sent server to client in update packets
     if (nbt.contains(TAG_ERROR_POS, Tag.TAG_COMPOUND)) {
       this.errorPos = NbtUtils.readBlockPos(nbt.getCompound(TAG_ERROR_POS));
     }
-    fuelModule.readFromTag(nbt);
+    this.fuelModule.readFromTag(nbt);
     if (nbt.contains(TAG_TEXTURE, Tag.TAG_STRING)) {
-      texture = RetexturedHelper.getBlock(nbt.getString(TAG_TEXTURE));
+      this.texture = RetexturedHelper.getBlock(nbt.getString(TAG_TEXTURE));
       RetexturedHelper.onTextureUpdated(this);
     }
   }
@@ -653,20 +653,20 @@ public abstract class HeatingStructureBlockEntity extends NameableBlockEntity im
   public void saveAdditional(CompoundTag compound) {
     // Tag that just writes to disk
     super.saveAdditional(compound);
-    if (structure != null) {
-      compound.put(TAG_STRUCTURE, structure.writeToTag());
+    if (this.structure != null) {
+      compound.put(TAG_STRUCTURE, this.structure.writeToTag());
     }
-    fuelModule.writeToTag(compound);
+    this.fuelModule.writeToTag(compound);
   }
 
   @Override
   public void saveSynced(CompoundTag compound) {
     // Tag that writes to disk and syncs to client
     super.saveSynced(compound);
-    compound.put(TAG_TANK, tank.write(new CompoundTag()));
-    compound.put(TAG_INVENTORY, meltingInventory.writeToTag());
-    if (texture != Blocks.AIR) {
-      compound.putString(TAG_TEXTURE, getTextureName());
+    compound.put(TAG_TANK, this.tank.write(new CompoundTag()));
+    compound.put(TAG_INVENTORY, this.meltingInventory.writeToTag());
+    if (this.texture != Blocks.AIR) {
+      compound.putString(TAG_TEXTURE, this.getTextureName());
     }
   }
 
@@ -674,12 +674,12 @@ public abstract class HeatingStructureBlockEntity extends NameableBlockEntity im
   public CompoundTag getUpdateTag() {
     // Tag that just syncs to client
     CompoundTag nbt = super.getUpdateTag();
-    if (structure != null) {
-      nbt.put(TAG_STRUCTURE, structure.writeClientTag());
+    if (this.structure != null) {
+      nbt.put(TAG_STRUCTURE, this.structure.writeClientTag());
     }
     // sync error position, not actually saved in Tag
-    if (errorPos != null) {
-      nbt.put(TAG_ERROR_POS, NbtUtils.writeBlockPos(errorPos));
+    if (this.errorPos != null) {
+      nbt.put(TAG_ERROR_POS, NbtUtils.writeBlockPos(this.errorPos));
     }
     return nbt;
   }
@@ -698,6 +698,6 @@ public abstract class HeatingStructureBlockEntity extends NameableBlockEntity im
 
   @Override
   public IModelData getRenderData() {
-    return modelData;
+    return this.modelData;
   }
 }

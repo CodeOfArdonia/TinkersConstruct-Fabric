@@ -184,8 +184,7 @@ public class SlimeTreeFeature extends Feature<SlimeTreeConfig> {
   protected boolean setLog(LevelSimulatedRW worldIn, RandomSource randomIn, BlockPos blockPos, Set<BlockPos> blockPosSet, BoundingBox mutableBoundingBoxIn, SlimeTreeConfig treeFeatureConfigIn) {
     if (!isAirOrLeavesAt(worldIn, blockPos)) {
       return false;
-    }
-    else {
+    } else {
       this.setBlock(worldIn, blockPos, treeFeatureConfigIn.trunkProvider.getState(randomIn, blockPos));
       //TODO mutableBoundingBoxIn.expand(new BoundingBox(blockPos, blockPos));
       blockPosSet.add(blockPos.immutable());
@@ -196,8 +195,7 @@ public class SlimeTreeFeature extends Feature<SlimeTreeConfig> {
   protected boolean placeAir(LevelSimulatedRW worldIn, RandomSource random, BlockPos blockPos, Set<BlockPos> blockPosSet, BoundingBox mutableBoundingBoxIn) {
     if (!isAirOrLeavesAt(worldIn, blockPos)) {
       return false;
-    }
-    else {
+    } else {
       this.setBlock(worldIn, blockPos, Blocks.AIR.defaultBlockState());
       //TODO mutableBoundingBoxIn.expand(new BoundingBox(blockPos, blockPos));
       blockPosSet.add(blockPos.immutable());
@@ -208,8 +206,7 @@ public class SlimeTreeFeature extends Feature<SlimeTreeConfig> {
   protected boolean setLeaf(LevelSimulatedRW worldIn, RandomSource random, BlockPos blockPos, Set<BlockPos> blockPosSet, BoundingBox mutableBoundingBoxIn, SlimeTreeConfig treeFeatureConfigIn) {
     if (!isAirOrLeavesAt(worldIn, blockPos)) {
       return false;
-    }
-    else {
+    } else {
       this.setBlock(worldIn, blockPos, treeFeatureConfigIn.leavesProvider.getState(random, blockPos));
       //TODO mutableBoundingBoxIn.expand(new BoundingBox(blockPos, blockPos));
       blockPosSet.add(blockPos.immutable());
@@ -220,8 +217,7 @@ public class SlimeTreeFeature extends Feature<SlimeTreeConfig> {
   protected boolean placeVine(LevelSimulatedRW worldIn, RandomSource random, BlockPos blockPos, Set<BlockPos> blockPosSet, BoundingBox mutableBoundingBoxIn, BlockState vineState) {
     if (!isAirOrLeavesAt(worldIn, blockPos)) {
       return false;
-    }
-    else {
+    } else {
       this.setBlock(worldIn, blockPos, vineState);
       //TODO mutableBoundingBoxIn.expand(new BoundingBox(blockPos, blockPos));
       blockPosSet.add(blockPos.immutable());
@@ -232,7 +228,7 @@ public class SlimeTreeFeature extends Feature<SlimeTreeConfig> {
   private BlockState getRandomizedVine(RandomSource random, BlockPos blockPos, SlimeTreeConfig config) {
     BlockState state = config.vinesProvider.getState(random, blockPos);
 
-    BooleanProperty[] sides = new BooleanProperty[] { VineBlock.NORTH, VineBlock.EAST, VineBlock.SOUTH, VineBlock.WEST };
+    BooleanProperty[] sides = new BooleanProperty[]{VineBlock.NORTH, VineBlock.EAST, VineBlock.SOUTH, VineBlock.WEST};
 
     for (BooleanProperty side : sides) {
       state = state.setValue(side, false);

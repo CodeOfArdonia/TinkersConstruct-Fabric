@@ -17,6 +17,7 @@ import net.minecraft.world.item.ItemStack;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ValidatedResult {
+
   /**
    * Result for when this recipe is not craftable, but has no message to display
    */
@@ -24,8 +25,9 @@ public class ValidatedResult {
 
   /**
    * Result containing the item result
-   * @param result  Item result of this recipe
-   * @return  Validation result with the given message
+   *
+   * @param result Item result of this recipe
+   * @return Validation result with the given message
    */
   public static ValidatedResult success(ItemStack result) {
     return new ValidatedResult.Success(result);
@@ -33,8 +35,9 @@ public class ValidatedResult {
 
   /**
    * Result for when this recipe is not craftable and has an error message
-   * @param message  Error message
-   * @return  Validation result with the given message
+   *
+   * @param message Error message
+   * @return Validation result with the given message
    */
   public static ValidatedResult failure(Component message) {
     return new ValidatedResult.Failure(message);
@@ -42,21 +45,25 @@ public class ValidatedResult {
 
   /**
    * Result for when this recipe is not craftable and has an error message
-   * @param translationKey  Error message translation key
-   * @param params          Arguments to format into the translation key
-   * @return  Validation result with the given message
+   *
+   * @param translationKey Error message translation key
+   * @param params         Arguments to format into the translation key
+   * @return Validation result with the given message
    */
   public static ValidatedResult failure(String translationKey, Object... params) {
     return failure(Component.translatable(translationKey, params));
   }
 
-  /** If true, this recipe passed and can be crafted for the given input */
+  /**
+   * If true, this recipe passed and can be crafted for the given input
+   */
   @Getter
   private final boolean success;
 
   /**
    * Gets the item result
-   * @return  Item result
+   *
+   * @return Item result
    */
   public ItemStack getResult() {
     return ItemStack.EMPTY;
@@ -64,7 +71,8 @@ public class ValidatedResult {
 
   /**
    * If true, this recipe failed with an error message. This message should be displayed on screen
-   * @return  true if the recipe failed with an error message
+   *
+   * @return true if the recipe failed with an error message
    */
   public boolean hasError() {
     return false;
@@ -72,15 +80,19 @@ public class ValidatedResult {
 
   /**
    * Returns the message for this result
-   * @return  result message
-   * @throws UnsupportedOperationException  if this result is success or pass
+   *
+   * @return result message
+   * @throws UnsupportedOperationException if this result is success or pass
    */
   public Component getMessage() {
     throw new UnsupportedOperationException("Cannot show error message on success");
   }
 
-  /** Class for success, which has an item stack */
+  /**
+   * Class for success, which has an item stack
+   */
   private static class Success extends ValidatedResult {
+
     @Getter
     private final ItemStack result;
 
@@ -90,8 +102,11 @@ public class ValidatedResult {
     }
   }
 
-  /** Class for failure, which has a message */
+  /**
+   * Class for failure, which has a message
+   */
   private static class Failure extends ValidatedResult {
+
     @Getter
     private final Component message;
 

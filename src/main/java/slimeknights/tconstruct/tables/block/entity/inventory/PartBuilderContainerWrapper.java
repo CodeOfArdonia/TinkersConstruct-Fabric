@@ -17,10 +17,15 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class PartBuilderContainerWrapper implements IPartBuilderContainer {
+
   private final PartBuilderBlockEntity builder;
-  /** If true, the material recipe is out of date*/
+  /**
+   * If true, the material recipe is out of date
+   */
   private boolean materialNeedsUpdate = true;
-  /** Cached material recipe, may be null if not a material item */
+  /**
+   * Cached material recipe, may be null if not a material item
+   */
   @Nullable
   private IMaterialValue material = null;
 
@@ -30,20 +35,24 @@ public class PartBuilderContainerWrapper implements IPartBuilderContainer {
 
   @Override
   public ItemStack getStack() {
-    return builder.getItem(PartBuilderBlockEntity.MATERIAL_SLOT);
+    return this.builder.getItem(PartBuilderBlockEntity.MATERIAL_SLOT);
   }
 
   @Override
   public ItemStack getPatternStack() {
-    return builder.getItem(PartBuilderBlockEntity.PATTERN_SLOT);
+    return this.builder.getItem(PartBuilderBlockEntity.PATTERN_SLOT);
   }
 
-  /** Gets the tiles world */
+  /**
+   * Gets the tiles world
+   */
   protected Level getWorld() {
-    return Objects.requireNonNull(builder.getLevel(), "Tile entity world must be nonnull");
+    return Objects.requireNonNull(this.builder.getLevel(), "Tile entity world must be nonnull");
   }
 
-  /** Refreshes the stored material */
+  /**
+   * Refreshes the stored material
+   */
   public void refreshMaterial() {
     this.materialNeedsUpdate = true;
     this.material = null;
@@ -54,7 +63,7 @@ public class PartBuilderContainerWrapper implements IPartBuilderContainer {
   public IMaterialValue getMaterial() {
     if (this.materialNeedsUpdate) {
       this.materialNeedsUpdate = false;
-      ItemStack stack = getStack();
+      ItemStack stack = this.getStack();
       if (stack.isEmpty()) {
         this.material = null;
       } else if (stack.is(TinkerTags.Items.TOOL_PARTS)) {
@@ -65,7 +74,7 @@ public class PartBuilderContainerWrapper implements IPartBuilderContainer {
           this.material = new MaterialValue(material, MaterialCastingLookup.getItemCost(stack.getItem()));
         }
       } else {
-        Level world = getWorld();
+        Level world = this.getWorld();
         this.material = world.getRecipeManager().getRecipeFor(TinkerRecipeTypes.MATERIAL.get(), this, world).orElse(null);
       }
     }

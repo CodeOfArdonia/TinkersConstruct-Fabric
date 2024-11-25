@@ -14,11 +14,15 @@ import static slimeknights.tconstruct.tables.block.entity.table.TinkerStationBlo
 
 @RequiredArgsConstructor
 public class ModifierWorktableContainerWrapper implements ITinkerableContainer.Mutable {
+
   private final ModifierWorktableBlockEntity worktable;
-  @Nullable @Setter
+  @Nullable
+  @Setter
   private Player player;
 
-  /** Cached tool instance to save lookup effort */
+  /**
+   * Cached tool instance to save lookup effort
+   */
   @Nullable
   private ToolStack tool;
 
@@ -27,26 +31,26 @@ public class ModifierWorktableContainerWrapper implements ITinkerableContainer.M
    */
   public void refreshInput(int slot) {
     if (slot == TINKER_SLOT) {
-      tool = null;
+      this.tool = null;
     }
   }
 
   @Override
   public ItemStack getTinkerableStack() {
-    return worktable.getItem(ModifierWorktableBlockEntity.TINKER_SLOT);
+    return this.worktable.getItem(ModifierWorktableBlockEntity.TINKER_SLOT);
   }
 
   @Override
   public ToolStack getTinkerable() {
-    if (tool == null) {
-      tool = ToolStack.from(getTinkerableStack());
+    if (this.tool == null) {
+      this.tool = ToolStack.from(this.getTinkerableStack());
     }
-    return tool;
+    return this.tool;
   }
 
   @Override
   public ItemStack getInput(int index) {
-    return worktable.getItem(index + ModifierWorktableBlockEntity.INPUT_START);
+    return this.worktable.getItem(index + ModifierWorktableBlockEntity.INPUT_START);
   }
 
   @Override
@@ -63,8 +67,8 @@ public class ModifierWorktableContainerWrapper implements ITinkerableContainer.M
 
   @Override
   public void giveItem(ItemStack stack) {
-    if (player != null) {
-      player.getInventory().placeItemBackInInventory(stack);
+    if (this.player != null) {
+      this.player.getInventory().placeItemBackInInventory(stack);
     }
   }
 }

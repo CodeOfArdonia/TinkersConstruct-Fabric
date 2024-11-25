@@ -51,6 +51,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class ModifierRemovalRecipe extends AbstractWorktableRecipe {
+
   private static final Component TITLE = TConstruct.makeTranslation("recipe", "remove_modifier.title");
   private static final Component DESCRIPTION = TConstruct.makeTranslation("recipe", "remove_modifier.description");
   private static final Component NO_MODIFIERS = TConstruct.makeTranslation("recipe", "remove_modifier.no_modifiers");
@@ -93,18 +94,18 @@ public class ModifierRemovalRecipe extends AbstractWorktableRecipe {
 
   @Override
   public boolean matches(ITinkerableContainer inv, Level world) {
-    if (!sizedTool.test(inv.getTinkerableStack())) {
+    if (!this.sizedTool.test(inv.getTinkerableStack())) {
       return false;
     }
-    return ModifierRecipe.checkMatch(inv, inputs);
+    return ModifierRecipe.checkMatch(inv, this.inputs);
   }
 
   /**
    * Filters the given modifier list
    */
   protected List<ModifierEntry> filter(@Nullable IToolStackView tool, List<ModifierEntry> modifiers) {
-    if (modifierPredicate != ModifierPredicate.ALWAYS) {
-      return modifiers.stream().filter(entryPredicate).toList();
+    if (this.modifierPredicate != ModifierPredicate.ALWAYS) {
+      return modifiers.stream().filter(this.entryPredicate).toList();
     }
     return modifiers;
   }
@@ -112,17 +113,17 @@ public class ModifierRemovalRecipe extends AbstractWorktableRecipe {
   @Override
   public List<ModifierEntry> getModifierOptions(@Nullable ITinkerableContainer inv) {
     if (inv == null) {
-      if (displayModifiers == null) {
-        displayModifiers = filter(null, ModifierRecipeLookup.getRecipeModifierList());
+      if (this.displayModifiers == null) {
+        this.displayModifiers = this.filter(null, ModifierRecipeLookup.getRecipeModifierList());
       }
-      return displayModifiers;
+      return this.displayModifiers;
     }
-    return filter(inv.getTinkerable(), inv.getTinkerable().getUpgrades().getModifiers());
+    return this.filter(inv.getTinkerable(), inv.getTinkerable().getUpgrades().getModifiers());
   }
 
   @Override
   public Component getDescription(@Nullable ITinkerableContainer inv) {
-    if (inv != null && inv.getTinkerable().getUpgrades().getModifiers().stream().noneMatch(entryPredicate)) {
+    if (inv != null && inv.getTinkerable().getUpgrades().getModifiers().stream().noneMatch(this.entryPredicate)) {
       return NO_MODIFIERS;
     }
     return DESCRIPTION;
@@ -184,7 +185,7 @@ public class ModifierRemovalRecipe extends AbstractWorktableRecipe {
   public void updateInputs(IToolStackView result, ITinkerableContainer.Mutable inv, boolean isServer) {
     super.updateInputs(result, inv, isServer);
     if (isServer) {
-      for (ItemStack stack : leftovers) {
+      for (ItemStack stack : this.leftovers) {
         inv.giveItem(stack.copy());
       }
     }
@@ -204,8 +205,8 @@ public class ModifierRemovalRecipe extends AbstractWorktableRecipe {
    */
   @Override
   public List<ItemStack> getInputTools() {
-    if (tools == null) {
-      tools = sizedTool.getMatchingStacks().stream().map(stack -> {
+    if (this.tools == null) {
+      this.tools = this.sizedTool.getMatchingStacks().stream().map(stack -> {
         ItemStack tool = IModifiableDisplay.getDisplayStack(stack.getItem());
         if (stack.getCount() > 1) {
           tool = ItemHandlerHelper.copyStackWithSize(tool, stack.getCount());
@@ -213,7 +214,7 @@ public class ModifierRemovalRecipe extends AbstractWorktableRecipe {
         return tool;
       }).toList();
     }
-    return tools;
+    return this.tools;
   }
 
   /**
@@ -227,7 +228,7 @@ public class ModifierRemovalRecipe extends AbstractWorktableRecipe {
 
     @Override
     default ModifierRemovalRecipe create(ResourceLocation id, SizedIngredient toolRequirement, List<SizedIngredient> inputs, List<ItemStack> leftovers, IJsonPredicate<ModifierId> modifierPredicate) {
-      return create(id, inputs, leftovers, modifierPredicate);
+      return this.create(id, inputs, leftovers, modifierPredicate);
     }
   }
 
@@ -270,7 +271,7 @@ public class ModifierRemovalRecipe extends AbstractWorktableRecipe {
       if (json.has("modifier_predicate")) {
         modifierPredicate = ModifierPredicate.LOADER.getAndDeserialize(json, "modifier_predicate");
       }
-      return factory.create(id, tool, ingredients, leftovers, modifierPredicate);
+      return this.factory.create(id, tool, ingredients, leftovers, modifierPredicate);
     }
 
     @Nullable
@@ -288,7 +289,7 @@ public class ModifierRemovalRecipe extends AbstractWorktableRecipe {
         leftovers.add(buffer.readItem());
       }
       IJsonPredicate<ModifierId> modifierPredicate = ModifierPredicate.LOADER.fromNetwork(buffer);
-      return factory.create(id, tool, ingredients.build(), leftovers.build(), modifierPredicate);
+      return this.factory.create(id, tool, ingredients.build(), leftovers.build(), modifierPredicate);
     }
 
     @Override
@@ -332,14 +333,14 @@ public class ModifierRemovalRecipe extends AbstractWorktableRecipe {
      * Sets the tool requirement for this recipe
      */
     public Builder setTools(Ingredient ingredient) {
-      return setTools(SizedIngredient.of(ingredient));
+      return this.setTools(SizedIngredient.of(ingredient));
     }
 
     /**
      * Adds a leftover stack to the recipe
      */
     public Builder addLeftover(ItemStack stack) {
-      leftovers.add(stack);
+      this.leftovers.add(stack);
       return this;
     }
 
@@ -347,20 +348,20 @@ public class ModifierRemovalRecipe extends AbstractWorktableRecipe {
      * Adds a leftover stack to the recipe
      */
     public Builder addLeftover(ItemLike item) {
-      return addLeftover(new ItemStack(item));
+      return this.addLeftover(new ItemStack(item));
     }
 
     @Override
     public void save(Consumer<FinishedRecipe> consumer) {
-      save(consumer, BuiltInRegistries.ITEM.getKey(leftovers.get(0).getItem()));
+      this.save(consumer, BuiltInRegistries.ITEM.getKey(this.leftovers.get(0).getItem()));
     }
 
     @Override
     public void save(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
-      if (inputs.isEmpty()) {
+      if (this.inputs.isEmpty()) {
         throw new IllegalStateException("Must have at least one input");
       }
-      ResourceLocation advancementId = buildOptionalAdvancement(id, "modifiers");
+      ResourceLocation advancementId = this.buildOptionalAdvancement(id, "modifiers");
       consumer.accept(new Finished(id, advancementId));
     }
 
@@ -373,24 +374,24 @@ public class ModifierRemovalRecipe extends AbstractWorktableRecipe {
       @Override
       public void serializeRecipeData(JsonObject json) {
         super.serializeRecipeData(json);
-        SizedIngredient ingredient = tools;
+        SizedIngredient ingredient = Builder.this.tools;
         if (ingredient == SizedIngredient.EMPTY) {
           ingredient = SizedIngredient.fromTag(TinkerTags.Items.MODIFIABLE);
         }
         json.add("tools", ingredient.serialize());
-        if (!leftovers.isEmpty()) {
+        if (!Builder.this.leftovers.isEmpty()) {
           JsonArray array = new JsonArray();
-          for (ItemStack stack : leftovers) {
+          for (ItemStack stack : Builder.this.leftovers) {
             array.add(JsonUtils.serializeItemStack(stack));
           }
           json.add("leftovers", array);
         }
-        json.add("modifier_predicate", ModifierPredicate.LOADER.serialize(modifierPredicate));
+        json.add("modifier_predicate", ModifierPredicate.LOADER.serialize(Builder.this.modifierPredicate));
       }
 
       @Override
       public RecipeSerializer<?> getType() {
-        return serializer;
+        return Builder.this.serializer;
       }
     }
   }

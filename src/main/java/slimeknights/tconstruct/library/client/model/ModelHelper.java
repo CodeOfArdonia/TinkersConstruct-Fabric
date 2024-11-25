@@ -4,6 +4,7 @@ import net.fabricmc.fabric.api.renderer.v1.model.WrapperBakedModel;
 import net.minecraft.client.resources.model.BakedModel;
 
 public class ModelHelper {
+
   /**
    * Fully unwrap a model, i.e. return the innermost model.
    */

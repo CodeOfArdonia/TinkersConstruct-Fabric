@@ -8,40 +8,41 @@ import slimeknights.tconstruct.library.modifiers.ModifierId;
  * That is, they may be used as traits or in recipes, but nothing in code relies on them existing
  */
 public class ModifierIds {
+
   // bonus modifier slots
-  public static final ModifierId writable    = id("writable");
+  public static final ModifierId writable = id("writable");
   public static final ModifierId recapitated = id("recapitated");
-  public static final ModifierId harmonious  = id("harmonious");
+  public static final ModifierId harmonious = id("harmonious");
   public static final ModifierId resurrected = id("resurrected");
-  public static final ModifierId rebalanced  = id("rebalanced");
-  public static final ModifierId gilded      = id("gilded");
-  public static final ModifierId draconic    = id("draconic");
+  public static final ModifierId rebalanced = id("rebalanced");
+  public static final ModifierId gilded = id("gilded");
+  public static final ModifierId draconic = id("draconic");
 
   // tier upgrades
-  public static final ModifierId emerald   = id("emerald");
-  public static final ModifierId diamond   = id("diamond");
+  public static final ModifierId emerald = id("emerald");
+  public static final ModifierId diamond = id("diamond");
   public static final ModifierId netherite = id("netherite");
 
   // general
   public static final ModifierId worldbound = id("worldbound");
-  public static final ModifierId shiny      = id("shiny");
-  public static final ModifierId sticky     = id("sticky");
+  public static final ModifierId shiny = id("shiny");
+  public static final ModifierId sticky = id("sticky");
   // general abilities
   public static final ModifierId reach = id("reach");
 
   // loot
-  public static final ModifierId luck    = id("luck");
+  public static final ModifierId luck = id("luck");
   public static final ModifierId looting = id("looting");
   public static final ModifierId fortune = id("fortune");
 
   // damage boost
-  public static final ModifierId sharpness   = id("sharpness");
+  public static final ModifierId sharpness = id("sharpness");
   public static final ModifierId swiftstrike = id("swiftstrike");
-  public static final ModifierId smite       = id("smite");
+  public static final ModifierId smite = id("smite");
   public static final ModifierId baneOfSssss = id("bane_of_sssss");
   public static final ModifierId antiaquatic = id("antiaquatic");
-  public static final ModifierId killager    = id("killager");
-  public static final ModifierId cooling     = id("cooling");
+  public static final ModifierId killager = id("killager");
+  public static final ModifierId cooling = id("cooling");
 
   // ranged
   public static final ModifierId power = id("power");
@@ -91,19 +92,19 @@ public class ModifierIds {
   public static final ModifierId ductile = id("ductile");
 
   // mob disguises
-  public static final ModifierId creeperDisguise         = id("creeper_disguise");
-  public static final ModifierId endermanDisguise        = id("enderman_disguise");
-  public static final ModifierId skeletonDisguise        = id("skeleton_disguise");
-  public static final ModifierId strayDisguise           = id("stray_disguise");
-  public static final ModifierId witherSkeletonDisguise  = id("wither_skeleton_disguise");
-  public static final ModifierId spiderDisguise          = id("spider_disguise");
-  public static final ModifierId caveSpiderDisguise      = id("cave_spider_disguise");
-  public static final ModifierId zombieDisguise          = id("zombie_disguise");
-  public static final ModifierId huskDisguise            = id("husk_disguise");
-  public static final ModifierId drownedDisguise         = id("drowned_disguise");
-  public static final ModifierId blazeDisguise           = id("blaze_disguise");
-  public static final ModifierId piglinDisguise          = id("piglin_disguise");
-  public static final ModifierId piglinBruteDisguise     = id("piglin_brute_disguise");
+  public static final ModifierId creeperDisguise = id("creeper_disguise");
+  public static final ModifierId endermanDisguise = id("enderman_disguise");
+  public static final ModifierId skeletonDisguise = id("skeleton_disguise");
+  public static final ModifierId strayDisguise = id("stray_disguise");
+  public static final ModifierId witherSkeletonDisguise = id("wither_skeleton_disguise");
+  public static final ModifierId spiderDisguise = id("spider_disguise");
+  public static final ModifierId caveSpiderDisguise = id("cave_spider_disguise");
+  public static final ModifierId zombieDisguise = id("zombie_disguise");
+  public static final ModifierId huskDisguise = id("husk_disguise");
+  public static final ModifierId drownedDisguise = id("drowned_disguise");
+  public static final ModifierId blazeDisguise = id("blaze_disguise");
+  public static final ModifierId piglinDisguise = id("piglin_disguise");
+  public static final ModifierId piglinBruteDisguise = id("piglin_brute_disguise");
   public static final ModifierId zombifiedPiglinDisguise = id("zombified_piglin_disguise");
 
 
@@ -111,8 +112,9 @@ public class ModifierIds {
 
   /**
    * Creates a new material ID
-   * @param name  ID name
-   * @return  Material ID object
+   *
+   * @param name ID name
+   * @return Material ID object
    */
   private static ModifierId id(String name) {
     return new ModifierId(TConstruct.MOD_ID, name);

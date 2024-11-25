@@ -13,13 +13,15 @@ import slimeknights.tconstruct.tables.menu.slot.PlayerSensitiveLazyResultSlot;
 import javax.annotation.Nullable;
 
 public class CraftingStationContainerMenu extends TabbedContainerMenu<CraftingStationBlockEntity> {
+
   private final PlayerSensitiveLazyResultSlot resultSlot;
 
   /**
    * Standard constructor
-   * @param id    Window ID
-   * @param inv   Player inventory
-   * @param tile  Relevant tile entity
+   *
+   * @param id   Window ID
+   * @param inv  Player inventory
+   * @param tile Relevant tile entity
    */
   public CraftingStationContainerMenu(int id, Inventory inv, @Nullable CraftingStationBlockEntity tile) {
     super(TinkerTables.craftingStationContainer.get(), id, inv, tile);
@@ -36,12 +38,12 @@ public class CraftingStationContainerMenu extends TabbedContainerMenu<CraftingSt
         }
       }
       // add result slot, will fetch result cache
-      this.addSlot(resultSlot = new PlayerSensitiveLazyResultSlot(inv.player, tile.getCraftingResult(), 124, 35));
+      this.addSlot(this.resultSlot = new PlayerSensitiveLazyResultSlot(inv.player, tile.getCraftingResult(), 124, 35));
 
       this.addChestSideInventory();
     } else {
       // requirement for final variable
-      resultSlot = null;
+      this.resultSlot = null;
     }
 
     this.addInventorySlots();
@@ -49,9 +51,10 @@ public class CraftingStationContainerMenu extends TabbedContainerMenu<CraftingSt
 
   /**
    * Factory constructor
-   * @param id   Window ID
-   * @param inv  Player inventory
-   * @param buf  Buffer for fetching tile
+   *
+   * @param id  Window ID
+   * @param inv Player inventory
+   * @param buf Buffer for fetching tile
    */
   public CraftingStationContainerMenu(int id, Inventory inv, FriendlyByteBuf buf) {
     this(id, inv, getTileEntityFromBuf(buf, CraftingStationBlockEntity.class));
@@ -61,29 +64,29 @@ public class CraftingStationContainerMenu extends TabbedContainerMenu<CraftingSt
   public ItemStack quickMoveStack(Player player, int index) {
     Slot slot = this.slots.get(index);
     // fix issue on shift clicking from the result slot if the recipe result mismatches the displayed item
-    if (slot == resultSlot) {
-      if (tile != null && slot.hasItem()) {
+    if (slot == this.resultSlot) {
+      if (this.tile != null && slot.hasItem()) {
         // return the original result so shift click works
         ItemStack original = slot.getItem().copy(); // TODO: are these copies really needed?
         // but add the true result into the inventory
-        ItemStack result = tile.getResultForPlayer(player);
+        ItemStack result = this.tile.getResultForPlayer(player);
         if (!result.isEmpty()) {
           boolean nothingDone = true;
-          if (subContainers.size() > 0) { // the sub container check does not do well with 0 sub containers
+          if (this.subContainers.size() > 0) { // the sub container check does not do well with 0 sub containers
             nothingDone = this.refillAnyContainer(result, this.subContainers);
           }
           nothingDone &= this.moveToPlayerInventory(result);
-          if (subContainers.size() > 0) {
+          if (this.subContainers.size() > 0) {
             nothingDone &= this.moveToAnyContainer(result, this.subContainers);
           }
           // if successfully added to an inventory, update
           if (!nothingDone) {
-            tile.takeResult(player, result, result.getCount());
-            tile.getCraftingResult().clearContent();
+            this.tile.takeResult(player, result, result.getCount());
+            this.tile.getCraftingResult().clearContent();
             return original;
           }
         } else {
-          tile.notifyUncraftable(player);
+          this.tile.notifyUncraftable(player);
         }
       }
       return ItemStack.EMPTY;
@@ -103,6 +106,6 @@ public class CraftingStationContainerMenu extends TabbedContainerMenu<CraftingSt
   }
 
   public PlayerSensitiveLazyResultSlot getResultSlot() {
-    return resultSlot;
+    return this.resultSlot;
   }
 }

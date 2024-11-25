@@ -20,6 +20,7 @@ import java.util.List;
  * Module that adds extra modifier slots to a tool.
  */
 public record ModifierSlotModule(SlotType type, int count) implements VolatileDataModifierHook, ModifierModule {
+
   private static final List<ModifierHook<?>> DEFAULT_HOOKS = List.of(TinkerHooks.VOLATILE_DATA);
 
   public ModifierSlotModule(SlotType type) {
@@ -34,7 +35,7 @@ public record ModifierSlotModule(SlotType type, int count) implements VolatileDa
 
   @Override
   public void addVolatileData(ToolRebuildContext context, ModifierEntry modifier, ModDataNBT volatileData) {
-    volatileData.addSlots(type, modifier.getLevel() * count);
+    volatileData.addSlots(this.type, modifier.getLevel() * this.count);
   }
 
   @Override
@@ -47,7 +48,9 @@ public record ModifierSlotModule(SlotType type, int count) implements VolatileDa
     return DEFAULT_HOOKS;
   }
 
-  /** Loader instance */
+  /**
+   * Loader instance
+   */
   public static final IGenericLoader<ModifierSlotModule> LOADER = new IGenericLoader<>() {
     @Override
     public ModifierSlotModule deserialize(JsonObject json) {

@@ -19,16 +19,16 @@ import slimeknights.tconstruct.world.TinkerStructures;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
-import java.util.Random;
 
 public class EarthSlimeIslandVariant extends AbstractSlimeIslandVariant {
+
   public EarthSlimeIslandVariant(int index, SlimeType dirtType) {
     super(index, dirtType, SlimeType.EARTH);
   }
 
   @Override
   public ResourceLocation getStructureName(String variantName) {
-    return TConstruct.getResource("slime_islands/earth/" + dirtType.getSerializedName() + "_" + variantName);
+    return TConstruct.getResource("slime_islands/earth/" + this.dirtType.getSerializedName() + "_" + variantName);
   }
 
   @Override
@@ -43,7 +43,7 @@ public class EarthSlimeIslandVariant extends AbstractSlimeIslandVariant {
 
   @Nullable
   @Override
-  public ConfiguredFeature<?,?> getTreeFeature(RandomSource random, RegistryAccess registryAccess) {
+  public ConfiguredFeature<?, ?> getTreeFeature(RandomSource random, RegistryAccess registryAccess) {
     return registryAccess.registryOrThrow(Registries.CONFIGURED_FEATURE).get(TinkerStructures.earthSlimeIslandTree);
   }
 

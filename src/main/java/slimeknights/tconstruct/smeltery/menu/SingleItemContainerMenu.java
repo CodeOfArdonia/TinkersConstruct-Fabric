@@ -18,6 +18,7 @@ import javax.annotation.Nullable;
  */
 @SuppressWarnings("UnstableApiUsage")
 public class SingleItemContainerMenu extends TriggeringBaseContainerMenu<BlockEntity> {
+
   public SingleItemContainerMenu(int id, @Nullable Inventory inv, @Nullable BlockEntity te) {
     super(TinkerSmeltery.singleItemContainer.get(), id, inv, te);
     if (te != null) {

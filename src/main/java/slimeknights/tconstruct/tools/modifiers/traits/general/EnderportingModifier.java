@@ -39,6 +39,7 @@ import javax.annotation.Nullable;
 import java.util.Set;
 
 public class EnderportingModifier extends NoLevelsModifier implements PlantHarvestModifierHook, ProjectileHitModifierHook, ProjectileLaunchModifierHook {
+
   private static final ResourceLocation PRIMARY_ARROW = TConstruct.getResource("enderporting_primary");
   private static final Set<RelativeMovement> PACKET_FLAGS = ImmutableSet.of(RelativeMovement.X, RelativeMovement.Y, RelativeMovement.Z);
 
@@ -47,7 +48,9 @@ public class EnderportingModifier extends NoLevelsModifier implements PlantHarve
     return 45;
   }
 
-  /** Attempts to teleport to the given location */
+  /**
+   * Attempts to teleport to the given location
+   */
   private static boolean tryTeleport(LivingEntity living, double x, double y, double z) {
     Level world = living.getCommandSenderWorld();
     // should never happen with the hooks, but just in case
@@ -87,7 +90,7 @@ public class EnderportingModifier extends NoLevelsModifier implements PlantHarve
             serverWorld.sendParticles(ParticleTypes.PORTAL, living.getX(), living.getY() + world.random.nextDouble() * 2.0D, living.getZ(), 1, world.random.nextGaussian(), 0.0D, world.random.nextGaussian(), 0);
           }
         }
-        world.playSound(null, living.getX(), living.getY(), living.getZ(), Sounds.ENDERPORTING.getSound(),  living.getSoundSource(), 1f, 1f);
+        world.playSound(null, living.getX(), living.getY(), living.getZ(), Sounds.ENDERPORTING.getSound(), living.getSoundSource(), 1f, 1f);
         return true;
       }
     }

@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class TooltipWidget<T extends Display> extends WidgetWithBounds {
+
   private final TinkersCategory<T> category;
   private final List<Widget> widgets;
   private final Rectangle bounds;
@@ -33,15 +34,15 @@ public class TooltipWidget<T extends Display> extends WidgetWithBounds {
 
   @Override
   public Rectangle getBounds() {
-    return bounds;
+    return this.bounds;
   }
 
   @Override
   public void render(GuiGraphics graphics, int mouseX, int mouseY, float f) {
     Point mouse = new Point(mouseX, mouseY);
 
-    if (containsMouse(mouse)) {
-      for (Slot slot : Widgets.<Slot>walk(widgets, listener -> listener instanceof Slot)) {
+    if (this.containsMouse(mouse)) {
+      for (Slot slot : Widgets.<Slot>walk(this.widgets, listener -> listener instanceof Slot)) {
         if (slot.containsMouse(mouse) && slot.isHighlightEnabled()) {
           if (slot.getCurrentTooltip(TooltipContext.of(mouse)) != null) {
             return;
@@ -49,7 +50,7 @@ public class TooltipWidget<T extends Display> extends WidgetWithBounds {
         }
       }
 
-      Tooltip tooltip = getTooltip(TooltipContext.of(mouse));
+      Tooltip tooltip = this.getTooltip(TooltipContext.of(mouse));
 
       if (tooltip != null) {
         tooltip.queue();
@@ -60,7 +61,7 @@ public class TooltipWidget<T extends Display> extends WidgetWithBounds {
   @Override
   @Nullable
   public Tooltip getTooltip(TooltipContext context) {
-    List<Component> strings = category.getTooltipStrings(display, widgets, context.getPoint().x - bounds.x - 4, context.getPoint().y - bounds.y - 4);
+    List<Component> strings = this.category.getTooltipStrings(this.display, this.widgets, context.getPoint().x - this.bounds.x - 4, context.getPoint().y - this.bounds.y - 4);
     if (strings.isEmpty()) {
       return null;
     }

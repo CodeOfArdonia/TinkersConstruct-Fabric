@@ -22,14 +22,16 @@ public class IchorSlimeSlingItem extends BaseSlimeSlingItem {
     super(props, SlimeType.ICHOR);
   }
 
-  /** Called when the player stops using an Item (stops holding the right mouse button). */
+  /**
+   * Called when the player stops using an Item (stops holding the right mouse button).
+   */
   @Override
   public void releaseUsing(ItemStack stack, Level worldIn, LivingEntity entityLiving, int timeLeft) {
     if (worldIn.isClientSide || !(entityLiving instanceof Player player)) {
       return;
     }
 
-    float f = getForce(stack, timeLeft) / 2;
+    float f = this.getForce(stack, timeLeft) / 2;
 
     float range = 5F;
     Vec3 start = player.getEyePosition(1F);
@@ -46,18 +48,18 @@ public class IchorSlimeSlingItem extends BaseSlimeSlingItem {
       BlockHitResult mop = getPlayerPOVHitResult(worldIn, player, ClipContext.Fluid.NONE);
       double blockDist = mop.getBlockPos().distToCenterSqr(start);
       if (mop.getType() == HitResult.Type.BLOCK && targetDist > blockDist) {
-        playMissSound(player);
+        this.playMissSound(player);
         return;
       }
 
       player.getCooldowns().addCooldown(stack.getItem(), 3);
-      target.knockback(f , -look.x, -look.z);
+      target.knockback(f, -look.x, -look.z);
       if (player instanceof ServerPlayer playerMP) {
         TinkerNetwork.getInstance().sendVanillaPacket(new ClientboundSetEntityMotionPacket(player), playerMP);
       }
-      onSuccess(player, stack);
+      this.onSuccess(player, stack);
     } else {
-      playMissSound(player);
+      this.playMissSound(player);
     }
   }
 }

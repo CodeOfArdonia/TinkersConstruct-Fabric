@@ -28,6 +28,7 @@ import java.util.stream.IntStream;
  */
 @AllArgsConstructor
 public class ToolBuildingRecipe implements ITinkerStationRecipe {
+
   @Getter
   protected final ResourceLocation id;
   @Getter
@@ -36,7 +37,9 @@ public class ToolBuildingRecipe implements ITinkerStationRecipe {
   protected final int outputCount;
   protected final List<Ingredient> ingredients;
 
-  /** @deprecated use {@link #ToolBuildingRecipe(ResourceLocation, String, IModifiable, int, List)} */
+  /**
+   * @deprecated use {@link #ToolBuildingRecipe(ResourceLocation, String, IModifiable, int, List)}
+   */
   @Deprecated
   public ToolBuildingRecipe(ResourceLocation id, String group, IModifiable output) {
     this(id, group, output, 1, Collections.emptyList());
@@ -52,7 +55,7 @@ public class ToolBuildingRecipe implements ITinkerStationRecipe {
     if (!inv.getTinkerableStack().isEmpty()) {
       return false;
     }
-    List<PartRequirement> parts = output.getToolDefinition().getData().getParts();
+    List<PartRequirement> parts = this.output.getToolDefinition().getData().getParts();
     if (parts.isEmpty()) {
       return false;
     }
@@ -66,7 +69,7 @@ public class ToolBuildingRecipe implements ITinkerStationRecipe {
     }
     // remaining slots must match extra requirements
     for (; i < inv.getInputCount(); i++) {
-      Ingredient ingredient = LogicHelper.getOrDefault(ingredients, i - partSize, Ingredient.EMPTY);
+      Ingredient ingredient = LogicHelper.getOrDefault(this.ingredients, i - partSize, Ingredient.EMPTY);
       if (!ingredient.test(inv.getInput(i))) {
         return false;
       }
@@ -78,13 +81,15 @@ public class ToolBuildingRecipe implements ITinkerStationRecipe {
   @Override
   public ItemStack assemble(ITinkerStationContainer inv, RegistryAccess registryAccess) {
     // first n slots contain parts
-    List<MaterialVariant> materials = IntStream.range(0, output.getToolDefinition().getData().getParts().size())
-                                               .mapToObj(i -> MaterialVariant.of(IMaterialItem.getMaterialFromStack(inv.getInput(i))))
-                                               .toList();
-    return ToolStack.createTool(output.asItem(), output.getToolDefinition(), new MaterialNBT(materials)).createStack(outputCount);
+    List<MaterialVariant> materials = IntStream.range(0, this.output.getToolDefinition().getData().getParts().size())
+      .mapToObj(i -> MaterialVariant.of(IMaterialItem.getMaterialFromStack(inv.getInput(i))))
+      .toList();
+    return ToolStack.createTool(this.output.asItem(), this.output.getToolDefinition(), new MaterialNBT(materials)).createStack(this.outputCount);
   }
 
-  /** @deprecated Use {@link #assemble(ITinkerStationContainer, RegistryAccess)} */
+  /**
+   * @deprecated Use {@link #assemble(ITinkerStationContainer, RegistryAccess)}
+   */
   @Deprecated
   @Override
   public ItemStack getResultItem(RegistryAccess registryAccess) {

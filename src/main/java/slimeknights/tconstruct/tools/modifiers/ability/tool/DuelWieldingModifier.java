@@ -6,6 +6,7 @@ import slimeknights.tconstruct.library.tools.stat.ModifierStatsBuilder;
 import slimeknights.tconstruct.library.tools.stat.ToolStats;
 
 public class DuelWieldingModifier extends OffhandAttackModifier {
+
   @Override
   public void addToolStats(ToolRebuildContext context, int level, ModifierStatsBuilder builder) {
     // on two handed tools, take a larger hit to attack damage, smaller to attack speed

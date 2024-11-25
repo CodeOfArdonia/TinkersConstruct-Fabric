@@ -30,11 +30,16 @@ import java.util.UUID;
  * Logic to handle the looting event for all main tinker tools
  */
 public class ModifierLootingHandler {
-  /** If contained in the set, they should use the offhand for looting */
-  private static final Map<UUID,EquipmentSlot> LOOTING_OFFHAND = new HashMap<>();
+
+  /**
+   * If contained in the set, they should use the offhand for looting
+   */
+  private static final Map<UUID, EquipmentSlot> LOOTING_OFFHAND = new HashMap<>();
   private static boolean init = false;
 
-  /** Initializies this listener */
+  /**
+   * Initializies this listener
+   */
   public static void init() {
     if (init) {
       return;
@@ -46,8 +51,9 @@ public class ModifierLootingHandler {
 
   /**
    * Sets the hand used for looting, so the tool is fetched from the proper context
-   * @param entity    Player to set
-   * @param slotType  Slot type
+   *
+   * @param entity   Player to set
+   * @param slotType Slot type
    */
   public static void setLootingSlot(LivingEntity entity, EquipmentSlot slotType) {
     if (slotType == EquipmentSlot.MAINHAND) {
@@ -57,12 +63,16 @@ public class ModifierLootingHandler {
     }
   }
 
-  /** Gets the slot to use for looting */
+  /**
+   * Gets the slot to use for looting
+   */
   public static EquipmentSlot getLootingSlot(@Nullable LivingEntity entity) {
     return entity != null ? LOOTING_OFFHAND.getOrDefault(entity.getUUID(), EquipmentSlot.MAINHAND) : EquipmentSlot.MAINHAND;
   }
 
-  /** Applies the looting bonus for modifiers */
+  /**
+   * Applies the looting bonus for modifiers
+   */
   private static int onLooting(DamageSource damageSource, LivingEntity target, int level, boolean recentlyHit) {
     // must be an attacker with our tool
 //    DamageSource damageSource = event.getDamageSource();
@@ -99,7 +109,9 @@ public class ModifierLootingHandler {
     return 0;
   }
 
-  /** Called when a player leaves the server to clear the face */
+  /**
+   * Called when a player leaves the server to clear the face
+   */
   private static void onLeaveServer(ServerGamePacketListenerImpl handler, MinecraftServer server) {
     LOOTING_OFFHAND.remove(handler.getPlayer().getUUID());
   }

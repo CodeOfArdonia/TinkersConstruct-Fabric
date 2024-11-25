@@ -11,6 +11,7 @@ import slimeknights.tconstruct.tools.TinkerModifiers;
 import slimeknights.tconstruct.tools.modifiers.slotless.OverslimeModifier;
 
 public class OvergrowthModifier extends Modifier {
+
   @Override
   public void addVolatileData(ToolRebuildContext context, int level, ModDataNBT volatileData) {
     TinkerModifiers.overslime.get().setFriend(volatileData);

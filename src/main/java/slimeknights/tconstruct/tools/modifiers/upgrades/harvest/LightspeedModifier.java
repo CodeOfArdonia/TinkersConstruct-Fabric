@@ -17,6 +17,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class LightspeedModifier extends IncrementalModifier {
+
   @Override
   public int getPriority() {
     return 125; // run before trait boosts such as dwarven
@@ -31,13 +32,13 @@ public class LightspeedModifier extends IncrementalModifier {
     if (pos != null) {
       int light = event.getEntity().getCommandSenderWorld().getBrightness(LightLayer.BLOCK, pos.relative(sideHit));
       // bonus is +9 mining speed at light level 15, +3 at light level 10, +1 at light level 5
-      float boost = (float)(level * Math.pow(3, (light - 5) / 5f) * tool.getMultiplier(ToolStats.MINING_SPEED) * miningSpeedModifier);
+      float boost = (float) (level * Math.pow(3, (light - 5) / 5f) * tool.getMultiplier(ToolStats.MINING_SPEED) * miningSpeedModifier);
       event.setNewSpeed(event.getNewSpeed() + boost);
     }
   }
 
   @Override
   public void addInformation(IToolStackView tool, int level, @Nullable Player player, List<Component> tooltip, TooltipKey tooltipKey, TooltipFlag tooltipFlag) {
-    addStatTooltip(tool, ToolStats.MINING_SPEED, TinkerTags.Items.HARVEST, 9 * getScaledLevel(tool, level), tooltip);
+    this.addStatTooltip(tool, ToolStats.MINING_SPEED, TinkerTags.Items.HARVEST, 9 * this.getScaledLevel(tool, level), tooltip);
   }
 }

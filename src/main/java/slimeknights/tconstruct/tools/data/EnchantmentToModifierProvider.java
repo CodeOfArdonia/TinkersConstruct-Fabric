@@ -1,7 +1,6 @@
 package slimeknights.tconstruct.tools.data;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-import net.minecraft.data.DataGenerator;
 import net.minecraft.world.item.enchantment.Enchantments;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.data.tinkering.AbstractEnchantmentToModifierProvider;
@@ -9,6 +8,7 @@ import slimeknights.tconstruct.library.modifiers.ModifierId;
 import slimeknights.tconstruct.tools.TinkerModifiers;
 
 public class EnchantmentToModifierProvider extends AbstractEnchantmentToModifierProvider {
+
   public EnchantmentToModifierProvider(FabricDataOutput output) {
     super(output);
   }
@@ -16,76 +16,78 @@ public class EnchantmentToModifierProvider extends AbstractEnchantmentToModifier
   @Override
   protected void addEnchantmentMappings() {
     // general
-    add(Enchantments.UNBREAKING, TinkerModifiers.reinforced.getId());
+    this.add(Enchantments.UNBREAKING, TinkerModifiers.reinforced.getId());
 
     // protection
-    add(Enchantments.ALL_DAMAGE_PROTECTION, TinkerModifiers.protection.getId());
-    add(Enchantments.FIRE_PROTECTION, TinkerModifiers.fireProtection.getId());
-    add(Enchantments.BLAST_PROTECTION, TinkerModifiers.blastProtection.getId());
-    add(Enchantments.PROJECTILE_PROTECTION, TinkerModifiers.projectileProtection.getId());
-    add(Enchantments.FALL_PROTECTION, TinkerModifiers.featherFalling.getId());
+    this.add(Enchantments.ALL_DAMAGE_PROTECTION, TinkerModifiers.protection.getId());
+    this.add(Enchantments.FIRE_PROTECTION, TinkerModifiers.fireProtection.getId());
+    this.add(Enchantments.BLAST_PROTECTION, TinkerModifiers.blastProtection.getId());
+    this.add(Enchantments.PROJECTILE_PROTECTION, TinkerModifiers.projectileProtection.getId());
+    this.add(Enchantments.FALL_PROTECTION, TinkerModifiers.featherFalling.getId());
     // misc armor
-    add(Enchantments.RESPIRATION, ModifierIds.respiration);
-    add(Enchantments.AQUA_AFFINITY, TinkerModifiers.aquaAffinity.getId());
-    add(Enchantments.THORNS, TinkerModifiers.thorns.getId());
-    add(Enchantments.DEPTH_STRIDER, ModifierIds.depthStrider);
-    add(Enchantments.FROST_WALKER, TinkerModifiers.frostWalker.getId());
-    add(Enchantments.SOUL_SPEED, TinkerModifiers.soulspeed.getId());
+    this.add(Enchantments.RESPIRATION, ModifierIds.respiration);
+    this.add(Enchantments.AQUA_AFFINITY, TinkerModifiers.aquaAffinity.getId());
+    this.add(Enchantments.THORNS, TinkerModifiers.thorns.getId());
+    this.add(Enchantments.DEPTH_STRIDER, ModifierIds.depthStrider);
+    this.add(Enchantments.FROST_WALKER, TinkerModifiers.frostWalker.getId());
+    this.add(Enchantments.SOUL_SPEED, TinkerModifiers.soulspeed.getId());
 
     // melee
-    add(Enchantments.SHARPNESS, ModifierIds.sharpness);
-    add(Enchantments.SMITE, ModifierIds.smite);
-    add(Enchantments.BANE_OF_ARTHROPODS, ModifierIds.baneOfSssss);
-    add(Enchantments.KNOCKBACK, TinkerModifiers.knockback.getId());
-    add(Enchantments.FIRE_ASPECT, TinkerModifiers.fiery.getId());
-    add(Enchantments.MOB_LOOTING, ModifierIds.luck);
-    add(Enchantments.SWEEPING_EDGE, TinkerModifiers.sweeping.getId());
-    add(Enchantments.IMPALING, ModifierIds.antiaquatic);
+    this.add(Enchantments.SHARPNESS, ModifierIds.sharpness);
+    this.add(Enchantments.SMITE, ModifierIds.smite);
+    this.add(Enchantments.BANE_OF_ARTHROPODS, ModifierIds.baneOfSssss);
+    this.add(Enchantments.KNOCKBACK, TinkerModifiers.knockback.getId());
+    this.add(Enchantments.FIRE_ASPECT, TinkerModifiers.fiery.getId());
+    this.add(Enchantments.MOB_LOOTING, ModifierIds.luck);
+    this.add(Enchantments.SWEEPING_EDGE, TinkerModifiers.sweeping.getId());
+    this.add(Enchantments.IMPALING, ModifierIds.antiaquatic);
 
     // harvest
-    add(Enchantments.BLOCK_EFFICIENCY, TinkerModifiers.haste.getId());
-    add(Enchantments.SILK_TOUCH, TinkerModifiers.silky.getId());
-    add(Enchantments.BLOCK_FORTUNE, ModifierIds.luck);
+    this.add(Enchantments.BLOCK_EFFICIENCY, TinkerModifiers.haste.getId());
+    this.add(Enchantments.SILK_TOUCH, TinkerModifiers.silky.getId());
+    this.add(Enchantments.BLOCK_FORTUNE, ModifierIds.luck);
 
     // ranged
-    add(Enchantments.POWER_ARROWS, ModifierIds.power);
-    add(Enchantments.PUNCH_ARROWS, TinkerModifiers.punch.getId());
-    add(Enchantments.FLAMING_ARROWS, TinkerModifiers.fiery.getId());
-    add(Enchantments.INFINITY_ARROWS, TinkerModifiers.crystalshot.getId());
-    add(Enchantments.MULTISHOT, TinkerModifiers.multishot.getId());
-    add(Enchantments.QUICK_CHARGE, ModifierIds.quickCharge);
-    add(Enchantments.PIERCING, TinkerModifiers.impaling.getId());
+    this.add(Enchantments.POWER_ARROWS, ModifierIds.power);
+    this.add(Enchantments.PUNCH_ARROWS, TinkerModifiers.punch.getId());
+    this.add(Enchantments.FLAMING_ARROWS, TinkerModifiers.fiery.getId());
+    this.add(Enchantments.INFINITY_ARROWS, TinkerModifiers.crystalshot.getId());
+    this.add(Enchantments.MULTISHOT, TinkerModifiers.multishot.getId());
+    this.add(Enchantments.QUICK_CHARGE, ModifierIds.quickCharge);
+    this.add(Enchantments.PIERCING, TinkerModifiers.impaling.getId());
 
     // tag compat
     // upgrade
-    addCompat(TinkerModifiers.experienced.getId());
-    addCompat(ModifierIds.killager);
-    addCompat(TinkerModifiers.magnetic.getId());
-    addCompat(TinkerModifiers.necrotic.getId());
-    addCompat(TinkerModifiers.severing.getId());
-    addCompat(ModifierIds.stepUp);
-    addCompat(TinkerModifiers.soulbound.getId());
-    addCompat(ModifierIds.trueshot);
+    this.addCompat(TinkerModifiers.experienced.getId());
+    this.addCompat(ModifierIds.killager);
+    this.addCompat(TinkerModifiers.magnetic.getId());
+    this.addCompat(TinkerModifiers.necrotic.getId());
+    this.addCompat(TinkerModifiers.severing.getId());
+    this.addCompat(ModifierIds.stepUp);
+    this.addCompat(TinkerModifiers.soulbound.getId());
+    this.addCompat(ModifierIds.trueshot);
 
     // defense
-    addCompat(ModifierIds.knockbackResistance);
-    addCompat(TinkerModifiers.magicProtection.getId());
-    addCompat(ModifierIds.revitalizing);
+    this.addCompat(ModifierIds.knockbackResistance);
+    this.addCompat(TinkerModifiers.magicProtection.getId());
+    this.addCompat(ModifierIds.revitalizing);
 
     // ability
-    addCompat(TinkerModifiers.autosmelt.getId());
-    addCompat(TinkerModifiers.doubleJump.getId());
-    addCompat(TinkerModifiers.expanded.getId());
-    addCompat(ModifierIds.luck);
-    addCompat(TinkerModifiers.multishot.getId());
-    addCompat(ModifierIds.reach);
-    addCompat(TinkerModifiers.tilling.getId());
-    addCompat(TinkerModifiers.reflecting.getId());
+    this.addCompat(TinkerModifiers.autosmelt.getId());
+    this.addCompat(TinkerModifiers.doubleJump.getId());
+    this.addCompat(TinkerModifiers.expanded.getId());
+    this.addCompat(ModifierIds.luck);
+    this.addCompat(TinkerModifiers.multishot.getId());
+    this.addCompat(ModifierIds.reach);
+    this.addCompat(TinkerModifiers.tilling.getId());
+    this.addCompat(TinkerModifiers.reflecting.getId());
   }
 
-  /** Adds a compat enchantment */
+  /**
+   * Adds a compat enchantment
+   */
   private void addCompat(ModifierId modifier) {
-    add(TConstruct.getResource("modifier_like/" + modifier.getPath()), modifier);
+    this.add(TConstruct.getResource("modifier_like/" + modifier.getPath()), modifier);
   }
 
   @Override

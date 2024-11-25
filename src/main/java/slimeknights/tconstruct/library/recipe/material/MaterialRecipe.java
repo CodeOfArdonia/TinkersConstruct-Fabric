@@ -34,7 +34,10 @@ import java.util.stream.Collectors;
  * Recipe to get the material from an ingredient
  */
 public class MaterialRecipe implements ICustomOutputRecipe<ISingleStackContainer>, IMaterialValue {
-  /** Vanilla requires 4 ingots for full repair, we drop it down to 3 to mesh better with nuggets and blocks and to fit small head costs better */
+
+  /**
+   * Vanilla requires 4 ingots for full repair, we drop it down to 3 to mesh better with nuggets and blocks and to fit small head costs better
+   */
   public static final float INGOTS_PER_REPAIR = 3f;
 
   @Getter
@@ -43,19 +46,29 @@ public class MaterialRecipe implements ICustomOutputRecipe<ISingleStackContainer
   protected final String group;
   @Getter
   protected final Ingredient ingredient;
-  /** Amount of material this recipe returns */
+  /**
+   * Amount of material this recipe returns
+   */
   @Getter
   protected final int value;
-  /** Amount of input items needed to craft this material */
+  /**
+   * Amount of input items needed to craft this material
+   */
   @Getter
   protected final int needed;
-  /** Material ID for the recipe return */
+  /**
+   * Material ID for the recipe return
+   */
   @Getter
   protected final MaterialVariant material;
-  /** Leftover stack of value 1, used if the value is more than 1 */
+  /**
+   * Leftover stack of value 1, used if the value is more than 1
+   */
   protected final ItemOutput leftover;
 
-  /** Durability restored per item input, lazy loaded */
+  /**
+   * Durability restored per item input, lazy loaded
+   */
   @Nullable
   private Float repairPerItem;
 
@@ -99,51 +112,57 @@ public class MaterialRecipe implements ICustomOutputRecipe<ISingleStackContainer
 
   @Override
   public boolean matches(ISingleStackContainer inv, Level worldIn) {
-    return !material.isUnknown() && this.ingredient.test(inv.getStack());
+    return !this.material.isUnknown() && this.ingredient.test(inv.getStack());
   }
 
   @Override
   public NonNullList<Ingredient> getIngredients() {
-    return NonNullList.of(Ingredient.EMPTY, ingredient);
+    return NonNullList.of(Ingredient.EMPTY, this.ingredient);
   }
 
-  /** Cache of the display items list */
+  /**
+   * Cache of the display items list
+   */
   private List<ItemStack> displayItems = null;
 
-  /** Gets a list of stacks for display in the recipe */
+  /**
+   * Gets a list of stacks for display in the recipe
+   */
   public List<ItemStack> getDisplayItems() {
-    if (displayItems == null) {
-      if (needed > 1) {
-        displayItems = Arrays.stream(ingredient.getItems())
-                             .map(stack -> ItemHandlerHelper.copyStackWithSize(stack, needed))
-                             .collect(Collectors.toList());
+    if (this.displayItems == null) {
+      if (this.needed > 1) {
+        this.displayItems = Arrays.stream(this.ingredient.getItems())
+          .map(stack -> ItemHandlerHelper.copyStackWithSize(stack, this.needed))
+          .collect(Collectors.toList());
       } else {
-        displayItems = Arrays.asList(ingredient.getItems());
+        this.displayItems = Arrays.asList(this.ingredient.getItems());
       }
     }
-    return displayItems;
+    return this.displayItems;
   }
 
   /**
    * Gets the amount to repair per item for tool repair
-   * @param data     Tool defintion data for fallback
-   * @param statsId  Preferred stats ID, if null no preference
-   * @return  Float amount per item to repair
+   *
+   * @param data    Tool defintion data for fallback
+   * @param statsId Preferred stats ID, if null no preference
+   * @return Float amount per item to repair
    */
   public float getRepairPerItem(ToolDefinitionData data, @Nullable MaterialStatsId statsId) {
-    if (repairPerItem == null) {
+    if (this.repairPerItem == null) {
       // multiply by recipe value (iron block is 9x), divide by needed (nuggets need 9), divide again by ingots per repair
-      repairPerItem = this.getValue() * getRepairDurability(data, material.getId(), statsId) / INGOTS_PER_REPAIR / this.getNeeded();
+      this.repairPerItem = this.getValue() * getRepairDurability(data, this.material.getId(), statsId) / INGOTS_PER_REPAIR / this.getNeeded();
     }
-    return repairPerItem;
+    return this.repairPerItem;
   }
 
   /**
    * Gets the head durability for the given material
-   * @param toolData      Stats fallback for missing tool materials
-   * @param materialId    Material
-   * @param statsId       Stats to use for repair, if null uses the first found stats with durability
-   * @return  Head durability
+   *
+   * @param toolData   Stats fallback for missing tool materials
+   * @param materialId Material
+   * @param statsId    Stats to use for repair, if null uses the first found stats with durability
+   * @return Head durability
    */
   public static int getRepairDurability(ToolDefinitionData toolData, MaterialId materialId, @Nullable MaterialStatsId statsId) {
     Optional<IMaterialStats> optional;
@@ -154,6 +173,6 @@ public class MaterialRecipe implements ICustomOutputRecipe<ISingleStackContainer
       // if no ID given, just find the first repairable stats
       optional = MaterialRegistry.getInstance().getAllStats(materialId).stream().filter(stats -> stats instanceof IRepairableMaterialStats).findFirst();
     }
-    return optional.map(stats -> ((IRepairableMaterialStats)stats).getDurability()).orElseGet(() -> toolData.getBaseStat(ToolStats.DURABILITY).intValue());
+    return optional.map(stats -> ((IRepairableMaterialStats) stats).getDurability()).orElseGet(() -> toolData.getBaseStat(ToolStats.DURABILITY).intValue());
   }
 }

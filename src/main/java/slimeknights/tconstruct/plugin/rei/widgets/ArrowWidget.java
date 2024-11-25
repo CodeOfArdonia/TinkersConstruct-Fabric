@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 
 public final class ArrowWidget extends Arrow {
+
   private final Rectangle bounds;
   private final ResourceLocation texture;
   private final int u, v;
@@ -34,7 +35,7 @@ public final class ArrowWidget extends Arrow {
 
   @Override
   public double getAnimationDuration() {
-    return animationDuration;
+    return this.animationDuration;
   }
 
   @Override
@@ -46,14 +47,14 @@ public final class ArrowWidget extends Arrow {
 
   @Override
   public Rectangle getBounds() {
-    return bounds;
+    return this.bounds;
   }
 
   @Override
   public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
     this.darkBackgroundAlpha.update(delta);
-    renderBackground(graphics, false, 1.0F);
-    renderBackground(graphics, true, this.darkBackgroundAlpha.value());
+    this.renderBackground(graphics, false, 1.0F);
+    this.renderBackground(graphics, true, this.darkBackgroundAlpha.value());
   }
 
   public void renderBackground(GuiGraphics graphics, boolean dark, float alpha) {
@@ -61,10 +62,10 @@ public final class ArrowWidget extends Arrow {
     RenderSystem.enableBlend();
     RenderSystem.blendFuncSeparate(770, 771, 1, 0);
     RenderSystem.blendFunc(770, 771);
-    if (getAnimationDuration() > 0) {
-      int width = Mth.ceil((System.currentTimeMillis() / (animationDuration / 24) % 24d));
+    if (this.getAnimationDuration() > 0) {
+      int width = Mth.ceil((System.currentTimeMillis() / (this.animationDuration / 24) % 24d));
 //      blit(matrices, getX() + width, getY(), u + width, v, 24 - width, 17);
-      graphics.blit(texture, getX(), getY(), u, v, width, 17);
+      graphics.blit(this.texture, this.getX(), this.getY(), this.u, this.v, width, 17);
     }
     RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
   }

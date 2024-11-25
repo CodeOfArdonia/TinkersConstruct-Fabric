@@ -24,9 +24,11 @@ import javax.annotation.Nullable;
 import java.util.function.Predicate;
 
 public class BulkQuiverModifier extends InventoryMenuModifier implements BowAmmoModifierHook {
+
   private static final ResourceLocation INVENTORY_KEY = TConstruct.getResource("bulk_quiver");
   private static final ResourceLocation LAST_SLOT = TConstruct.getResource("quiver_last_selected");
   private static final Pattern ARROW = new Pattern(TConstruct.getResource("arrow"));
+
   public BulkQuiverModifier() {
     super(INVENTORY_KEY, 2);
   }
@@ -61,7 +63,7 @@ public class BulkQuiverModifier extends InventoryMenuModifier implements BowAmmo
       return ItemStack.EMPTY;
     }
     ModDataNBT persistentData = tool.getPersistentData();
-    ResourceLocation key = getInventoryKey();
+    ResourceLocation key = this.getInventoryKey();
     ListTag slots = persistentData.get(key, GET_COMPOUND_LIST);
     if (!slots.isEmpty()) {
       // search all slots for the first match
@@ -81,6 +83,6 @@ public class BulkQuiverModifier extends InventoryMenuModifier implements BowAmmo
   public void shrinkAmmo(IToolStackView tool, ModifierEntry modifier, LivingEntity shooter, ItemStack ammo, int needed) {
     // we assume no one else touched the quiver inventory, this is a good assumption, do not make it a bad assumption by modifying the quiver in other modifiers
     ammo.shrink(needed);
-    setStack(tool, modifier, tool.getPersistentData().getInt((LAST_SLOT)), ammo);
+    this.setStack(tool, modifier, tool.getPersistentData().getInt((LAST_SLOT)), ammo);
   }
 }

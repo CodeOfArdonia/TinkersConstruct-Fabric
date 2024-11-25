@@ -1,17 +1,14 @@
 package slimeknights.tconstruct.smeltery.item;
 
 import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
-import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -30,6 +27,7 @@ import java.util.Objects;
  */
 @SuppressWarnings("removal")
 public class CopperCanItem extends Item {
+
   private static final String TAG_FLUID = "fluid";
   private static final String TAG_FLUID_TAG = "fluid_tag";
 
@@ -65,7 +63,9 @@ public class CopperCanItem extends Item {
     }
   }
 
-  /** Sets the fluid on the given stack */
+  /**
+   * Sets the fluid on the given stack
+   */
   public static ItemStack setFluid(ItemStack stack, FluidStack fluid) {
     // if empty, try to remove the NBT, helps with recipes
     if (fluid.isEmpty()) {
@@ -90,7 +90,9 @@ public class CopperCanItem extends Item {
     return stack;
   }
 
-  /** Gets the fluid from the given stack */
+  /**
+   * Gets the fluid from the given stack
+   */
   public static Fluid getFluid(CompoundTag nbt) {
     if (nbt != null) {
       ResourceLocation location = ResourceLocation.tryParse(nbt.getString(TAG_FLUID));
@@ -104,7 +106,9 @@ public class CopperCanItem extends Item {
     return Fluids.EMPTY;
   }
 
-  /** Gets the fluid NBT from the given stack */
+  /**
+   * Gets the fluid NBT from the given stack
+   */
   @Nullable
   public static CompoundTag getFluidTag(CompoundTag nbt) {
     if (nbt != null && nbt.contains(TAG_FLUID_TAG, Tag.TAG_COMPOUND)) {
@@ -115,8 +119,9 @@ public class CopperCanItem extends Item {
 
   /**
    * Gets a string variant name for the given stack
-   * @param stack  Stack instance to check
-   * @return  String variant name
+   *
+   * @param stack Stack instance to check
+   * @return String variant name
    */
   public static String getSubtype(ItemStack stack) {
     CompoundTag nbt = stack.getTag();

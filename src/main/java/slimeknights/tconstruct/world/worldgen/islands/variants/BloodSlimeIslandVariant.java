@@ -21,12 +21,12 @@ import slimeknights.tconstruct.world.TinkerStructures;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
-import java.util.Random;
 
 /**
  * Nether slime island variant that spawns in lava oceans
  */
 public class BloodSlimeIslandVariant extends AbstractSlimeIslandVariant {
+
   public BloodSlimeIslandVariant(int index) {
     super(index, SlimeType.ICHOR, SlimeType.BLOOD);
   }
@@ -48,7 +48,7 @@ public class BloodSlimeIslandVariant extends AbstractSlimeIslandVariant {
 
   @Nullable
   @Override
-  public ConfiguredFeature<?,?> getTreeFeature(RandomSource random, RegistryAccess registryAccess) {
+  public ConfiguredFeature<?, ?> getTreeFeature(RandomSource random, RegistryAccess registryAccess) {
     return registryAccess.registryOrThrow(Registries.CONFIGURED_FEATURE).get(TinkerStructures.bloodSlimeIslandFungus);
   }
 
