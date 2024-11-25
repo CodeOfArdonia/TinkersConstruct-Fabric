@@ -13,3 +13,7 @@ Also, this is a LTS version only for 1.20.1 fabric. So don't ask me for porting 
 - When throwing items directly in to smeltery it will wrongly stack.
 - Crash server when wearing piglin/zombie_piglin head.
 - Piggy backpack will make your chestplate disappear.
+
+## Modifications
+
+- Remove skeletons smelt to milk recipes.

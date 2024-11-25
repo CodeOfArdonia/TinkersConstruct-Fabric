@@ -1,16 +1,12 @@
 package slimeknights.tconstruct.tables;
 
-import io.github.fabricators_of_create.porting_lib.event.client.ModelLoadCallback;
 import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
 import io.github.fabricators_of_create.porting_lib.models.geometry.RegisterGeometryLoadersCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
-import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.DyeableLeatherItem;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import slimeknights.tconstruct.TConstruct;
@@ -63,7 +59,7 @@ public class TableClientEvents extends ClientEventBase {
       if (world != null && pos != null) {
         BlockEntity te = world.getBlockEntity(pos);
         if (te instanceof TinkersChestBlockEntity) {
-          return ((TinkersChestBlockEntity)te).getColor();
+          return ((TinkersChestBlockEntity) te).getColor();
         }
       }
       return -1;
@@ -71,6 +67,6 @@ public class TableClientEvents extends ClientEventBase {
   }
 
   static void registerItemColors() {
-    ColorProviderRegistry.ITEM.register((stack, index) -> ((DyeableLeatherItem)stack.getItem()).getColor(stack), TinkerTables.tinkersChest.asItem());
+    ColorProviderRegistry.ITEM.register((stack, index) -> ((DyeableLeatherItem) stack.getItem()).getColor(stack), TinkerTables.tinkersChest.asItem());
   }
 }

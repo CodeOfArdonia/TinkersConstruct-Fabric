@@ -143,7 +143,6 @@ public class PiggyBackPackItem extends TooltipItem {
     }
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot equipmentSlot) {
     return ImmutableMultimap.of(); // no attributes, the potion effect handles them

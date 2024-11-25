@@ -1833,11 +1833,12 @@ public class SmelteryRecipeProvider extends BaseRecipeProvider implements ISmelt
                         .save(consumer, prefix(BuiltInRegistries.ENTITY_TYPE.getKey(EntityType.CREEPER), headFolder));
 
     // melt skeletons to get the milk out
-    EntityMeltingRecipeBuilder.melting(EntityIngredient.of(EntityIngredient.of(EntityTypeTags.SKELETONS), EntityIngredient.of(EntityType.SKELETON_HORSE)),
-                                       new FluidStack(Milk.STILL_MILK, FluidConstants.BUCKET / 10))
-                              .save(consumer, modResource(folder + "skeletons"));
-    MeltingRecipeBuilder.melting(Ingredient.of(Items.SKELETON_SKULL, Items.WITHER_SKELETON_SKULL, TinkerWorld.heads.get(TinkerHeadType.STRAY)), Milk.STILL_MILK, FluidConstants.BUCKET / 4)
-                        .save(consumer, prefix(BuiltInRegistries.ENTITY_TYPE.getKey(EntityType.SKELETON), headFolder));
+    //TODO: Remove
+//    EntityMeltingRecipeBuilder.melting(EntityIngredient.of(EntityIngredient.of(EntityTypeTags.SKELETONS), EntityIngredient.of(EntityType.SKELETON_HORSE)),
+//                                       new FluidStack(Milk.STILL_MILK, FluidConstants.BUCKET / 10))
+//                              .save(consumer, modResource(folder + "skeletons"));
+//    MeltingRecipeBuilder.melting(Ingredient.of(Items.SKELETON_SKULL, Items.WITHER_SKELETON_SKULL, TinkerWorld.heads.get(TinkerHeadType.STRAY)), Milk.STILL_MILK, FluidConstants.BUCKET / 4)
+//                        .save(consumer, prefix(BuiltInRegistries.ENTITY_TYPE.getKey(EntityType.SKELETON), headFolder));
 
     // slimes melt into slime, shocker
     EntityMeltingRecipeBuilder.melting(EntityIngredient.of(EntityType.SLIME, TinkerWorld.earthSlimeEntity.get()), new FluidStack(TinkerFluids.earthSlime.get(), FluidValues.SLIMEBALL / 10))

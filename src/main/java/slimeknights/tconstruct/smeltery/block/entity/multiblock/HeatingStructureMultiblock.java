@@ -5,14 +5,12 @@ import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import slimeknights.mantle.block.entity.MantleBlockEntity;
 import slimeknights.tconstruct.common.multiblock.IMasterLogic;
-import slimeknights.tconstruct.common.multiblock.IServantLogic;
-import slimeknights.tconstruct.library.utils.TagUtil;
 import slimeknights.tconstruct.smeltery.block.entity.multiblock.HeatingStructureMultiblock.StructureData;
 
 import javax.annotation.Nullable;
@@ -25,12 +23,17 @@ import java.util.Set;
  *
  */
 public abstract class HeatingStructureMultiblock<T extends MantleBlockEntity & IMasterLogic> extends MultiblockCuboid<StructureData> {
+
   private static final String TAG_TANKS = "tanks";
   private static final String TAG_INSIDE_CHECK = "insideCheck";
 
-  /** Parent structure instance */
+  /**
+   * Parent structure instance
+   */
   protected final T parent;
-  /** List to check if a tank is found between valid block checks */
+  /**
+   * List to check if a tank is found between valid block checks
+   */
   protected final List<BlockPos> tanks = new ArrayList<>();
 
   public HeatingStructureMultiblock(T parent, boolean hasFloor, boolean hasFrame, boolean hasCeiling, int maxHeight, int innerLimit) {
@@ -53,9 +56,10 @@ public abstract class HeatingStructureMultiblock<T extends MantleBlockEntity & I
 
   /**
    * Creates a copy of structure data for the client side
-   * @param min  Min position
-   * @param max  Max position
-   * @return  Structure data
+   *
+   * @param min Min position
+   * @param max Max position
+   * @return Structure data
    */
   public StructureData createClient(BlockPos min, BlockPos max, List<BlockPos> tanks) {
     return new StructureData(min, max, Collections.emptySet(), hasFloor, hasFrame, hasCeiling, tanks);
@@ -70,7 +74,8 @@ public abstract class HeatingStructureMultiblock<T extends MantleBlockEntity & I
 
   /**
    * Reads the structure data from Tag
-   * @param  nbt  Tag tag
+   *
+   * @param nbt Tag tag
    * @return Structure data, or null if invalid
    */
   @Override
@@ -83,25 +88,9 @@ public abstract class HeatingStructureMultiblock<T extends MantleBlockEntity & I
   }
 
   /**
-   * Checks if the given block position is a valid slave
-   * @param world  Level instance
-   * @param pos    Position to check, note it may be mutable
-   * @return   True if its a valid slave
-   */
-  protected boolean isValidSlave(Level world, BlockPos pos) {
-    BlockEntity te = world.getBlockEntity(pos);
-
-    // slave-blocks are only allowed if they already belong to this smeltery
-    if (te instanceof IServantLogic) {
-      return ((IServantLogic)te).isValidMaster(parent);
-    }
-
-    return true;
-  }
-
-  /**
    * Checks if this structure can expand up by one block
-   * @return  True if this structure can expand
+   *
+   * @return True if this structure can expand
    */
   public boolean canExpand(StructureData data, Level world) {
     // note that if the structure has neither a floor nor ceiling, this will only expand upwards
@@ -125,16 +114,24 @@ public abstract class HeatingStructureMultiblock<T extends MantleBlockEntity & I
 
   /* Block checks */
 
-  /** Return true for blocks valid at any location in the structure */
+  /**
+   * Return true for blocks valid at any location in the structure
+   */
   protected abstract boolean isValidBlock(Block block);
 
-  /** Return true for blocks valid in the structure floor */
+  /**
+   * Return true for blocks valid in the structure floor
+   */
   protected abstract boolean isValidFloor(Block block);
 
-  /** Return true for blocks that serve as tanks */
+  /**
+   * Return true for blocks that serve as tanks
+   */
   protected abstract boolean isValidTank(Block block);
 
-  /** Return true for blocks valid in the structure walls */
+  /**
+   * Return true for blocks valid in the structure walls
+   */
   protected abstract boolean isValidWall(Block block);
 
   @Override
@@ -142,9 +139,6 @@ public abstract class HeatingStructureMultiblock<T extends MantleBlockEntity & I
     // controller always is valid
     if (pos.equals(parent.getBlockPos())) {
       return true;
-    }
-    if (!isValidSlave(world, pos)) {
-      return false;
     }
 
     // floor has a smaller list
@@ -179,12 +173,19 @@ public abstract class HeatingStructureMultiblock<T extends MantleBlockEntity & I
     return structure.isDirectlyAbove(pos) && isValidWall(state.getBlock());
   }
 
-  /** Extension of structure data to contain tanks list and the inside check */
+  /**
+   * Extension of structure data to contain tanks list and the inside check
+   */
   public static class StructureData extends MultiblockStructureData {
-    /** Positions of all tanks in the structure area */
+
+    /**
+     * Positions of all tanks in the structure area
+     */
     @Getter
     private final List<BlockPos> tanks;
-    /** Next position to check for inside checks */
+    /**
+     * Next position to check for inside checks
+     */
     private BlockPos insideCheck;
 
     protected StructureData(BlockPos minPos, BlockPos maxPos, Set<BlockPos> extraPositions, boolean hasFloor, boolean hasFrame, boolean hasCeiling, List<BlockPos> tanks) {
@@ -194,7 +195,8 @@ public abstract class HeatingStructureMultiblock<T extends MantleBlockEntity & I
 
     /**
      * Checks if there are any tanks in this structure
-     * @return  True if there are tanks
+     *
+     * @return True if there are tanks
      */
     public boolean hasTanks() {
       return !tanks.isEmpty();
@@ -202,8 +204,9 @@ public abstract class HeatingStructureMultiblock<T extends MantleBlockEntity & I
 
     /**
      * Gets the next inside position in the structure
-     * @param prev  Previous inside position
-     * @return  Next inside position based on the previous one
+     *
+     * @param prev Previous inside position
+     * @return Next inside position based on the previous one
      */
     private BlockPos getNextInsideCheck(@Nullable BlockPos prev) {
       BlockPos min = getMinInside();
@@ -236,7 +239,8 @@ public abstract class HeatingStructureMultiblock<T extends MantleBlockEntity & I
 
     /**
      * Gets the next inside position to check in the structure
-     * @return  Next inside position based on the previous one
+     *
+     * @return Next inside position based on the previous one
      */
     public BlockPos getNextInsideCheck() {
       insideCheck = getNextInsideCheck(insideCheck);
@@ -245,7 +249,8 @@ public abstract class HeatingStructureMultiblock<T extends MantleBlockEntity & I
 
     /**
      * Gets the number of blocks making up the walls and floor
-     * @return  Blocks in walls and floor
+     *
+     * @return Blocks in walls and floor
      */
     public int getPerimeterCount() {
       BlockPos min = getMinInside();
@@ -266,13 +271,14 @@ public abstract class HeatingStructureMultiblock<T extends MantleBlockEntity & I
 
     /**
      * Writes this structure to Tag
-     * @return  structure as Tag
+     *
+     * @return structure as Tag
      */
     @Override
     public CompoundTag writeToTag() {
       CompoundTag nbt = super.writeToTag();
       if (insideCheck != null) {
-        nbt.put(TAG_INSIDE_CHECK, TagUtil.writePos(insideCheck));
+        nbt.put(TAG_INSIDE_CHECK, NbtUtils.writeBlockPos(insideCheck));
       }
       return nbt;
     }
