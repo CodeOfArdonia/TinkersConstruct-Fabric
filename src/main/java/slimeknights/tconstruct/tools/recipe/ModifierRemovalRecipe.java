@@ -219,6 +219,7 @@ public class ModifierRemovalRecipe extends AbstractWorktableRecipe {
   /**
    * @deprecated use {@link Factory}
    */
+  @Deprecated
   @FunctionalInterface
   public interface ModifierRemovalRecipeFactory extends Factory {
 

@@ -10,3 +10,4 @@ use [Hephaestus](https://github.com/Alpha-s-Stuff/TinkersConstruct) instead.
 - Casting Table will not drop casts and items correctly.
 - Crash when you open the gui provide by a broken smeltery.
 - Some recipes cannot be used due to wrong tags.
+- When throwing items directly in to smeltery it will wrongly stack.
