@@ -3,8 +3,8 @@ package slimeknights.tconstruct.world;
 import com.google.common.collect.Lists;
 import io.github.fabricators_of_create.porting_lib.config.ConfigEvents;
 import io.github.fabricators_of_create.porting_lib.config.ConfigType;
-import io.github.fabricators_of_create.porting_lib.entity.events.LivingEntityEvents.LivingVisibilityEvent;
 import io.github.fabricators_of_create.porting_lib.entity.events.LivingEntityEvents;
+import io.github.fabricators_of_create.porting_lib.entity.events.LivingEntityEvents.LivingVisibilityEvent;
 import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import io.github.fabricators_of_create.porting_lib.tags.Tags;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
@@ -60,6 +60,7 @@ import java.util.function.Predicate;
 
 @SuppressWarnings("unused")
 public class WorldEvents {
+
   public static void init() {
     LootTableEvents.MODIFY.register(WorldEvents::onLootTableLoad);
     LivingVisibilityEvent.VISIBILITY.register(WorldEvents::livingVisibility);
@@ -86,7 +87,7 @@ public class WorldEvents {
     BiomeModifications.addSpawn(BiomeSelectors.foundInTheEnd(), MobCategory.MONSTER, TinkerWorld.enderSlimeEntity.get(), 10, 2, 4);
     // geodes only on outer islands
     if (Config.COMMON.enderGeodes.get()/* && key != null && !Biomes.THE_END.equals(key)*/) {
-      BiomeModifications.addFeature(context -> context.canGenerateIn(LevelStem.END) && context.getBiomeKey() != Biomes.THE_END,Decoration.LOCAL_MODIFICATIONS, TinkerWorld.placedEnderGeodeKey);
+      BiomeModifications.addFeature(context -> context.canGenerateIn(LevelStem.END) && context.getBiomeKey() != Biomes.THE_END, Decoration.LOCAL_MODIFICATIONS, TinkerWorld.placedEnderGeodeKey);
     }
     // overworld gets tricky
     // slime spawns anywhere, uses the grass
@@ -122,9 +123,10 @@ public class WorldEvents {
 
   /**
    * Injects an entry into a loot pool
-   * @param lootTable      Loot table event
-   * @param poolName   Pool name
-   * @param entries    Entry to inject
+   *
+   * @param lootTable Loot table event
+   * @param poolName  Pool name
+   * @param entries   Entry to inject
    */
   private static void injectInto(LootTable lootTable, String poolName, LootPoolEntryContainer... entries) {
     LootPool pool = getPool(lootTable, poolName);
@@ -140,13 +142,17 @@ public class WorldEvents {
     return Lists.newArrayList(table.pools).stream().filter(e -> name.equals(e.getName())).findFirst().orElse(null);
   }
 
-  /** Makes a seed injection loot entry */
+  /**
+   * Makes a seed injection loot entry
+   */
   private static LootPoolEntryContainer makeSeed(SlimeType type, int weight) {
     return LootItem.lootTableItem(TinkerWorld.slimeGrassSeeds.get(type)).setWeight(weight)
-                    .apply(SetItemCountFunction.setCount(UniformGenerator.between(2, 4))).build();
+      .apply(SetItemCountFunction.setCount(UniformGenerator.between(2, 4))).build();
   }
 
-  /** Makes a sapling injection loot entry */
+  /**
+   * Makes a sapling injection loot entry
+   */
   private static LootPoolEntryContainer makeSapling(SlimeType type, int weight) {
     return LootItem.lootTableItem(TinkerWorld.slimeSapling.get(type)).setWeight(weight).build();
   }
@@ -184,14 +190,14 @@ public class WorldEvents {
           int weight = Config.COMMON.barterBlazingBlood.get();
           if (weight > 0) {
             injectInto(manager.getLootTable(name), "main", LootItem.lootTableItem(TinkerSmeltery.scorchedLantern).setWeight(weight)
-                                              .apply(SetFluidLootFunction.builder(new FluidStack(TinkerFluids.blazingBlood.get(), FluidValues.LANTERN_CAPACITY)))
-                                              .apply(SetItemCountFunction.setCount(UniformGenerator.between(1, 4)))
-                                              .build());
+              .apply(SetFluidLootFunction.builder(new FluidStack(TinkerFluids.blazingBlood.get(), FluidValues.LANTERN_CAPACITY)))
+              .apply(SetItemCountFunction.setCount(UniformGenerator.between(1, 4)))
+              .build());
           }
           break;
         }
 
-          // randomly swap vanilla tool for a tinkers tool
+        // randomly swap vanilla tool for a tinkers tool
         case "chests/spawn_bonus_chest": {
           int weight = Config.COMMON.tinkerToolBonusChest.get();
           if (weight > 0) {
@@ -199,19 +205,19 @@ public class WorldEvents {
             RandomMaterial firstHandle = RandomMaterial.firstWithStat(HandleMaterialStats.ID); // should be wood
             RandomMaterial randomBinding = RandomMaterial.random(ExtraMaterialStats.ID).tier(1).build();
             injectInto(manager.getLootTable(name), "main", LootItem.lootTableItem(TinkerTools.handAxe.get())
-                                              .setWeight(weight)
-                                              .apply(AddToolDataFunction.builder()
-                                                               .addMaterial(randomHead)
-                                                               .addMaterial(firstHandle)
-                                                               .addMaterial(randomBinding))
-                                              .build());
+              .setWeight(weight)
+              .apply(AddToolDataFunction.builder()
+                .addMaterial(randomHead)
+                .addMaterial(firstHandle)
+                .addMaterial(randomBinding))
+              .build());
             injectInto(manager.getLootTable(name), "pool1", LootItem.lootTableItem(TinkerTools.pickaxe.get())
-                                               .setWeight(weight)
-                                               .apply(AddToolDataFunction.builder()
-                                                               .addMaterial(randomHead)
-                                                               .addMaterial(firstHandle)
-                                                               .addMaterial(randomBinding))
-                                               .build());
+              .setWeight(weight)
+              .apply(AddToolDataFunction.builder()
+                .addMaterial(randomHead)
+                .addMaterial(firstHandle)
+                .addMaterial(randomBinding))
+              .build());
           }
           break;
         }
@@ -230,23 +236,20 @@ public class WorldEvents {
     ItemStack helmet = entity.getItemBySlot(EquipmentSlot.HEAD);
     Item item = helmet.getItem();
     if (item != Items.AIR && TinkerWorld.headItems.contains(item)) {
-      if (lookingEntity.getType() == ((TinkerHeadType)((SkullBlock)((BlockItem)item).getBlock()).getType()).getType()) {
+      if (item instanceof BlockItem blockItem && blockItem.getBlock() instanceof SkullBlock skullBlock && skullBlock.getType() instanceof TinkerHeadType tinkerHeadType && tinkerHeadType.getType() == lookingEntity.getType()) {
         event.modifyVisibility(0.5f);
       }
     }
   }
 
   static boolean creeperKill(LivingEntity target, DamageSource source, Collection<ItemEntity> drops, int lootingLevel, boolean recentlyHit) {
-    if (source != null) {
-      Entity entity = source.getEntity();
-      if (entity instanceof Creeper creeper) {
-        if (creeper.canDropMobsSkull()) {
-          LivingEntity dying = target;
-          TinkerHeadType headType = TinkerHeadType.fromEntityType(dying.getType());
-          if (headType != null && Config.COMMON.headDrops.get(headType).get()) {
-            creeper.increaseDroppedSkulls();
-            drops.add(dying.spawnAtLocation(TinkerWorld.heads.get(headType)));
-          }
+    Entity entity = source.getEntity();
+    if (entity instanceof Creeper creeper) {
+      if (creeper.canDropMobsSkull()) {
+        TinkerHeadType headType = TinkerHeadType.fromEntityType(target.getType());
+        if (headType != null && Config.COMMON.headDrops.get(headType).get()) {
+          creeper.increaseDroppedSkulls();
+          drops.add(target.spawnAtLocation(TinkerWorld.heads.get(headType)));
         }
       }
     }

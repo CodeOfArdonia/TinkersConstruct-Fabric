@@ -3,7 +3,6 @@ package slimeknights.tconstruct.gadgets.item;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import io.github.fabricators_of_create.porting_lib.entity.client.MobEffectRenderer;
-import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
@@ -36,7 +35,9 @@ import slimeknights.tconstruct.library.client.RenderUtils;
 import javax.annotation.Nonnull;
 
 public class PiggyBackPackItem extends TooltipItem {
+
   private static final int MAX_ENTITY_STACK = 3; // how many entities can be carried at once
+
   public PiggyBackPackItem(Properties props) {
     super(props);
   }
@@ -46,7 +47,7 @@ public class PiggyBackPackItem extends TooltipItem {
     // is the chest slot empty?
     ItemStack chestArmor = playerIn.getItemBySlot(EquipmentSlot.CHEST);
 
-    if(chestArmor != ItemStack.EMPTY) {
+    if (chestArmor != ItemStack.EMPTY) {
       // need enough space to exchange the chest armor
       if (chestArmor.getItem() != this && playerIn.getInventory().getFreeSlot() == -1) {
         // not enough inventory space
@@ -58,8 +59,7 @@ public class PiggyBackPackItem extends TooltipItem {
     if (this.pickupEntity(playerIn, target)) {
       // unequip old armor
       if (chestArmor.getItem() != this) {
-        int piggyBackpackSlot = playerIn.getInventory().findSlotMatchingItem(stack);
-        playerIn.getInventory().add(piggyBackpackSlot, chestArmor);
+        playerIn.addItem(chestArmor);
         chestArmor = ItemStack.EMPTY;
       }
 
@@ -150,6 +150,7 @@ public class PiggyBackPackItem extends TooltipItem {
   }
 
   public static class CarryPotionEffect extends TinkerEffect {
+
     static final String UUID = "ff4de63a-2b24-11e6-b67b-9e71128cae77";
 
     public CarryPotionEffect() {
