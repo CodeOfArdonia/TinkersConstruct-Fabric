@@ -17,7 +17,7 @@
   "license": "MIT",
   "icon": "logo.png",
   "mixins": [
-    "hephaestus.mixins.json"
+    "supporoform.mixins.json"
   ],
   "environment": "*",
   "entrypoints": {
@@ -51,6 +51,15 @@
     ]
   },
   "accessWidener": "tinkers.accesswidener",
+  "custom": {
+    "cardinal-components": [
+      "tconstruct:piggyback",
+      "tconstruct:equipment_watcher",
+      "tconstruct:persistent_data",
+      "tconstruct:modifier_data",
+      "tconstruct:modifiers"
+    ]
+  },
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric": ">=${fabric_version}",
@@ -79,15 +88,5 @@
     "porting_lib_transfer": ">=${port_lib_transfer_version}",
     "porting_lib_tool_actions": ">=${port_lib_tool_actions_version}",
     "reach-entity-attributes": ">=${reach_entity_attributes_version}"
-  },
-  "custom": {
-    "cardinal-components": [
-      "tconstruct:piggyback",
-      "tconstruct:equipment_watcher",
-      "tconstruct:persistent_data",
-      "tconstruct:modifier_data",
-      "tconstruct:modifiers"
-    ],
-    "banner": "Mantle.png"
   }
 }

@@ -8,6 +8,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -16,6 +17,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import slimeknights.mantle.util.BlockEntityHelper;
 import slimeknights.tconstruct.shared.block.TableBlock;
 import slimeknights.tconstruct.smeltery.block.entity.CastingBlockEntity;
+
+import javax.annotation.Nullable;
 
 @Getter
 public abstract class AbstractCastingBlock extends TableBlock {
@@ -77,5 +80,12 @@ public abstract class AbstractCastingBlock extends TableBlock {
   @Override
   public int getAnalogOutputSignal(BlockState blockState, Level worldIn, BlockPos pos) {
     return Math.toIntExact(BlockEntityHelper.get(CastingBlockEntity.class, worldIn, pos).map(te -> te.getAnalogSignal()).orElse(0L));
+  }
+
+  @Override
+  public void playerDestroy(Level world, Player player, BlockPos pos, BlockState blockState, @Nullable BlockEntity blockEntity, ItemStack itemStack) {
+    super.playerDestroy(world, player, pos, blockState, blockEntity, itemStack);
+    if (blockEntity instanceof CastingBlockEntity castingBlock)
+      castingBlock.dropStacks();
   }
 }

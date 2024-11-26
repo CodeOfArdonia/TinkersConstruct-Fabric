@@ -75,15 +75,10 @@ public class EquipmentChangeWatcher implements EntityComponentInitializer {
    */
   @Override
   public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
-    registry.registerForPlayers(CAPABILITY, player -> {
-//        if (player.getCommandSenderWorld().isClientSide) {
-      return new PlayerLastEquipment(player);
-//        }
-//      return null;
-    });
+    registry.registerForPlayers(CAPABILITY, PlayerLastEquipment::new);
     EntityEvents.ON_REMOVE.register((entity, reason) -> {
       if (entity instanceof Player player)
-        player.getComponent(CAPABILITY).run();
+        CAPABILITY.get(player).run();
     });
   }
 

@@ -50,11 +50,4 @@ public class CastingTableBlock extends AbstractCastingBlock {
   public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> check) {
     return CastingBlockEntity.getTicker(pLevel, check, TinkerSmeltery.table.get());
   }
-
-  @Override
-  public void playerDestroy(Level world, Player player, BlockPos pos, BlockState blockState, @Nullable BlockEntity blockEntity, ItemStack itemStack) {
-    super.playerDestroy(world, player, pos, blockState, blockEntity, itemStack);
-    if (blockEntity instanceof CastingBlockEntity castingBlock)
-      castingBlock.dropStacks();
-  }
 }

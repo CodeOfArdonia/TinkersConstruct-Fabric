@@ -80,7 +80,7 @@ public class EquipmentContext {
    */
   public LazyOptional<TinkerDataCapability.Holder> getTinkerData() {
     if (this.tinkerData == null) {
-      this.tinkerData = LazyOptional.of(() -> this.entity.getComponent(TinkerDataCapability.CAPABILITY));
+      this.tinkerData = LazyOptional.of(() -> TinkerDataCapability.CAPABILITY.get(this.entity));
     }
     return this.tinkerData;
   }
