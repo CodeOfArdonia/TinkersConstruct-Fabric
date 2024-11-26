@@ -34,40 +34,7 @@ repositories {
 }
 
 group = 'slimeknights.mantle'
-
-// sets version to the slimeKnights version format
-task buildInfo {
-    try {
-        def cmd = "git rev-parse --short HEAD"
-        def proc = cmd.execute()
-        proc.waitFor()
-        if (proc.exitValue() == 0) {
-            ext.revision = proc.text.trim()
-        } else {
-            ext.revision = "GITBORK"
-        }
-    } catch (all) {
-        ext.revision = "gitgud"
-    }
-
-    if (System.getenv().GITHUB_RUN_NUMBER != null) {
-        ext.buildNum = "${System.getenv().GITHUB_RUN_NUMBER}"
-    } else {
-        ext.buildNum = "DEV.${project.buildInfo.revision}"
-    }
-}
-ext.artifact_version = 'NFG'
-if (System.getenv().ARTIFACT_VERSION == null) {
-    artifact_version = "${mod_version}.${project.buildInfo.buildNum}"
-}
-if (System.getenv().ARTIFACT_VERSION != null) {
-    artifact_version = "${system.getenv().ARTIFACT_VERSION}"
-}
-
-version = "${minecraft_version}-${artifact_version}"
-
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+version = "${minecraft_version}-${mod_version}"
 
 sourceSets {
     main {
@@ -164,18 +131,6 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
 
     modImplementation(include("me.alphamode:Star:${project.star_version}+${project.minecraft_version}"))
-}
-
-task buildOrPublish {
-    group = "build"
-    String mavenUser = System.getenv().MAVEN_USER
-    if (mavenUser != null && !mavenUser.isEmpty()) {
-        dependsOn(tasks.getByName("publish"))
-        println "prepared for publish"
-    } else {
-        dependsOn(tasks.getByName("build"))
-        println "prepared for build"
-    }
 }
 
 jar {

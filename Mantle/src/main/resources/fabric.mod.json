@@ -38,7 +38,6 @@
       "slimeknights.mantle.plugin.jei.JEIPlugin"
     ]
   },
-  "accessWidener": "mantle.accesswidener",
   "mixins": [
     "mantle.mixins.json"
   ],

@@ -36,7 +36,7 @@ public class SetFluidLootFunction extends LootItemConditionalFunction {
 
   @Override
   protected ItemStack run(ItemStack stack, LootContext context) {
-    ContainerItemContext container = ContainerItemContext.withInitial(stack);
+    ContainerItemContext container = ContainerItemContext.withConstant(stack);
     Storage<FluidVariant> storage = FluidStorage.ITEM.find(stack, container);
     if (storage != null) {
       try (Transaction tx = TransferUtil.getTransaction()) {

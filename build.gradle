@@ -126,13 +126,18 @@ dependencies {
     implementation(include("com.google.code.findbugs:jsr305:3.0.2"))
 
     // dependencies
-    implementation(include(project.dependencies.project(path: ":Mantle", configuration: 'namedElements')))
+    modImplementation(include(project.dependencies.project(path: ":Mantle", configuration: 'namedElements'))) { transitive false }
 
     modImplementation("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
     include(implementation(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-fabric:0.1.1")))
     for (String module in port_lib_modules.split(",")) {
         modImplementation(include("io.github.fabricators_of_create.Porting-Lib:$module:$port_lib_version+$minecraft_base_version"))
     }
+
+    modApi "dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cca_version}"
+    modApi "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:${project.cca_version}"
+    include "dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cca_version}"
+    include "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:${project.cca_version}"
 
     api(include('com.electronwill.night-config:core:3.6.6'))
     api(include('com.electronwill.night-config:toml:3.6.6'))

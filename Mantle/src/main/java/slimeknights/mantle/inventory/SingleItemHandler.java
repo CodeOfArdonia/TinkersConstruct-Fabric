@@ -19,16 +19,20 @@ import javax.annotation.Nonnull;
 @SuppressWarnings("unused")
 @RequiredArgsConstructor
 public abstract class SingleItemHandler<T extends MantleBlockEntity> implements SlottedStackStorage {
+
   protected final T parent;
   private final int maxStackSize;
 
-  /** Current item in this slot */
+  /**
+   * Current item in this slot
+   */
   @Getter
   private ItemStack stack = ItemStack.EMPTY;
 
   /**
    * Sets the stack in this duct
-   * @param newStack  New stack
+   *
+   * @param newStack New stack
    */
   public void setStack(ItemStack newStack) {
     this.stack = newStack;
@@ -37,8 +41,9 @@ public abstract class SingleItemHandler<T extends MantleBlockEntity> implements 
 
   /**
    * Checks if the given stack is valid for this slot
-   * @param stack  Stack
-   * @return  True if valid
+   *
+   * @param stack Stack
+   * @return True if valid
    */
   protected abstract boolean isItemValid(ItemVariant stack);
 
@@ -46,7 +51,7 @@ public abstract class SingleItemHandler<T extends MantleBlockEntity> implements 
   /* Properties */
 
   @Override
-  public boolean isItemValid(int slot, ItemVariant stack) {
+  public boolean isItemValid(int slot, ItemVariant stack, int count) {
     return slot == 0 && isItemValid(stack);
   }
 
@@ -106,7 +111,8 @@ public abstract class SingleItemHandler<T extends MantleBlockEntity> implements 
 
   /**
    * Writes this module to NBT
-   * @return  Module in NBT
+   *
+   * @return Module in NBT
    */
   public CompoundTag writeToNBT() {
     CompoundTag nbt = new CompoundTag();
@@ -118,7 +124,8 @@ public abstract class SingleItemHandler<T extends MantleBlockEntity> implements 
 
   /**
    * Reads this module from NBT
-   * @param nbt  NBT
+   *
+   * @param nbt NBT
    */
   public void readFromNBT(CompoundTag nbt) {
     stack = ItemStack.of(nbt);

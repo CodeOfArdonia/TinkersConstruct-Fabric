@@ -11,6 +11,7 @@ import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import lombok.RequiredArgsConstructor;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageUtil;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -27,9 +28,12 @@ import slimeknights.mantle.util.JsonHelper;
 import java.lang.reflect.Type;
 import java.util.function.Consumer;
 
-/** Fluid transfer info that fills a fluid into an item */
+/**
+ * Fluid transfer info that fills a fluid into an item
+ */
 @RequiredArgsConstructor
 public class FillFluidContainerTransfer implements IFluidContainerTransfer {
+
   public static final ResourceLocation ID = Mantle.getResource("fill_item");
 
   private final Ingredient input;
@@ -48,7 +52,9 @@ public class FillFluidContainerTransfer implements IFluidContainerTransfer {
     return input.test(stack) && this.fluid.test(fluid);
   }
 
-  /** Gets the output filled with the given fluid */
+  /**
+   * Gets the output filled with the given fluid
+   */
   protected ItemStack getFilled(FluidStack drained) {
     return this.filled.get().copy();
   }
@@ -58,7 +64,7 @@ public class FillFluidContainerTransfer implements IFluidContainerTransfer {
   public TransferResult transfer(ItemStack stack, FluidStack fluid, Storage<FluidVariant> handler) {
     long amount = this.fluid.getAmount(fluid.getFluid());
     FluidStack toDrain = new FluidStack(fluid, amount);
-    long simulated = handler.simulateExtract(toDrain.getType(), toDrain.getAmount(), null);
+    long simulated = StorageUtil.simulateInsert(handler, toDrain.getType(), toDrain.getAmount(), null);
     if (simulated == amount) {
       try (Transaction t = TransferUtil.getTransaction()) {
         long actual = handler.extract(toDrain.getType(), toDrain.getAmount(), t);
@@ -87,7 +93,9 @@ public class FillFluidContainerTransfer implements IFluidContainerTransfer {
    */
   public static final JsonDeserializer<FillFluidContainerTransfer> DESERIALIZER = new Deserializer<>(FillFluidContainerTransfer::new);
 
-  public record Deserializer<T extends FillFluidContainerTransfer>(TriFunction<Ingredient, ItemOutput, FluidIngredient, T> factory) implements JsonDeserializer<T> {
+  public record Deserializer<T extends FillFluidContainerTransfer>(
+    TriFunction<Ingredient, ItemOutput, FluidIngredient, T> factory) implements JsonDeserializer<T> {
+
     @Override
     public T deserialize(JsonElement element, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
       JsonObject json = element.getAsJsonObject();

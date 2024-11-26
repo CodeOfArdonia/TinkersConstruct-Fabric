@@ -11,6 +11,7 @@ import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import lombok.RequiredArgsConstructor;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageUtil;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -56,7 +57,7 @@ public class EmptyFluidContainerTransfer implements IFluidContainerTransfer {
   @Override
   public TransferResult transfer(ItemStack stack, FluidStack fluid, Storage<FluidVariant> handler) {
     FluidStack contained = getFluid(stack);
-    long simulated = handler.simulateInsert(contained.getType(), contained.getAmount(), null);
+    long simulated = StorageUtil.simulateInsert(handler,contained.getType(), contained.getAmount(), null);
     if (simulated == this.fluid.getAmount()) {
       try (Transaction t = TransferUtil.getTransaction()) {
         long actual = handler.insert(contained.getType(), contained.getAmount(), t);

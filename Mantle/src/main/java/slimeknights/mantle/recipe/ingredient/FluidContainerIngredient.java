@@ -60,7 +60,7 @@ public class FluidContainerIngredient implements CustomIngredient {
   @Override
   public boolean test(@Nullable ItemStack stack) {
     // first, must have a fluid capability
-    return stack != null && !stack.isEmpty() && Optional.ofNullable(FluidStorage.ITEM.find(stack, ContainerItemContext.withInitial(stack))).flatMap(cap -> {
+    return stack != null && !stack.isEmpty() && Optional.ofNullable(FluidStorage.ITEM.find(stack, ContainerItemContext.withConstant(stack))).flatMap(cap -> {
       // second, must contain enough fluid
       FluidStack contained = TransferUtil.getFirstFluid(cap);
       if (!contained.isEmpty() && fluidIngredient.getAmount(contained.getFluid()) == contained.getAmount() && fluidIngredient.test(contained.getFluid())) {
@@ -71,7 +71,7 @@ public class FluidContainerIngredient implements CustomIngredient {
       return Optional.empty();
     }).filter(cap -> {
       // alright, we know it has the fluid, the question is just whether draining the fluid will give us the desired result
-      Storage<FluidVariant> storage = FluidStorage.ITEM.find(cap, ContainerItemContext.withInitial(cap));
+      Storage<FluidVariant> storage = FluidStorage.ITEM.find(cap, ContainerItemContext.withConstant(cap));
       Fluid fluid = TransferUtil.getFirstFluid(storage).getFluid();
       long amount = fluidIngredient.getAmount(fluid);
       FluidStack drained = TransferUtil.extractAnyFluid(storage, amount);
