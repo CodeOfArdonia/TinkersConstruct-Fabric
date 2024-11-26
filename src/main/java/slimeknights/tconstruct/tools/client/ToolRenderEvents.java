@@ -47,8 +47,6 @@ public class ToolRenderEvents {
 
   /**
    * Renders the outline on the extra blocks
-   *
-   * @param event the highlight event
    */
   static boolean renderBlockHighlights(WorldRenderContext context, @Nullable HitResult target) {
     Level world = Minecraft.getInstance().level;

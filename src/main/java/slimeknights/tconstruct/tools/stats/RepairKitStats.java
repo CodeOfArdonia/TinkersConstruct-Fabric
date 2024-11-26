@@ -20,6 +20,7 @@ import java.util.List;
 /**
  * Internal stat type to make a material repairable without making it a head material. Only required if you use no other repairable material stat type
  */
+@Getter
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @ToString
@@ -29,7 +30,6 @@ public class RepairKitStats extends BaseMaterialStats implements IRepairableMate
   private static final List<Component> DESCRIPTION = ImmutableList.of(ToolStats.DURABILITY.getDescription());
   public static final RepairKitStats DEFAULT = new RepairKitStats(1);
 
-  @Getter
   private final int durability;
 
   public RepairKitStats(FriendlyByteBuf buffer) {

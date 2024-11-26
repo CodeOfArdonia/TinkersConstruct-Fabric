@@ -216,7 +216,7 @@ public class TConstruct implements ModInitializer {
    * @return Location for tinkers
    */
   public static ResourceLocation getResource(String name) {
-    return new ResourceLocation(MOD_ID, name);
+    return ResourceLocation.tryBuild(MOD_ID, name);
   }
 
   /**

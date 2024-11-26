@@ -27,10 +27,10 @@ import javax.annotation.Nullable;
 /**
  * Recipe to add additional slots with the creative modifier
  */
+@Getter
 @RequiredArgsConstructor
 public class CreativeSlotRecipe implements ITinkerStationRecipe, IModifierRecipe {
 
-  @Getter
   private final ResourceLocation id;
 
   /**

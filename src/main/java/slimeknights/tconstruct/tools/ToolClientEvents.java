@@ -228,7 +228,7 @@ public class ToolClientEvents extends ClientEventBase {
    */
   private static void handleKeyBindings(Player player) {
     Minecraft minecraft = Minecraft.getInstance();
-    if (minecraft.player != null && minecraft.player == player && player.level().isClientSide() && !minecraft.player.isSpectator()) {
+    if (minecraft.player == player && player.level().isClientSide() && !minecraft.player.isSpectator()) {
 
       // jumping in mid air for double jump
       // ensure we pressed the key since the last tick, holding should not use all your jumps at once

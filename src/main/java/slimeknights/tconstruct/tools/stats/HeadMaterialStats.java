@@ -75,7 +75,7 @@ public class HeadMaterialStats extends BaseMaterialStats implements IRepairableM
         this.tier = TierSortingRegistry.byName(this.harvestTier);
       }
       if (this.tier == null) {
-        TConstruct.LOG.error("Failed to find tool tier by name " + this.harvestTier);
+        TConstruct.LOG.error("Failed to find tool tier by name {}", this.harvestTier);
         this.tier = DEFAULT.getTier();
       }
     }

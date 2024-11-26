@@ -69,7 +69,7 @@ public class HarvestTiersCommand {
   /**
    * Runs the command, dumping the tag
    */
-  private static int list(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+  private static int list(CommandContext<CommandSourceStack> context) {
     List<Tier> sortedTiers = TierSortingRegistry.getSortedTiers();
 
     // start building output message
@@ -96,7 +96,7 @@ public class HarvestTiersCommand {
   /**
    * Runs the command, dumping the tag
    */
-  private static int run(CommandContext<CommandSourceStack> context, boolean saveFile) throws CommandSyntaxException {
+  private static int run(CommandContext<CommandSourceStack> context, boolean saveFile) {
     List<Tier> sortedTiers = TierSortingRegistry.getSortedTiers();
 
     // save the list as JSON

@@ -58,7 +58,7 @@ public class DumpLootModifiers {
   /**
    * Runs the command, dumping the tag
    */
-  private static int run(CommandContext<CommandSourceStack> context, boolean saveFile) throws CommandSyntaxException {
+  private static int run(CommandContext<CommandSourceStack> context, boolean saveFile) {
     List<ResourceLocation> finalLocations = new ArrayList<>();
     ResourceManager manager = context.getSource().getServer().getResourceManager();
     // logic based on forge logic for reading loot managers
