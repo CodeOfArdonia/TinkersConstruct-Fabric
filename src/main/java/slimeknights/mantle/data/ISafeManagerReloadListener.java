@@ -13,16 +13,18 @@ import java.util.function.Consumer;
  * TODO 1.19: move to {@code slimeknights.data.listener}
  */
 public interface ISafeManagerReloadListener extends ResourceManagerReloadListener, IdentifiableResourceReloadListener {
+
   @Override
   default void onResourceManagerReload(ResourceManager resourceManager) {
 //    if (ModLoader.isLoadingStateValid()) {
-      onReloadSafe(resourceManager);
+    this.onReloadSafe(resourceManager);
 //    }
   }
 
   /**
    * Safely handle a resource manager reload. Only runs if the mod loading state is valid
-   * @param resourceManager  Resource manager
+   *
+   * @param resourceManager Resource manager
    */
   void onReloadSafe(ResourceManager resourceManager);
 

@@ -21,9 +21,12 @@ import slimeknights.mantle.util.JsonHelper;
 
 import java.util.Set;
 
-/** Variant of {@link net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition} that allows using a tag for block type instead of a block */
+/**
+ * Variant of {@link net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition} that allows using a tag for block type instead of a block
+ */
 @RequiredArgsConstructor
 public class BlockTagLootCondition implements LootItemCondition {
+
   public static final SerializerImpl SERIALIZER = new SerializerImpl();
 
   private final TagKey<Block> tag;
@@ -40,7 +43,7 @@ public class BlockTagLootCondition implements LootItemCondition {
   @Override
   public boolean test(LootContext context) {
     BlockState state = context.getParamOrNull(LootContextParams.BLOCK_STATE);
-    return state != null && state.is(tag) && this.properties.matches(state);
+    return state != null && state.is(this.tag) && this.properties.matches(state);
   }
 
   @Override
@@ -54,6 +57,7 @@ public class BlockTagLootCondition implements LootItemCondition {
   }
 
   private static class SerializerImpl implements Serializer<BlockTagLootCondition> {
+
     @Override
     public void serialize(JsonObject json, BlockTagLootCondition loot, JsonSerializationContext context) {
       json.addProperty("tag", loot.tag.location().toString());

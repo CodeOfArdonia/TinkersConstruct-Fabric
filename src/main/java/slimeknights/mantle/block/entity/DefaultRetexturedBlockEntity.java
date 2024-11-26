@@ -21,10 +21,12 @@ import static slimeknights.mantle.util.RetexturedHelper.TAG_TEXTURE;
  * Standard implementation for {@link IRetexturedBlockEntity}, use alongside {@link RetexturedBlock} and {@link slimeknights.mantle.item.RetexturedBlockItem}
  */
 public class DefaultRetexturedBlockEntity extends MantleBlockEntity implements IRetexturedBlockEntity {
+
   private final Lazy<IModelData> data = Lazy.of(this::getRetexturedModelData);
   @Nonnull
   @Getter
   private Block texture = Blocks.AIR;
+
   public DefaultRetexturedBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
     super(type, pos, state);
   }
@@ -37,15 +39,15 @@ public class DefaultRetexturedBlockEntity extends MantleBlockEntity implements I
 
   @Override
   public String getTextureName() {
-    return RetexturedHelper.getTextureName(texture);
+    return RetexturedHelper.getTextureName(this.texture);
   }
 
   @Override
   public void updateTexture(String name) {
-    Block oldTexture = texture;
-    texture = RetexturedHelper.getBlock(name);
-    if (oldTexture != texture) {
-      setChangedFast();
+    Block oldTexture = this.texture;
+    this.texture = RetexturedHelper.getBlock(name);
+    if (oldTexture != this.texture) {
+      this.setChangedFast();
       RetexturedHelper.onTextureUpdated(this);
     }
   }
@@ -58,8 +60,8 @@ public class DefaultRetexturedBlockEntity extends MantleBlockEntity implements I
   @Override
   protected void saveSynced(CompoundTag tags) {
     super.saveSynced(tags);
-    if (texture != Blocks.AIR) {
-      tags.putString(TAG_TEXTURE, getTextureName());
+    if (this.texture != Blocks.AIR) {
+      tags.putString(TAG_TEXTURE, this.getTextureName());
     }
   }
 
@@ -67,7 +69,7 @@ public class DefaultRetexturedBlockEntity extends MantleBlockEntity implements I
   public void load(CompoundTag tags) {
     super.load(tags);
     if (tags.contains(TAG_TEXTURE, Tag.TAG_STRING)) {
-      texture = RetexturedHelper.getBlock(tags.getString(TAG_TEXTURE));
+      this.texture = RetexturedHelper.getBlock(tags.getString(TAG_TEXTURE));
       RetexturedHelper.onTextureUpdated(this);
     }
   }

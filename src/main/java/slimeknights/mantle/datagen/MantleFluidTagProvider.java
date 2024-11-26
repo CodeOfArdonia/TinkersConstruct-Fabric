@@ -10,8 +10,11 @@ import java.util.concurrent.CompletableFuture;
 import static slimeknights.mantle.datagen.MantleTags.Fluids.LAVA;
 import static slimeknights.mantle.datagen.MantleTags.Fluids.WATER;
 
-/** Provider for tags added by mantle, generally not useful for other mods */
+/**
+ * Provider for tags added by mantle, generally not useful for other mods
+ */
 public class MantleFluidTagProvider extends FabricTagProvider.FluidTagProvider {
+
   public MantleFluidTagProvider(FabricDataOutput gen, CompletableFuture<HolderLookup.Provider> registriesFuture) {
     super(gen, registriesFuture);
   }

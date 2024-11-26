@@ -6,19 +6,22 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import lombok.RequiredArgsConstructor;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.util.GsonHelper;
-import net.minecraft.resources.ResourceLocation;
 import slimeknights.mantle.Mantle;
 
 import java.lang.reflect.Type;
 import java.util.List;
 
-/** Loot condition requiring one of the existing items is the given stack */
+/**
+ * Loot condition requiring one of the existing items is the given stack
+ */
 @RequiredArgsConstructor
 public class ContainsItemModifierLootCondition implements ILootModifierCondition {
+
   public static final ResourceLocation ID = Mantle.getResource("contains_item");
   private final Ingredient ingredient;
   private final int amountNeeded;
@@ -31,9 +34,9 @@ public class ContainsItemModifierLootCondition implements ILootModifierCondition
   public boolean test(List<ItemStack> generatedLoot, LootContext context) {
     int matched = 0;
     for (ItemStack stack : generatedLoot) {
-      if (ingredient.test(stack)) {
+      if (this.ingredient.test(stack)) {
         matched += stack.getCount();
-        if (matched >= amountNeeded) {
+        if (matched >= this.amountNeeded) {
           return true;
         }
       }
@@ -45,14 +48,16 @@ public class ContainsItemModifierLootCondition implements ILootModifierCondition
   public JsonObject serialize(JsonSerializationContext context) {
     JsonObject json = new JsonObject();
     json.addProperty("type", ID.toString());
-    json.add("ingredient", ingredient.toJson());
-    if (amountNeeded != 1) {
-      json.addProperty("needed", amountNeeded);
+    json.add("ingredient", this.ingredient.toJson());
+    if (this.amountNeeded != 1) {
+      json.addProperty("needed", this.amountNeeded);
     }
     return json;
   }
 
-  /** Parses this from JSON */
+  /**
+   * Parses this from JSON
+   */
   public static ContainsItemModifierLootCondition deserialize(JsonElement element, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
     JsonObject json = GsonHelper.convertToJsonObject(element, "condition");
     Ingredient ingredient = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "ingredient"));

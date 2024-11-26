@@ -9,6 +9,7 @@ import java.util.function.BiConsumer;
  * @see BiConsumer
  */
 @FunctionalInterface
-public interface NonnullBiConsumer<T,U> {
+public interface NonnullBiConsumer<T, U> {
+
   void accept(@Nonnull T t, @Nonnull U u);
 }

@@ -2,7 +2,6 @@ package slimeknights.mantle.util;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -23,9 +22,14 @@ import java.util.Objects;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RetexturedHelper {
-  /** Tag name for texture blocks. Should not be used directly, use the utils to interact */
+
+  /**
+   * Tag name for texture blocks. Should not be used directly, use the utils to interact
+   */
   public static final String TAG_TEXTURE = "texture";
-  /** Property for tile entities containing a texture block */
+  /**
+   * Property for tile entities containing a texture block
+   */
   public static final ModelProperty<Block> BLOCK_PROPERTY = new ModelProperty<>(block -> block != Blocks.AIR);
 
 
@@ -33,8 +37,9 @@ public final class RetexturedHelper {
 
   /**
    * Gets a block for the given name
-   * @param name  Block name
-   * @return  Block entry, or {@link Blocks#AIR} if no match
+   *
+   * @param name Block name
+   * @return Block entry, or {@link Blocks#AIR} if no match
    */
   public static Block getBlock(String name) {
     if (!name.isEmpty()) {
@@ -48,8 +53,9 @@ public final class RetexturedHelper {
 
   /**
    * Gets the name of the texture from NBT
-   * @param nbt  NBT tag
-   * @return  Name of the texture, or empty if no texture
+   *
+   * @param nbt NBT tag
+   * @return Name of the texture, or empty if no texture
    */
   public static String getTextureName(@Nullable CompoundTag nbt) {
     if (nbt == null) {
@@ -60,8 +66,9 @@ public final class RetexturedHelper {
 
   /**
    * Gets the name of the texture from the block
-   * @param block  Block
-   * @return  Name of the texture, or empty if the block is air
+   *
+   * @param block Block
+   * @return Name of the texture, or empty if the block is air
    */
   public static String getTextureName(Block block) {
     if (block == Blocks.AIR) {
@@ -75,8 +82,9 @@ public final class RetexturedHelper {
 
   /**
    * Sets the texture in an NBT instance
-   * @param nbt      Tag instance
-   * @param texture  Texture to set
+   *
+   * @param nbt     Tag instance
+   * @param texture Texture to set
    */
   public static void setTexture(@Nullable CompoundTag nbt, String texture) {
     if (nbt != null) {
@@ -88,7 +96,9 @@ public final class RetexturedHelper {
     }
   }
 
-  /** Helper to call client side when the texture changes to refresh model data */
+  /**
+   * Helper to call client side when the texture changes to refresh model data
+   */
   public static <T extends BlockEntity & IRetexturedBlockEntity> void onTextureUpdated(T self) {
     // update the texture in BE data
     Level level = self.getLevel();

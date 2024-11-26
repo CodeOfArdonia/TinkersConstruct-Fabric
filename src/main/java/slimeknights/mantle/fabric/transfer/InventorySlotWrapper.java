@@ -23,6 +23,7 @@ import net.minecraft.world.level.block.state.properties.ChestType;
  * This is handled by the Map in InventoryStorageImpl.
  */
 class InventorySlotWrapper extends SingleStackStorage {
+
   /**
    * The strong reference to the InventoryStorageImpl ensures that the weak value doesn't get GC'ed when individual slots are still being accessed.
    */
@@ -39,48 +40,48 @@ class InventorySlotWrapper extends SingleStackStorage {
 
   @Override
   protected ItemStack getStack() {
-    return storage.inventory.getItem(slot);
+    return this.storage.inventory.getItem(this.slot);
   }
 
   @Override
   protected void setStack(ItemStack stack) {
-    if (specialInv == null) {
-      storage.inventory.setItem(slot, stack);
+    if (this.specialInv == null) {
+      this.storage.inventory.setItem(this.slot, stack);
     } else {
-      specialInv.fabric_setSuppress(true);
+      this.specialInv.fabric_setSuppress(true);
 
       try {
-        storage.inventory.setItem(slot, stack);
+        this.storage.inventory.setItem(this.slot, stack);
       } finally {
-        specialInv.fabric_setSuppress(false);
+        this.specialInv.fabric_setSuppress(false);
       }
     }
   }
 
   @Override
   public long insert(ItemVariant insertedVariant, long maxAmount, TransactionContext transaction) {
-    if (!canInsert(slot, ((ItemVariantImpl) insertedVariant).getCachedStack())) {
+    if (!this.canInsert(this.slot, ((ItemVariantImpl) insertedVariant).getCachedStack())) {
       return 0;
     }
 
     long ret = super.insert(insertedVariant, maxAmount, transaction);
-    if (specialInv != null && ret > 0) specialInv.fabric_onTransfer(slot, transaction);
+    if (this.specialInv != null && ret > 0) this.specialInv.fabric_onTransfer(this.slot, transaction);
     return ret;
   }
 
   private boolean canInsert(int slot, ItemStack stack) {
-    if (storage.inventory instanceof ShulkerBoxBlockEntity shulker) {
+    if (this.storage.inventory instanceof ShulkerBoxBlockEntity shulker) {
       // Shulkers override canInsert but not isValid.
       return shulker.canPlaceItemThroughFace(slot, stack, null);
     } else {
-      return storage.inventory.canPlaceItem(slot, stack);
+      return this.storage.inventory.canPlaceItem(slot, stack);
     }
   }
 
   @Override
   public long extract(ItemVariant variant, long maxAmount, TransactionContext transaction) {
     long ret = super.extract(variant, maxAmount, transaction);
-    if (specialInv != null && ret > 0) specialInv.fabric_onTransfer(slot, transaction);
+    if (this.specialInv != null && ret > 0) this.specialInv.fabric_onTransfer(this.slot, transaction);
     return ret;
   }
 
@@ -94,26 +95,26 @@ class InventorySlotWrapper extends SingleStackStorage {
   @Override
   public int getCapacity(ItemVariant variant) {
     // Special case to limit buckets to 1 in furnace fuel inputs.
-    if (storage.inventory instanceof AbstractFurnaceBlockEntity && slot == 1 && variant.isOf(Items.BUCKET)) {
+    if (this.storage.inventory instanceof AbstractFurnaceBlockEntity && this.slot == 1 && variant.isOf(Items.BUCKET)) {
       return 1;
     }
 
     // Special case to limit brewing stand "bottle inputs" to 1.
-    if (storage.inventory instanceof BrewingStandBlockEntity && slot < 3) {
+    if (this.storage.inventory instanceof BrewingStandBlockEntity && this.slot < 3) {
       return 1;
     }
 
-    return Math.min(storage.inventory.getMaxStackSize(), variant.getItem().getMaxStackSize());
+    return Math.min(this.storage.inventory.getMaxStackSize(), variant.getItem().getMaxStackSize());
   }
 
   // We override updateSnapshots to also schedule a markDirty call for the backing inventory.
   @Override
   public void updateSnapshots(TransactionContext transaction) {
-    storage.markDirtyParticipant.updateSnapshots(transaction);
+    this.storage.markDirtyParticipant.updateSnapshots(transaction);
     super.updateSnapshots(transaction);
 
     // For chests: also schedule a markDirty call for the other half
-    if (storage.inventory instanceof ChestBlockEntity chest && chest.getBlockState().getValue(ChestBlock.TYPE) != ChestType.SINGLE) {
+    if (this.storage.inventory instanceof ChestBlockEntity chest && chest.getBlockState().getValue(ChestBlock.TYPE) != ChestType.SINGLE) {
       BlockPos otherChestPos = chest.getBlockPos().relative(ChestBlock.getConnectedDirection(chest.getBlockState()));
 
       if (chest.getLevel().getBlockEntity(otherChestPos) instanceof ChestBlockEntity otherChest) {
@@ -124,24 +125,24 @@ class InventorySlotWrapper extends SingleStackStorage {
 
   @Override
   protected void releaseSnapshot(ItemStack snapshot) {
-    lastReleasedSnapshot = snapshot;
+    this.lastReleasedSnapshot = snapshot;
   }
 
   @Override
   protected void onFinalCommit() {
     // Try to apply the change to the original stack
-    ItemStack original = lastReleasedSnapshot;
-    ItemStack currentStack = getStack();
+    ItemStack original = this.lastReleasedSnapshot;
+    ItemStack currentStack = this.getStack();
 
-    if (storage.inventory instanceof SpecialLogicInventory specialLogicInv) {
-      specialLogicInv.fabric_onFinalCommit(slot, original, currentStack);
+    if (this.storage.inventory instanceof SpecialLogicInventory specialLogicInv) {
+      specialLogicInv.fabric_onFinalCommit(this.slot, original, currentStack);
     }
 
     if (!original.isEmpty() && original.getItem() == currentStack.getItem()) {
       // None is empty and the items match: just update the amount and NBT, and reuse the original stack.
       original.setCount(currentStack.getCount());
       original.setTag(currentStack.hasTag() ? currentStack.getTag().copy() : null);
-      setStack(original);
+      this.setStack(original);
     } else {
       // Otherwise assume everything was taken from original so empty it.
       original.setCount(0);
@@ -150,6 +151,6 @@ class InventorySlotWrapper extends SingleStackStorage {
 
   @Override
   public String toString() {
-    return "InventorySlotWrapper[%s#%d]".formatted(DebugMessages.forInventory(storage.inventory), slot);
+    return "InventorySlotWrapper[%s#%d]".formatted(DebugMessages.forInventory(this.storage.inventory), this.slot);
   }
 }

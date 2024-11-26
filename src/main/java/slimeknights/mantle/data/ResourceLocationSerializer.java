@@ -20,10 +20,13 @@ import java.util.function.Function;
  */
 @RequiredArgsConstructor
 public class ResourceLocationSerializer<T extends ResourceLocation> implements JsonDeserializer<T>, JsonSerializer<T> {
-  private final Function<String,T> constructor;
+
+  private final Function<String, T> constructor;
   private final String modId;
 
-  /** Creates an instance for resource locations */
+  /**
+   * Creates an instance for resource locations
+   */
   public static ResourceLocationSerializer<ResourceLocation> resourceLocation(String modId) {
     return new ResourceLocationSerializer<>(ResourceLocation::new, modId);
   }
@@ -37,8 +40,8 @@ public class ResourceLocationSerializer<T extends ResourceLocation> implements J
   public T deserialize(JsonElement element, Type type, JsonDeserializationContext context) throws JsonParseException {
     String loc = GsonHelper.convertToString(element, "location");
     if (!loc.contains(":")) {
-      loc = modId + ":" + loc;
+      loc = this.modId + ":" + loc;
     }
-    return constructor.apply(loc);
+    return this.constructor.apply(loc);
   }
 }

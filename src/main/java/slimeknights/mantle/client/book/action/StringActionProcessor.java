@@ -28,7 +28,7 @@ public class StringActionProcessor {
     }
 
     String id = action.substring(0, action.indexOf(PROTOCOL_SEPARATOR));
-    if(!id.contains(":"))
+    if (!id.contains(":"))
       id = "mantle:" + id;
 
     ResourceLocation protoId = new ResourceLocation(id);

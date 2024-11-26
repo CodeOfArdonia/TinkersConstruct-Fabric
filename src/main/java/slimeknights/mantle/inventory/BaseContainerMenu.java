@@ -1,5 +1,7 @@
 package slimeknights.mantle.inventory;
 
+import io.github.fabricators_of_create.porting_lib.util.EnvExecutor;
+import net.fabricmc.api.EnvType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
@@ -13,8 +15,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.fabricmc.api.EnvType;
-import io.github.fabricators_of_create.porting_lib.util.EnvExecutor;
 import slimeknights.mantle.util.BlockEntityHelper;
 
 import javax.annotation.Nullable;
@@ -90,15 +90,15 @@ public class BaseContainerMenu<TILE extends BlockEntity> extends AbstractContain
       return true;
     }
 
-    if (!tile.isRemoved()) {
+    if (!this.tile.isRemoved()) {
       //prevent Containers from remaining valid after the chunk has unloaded;
-      Level world = tile.getLevel();
+      Level world = this.tile.getLevel();
 
       if (world == null) {
         return false;
       }
 
-      return world.isLoaded(tile.getBlockPos());
+      return world.isLoaded(this.tile.getBlockPos());
     }
 
     return false;
@@ -128,7 +128,7 @@ public class BaseContainerMenu<TILE extends BlockEntity> extends AbstractContain
   }
 
   /*
-  * Override this to set the Y offset for the inventory slots.
+   * Override this to set the Y offset for the inventory slots.
    */
   protected int getInventoryYOffset() {
     return BASE_Y_OFFSET;
@@ -142,13 +142,13 @@ public class BaseContainerMenu<TILE extends BlockEntity> extends AbstractContain
 
     for (int slotY = 0; slotY < 3; slotY++) {
       for (int slotX = 0; slotX < 9; slotX++) {
-        addSlot(new Slot(inv, slotX + slotY * 9 + 9, xOffset + slotX * 18, yOffset + slotY * 18));
+        this.addSlot(new Slot(inv, slotX + slotY * 9 + 9, xOffset + slotX * 18, yOffset + slotY * 18));
       }
     }
 
     yOffset += 58;
     for (int slotY = 0; slotY < 9; slotY++) {
-      addSlot(new Slot(inv, slotY, xOffset + slotY * 18, yOffset));
+      this.addSlot(new Slot(inv, slotY, xOffset + slotY * 18, yOffset));
     }
 
     this.playerInventoryStart = start;
@@ -312,9 +312,10 @@ public class BaseContainerMenu<TILE extends BlockEntity> extends AbstractContain
 
   /**
    * Gets a tile entity from a packet buffer
-   * @param buf     Packet buffer instance
-   * @param type    Tile entity class
-   * @param <TILE>  Tile entity type
+   *
+   * @param buf    Packet buffer instance
+   * @param type   Tile entity class
+   * @param <TILE> Tile entity type
    * @return Tile entity, or null if unable to find
    */
   @Nullable

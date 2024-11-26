@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import slimeknights.mantle.fluid.attributes.FluidAttributes;
 
 public class FluidAttributeClientHandler implements FluidRenderHandler {
+
   protected final FluidAttributes attributes;
 
   protected TextureAtlasSprite[] sprites;
@@ -21,24 +22,24 @@ public class FluidAttributeClientHandler implements FluidRenderHandler {
 
   @Override
   public TextureAtlasSprite[] getFluidSprites(@Nullable BlockAndTintGetter view, @Nullable BlockPos pos, FluidState state) {
-    return sprites;
+    return this.sprites;
   }
 
   @Override
   public int getFluidColor(@Nullable BlockAndTintGetter view, @Nullable BlockPos pos, FluidState state) {
-    return attributes.getColor(view, pos);
+    return this.attributes.getColor(view, pos);
   }
 
   @Override
   public void reloadTextures(TextureAtlas textureAtlas) {
-    ResourceLocation overlayTexture = attributes.getOverlayTexture();
+    ResourceLocation overlayTexture = this.attributes.getOverlayTexture();
     this.sprites = new TextureAtlasSprite[overlayTexture == null ? 2 : 3];
-    sprites[0] = textureAtlas.getSprite(attributes.getStillTexture());
-    sprites[1] = textureAtlas.getSprite(attributes.getFlowingTexture());
+    this.sprites[0] = textureAtlas.getSprite(this.attributes.getStillTexture());
+    this.sprites[1] = textureAtlas.getSprite(this.attributes.getFlowingTexture());
 
 
     if (overlayTexture != null) {
-      sprites[2] = textureAtlas.getSprite(overlayTexture);
+      this.sprites[2] = textureAtlas.getSprite(overlayTexture);
     }
   }
 }

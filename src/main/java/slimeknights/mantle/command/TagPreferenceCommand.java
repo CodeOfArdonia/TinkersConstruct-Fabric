@@ -12,28 +12,32 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import slimeknights.mantle.recipe.helper.TagPreference;
 
-/** Command to test tag preference behavior */
+/**
+ * Command to test tag preference behavior
+ */
 public class TagPreferenceCommand {
+
   private static final String EMPTY_TAG = "command.mantle.tag_preference.empty_tag";
   private static final String PREFERENCE = "command.mantle.tag_preference.preference";
 
   /**
    * Registers this sub command with the root command
-   * @param subCommand  Command builder
+   *
+   * @param subCommand Command builder
    */
   public static void register(LiteralArgumentBuilder<CommandSourceStack> subCommand) {
     subCommand.requires(sender -> sender.hasPermission(MantleCommand.PERMISSION_EDIT_SPAWN))
-              .then(Commands.argument("type", RegistryArgument.registry()).suggests(MantleCommand.REGISTRY)
-                            .then(Commands.argument("name", ResourceLocationArgument.id()).suggests(MantleCommand.VALID_TAGS)
-                                          .executes(TagPreferenceCommand::run)));
+      .then(Commands.argument("type", RegistryArgument.registry()).suggests(MantleCommand.REGISTRY)
+        .then(Commands.argument("name", ResourceLocationArgument.id()).suggests(MantleCommand.VALID_TAGS)
+          .executes(TagPreferenceCommand::run)));
   }
 
   /**
    * Runs the command
    *
-   * @param context  Tag context
-   * @return  Integer return
-   * @throws CommandSyntaxException  If invalid values are passed
+   * @param context Tag context
+   * @return Integer return
+   * @throws CommandSyntaxException If invalid values are passed
    */
   private static int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
     return runGeneric(context, RegistryArgument.getResult(context, "type"));
@@ -42,8 +46,8 @@ public class TagPreferenceCommand {
   /**
    * Runs the command, fixing issues with generics
    *
-   * @param context  Tag context
-   * @return  Integer return
+   * @param context Tag context
+   * @return Integer return
    */
   private static <T> int runGeneric(CommandContext<CommandSourceStack> context, Registry<T> registry) {
     ResourceLocation name = context.getArgument("name", ResourceLocation.class);

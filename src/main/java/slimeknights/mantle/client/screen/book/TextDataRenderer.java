@@ -66,7 +66,7 @@ public class TextDataRenderer {
 
       if (item.useOldColor) {
         ChatFormatting colFormat = ChatFormatting.getByName(item.color);
-        if(colFormat != null) {
+        if (colFormat != null) {
           modifiers += colFormat;
         } else {
           modifiers += "unknown color"; // more descriptive than null
@@ -138,14 +138,14 @@ public class TextDataRenderer {
       box3H = (int) (atY + fr.lineHeight * item.scale);
 
       boolean mouseInside = (mouseX >= box1X && mouseX <= box1W && mouseY >= box1Y && mouseY <= box1H && box1X != box1W && box1Y != box1H)
-                            || (mouseX >= box2X && mouseX <= box2W && mouseY >= box2Y && mouseY <= box2H && box2X != box2W && box2Y != box2H)
-                            || (mouseX >= box3X && mouseX <= box3W && mouseY >= box3Y && mouseY <= box3H && box3X != box3W && box1Y != box3H);
+        || (mouseX >= box2X && mouseX <= box2W && mouseY >= box2Y && mouseY <= box2H && box2X != box2W && box2Y != box2H)
+        || (mouseX >= box3X && mouseX <= box3W && mouseY >= box3Y && mouseY <= box3H && box3X != box3W && box1Y != box3H);
       if (item.tooltip != null && item.tooltip.length > 0) {
         if (BookScreen.debug) {
           Matrix4f matrix = guiGraphics.pose().last().pose();
-          ScreenUtils.drawGradientRect(matrix, 0, box1X,  box1Y,  box1W,      box1H,      0xFF00FF00, 0xFF00FF00);
-          ScreenUtils.drawGradientRect(matrix, 0, box2X,  box2Y,  box2W,      box2H,      0xFFFF0000, 0xFFFF0000);
-          ScreenUtils.drawGradientRect(matrix, 0, box3X,  box3Y,  box3W,      box3H,      0xFF0000FF, 0xFF0000FF);
+          ScreenUtils.drawGradientRect(matrix, 0, box1X, box1Y, box1W, box1H, 0xFF00FF00, 0xFF00FF00);
+          ScreenUtils.drawGradientRect(matrix, 0, box2X, box2Y, box2W, box2H, 0xFFFF0000, 0xFFFF0000);
+          ScreenUtils.drawGradientRect(matrix, 0, box3X, box3Y, box3W, box3H, 0xFF0000FF, 0xFF0000FF);
           ScreenUtils.drawGradientRect(matrix, 0, mouseX, mouseY, mouseX + 5, mouseY + 5, 0xFFFF00FF, 0xFFFFFF00);
         }
 
@@ -229,7 +229,9 @@ public class TextDataRenderer {
     return s.split("\r");
   }
 
-  /** Gets the number of lines needed to render the given text */
+  /**
+   * Gets the number of lines needed to render the given text
+   */
   public static int getLinesForString(String s, String modifiers, int width, String prefix, Font fr) {
     return cropStringBySize(s, modifiers, width, Short.MAX_VALUE, width - fr.width(prefix), fr, 1.0f).length;
   }

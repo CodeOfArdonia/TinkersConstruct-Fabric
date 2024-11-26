@@ -42,12 +42,13 @@ public class ScalableElementScreen extends ElementScreen {
 
   /**
    * Draws this shape scaling upwards instead of downwards
-   * @param guiGraphics  Gui graphics instance
-   * @param texture      The texture to draw
-   * @param xPos         X position of top of image
-   * @param yPos         Y position of top of image
-   * @param height       Height to draw
-   * @return  Width for some reason
+   *
+   * @param guiGraphics Gui graphics instance
+   * @param texture     The texture to draw
+   * @param xPos        X position of top of image
+   * @param yPos        Y position of top of image
+   * @param height      Height to draw
+   * @return Width for some reason
    */
   public int drawScaledYUp(GuiGraphics guiGraphics, ResourceLocation texture, int xPos, int yPos, int height) {
     // remainder that doesn't fit total height

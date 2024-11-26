@@ -11,10 +11,13 @@ import java.util.function.IntSupplier;
  */
 @AllArgsConstructor
 public class LambdaDataSlot extends DataSlot {
+
   private final IntSupplier getter;
   private final IntConsumer setter;
 
-  /** Constructor to let you start from a value other than 0 */
+  /**
+   * Constructor to let you start from a value other than 0
+   */
   public LambdaDataSlot(int startingValue, IntSupplier getter, IntConsumer setter) {
     this(getter, setter);
     this.prevValue = startingValue;
@@ -22,11 +25,11 @@ public class LambdaDataSlot extends DataSlot {
 
   @Override
   public int get() {
-    return getter.getAsInt();
+    return this.getter.getAsInt();
   }
 
   @Override
   public void set(int value) {
-    setter.accept(value);
+    this.setter.accept(value);
   }
 }

@@ -21,6 +21,7 @@ import java.util.function.Consumer;
  */
 @SuppressWarnings("UnusedReturnValue")
 public class ConsumerWrapperBuilder {
+
   private final List<ConditionJsonProvider> conditions = new ArrayList<>();
   @Nullable
   private final RecipeSerializer<?> override;
@@ -34,6 +35,7 @@ public class ConsumerWrapperBuilder {
 
   /**
    * Creates a wrapper builder with the default serializer
+   *
    * @return Default serializer builder
    */
   public static ConsumerWrapperBuilder wrap() {
@@ -42,6 +44,7 @@ public class ConsumerWrapperBuilder {
 
   /**
    * Creates a wrapper builder with a serializer override
+   *
    * @param override Serializer override
    * @return Default serializer builder
    */
@@ -51,6 +54,7 @@ public class ConsumerWrapperBuilder {
 
   /**
    * Creates a wrapper builder with a serializer name override
+   *
    * @param override Serializer override
    * @return Default serializer builder
    */
@@ -60,24 +64,27 @@ public class ConsumerWrapperBuilder {
 
   /**
    * Adds a conditional to the consumer
+   *
    * @param condition Condition to add
    * @return Added condition
    */
   public ConsumerWrapperBuilder addCondition(ConditionJsonProvider condition) {
-    conditions.add(condition);
+    this.conditions.add(condition);
     return this;
   }
 
   /**
    * Builds the consumer for the wrapper builder
+   *
    * @param consumer Base consumer
    * @return Built wrapper consumer
    */
   public Consumer<FinishedRecipe> build(Consumer<FinishedRecipe> consumer) {
-    return (recipe) -> consumer.accept(new Wrapped(recipe, conditions, override, overrideName));
+    return (recipe) -> consumer.accept(new Wrapped(recipe, this.conditions, this.override, this.overrideName));
   }
 
   private static class Wrapped implements FinishedRecipe {
+
     private final FinishedRecipe original;
     private final List<ConditionJsonProvider> conditions;
     @Nullable
@@ -87,8 +94,7 @@ public class ConsumerWrapperBuilder {
 
     private Wrapped(FinishedRecipe original, List<ConditionJsonProvider> conditions, @Nullable RecipeSerializer<?> override, @Nullable ResourceLocation overrideName) {
       // if wrapping another wrapper result, merge the two together
-      if (original instanceof Wrapped) {
-        Wrapped toMerge = (Wrapped) original;
+      if (original instanceof Wrapped toMerge) {
         this.original = toMerge.original;
         this.conditions = ImmutableList.<ConditionJsonProvider>builder().addAll(toMerge.conditions).addAll(conditions).build();
         // consumer wrappers are processed inside out, so the innermost wrapped recipe is the one with the most recent serializer override
@@ -110,10 +116,10 @@ public class ConsumerWrapperBuilder {
     @Override
     public JsonObject serializeRecipe() {
       JsonObject json = new JsonObject();
-      if (overrideName != null) {
-        json.addProperty("type", overrideName.toString());
+      if (this.overrideName != null) {
+        json.addProperty("type", this.overrideName.toString());
       } else {
-        json.addProperty("type", Objects.requireNonNull(BuiltInRegistries.RECIPE_SERIALIZER.getKey(getType())).toString());
+        json.addProperty("type", Objects.requireNonNull(BuiltInRegistries.RECIPE_SERIALIZER.getKey(this.getType())).toString());
       }
       this.serializeRecipeData(json);
       return json;
@@ -122,40 +128,40 @@ public class ConsumerWrapperBuilder {
     @Override
     public void serializeRecipeData(JsonObject json) {
       // add conditions on top
-      if (!conditions.isEmpty()) {
+      if (!this.conditions.isEmpty()) {
         JsonArray conditionsArray = new JsonArray();
-        for (ConditionJsonProvider condition : conditions) {
+        for (ConditionJsonProvider condition : this.conditions) {
           conditionsArray.add(condition.toJson());
         }
         json.add(ResourceConditions.CONDITIONS_KEY, conditionsArray);
       }
       // serialize the normal recipe
-      original.serializeRecipeData(json);
+      this.original.serializeRecipeData(json);
     }
 
     @Override
     public ResourceLocation getId() {
-      return original.getId();
+      return this.original.getId();
     }
 
     @Override
     public RecipeSerializer<?> getType() {
-      if (override != null) {
-        return override;
+      if (this.override != null) {
+        return this.override;
       }
-      return original.getType();
+      return this.original.getType();
     }
 
     @Nullable
     @Override
     public JsonObject serializeAdvancement() {
-      return original.serializeAdvancement();
+      return this.original.serializeAdvancement();
     }
 
     @Nullable
     @Override
     public ResourceLocation getAdvancementId() {
-      return original.getAdvancementId();
+      return this.original.getAdvancementId();
     }
   }
 }

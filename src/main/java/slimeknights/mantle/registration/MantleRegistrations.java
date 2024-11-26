@@ -7,6 +7,7 @@ import slimeknights.mantle.block.entity.MantleSignBlockEntity;
  * Various objects registered under Mantle
  */
 public class MantleRegistrations {
+
   private MantleRegistrations() {}
 
   public static BlockEntityType<MantleSignBlockEntity> SIGN;

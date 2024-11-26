@@ -10,12 +10,12 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
-import net.minecraft.util.GsonHelper;
 import slimeknights.mantle.loot.MantleLoot;
 import slimeknights.mantle.recipe.helper.RecipeHelper;
 
@@ -23,10 +23,14 @@ import slimeknights.mantle.recipe.helper.RecipeHelper;
  * Loot function to set the fluid on a dropped item
  */
 public class SetFluidLootFunction extends LootItemConditionalFunction {
+
   public static final Serializer SERIALIZER = new Serializer();
 
-  /** Fluid to add to the item */
+  /**
+   * Fluid to add to the item
+   */
   private final FluidStack fluid;
+
   protected SetFluidLootFunction(LootItemCondition[] conditionsIn, FluidStack fluid) {
     super(conditionsIn);
     this.fluid = fluid;
@@ -38,7 +42,7 @@ public class SetFluidLootFunction extends LootItemConditionalFunction {
     Storage<FluidVariant> storage = FluidStorage.ITEM.find(stack, container);
     if (storage != null) {
       try (Transaction tx = TransferUtil.getTransaction()) {
-        storage.insert(fluid.getType(), fluid.getAmount(), tx);
+        storage.insert(this.fluid.getType(), this.fluid.getAmount(), tx);
         tx.commit();
         return container.getItemVariant().toStack((int) container.getAmount());
       }
@@ -53,15 +57,19 @@ public class SetFluidLootFunction extends LootItemConditionalFunction {
 
   /**
    * Creates a new builder with the given fluid
-   * @param fluid  Fluid to set
-   * @return  Builder instance
+   *
+   * @param fluid Fluid to set
+   * @return Builder instance
    */
   public static Builder<?> builder(FluidStack fluid) {
     return simpleBuilder(conditions -> new SetFluidLootFunction(conditions, fluid));
   }
 
-  /** Serializer logic for the function */
+  /**
+   * Serializer logic for the function
+   */
   private static class Serializer extends LootItemConditionalFunction.Serializer<SetFluidLootFunction> {
+
     @Override
     public void serialize(JsonObject json, SetFluidLootFunction loot, JsonSerializationContext context) {
       super.serialize(json, loot, context);

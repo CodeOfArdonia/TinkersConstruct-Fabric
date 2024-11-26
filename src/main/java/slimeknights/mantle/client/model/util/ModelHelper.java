@@ -32,8 +32,11 @@ import java.util.function.Function;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ModelHelper {
-  private static final Map<Block,ResourceLocation> TEXTURE_NAME_CACHE = new ConcurrentHashMap<>();
-  /** Listener instance to clear cache */
+
+  private static final Map<Block, ResourceLocation> TEXTURE_NAME_CACHE = new ConcurrentHashMap<>();
+  /**
+   * Listener instance to clear cache
+   */
   public static final SimpleSynchronousResourceReloadListener LISTENER = new SimpleSynchronousResourceReloadListener() {
     @Override
     public ResourceLocation getFabricId() {
@@ -50,10 +53,11 @@ public class ModelHelper {
 
   /**
    * Gets the model for the given block
-   * @param state  Block state
-   * @param clazz  Class type to cast result into
-   * @param <T>    Class type
-   * @return  Block model, or null if its missing or the wrong class type
+   *
+   * @param state Block state
+   * @param clazz Class type to cast result into
+   * @param <T>   Class type
+   * @return Block model, or null if its missing or the wrong class type
    */
   @Nullable
   public static <T extends BakedModel> T getBakedModel(BlockState state, Class<T> clazz) {
@@ -65,7 +69,7 @@ public class ModelHelper {
     BakedModel baked = unwrap(minecraft.getModelManager().getBlockModelShaper().getBlockModel(state), clazz);
     // map multipart and weighted random into the first variant
     if (baked instanceof MultiPartBakedModel) {
-      baked = ((MultiPartBakedModel)baked).selectors.get(0).getRight();
+      baked = ((MultiPartBakedModel) baked).selectors.get(0).getRight();
     }
     if (baked instanceof WeightedBakedModel) {
       baked = ((WeightedBakedModel) baked).wrapped;
@@ -79,10 +83,11 @@ public class ModelHelper {
 
   /**
    * Gets the model for the given item
-   * @param item   Item provider
-   * @param clazz  Class type to cast result into
-   * @param <T>    Class type
-   * @return  Item model, or null if its missing or the wrong class type
+   *
+   * @param item  Item provider
+   * @param clazz Class type to cast result into
+   * @param <T>   Class type
+   * @return Item model, or null if its missing or the wrong class type
    */
   @Nullable
   public static <T extends BakedModel> T getBakedModel(ItemLike item, Class<T> clazz) {
@@ -100,7 +105,8 @@ public class ModelHelper {
 
   /**
    * Gets the texture name for a block from the model manager
-   * @param block  Block to fetch
+   *
+   * @param block Block to fetch
    * @return Texture name for the block
    */
   @SuppressWarnings("deprecation")
@@ -115,6 +121,7 @@ public class ModelHelper {
 
   /**
    * Gets the name of a particle texture for a block, using the cached value if present
+   *
    * @param block Block to fetch
    * @return Texture name for the block
    */
@@ -126,13 +133,14 @@ public class ModelHelper {
 
   /**
    * Converts a JSON float array to the specified object
-   * @param json    JSON object
-   * @param name    Name of the array in the object to fetch
-   * @param size    Expected array size
-   * @param mapper  Functon to map from the array to the output type
-   * @param <T> Output type
-   * @return  Vector3f of data
-   * @throws JsonParseException  If there is no array or the length is wrong
+   *
+   * @param json   JSON object
+   * @param name   Name of the array in the object to fetch
+   * @param size   Expected array size
+   * @param mapper Functon to map from the array to the output type
+   * @param <T>    Output type
+   * @return Vector3f of data
+   * @throws JsonParseException If there is no array or the length is wrong
    */
   public static <T> T arrayToObject(JsonObject json, String name, int size, Function<float[], T> mapper) {
     JsonArray array = GsonHelper.getAsJsonArray(json, name);
@@ -140,7 +148,7 @@ public class ModelHelper {
       throw new JsonParseException("Expected " + size + " " + name + " values, found: " + array.size());
     }
     float[] vec = new float[size];
-    for(int i = 0; i < size; ++i) {
+    for (int i = 0; i < size; ++i) {
       vec[i] = GsonHelper.convertToFloat(array.get(i), name + "[" + i + "]");
     }
     return mapper.apply(vec);
@@ -148,10 +156,11 @@ public class ModelHelper {
 
   /**
    * Converts a JSON array with 3 elements into a Vector3f
-   * @param json  JSON object
-   * @param name  Name of the array in the object to fetch
-   * @return  Vector3f of data
-   * @throws JsonParseException  If there is no array or the length is wrong
+   *
+   * @param json JSON object
+   * @param name Name of the array in the object to fetch
+   * @return Vector3f of data
+   * @throws JsonParseException If there is no array or the length is wrong
    */
   public static Vector3f arrayToVector(JsonObject json, String name) {
     return arrayToObject(json, name, 3, arr -> new Vector3f(arr[0], arr[1], arr[2]));
@@ -159,8 +168,9 @@ public class ModelHelper {
 
   /**
    * Gets a rotation from JSON
-   * @param json  JSON parent
-   * @return  Integer of 0, 90, 180, or 270
+   *
+   * @param json JSON parent
+   * @return Integer of 0, 90, 180, or 270
    */
   public static int getRotation(JsonObject json, String key) {
     int i = GsonHelper.getAsInt(json, key, 0);
@@ -224,11 +234,11 @@ public class ModelHelper {
   public static <T extends BakedModel> BakedModel unwrap(BakedModel model, Class<T> modelClass) {
     while (model instanceof WrapperBakedModel wrapper) {
       if (modelClass.isAssignableFrom(model.getClass()))
-        return (T) model;
+        return model;
       BakedModel wrapped = wrapper.getWrappedModel();
 
       if (wrapped == null) {
-        return (T) model;
+        return model;
       } else if (wrapped == model) {
         throw new IllegalArgumentException("Model " + model + " is wrapping itself!");
       } else {

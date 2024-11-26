@@ -11,28 +11,36 @@ import net.minecraft.world.item.ItemStack;
 public interface IRecipeContainer extends Container {
   /* Unsupported operations */
 
-  /** @deprecated unsupported method */
+  /**
+   * @deprecated unsupported method
+   */
   @Deprecated
   @Override
   default ItemStack removeItem(int index, int count) {
     throw new UnsupportedOperationException();
   }
 
-  /** @deprecated unsupported method */
+  /**
+   * @deprecated unsupported method
+   */
   @Deprecated
   @Override
   default ItemStack removeItemNoUpdate(int index) {
     throw new UnsupportedOperationException();
   }
 
-  /** @deprecated unsupported method */
+  /**
+   * @deprecated unsupported method
+   */
   @Deprecated
   @Override
   default void setItem(int index, ItemStack stack) {
     throw new UnsupportedOperationException();
   }
 
-  /** @deprecated unsupported method */
+  /**
+   * @deprecated unsupported method
+   */
   @Deprecated
   @Override
   default void clearContent() {
@@ -41,12 +49,16 @@ public interface IRecipeContainer extends Container {
 
   /* Unused */
 
-  /** @deprecated unused method */
+  /**
+   * @deprecated unused method
+   */
   @Deprecated
   @Override
   default void setChanged() {}
 
-  /** @deprecated unused method */
+  /**
+   * @deprecated unused method
+   */
   @Deprecated
   @Override
   default boolean stillValid(Player player) {

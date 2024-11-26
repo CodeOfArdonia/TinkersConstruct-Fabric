@@ -1,8 +1,8 @@
 package slimeknights.mantle.client.book.repository;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
 import org.apache.commons.io.IOUtils;
 import slimeknights.mantle.client.book.BookLoader;
 import slimeknights.mantle.client.book.data.SectionData;

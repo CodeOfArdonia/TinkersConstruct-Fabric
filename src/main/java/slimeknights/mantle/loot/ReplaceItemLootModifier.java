@@ -30,8 +30,11 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
-/** Loot modifier to replace an item with another */
+/**
+ * Loot modifier to replace an item with another
+ */
 public class ReplaceItemLootModifier extends LootModifier {
+
   public static final Codec<ReplaceItemLootModifier> CODEC = RecordCodecBuilder.create(inst -> {
     Codec<Ingredient> ingredientCodec = Codec.PASSTHROUGH.flatXmap(dynamic -> {
       JsonElement element = IGlobalLootModifier.getJson(dynamic);
@@ -50,13 +53,21 @@ public class ReplaceItemLootModifier extends LootModifier {
       .apply(inst, ReplaceItemLootModifier::new);
   });
 
-  /** Ingredient to test for the original item */
+  /**
+   * Ingredient to test for the original item
+   */
   private final Ingredient original;
-  /** Item for the replacement */
+  /**
+   * Item for the replacement
+   */
   private final ItemOutput replacement;
-  /** Functions to apply to the replacement */
+  /**
+   * Functions to apply to the replacement
+   */
   private final LootItemFunction[] functions;
-  /** Functions merged into a single function for ease of use */
+  /**
+   * Functions merged into a single function for ease of use
+   */
   private final BiFunction<ItemStack, LootContext, ItemStack> combinedFunctions;
 
   protected ReplaceItemLootModifier(LootItemCondition[] conditionsIn, Ingredient original, ItemOutput replacement, LootItemFunction[] functions) {
@@ -67,7 +78,9 @@ public class ReplaceItemLootModifier extends LootModifier {
     this.combinedFunctions = LootItemFunctions.compose(functions);
   }
 
-  /** Creates a builder to create a loot modifier */
+  /**
+   * Creates a builder to create a loot modifier
+   */
   public static Builder builder(Ingredient original, ItemOutput replacement) {
     return new Builder(original, replacement);
   }
@@ -76,9 +89,9 @@ public class ReplaceItemLootModifier extends LootModifier {
   @Override
   protected ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
     return new ObjectArrayList<>(generatedLoot.stream().map(stack -> {
-      if (original.test(stack)) {
+      if (this.original.test(stack)) {
         ItemStack replacement = this.replacement.get();
-        return combinedFunctions.apply(ItemHandlerHelper.copyStackWithSize(replacement, replacement.getCount() * stack.getCount()), context);
+        return this.combinedFunctions.apply(ItemHandlerHelper.copyStackWithSize(replacement, replacement.getCount() * stack.getCount()), context);
       }
       return stack;
     }).collect(Collectors.toList()));
@@ -89,9 +102,12 @@ public class ReplaceItemLootModifier extends LootModifier {
     return CODEC;
   }
 
-  /** Logic to build this modifier for datagen */
+  /**
+   * Logic to build this modifier for datagen
+   */
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
   public static class Builder extends AbstractLootModifierBuilder<Builder> {
+
     private final Ingredient input;
     private final ItemOutput replacement;
     private final List<LootItemFunction> functions = new ArrayList<>();
@@ -100,13 +116,13 @@ public class ReplaceItemLootModifier extends LootModifier {
      * Adds a loot function to the builder
      */
     public Builder addFunction(LootItemFunction function) {
-      functions.add(function);
+      this.functions.add(function);
       return this;
     }
 
     @Override
     public void build(String name, GlobalLootModifierProvider provider) {
-      provider.add(name, MantleLoot.REPLACE_ITEM, new ReplaceItemLootModifier(getConditions(), input, replacement, functions.toArray(new LootItemFunction[0])));
+      provider.add(name, MantleLoot.REPLACE_ITEM, new ReplaceItemLootModifier(this.getConditions(), this.input, this.replacement, this.functions.toArray(new LootItemFunction[0])));
     }
   }
 }

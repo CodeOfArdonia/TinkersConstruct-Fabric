@@ -13,12 +13,14 @@ import java.util.function.Supplier;
  */
 @SuppressWarnings("unused")
 public class WallBuildingBlockObject extends BuildingBlockObject {
+
   private final Supplier<? extends WallBlock> wall;
 
   /**
    * Creates a new object from a building block object plus a wall.
-   * @param object  Previous building block object
-   * @param wall    Wall object
+   *
+   * @param object Previous building block object
+   * @param wall   Wall object
    */
   public WallBuildingBlockObject(BuildingBlockObject object, Supplier<? extends WallBlock> wall) {
     super(object);
@@ -27,20 +29,23 @@ public class WallBuildingBlockObject extends BuildingBlockObject {
 
   /**
    * Creates a new wall building block object from the given blocks
-   * @param object  Building block object
-   * @param wall    Wall entry
+   *
+   * @param object Building block object
+   * @param wall   Wall entry
    */
   public WallBuildingBlockObject(BuildingBlockObject object, Block wall) {
     this(object, () -> (WallBlock) wall);
   }
 
-  /** Gets the wall for this block */
+  /**
+   * Gets the wall for this block
+   */
   public WallBlock getWall() {
-    return Objects.requireNonNull(wall.get(), "Wall Building Block Object missing wall");
+    return Objects.requireNonNull(this.wall.get(), "Wall Building Block Object missing wall");
   }
 
   @Override
   public List<Block> values() {
-    return Arrays.asList(get(), getSlab(), getStairs(), getWall());
+    return Arrays.asList(this.get(), this.getSlab(), this.getStairs(), this.getWall());
   }
 }

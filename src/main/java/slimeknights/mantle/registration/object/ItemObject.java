@@ -13,19 +13,26 @@ import java.util.function.Supplier;
 
 /**
  * Registry object wrapper to implement {@link ItemLike}
- * @param <I>  Item class
+ *
+ * @param <I> Item class
  */
 @SuppressWarnings({"unused", "WeakerAccess"})
 @AllArgsConstructor
 public class ItemObject<I extends ItemLike> implements Supplier<I>, ItemLike {
-  /** Supplier to the registry entry */
+
+  /**
+   * Supplier to the registry entry
+   */
   private final Supplier<? extends I> entry;
-  /** Supplier to the registry name for this entry, allows fetching the name before the entry resolves if registry object is used */
+  /**
+   * Supplier to the registry name for this entry, allows fetching the name before the entry resolves if registry object is used
+   */
   private final ResourceLocation name;
 
   /**
    * Creates a new item object from a supplier instance. Registry name will be fetched from the supplier entry, so the entry must be present during construction
-   * @param entry  Existing registry entry, typically a vanilla block or a registered block
+   *
+   * @param entry Existing registry entry, typically a vanilla block or a registered block
    */
   public ItemObject(I entry) {
     this.entry = () -> entry;
@@ -34,7 +41,8 @@ public class ItemObject<I extends ItemLike> implements Supplier<I>, ItemLike {
 
   /**
    * Creates a new item object using the given registry object. This variant can resolve its name before the registry object entry resolves
-   * @param object  Object base
+   *
+   * @param object Object base
    */
   public ItemObject(RegistryObject<? extends I> object) {
     this.entry = object;
@@ -43,7 +51,8 @@ public class ItemObject<I extends ItemLike> implements Supplier<I>, ItemLike {
 
   /**
    * Creates a new item object using another item object. Intended to be used in a subclass to avoid an extra wrapper
-   * @param object  Object base
+   *
+   * @param object Object base
    */
   protected ItemObject(ItemObject<? extends I> object) {
     this.entry = object.entry;
@@ -52,22 +61,24 @@ public class ItemObject<I extends ItemLike> implements Supplier<I>, ItemLike {
 
   /**
    * Gets the entry, throwing an exception if not present
-   * @return  Entry
-   * @throws NullPointerException  if not present
+   *
+   * @return Entry
+   * @throws NullPointerException if not present
    */
   @Override
   public I get() {
-    return Objects.requireNonNull(entry.get(), () -> "Item Object not present " + name);
+    return Objects.requireNonNull(this.entry.get(), () -> "Item Object not present " + this.name);
   }
 
   /**
    * Gets the entry, or null if its not present
-   * @return  entry, or null if missing
+   *
+   * @return entry, or null if missing
    */
   @Nullable
   public I getOrNull() {
     try {
-      return entry.get();
+      return this.entry.get();
     } catch (NullPointerException e) {
       // thrown by RegistryObject if missing value
       return null;
@@ -76,14 +87,15 @@ public class ItemObject<I extends ItemLike> implements Supplier<I>, ItemLike {
 
   @Override
   public Item asItem() {
-    return get().asItem();
+    return this.get().asItem();
   }
 
   /**
    * Gets the resource location for the given item
-   * @return  Resource location for the given item
+   *
+   * @return Resource location for the given item
    */
   public ResourceLocation getRegistryName() {
-    return name;
+    return this.name;
   }
 }

@@ -24,23 +24,27 @@ import java.util.function.Supplier;
  * Class representing an item stack output. Supports both direct stacks and tag output, behaving like an ingredient used for output
  */
 public abstract class ItemOutput implements Supplier<ItemStack> {
+
   /**
    * Gets the item output of this recipe
-   * @return  Item output
+   *
+   * @return Item output
    */
   @Override
   public abstract ItemStack get();
 
   /**
    * Writes this output to JSON
-   * @return  Json element
+   *
+   * @return Json element
    */
   public abstract JsonElement serialize();
 
   /**
    * Creates a new output for the given stack
-   * @param stack  Stack
-   * @return  Output
+   *
+   * @param stack Stack
+   * @return Output
    */
   public static ItemOutput fromStack(ItemStack stack) {
     return new OfStack(stack);
@@ -48,9 +52,10 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
 
   /**
    * Creates a new output for the given item
+   *
    * @param item  Item
    * @param count Stack count
-   * @return  Output
+   * @return Output
    */
   public static ItemOutput fromItem(ItemLike item, int count) {
     return new OfItem(item.asItem(), count);
@@ -58,8 +63,9 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
 
   /**
    * Creates a new output for the given item
-   * @param item  Item
-   * @return  Output
+   *
+   * @param item Item
+   * @return Output
    */
   public static ItemOutput fromItem(ItemLike item) {
     return fromItem(item, 1);
@@ -67,7 +73,8 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
 
   /**
    * Creates a new output for the given tag
-   * @param tag  Tag
+   *
+   * @param tag Tag
    * @return Output
    */
   public static ItemOutput fromTag(TagKey<Item> tag, int count) {
@@ -76,8 +83,9 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
 
   /**
    * Reads an item output from JSON
-   * @param element  Json element
-   * @return  Read output
+   *
+   * @param element Json element
+   * @return Read output
    */
   public static ItemOutput fromJson(JsonElement element) {
     if (element.isJsonPrimitive()) {
@@ -100,43 +108,48 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
 
   /**
    * Writes this output to the packet buffer
-   * @param buffer  Packet buffer instance
+   *
+   * @param buffer Packet buffer instance
    */
   public void write(FriendlyByteBuf buffer) {
-    buffer.writeItem(get());
+    buffer.writeItem(this.get());
   }
 
   /**
    * Reads an item output from the packet buffer
-   * @param buffer  Buffer instance
-   * @return  Item output
+   *
+   * @param buffer Buffer instance
+   * @return Item output
    */
   public static ItemOutput read(FriendlyByteBuf buffer) {
     return fromStack(buffer.readItem());
   }
 
-  /** Class for an output that is just an item, simplifies NBT for serializing as vanilla forces NBT to be set for tools and forge goes through extra steps when NBT is set */
+  /**
+   * Class for an output that is just an item, simplifies NBT for serializing as vanilla forces NBT to be set for tools and forge goes through extra steps when NBT is set
+   */
   @RequiredArgsConstructor
   private static class OfItem extends ItemOutput {
+
     private final Item item;
     private final int count;
     private ItemStack cachedStack;
 
     @Override
     public ItemStack get() {
-      if (cachedStack == null) {
-        cachedStack = new ItemStack(item, count);
+      if (this.cachedStack == null) {
+        this.cachedStack = new ItemStack(this.item, this.count);
       }
-      return cachedStack;
+      return this.cachedStack;
     }
 
     @Override
     public JsonElement serialize() {
-      String itemName = Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(item)).toString();
-      if (count > 1) {
+      String itemName = Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(this.item)).toString();
+      if (this.count > 1) {
         JsonObject json = new JsonObject();
         json.addProperty("item", itemName);
-        json.addProperty("count", count);
+        json.addProperty("count", this.count);
         return json;
       } else {
         return new JsonPrimitive(itemName);
@@ -144,28 +157,31 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
     }
   }
 
-  /** Class for an output that is just a stack */
+  /**
+   * Class for an output that is just a stack
+   */
   @RequiredArgsConstructor
   private static class OfStack extends ItemOutput {
+
     private final ItemStack stack;
 
     @Override
     public ItemStack get() {
-      return stack;
+      return this.stack;
     }
 
     @Override
     public JsonElement serialize() {
-      String itemName = Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(stack.getItem())).toString();
-      int count = stack.getCount();
+      String itemName = Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(this.stack.getItem())).toString();
+      int count = this.stack.getCount();
       // if the item has NBT or a count, write as object
-      if (stack.hasTag() || count > 1) {
+      if (this.stack.hasTag() || count > 1) {
         JsonObject jsonResult = new JsonObject();
         jsonResult.addProperty("item", itemName);
         if (count > 1) {
           jsonResult.addProperty("count", count);
         }
-        CompoundTag nbt = stack.getTag();
+        CompoundTag nbt = this.stack.getTag();
         if (nbt != null) {
           jsonResult.addProperty("nbt", nbt.toString());
         }
@@ -176,9 +192,12 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
     }
   }
 
-  /** Class for an output from a tag preference */
+  /**
+   * Class for an output from a tag preference
+   */
   @RequiredArgsConstructor
   private static class OfTagPreference extends ItemOutput {
+
     private final TagKey<Item> tag;
     private final int count;
     private ItemStack cachedResult = null;
@@ -187,20 +206,20 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
     public ItemStack get() {
       // cache the result from the tag preference to save effort, especially helpful if the tag becomes invalid
       // this object should only exist in recipes so no need to invalidate the cache
-      if (cachedResult == null) {
-        cachedResult = TagPreference.getPreference(tag)
-                                    .map(item -> new ItemStack(item, count))
-                                    .orElse(ItemStack.EMPTY);
+      if (this.cachedResult == null) {
+        this.cachedResult = TagPreference.getPreference(this.tag)
+          .map(item -> new ItemStack(item, this.count))
+          .orElse(ItemStack.EMPTY);
       }
-      return cachedResult;
+      return this.cachedResult;
     }
 
     @Override
     public JsonElement serialize() {
       JsonObject json = new JsonObject();
-      json.addProperty("tag", tag.location().toString());
-      if (count != 1) {
-        json.addProperty("count", count);
+      json.addProperty("tag", this.tag.location().toString());
+      if (this.count != 1) {
+        json.addProperty("count", this.count);
       }
       return json;
     }

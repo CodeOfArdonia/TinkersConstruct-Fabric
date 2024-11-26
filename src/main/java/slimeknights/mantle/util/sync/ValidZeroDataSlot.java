@@ -11,6 +11,7 @@ import java.util.function.Consumer;
  */
 @SuppressWarnings("unused")
 public class ValidZeroDataSlot extends DataSlot {
+
   private final ContainerData data;
   private final int idx;
 
@@ -22,21 +23,22 @@ public class ValidZeroDataSlot extends DataSlot {
 
   @Override
   public int get() {
-    return data.get(idx);
+    return this.data.get(this.idx);
   }
 
   @Override
   public void set(int value) {
-    data.set(idx, value);
+    this.data.set(this.idx, value);
   }
 
   /**
    * Creates smart int reference holders and adds them to the given consumer
-   * @param consumer  Consumer for reference holders
-   * @param array     Array source
+   *
+   * @param consumer Consumer for reference holders
+   * @param array    Array source
    */
   public static void trackIntArray(Consumer<DataSlot> consumer, ContainerData array) {
-    for(int i = 0; i < array.getCount(); ++i) {
+    for (int i = 0; i < array.getCount(); ++i) {
       consumer.accept(new ValidZeroDataSlot(array, i));
     }
   }

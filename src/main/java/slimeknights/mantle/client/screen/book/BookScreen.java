@@ -106,28 +106,28 @@ public class BookScreen extends Screen {
 
   private Vector3f splitRGB(int color) {
     float r = FastColor.ARGB32.red(color) / 255.F;
-    float g = FastColor.ARGB32.green(color)  / 255.F;
-    float b = FastColor.ARGB32.blue(color)  / 255.F;
+    float g = FastColor.ARGB32.green(color) / 255.F;
+    float b = FastColor.ARGB32.blue(color) / 255.F;
 
     return new Vector3f(r, g, b);
   }
 
   private Vector4f splitRGBA(int color) {
     float r = FastColor.ARGB32.red(color) / 255.F;
-    float g = FastColor.ARGB32.green(color)  / 255.F;
-    float b = FastColor.ARGB32.blue(color)  / 255.F;
-    float a = FastColor.ARGB32.alpha(color)  / 255.F;
+    float g = FastColor.ARGB32.green(color) / 255.F;
+    float b = FastColor.ARGB32.blue(color) / 255.F;
+    float a = FastColor.ARGB32.alpha(color) / 255.F;
 
     return new Vector4f(r, g, b, a);
   }
 
   @Override
-  public void render(GuiGraphics guiGraphics, int mouseX , int mouseY, float partialTicks) {
-    if(this.minecraft == null) {
+  public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    if (this.minecraft == null) {
       return;
     }
 
-    Font fontRenderer = getFontRenderer();
+    Font fontRenderer = this.getFontRenderer();
 
     if (debug) {
       guiGraphics.fill(0, 0, fontRenderer.width("DEBUG") + 4, fontRenderer.lineHeight + 4, 0x55000000);
@@ -138,9 +138,9 @@ public class BookScreen extends Screen {
     // RenderSystem.enableAlphaTest(); TODO: still needed?
     RenderSystem.enableBlend();
 
-    Vector3f coverColor = splitRGB(this.book.appearance.coverColor);
+    Vector3f coverColor = this.splitRGB(this.book.appearance.coverColor);
 
-    if(this.page == -1) {
+    if (this.page == -1) {
       this.renderCover(guiGraphics, coverColor);
     } else {
       // Jank way to copy last matrix in matrix stack, as no proper way is provided
@@ -152,23 +152,23 @@ public class BookScreen extends Screen {
       rightMatrix.last().pose().mul(guiGraphics.pose().last().pose());
       rightMatrix.last().normal().mul(guiGraphics.pose().last().normal());
 
-      drawerTransform(leftMatrix, false);
-      drawerTransform(rightMatrix, true);
+      this.drawerTransform(leftMatrix, false);
+      this.drawerTransform(rightMatrix, true);
 
       leftMatrix.scale(PAGE_SCALE, PAGE_SCALE, 1F);
       rightMatrix.scale(PAGE_SCALE, PAGE_SCALE, 1F);
 
-      boolean renderLeft = shouldRenderPage(this.page, false);
-      boolean renderRight = shouldRenderPage(this.page, true);
+      boolean renderLeft = this.shouldRenderPage(this.page, false);
+      boolean renderRight = this.shouldRenderPage(this.page, true);
 
-      renderUnderLayer(guiGraphics, coverColor);
+      this.renderUnderLayer(guiGraphics, coverColor);
 
-      if(renderLeft) {
-        renderPageBackground(guiGraphics, false);
+      if (renderLeft) {
+        this.renderPageBackground(guiGraphics, false);
       }
 
-      if(renderRight) {
-        renderPageBackground(guiGraphics, true);
+      if (renderRight) {
+        this.renderPageBackground(guiGraphics, true);
       }
 
       int leftMX = this.getMouseX(false);
@@ -176,12 +176,12 @@ public class BookScreen extends Screen {
       int mY = this.getMouseY();
 
       for (ILayerRenderFunction layer : LAYERS) {
-        if(renderLeft) {
-          renderPageLayer(new GuiGraphics(Minecraft.getInstance(), leftMatrix, guiGraphics.bufferSource()), leftMX, mY, partialTicks, leftElements, layer);
+        if (renderLeft) {
+          this.renderPageLayer(new GuiGraphics(Minecraft.getInstance(), leftMatrix, guiGraphics.bufferSource()), leftMX, mY, partialTicks, this.leftElements, layer);
         }
 
-        if(renderRight) {
-          renderPageLayer(new GuiGraphics(Minecraft.getInstance(), rightMatrix, guiGraphics.bufferSource()), rightMX, mY, partialTicks, rightElements, layer);
+        if (renderRight) {
+          this.renderPageLayer(new GuiGraphics(Minecraft.getInstance(), rightMatrix, guiGraphics.bufferSource()), rightMX, mY, partialTicks, this.rightElements, layer);
         }
       }
     }
@@ -190,7 +190,7 @@ public class BookScreen extends Screen {
   }
 
   private boolean shouldRenderPage(int pageNum, boolean rightSide) {
-    if(!rightSide) {
+    if (!rightSide) {
       return pageNum != 0;
     }
 
@@ -200,26 +200,26 @@ public class BookScreen extends Screen {
 
   private void renderCover(GuiGraphics guiGraphics, Vector3f coverColor) {
     PoseStack matrixStack = guiGraphics.pose();
-    Font fontRenderer = getFontRenderer();
+    Font fontRenderer = this.getFontRenderer();
 
     int centerX = this.width / 2 - PAGE_WIDTH_UNSCALED / 2;
     int centerY = this.height / 2 - PAGE_HEIGHT_UNSCALED / 2;
 
     RenderSystem.setShaderColor(coverColor.x(), coverColor.y(), coverColor.z(), 1.0f);
-    guiGraphics.blit(book.appearance.getCoverTexture(), centerX, centerY, 0, 0, PAGE_WIDTH_UNSCALED, PAGE_HEIGHT_UNSCALED, TEX_SIZE, TEX_SIZE);
+    guiGraphics.blit(this.book.appearance.getCoverTexture(), centerX, centerY, 0, 0, PAGE_WIDTH_UNSCALED, PAGE_HEIGHT_UNSCALED, TEX_SIZE, TEX_SIZE);
     RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 
     if (!this.book.appearance.title.isEmpty()) {
-      guiGraphics.blit(book.appearance.getCoverTexture(), centerX, centerY, 0, PAGE_HEIGHT_UNSCALED, PAGE_WIDTH_UNSCALED, PAGE_HEIGHT_UNSCALED, TEX_SIZE, TEX_SIZE);
+      guiGraphics.blit(this.book.appearance.getCoverTexture(), centerX, centerY, 0, PAGE_HEIGHT_UNSCALED, PAGE_WIDTH_UNSCALED, PAGE_HEIGHT_UNSCALED, TEX_SIZE, TEX_SIZE);
 
       matrixStack.pushPose();
 
       int width = fontRenderer.width(this.book.appearance.title);
-      float scale = Mth.clamp((float)PAGE_WIDTH / width, 0F, 2.5F);
+      float scale = Mth.clamp((float) PAGE_WIDTH / width, 0F, 2.5F);
 
       matrixStack.scale(scale, scale, 1F);
 
-      drawString(guiGraphics, fontRenderer, this.book.appearance.title, (this.width / 2F) / scale + 3 - width / 2F, (this.height / 2F - fontRenderer.lineHeight / 2F) / scale - 4, this.book.appearance.getCoverTextColor(), true);
+      this.drawString(guiGraphics, fontRenderer, this.book.appearance.title, (this.width / 2F) / scale + 3 - width / 2F, (this.height / 2F - fontRenderer.lineHeight / 2F) / scale - 4, this.book.appearance.getCoverTextColor(), true);
       matrixStack.popPose();
     }
 
@@ -227,10 +227,10 @@ public class BookScreen extends Screen {
       matrixStack.pushPose();
 
       int width = fontRenderer.width(this.book.appearance.subtitle);
-      float scale = Mth.clamp((float)PAGE_WIDTH / width, 0F, 1.5F);
+      float scale = Mth.clamp((float) PAGE_WIDTH / width, 0F, 1.5F);
 
       matrixStack.scale(scale, scale, 1F);
-      drawString(guiGraphics, fontRenderer, this.book.appearance.subtitle, (this.width / 2F) / scale + 7 - width / 2F, (this.height / 2F + 100 - fontRenderer.lineHeight * 2) / scale, this.book.appearance.getCoverTextColor(), true);
+      this.drawString(guiGraphics, fontRenderer, this.book.appearance.subtitle, (this.width / 2F) / scale + 7 - width / 2F, (this.height / 2F + 100 - fontRenderer.lineHeight * 2) / scale, this.book.appearance.getCoverTextColor(), true);
       matrixStack.popPose();
     }
   }
@@ -240,7 +240,7 @@ public class BookScreen extends Screen {
       return 0;
     } else {
       int l = font.drawInBatch(
-        string, (float)i, (float)j, k, bl, guiGraphics.pose().last().pose(), guiGraphics.bufferSource(), Font.DisplayMode.NORMAL, 0, 15728880, font.isBidirectional()
+        string, i, j, k, bl, guiGraphics.pose().last().pose(), guiGraphics.bufferSource(), Font.DisplayMode.NORMAL, 0, 15728880, font.isBidirectional()
       );
       guiGraphics.flushIfUnmanaged();
       return l;
@@ -254,10 +254,10 @@ public class BookScreen extends Screen {
   }
 
   private void renderPageBackground(GuiGraphics guiGraphics, boolean rightSide) {
-    Vector3f pageTint = splitRGB(this.book.appearance.getPageTint());
+    Vector3f pageTint = this.splitRGB(this.book.appearance.getPageTint());
     RenderSystem.setShaderColor(pageTint.x(), pageTint.y(), pageTint.z(), 1f);
 
-    if(!rightSide) {
+    if (!rightSide) {
       guiGraphics.blit(this.book.appearance.getBookTexture(), this.width / 2 - PAGE_WIDTH_UNSCALED, this.height / 2 - PAGE_HEIGHT_UNSCALED / 2, 0, PAGE_HEIGHT_UNSCALED, PAGE_WIDTH_UNSCALED, PAGE_HEIGHT_UNSCALED, TEX_SIZE, TEX_SIZE);
     } else {
       guiGraphics.blit(this.book.appearance.getBookTexture(), this.width / 2, this.height / 2 - PAGE_HEIGHT_UNSCALED / 2, PAGE_WIDTH_UNSCALED, PAGE_HEIGHT_UNSCALED, PAGE_WIDTH_UNSCALED, PAGE_HEIGHT_UNSCALED, TEX_SIZE, TEX_SIZE);
@@ -265,11 +265,11 @@ public class BookScreen extends Screen {
   }
 
   private void renderPageLayer(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks, List<BookElement> elements, ILayerRenderFunction layerFunc) {
-    RenderSystem.setShaderTexture(0, book.appearance.getCoverTexture());
+    RenderSystem.setShaderTexture(0, this.book.appearance.getCoverTexture());
 
-    Font font = getFontRenderer();
+    Font font = this.getFontRenderer();
 
-    for(BookElement element : elements) {
+    for (BookElement element : elements) {
       RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
       layerFunc.draw(element, guiGraphics, mouseX, mouseY, partialTicks, font);
     }
@@ -279,9 +279,9 @@ public class BookScreen extends Screen {
   protected void init() {
     super.init();
 
-    clearWidgets();
+    this.clearWidgets();
 
-    this.previousArrow = this.addRenderableWidget(new ArrowButton(book, 50, -50, ArrowButton.ArrowType.PREV, this.book.appearance.arrowColor, this.book.appearance.arrowColorHover, (p_212998_1_) -> {
+    this.previousArrow = this.addRenderableWidget(new ArrowButton(this.book, 50, -50, ArrowButton.ArrowType.PREV, this.book.appearance.arrowColor, this.book.appearance.arrowColorHover, (p_212998_1_) -> {
       this.page--;
 
       if (this.page < -1) {
@@ -292,7 +292,7 @@ public class BookScreen extends Screen {
       this.buildPages();
     }));
 
-    this.nextArrow = this.addRenderableWidget(new ArrowButton(book, -50, -50, ArrowButton.ArrowType.NEXT, this.book.appearance.arrowColor, this.book.appearance.arrowColorHover, (p_212998_1_) -> {
+    this.nextArrow = this.addRenderableWidget(new ArrowButton(this.book, -50, -50, ArrowButton.ArrowType.NEXT, this.book.appearance.arrowColor, this.book.appearance.arrowColorHover, (p_212998_1_) -> {
       this.page++;
 
       int fullPageCount = this.book.getFullPageCount(this.advancementCache);
@@ -305,7 +305,7 @@ public class BookScreen extends Screen {
       this.buildPages();
     }));
 
-    this.backArrow = this.addRenderableWidget(new ArrowButton(book, this.width / 2 - ArrowButton.WIDTH / 2, this.height / 2 + ArrowButton.HEIGHT / 2 + PAGE_HEIGHT / 2, ArrowButton.ArrowType.LEFT, this.book.appearance.arrowColor, this.book.appearance.arrowColorHover, (p_212998_1_) -> {
+    this.backArrow = this.addRenderableWidget(new ArrowButton(this.book, this.width / 2 - ArrowButton.WIDTH / 2, this.height / 2 + ArrowButton.HEIGHT / 2 + PAGE_HEIGHT / 2, ArrowButton.ArrowType.LEFT, this.book.appearance.arrowColor, this.book.appearance.arrowColorHover, (p_212998_1_) -> {
       if (this.oldPage >= -1) {
         this.page = this.oldPage;
       }
@@ -314,16 +314,16 @@ public class BookScreen extends Screen {
       this.buildPages();
     }));
 
-    this.indexArrow = this.addRenderableWidget(new ArrowButton(book, this.width / 2 - PAGE_WIDTH_UNSCALED - ArrowButton.WIDTH / 2, this.height / 2 - PAGE_HEIGHT_UNSCALED / 2, ArrowButton.ArrowType.BACK_UP, this.book.appearance.arrowColor, this.book.appearance.arrowColorHover, (p_212998_1_) -> {
+    this.indexArrow = this.addRenderableWidget(new ArrowButton(this.book, this.width / 2 - PAGE_WIDTH_UNSCALED - ArrowButton.WIDTH / 2, this.height / 2 - PAGE_HEIGHT_UNSCALED / 2, ArrowButton.ArrowType.BACK_UP, this.book.appearance.arrowColor, this.book.appearance.arrowColorHover, (p_212998_1_) -> {
       this.openPage(this.book.findPageNumber("index.page1", this.advancementCache));
 
       this.oldPage = -2;
       this.buildPages();
     }));
 
-    if(this.bookPickup != null) {
+    if (this.bookPickup != null) {
       int margin = 10;
-      if(this.height / 2 + PAGE_HEIGHT_UNSCALED / 2 + margin + 20 >= this.height) {
+      if (this.height / 2 + PAGE_HEIGHT_UNSCALED / 2 + margin + 20 >= this.height) {
         margin = 0;
       }
 
@@ -359,7 +359,9 @@ public class BookScreen extends Screen {
     this.nextArrow.setY(this.height / 2 + 75);
   }
 
-  /** Goes to the previous page */
+  /**
+   * Goes to the previous page
+   */
   private void previousPage() {
     this.page--;
     if (this.page < -1) {
@@ -369,7 +371,9 @@ public class BookScreen extends Screen {
     this.buildPages();
   }
 
-  /** Goes to the next page */
+  /**
+   * Goes to the next page
+   */
   private void nextPage() {
     this.page++;
     int fullPageCount = this.book.getFullPageCount(this.advancementCache);
@@ -386,11 +390,11 @@ public class BookScreen extends Screen {
 
     switch (keyCode) {
       case GLFW.GLFW_KEY_LEFT, GLFW.GLFW_KEY_A -> {
-        previousPage();
+        this.previousPage();
         return true;
       }
       case GLFW.GLFW_KEY_RIGHT, GLFW.GLFW_KEY_D -> {
-        nextPage();
+        this.nextPage();
         return true;
       }
       case GLFW.GLFW_KEY_F3 -> {
@@ -405,10 +409,10 @@ public class BookScreen extends Screen {
   @Override
   public boolean mouseScrolled(double unKnown1, double unKnown2, double scrollDelta) {
     if (scrollDelta < 0.0D) {
-      nextPage();
+      this.nextPage();
       return true;
     } else if (scrollDelta > 0.0D) {
-      previousPage();
+      this.previousPage();
       return true;
     }
 
@@ -427,7 +431,7 @@ public class BookScreen extends Screen {
       right = true;
     }
 
-    lastClick = new double[]{mouseX, mouseY};
+    this.lastClick = new double[]{mouseX, mouseY};
 
     // Not foreach to prevent conmodification crashes
     int oldPage = this.page;
@@ -460,8 +464,8 @@ public class BookScreen extends Screen {
       element.mouseReleased(mouseX, mouseY, mouseButton);
     }
 
-    lastClick = null;
-    lastDrag = null;
+    this.lastClick = null;
+    this.lastDrag = null;
 
     return super.mouseReleased(originalMouseX, originalMouseY, mouseButton);
   }
@@ -477,17 +481,17 @@ public class BookScreen extends Screen {
       right = true;
     }
 
-    if (lastClick != null) {
-      if (lastDrag == null)
-        lastDrag = new double[]{mouseX, mouseY};
+    if (this.lastClick != null) {
+      if (this.lastDrag == null)
+        this.lastDrag = new double[]{mouseX, mouseY};
 
       // Not foreach to prevent conmodification crashes
       for (int i = 0; right ? i < this.rightElements.size() : i < this.leftElements.size(); i++) {
         BookElement element = right ? this.rightElements.get(i) : this.leftElements.get(i);
-        element.mouseDragged(lastClick[0], lastClick[1], mouseX, mouseY, lastDrag[0], lastDrag[1], button);
+        element.mouseDragged(this.lastClick[0], this.lastClick[1], mouseX, mouseY, this.lastDrag[0], this.lastDrag[1], button);
       }
 
-      lastDrag = new double[]{mouseX, mouseY};
+      this.lastDrag = new double[]{mouseX, mouseY};
     }
 
 
@@ -500,7 +504,7 @@ public class BookScreen extends Screen {
       return;
     }
     // find what page to update
-    if (pageUpdater != null) {
+    if (this.pageUpdater != null) {
       String pageStr = "";
       if (this.page >= 0) {
         PageData page = this.page == 0 ? this.book.findPage(0, this.advancementCache) : this.book.findPage((this.page - 1) * 2 + 1, this.advancementCache);
@@ -511,7 +515,7 @@ public class BookScreen extends Screen {
           pageStr = page.parent.name + "." + page.name;
         }
       }
-      pageUpdater.accept(pageStr);
+      this.pageUpdater.accept(pageStr);
     }
   }
 

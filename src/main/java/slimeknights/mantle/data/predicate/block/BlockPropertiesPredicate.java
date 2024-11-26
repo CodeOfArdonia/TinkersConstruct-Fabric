@@ -32,19 +32,21 @@ import java.util.function.Function;
 
 /**
  * Predicate matching a block with the given properties
- * @param block       Block to match
- * @param properties  Properties to match
+ *
+ * @param block      Block to match
+ * @param properties Properties to match
  */
 public record BlockPropertiesPredicate(Block block, List<Matcher> properties) implements BlockPredicate {
-  private static final Function<String,RuntimeException> JSON_EXCEPTION = JsonSyntaxException::new;
-  private static final Function<String,RuntimeException> DECODER_EXCEPTION = DecoderException::new;
+
+  private static final Function<String, RuntimeException> JSON_EXCEPTION = JsonSyntaxException::new;
+  private static final Function<String, RuntimeException> DECODER_EXCEPTION = DecoderException::new;
 
   @Override
   public boolean matches(BlockState input) {
-    if (input.getBlock() != block) {
+    if (input.getBlock() != this.block) {
       return false;
     }
-    for (Matcher matcher : properties) {
+    for (Matcher matcher : this.properties) {
       if (!matcher.matches(input)) {
         return false;
       }
@@ -57,7 +59,9 @@ public record BlockPropertiesPredicate(Block block, List<Matcher> properties) im
     return LOADER;
   }
 
-  /** Parses a property from the given state definition */
+  /**
+   * Parses a property from the given state definition
+   */
   private static Property<?> parseProperty(Block block, String name, Function<String, RuntimeException> exception) {
     Property<?> property = block.getStateDefinition().getProperty(name);
     if (property == null) {
@@ -109,21 +113,34 @@ public record BlockPropertiesPredicate(Block block, List<Matcher> properties) im
     }
   };
 
-  /** Interface of nested matcher classes */
+  /**
+   * Interface of nested matcher classes
+   */
   public sealed interface Matcher {
-    /** Returns true if the given block matches the given property */
+
+    /**
+     * Returns true if the given block matches the given property
+     */
     boolean matches(BlockState state);
 
-    /** Gets the property for this matcher */
+    /**
+     * Gets the property for this matcher
+     */
     Property<?> property();
 
-    /** Serializes the match to a json element */
+    /**
+     * Serializes the match to a json element
+     */
     JsonElement serialize();
 
-    /** Writes this to the network */
+    /**
+     * Writes this to the network
+     */
     void toNetwork(FriendlyByteBuf buffer);
 
-    /** Deserializes the value from JSON */
+    /**
+     * Deserializes the value from JSON
+     */
     private static <T extends Comparable<T>> T parseValue(Property<T> property, String name, Function<String, RuntimeException> exception) {
       Optional<T> value = property.getValue(name);
       if (value.isPresent()) {
@@ -134,10 +151,11 @@ public record BlockPropertiesPredicate(Block block, List<Matcher> properties) im
 
     /**
      * Deserializes the property from JSON
-     * @param element   Json to deserialize
-     * @param property  Property to use
-     * @param <T>  Property type
-     * @return  Matcher instance
+     *
+     * @param element  Json to deserialize
+     * @param property Property to use
+     * @param <T>      Property type
+     * @return Matcher instance
      */
     static <T extends Comparable<T>> Matcher deserialize(Property<T> property, JsonElement element) {
       // if a value type, exact match. To reduce code, just use the set matcher with size 1
@@ -147,7 +165,7 @@ public record BlockPropertiesPredicate(Block block, List<Matcher> properties) im
       // if an array, set match
       if (element.isJsonArray()) {
         return new SetMatcher<>(property, ImmutableSet.copyOf(JsonHelper.parseList(
-          element.getAsJsonArray(), property.getName(),(e, key) -> parseValue(property, GsonHelper.convertToString(e, key), JSON_EXCEPTION)))
+          element.getAsJsonArray(), property.getName(), (e, key) -> parseValue(property, GsonHelper.convertToString(e, key), JSON_EXCEPTION)))
         );
       }
       // object means range match
@@ -176,9 +194,10 @@ public record BlockPropertiesPredicate(Block block, List<Matcher> properties) im
 
     /**
      * Parses a matcher from the buffer
-     * @param block   Block to search for the property
-     * @param buffer  Buffer instance before reading property name
-     * @return  Matcher instance
+     *
+     * @param block  Block to search for the property
+     * @param buffer Buffer instance before reading property name
+     * @return Matcher instance
      */
     static Matcher fromNetwork(Block block, FriendlyByteBuf buffer) {
       Property<?> property = parseProperty(block, buffer.readUtf(Short.MAX_VALUE), DECODER_EXCEPTION);
@@ -187,9 +206,10 @@ public record BlockPropertiesPredicate(Block block, List<Matcher> properties) im
 
     /**
      * Parses a matcher from the buffer
-     * @param property   Matcher property
-     * @param buffer     Buffer instance after reading property name
-     * @return  Matcher instance
+     *
+     * @param property Matcher property
+     * @param buffer   Buffer instance after reading property name
+     * @return Matcher instance
      */
     static <T extends Comparable<T>> Matcher fromNetwork(Property<T> property, FriendlyByteBuf buffer) {
       int size = buffer.readVarInt();
@@ -217,10 +237,12 @@ public record BlockPropertiesPredicate(Block block, List<Matcher> properties) im
 
   /**
    * Matches on a value being in a set.
-   * @param property  Property to match
-   * @param values    Set of values, must not be empty
+   *
+   * @param property Property to match
+   * @param values   Set of values, must not be empty
    */
   public record SetMatcher<T extends Comparable<T>>(Property<T> property, Set<T> values) implements Matcher {
+
     public SetMatcher {
       if (values.isEmpty()) {
         throw new IllegalArgumentException("Values must not be empty");
@@ -233,40 +255,44 @@ public record BlockPropertiesPredicate(Block block, List<Matcher> properties) im
 
     @Override
     public boolean matches(BlockState state) {
-      return values.contains(state.getValue(property));
+      return this.values.contains(state.getValue(this.property));
     }
 
     @Override
     public JsonElement serialize() {
       // if only a single element, simplify serialization
-      if (values.size() == 1) {
-        return new JsonPrimitive(property.getName(values.iterator().next()));
+      if (this.values.size() == 1) {
+        return new JsonPrimitive(this.property.getName(this.values.iterator().next()));
       }
       // if more than 1 element, store in an array
       JsonArray array = new JsonArray();
-      for (T value : values) {
-        array.add(property.getName(value));
+      for (T value : this.values) {
+        array.add(this.property.getName(value));
       }
       return array;
     }
 
     @Override
     public void toNetwork(FriendlyByteBuf buffer) {
-      buffer.writeUtf(property.getName());
+      buffer.writeUtf(this.property.getName());
       // size of 0 represents range matcher, size above 0 means set matcher
-      buffer.writeVarInt(values.size());
+      buffer.writeVarInt(this.values.size());
       // only way we know to sync the property and values is as strings, inefficient but mojang never made properties buffer friendly
-      for (T value : values) {
-        buffer.writeUtf(property.getName(value));
+      for (T value : this.values) {
+        buffer.writeUtf(this.property.getName(value));
       }
     }
   }
 
-  /** Helper to deal with the range matcher network serializing */
+  /**
+   * Helper to deal with the range matcher network serializing
+   */
   private enum RangeType {
     FULL, MIN, MAX;
 
-    /** Creates a ranged type from the given values, doubles as a validator for the arguments */
+    /**
+     * Creates a ranged type from the given values, doubles as a validator for the arguments
+     */
     public static RangeType fromValues(@Nullable Object min, @Nullable Object max) {
       if (max == null) {
         if (min == null) {
@@ -281,62 +307,71 @@ public record BlockPropertiesPredicate(Block block, List<Matcher> properties) im
     }
   }
 
-  /** Matches on a range of values */
-  public record RangeMatcher<T extends Comparable<T>>(Property<T> property, @Nullable T min, @Nullable T max) implements Matcher {
+  /**
+   * Matches on a range of values
+   */
+  public record RangeMatcher<T extends Comparable<T>>(Property<T> property, @Nullable T min,
+                                                      @Nullable T max) implements Matcher {
+
     public RangeMatcher {
       RangeType.fromValues(min, max);
     }
 
     @Override
     public boolean matches(BlockState state) {
-      T value = state.getValue(property);
+      T value = state.getValue(this.property);
       // null means ignore that part of the range
-      return (min == null || value.compareTo(min) >= 0) && (max == null || value.compareTo(max) <= 0);
+      return (this.min == null || value.compareTo(this.min) >= 0) && (this.max == null || value.compareTo(this.max) <= 0);
     }
 
     @Override
     public JsonElement serialize() {
       JsonObject json = new JsonObject();
-      if (min != null) {
-        json.addProperty("min", property.getName(min));
+      if (this.min != null) {
+        json.addProperty("min", this.property.getName(this.min));
       }
-      if (max != null) {
-        json.addProperty("max", property.getName(max));
+      if (this.max != null) {
+        json.addProperty("max", this.property.getName(this.max));
       }
       return json;
     }
 
     @Override
     public void toNetwork(FriendlyByteBuf buffer) {
-      buffer.writeUtf(property.getName());
+      buffer.writeUtf(this.property.getName());
       // 0 means it' a range match, anything above 0 is the set size
       buffer.writeVarInt(0);
-      buffer.writeEnum(RangeType.fromValues(min, max));
-      if (min != null) {
-        buffer.writeUtf(property.getName(min));
+      buffer.writeEnum(RangeType.fromValues(this.min, this.max));
+      if (this.min != null) {
+        buffer.writeUtf(this.property.getName(this.min));
       }
-      if (max != null) {
-        buffer.writeUtf(property.getName(max));
+      if (this.max != null) {
+        buffer.writeUtf(this.property.getName(this.max));
       }
     }
   }
 
-  /** Creates a builder instance */
+  /**
+   * Creates a builder instance
+   */
   public static Builder block(Block block) {
     return new Builder(block);
   }
 
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
   public static class Builder {
+
     private final Block block;
     private final Map<Property<?>, Matcher> matchers = new LinkedHashMap<>();
 
-    /** Adds a matcher to the builder */
+    /**
+     * Adds a matcher to the builder
+     */
     private Builder matches(Matcher matcher) {
       Property<?> property = matcher.property();
       // validate the property is part of the block
-      if (!block.getStateDefinition().getProperties().contains(property)) {
-        throw new IllegalArgumentException("Property " + property + " does not exist in block " + block);
+      if (!this.block.getStateDefinition().getProperties().contains(property)) {
+        throw new IllegalArgumentException("Property " + property + " does not exist in block " + this.block);
       }
       // validate we don't have the same property twice, messes with JSON serialization
       Matcher original = this.matchers.put(property, matcher);
@@ -349,44 +384,56 @@ public record BlockPropertiesPredicate(Block block, List<Matcher> properties) im
 
     /* Set match */
 
-    /** Matches on the given set values */
+    /**
+     * Matches on the given set values
+     */
     public <T extends Comparable<T>> Builder matches(Property<T> property, Set<T> values) {
-      return matches(new SetMatcher<>(property, values));
+      return this.matches(new SetMatcher<>(property, values));
     }
 
-    /** Matches on the given set values */
+    /**
+     * Matches on the given set values
+     */
     @SafeVarargs
     public final <T extends Comparable<T>> Builder matches(Property<T> property, T... values) {
-      return matches(property, Set.of(values));
+      return this.matches(property, Set.of(values));
     }
 
 
     /* Range match */
 
-    /** Matches values between min and max (inclusive) */
+    /**
+     * Matches values between min and max (inclusive)
+     */
     public <T extends Comparable<T>> Builder range(Property<T> property, T min, T max) {
       if (Objects.equals(min, max)) {
-        return matches(property, min);
+        return this.matches(property, min);
       }
-      return matches(new RangeMatcher<>(property, min, max));
+      return this.matches(new RangeMatcher<>(property, min, max));
     }
 
-    /** Matches values greater than or equal to min */
+    /**
+     * Matches values greater than or equal to min
+     */
     public <T extends Comparable<T>> Builder min(Property<T> property, T min) {
-      return matches(new RangeMatcher<>(property, min, null));
+      return this.matches(new RangeMatcher<>(property, min, null));
     }
 
-    /** Matches values less than or equal to max */
+    /**
+     * Matches values less than or equal to max
+     */
     public <T extends Comparable<T>> Builder max(Property<T> property, T max) {
-      return matches(new RangeMatcher<>(property, null, max));
+      return this.matches(new RangeMatcher<>(property, null, max));
     }
 
-    /** Builds the final instance */
+    /**
+     * Builds the final instance
+     */
     public BlockPropertiesPredicate build() {
-      if (matchers.isEmpty()) {
+      if (this.matchers.isEmpty()) {
         throw new IllegalArgumentException("Must have at least one property");
       }
-      return new BlockPropertiesPredicate(block, ImmutableList.copyOf(matchers.values()));
+      return new BlockPropertiesPredicate(this.block, ImmutableList.copyOf(this.matchers.values()));
     }
   }
 }

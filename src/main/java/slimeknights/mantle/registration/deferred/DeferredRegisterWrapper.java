@@ -12,13 +12,19 @@ import java.util.function.Supplier;
 
 /**
  * Base logic for a deferred register wrapper
- * @param <T>  Registry type
+ *
+ * @param <T> Registry type
  */
 @SuppressWarnings("WeakerAccess")
 public abstract class DeferredRegisterWrapper<T> {
-  /** Registry instance, use this to provide register methods */
+
+  /**
+   * Registry instance, use this to provide register methods
+   */
   protected final SynchronizedDeferredRegister<T> register;
-  /** Mod ID for registration */
+  /**
+   * Mod ID for registration
+   */
   protected final String modID;
 
   protected DeferredRegisterWrapper(ResourceKey<Registry<T>> reg, String modID) {
@@ -34,27 +40,29 @@ public abstract class DeferredRegisterWrapper<T> {
    * Initializes this registry wrapper. Needs to be called during mod construction
    */
   public void register() {
-    register.register();
+    this.register.register();
   }
 
   /* Utilities */
 
   /**
    * Gets a resource location object for the given name
-   * @param name  Name
-   * @return  Resource location string
+   *
+   * @param name Name
+   * @return Resource location string
    */
   protected ResourceLocation resource(String name) {
-    return new ResourceLocation(modID, name);
+    return new ResourceLocation(this.modID, name);
   }
 
   /**
    * Gets a resource location string for the given name
-   * @param name  Name
-   * @return  Resource location string
+   *
+   * @param name Name
+   * @return Resource location string
    */
   protected String resourceName(String name) {
-    return modID + ":" + name;
+    return this.modID + ":" + name;
   }
 
 
@@ -62,17 +70,18 @@ public abstract class DeferredRegisterWrapper<T> {
 
   /**
    * Registers an item with multiple variants, prefixing the name with the value name
-   * @param values    Enum values to use for this block
-   * @param name      Name of the block
-   * @param register  Function to register an entry
-   * @return  EnumObject mapping between different block types
+   *
+   * @param values   Enum values to use for this block
+   * @param name     Name of the block
+   * @param register Function to register an entry
+   * @return EnumObject mapping between different block types
    */
-  protected static <E extends Enum<E> & StringRepresentable, V extends T, T> EnumObject<E,V> registerEnum(E[] values, String name, BiFunction<String,E,Supplier<? extends V>> register) {
+  protected static <E extends Enum<E> & StringRepresentable, V extends T, T> EnumObject<E, V> registerEnum(E[] values, String name, BiFunction<String, E, Supplier<? extends V>> register) {
     if (values.length == 0) {
       throw new IllegalArgumentException("Must have at least one value");
     }
     // note this cast only works because you cannot extend an enum
-    EnumObject.Builder<E,V> builder = new EnumObject.Builder<>(values[0].getDeclaringClass());
+    EnumObject.Builder<E, V> builder = new EnumObject.Builder<>(values[0].getDeclaringClass());
     for (E value : values) {
       builder.put(value, register.apply(value.getSerializedName() + "_" + name, value));
     }
@@ -81,17 +90,18 @@ public abstract class DeferredRegisterWrapper<T> {
 
   /**
    * Registers an item with multiple variants, suffixing the name with the value name
-   * @param name      Name of the block
-   * @param values    Enum values to use for this block
-   * @param register  Function to register an entry
-   * @return  EnumObject mapping between different block types
+   *
+   * @param name     Name of the block
+   * @param values   Enum values to use for this block
+   * @param register Function to register an entry
+   * @return EnumObject mapping between different block types
    */
-  protected static <E extends Enum<E> & StringRepresentable, V extends T, T> EnumObject<E,V> registerEnum(String name, E[] values, BiFunction<String,E,Supplier<? extends V>> register) {
+  protected static <E extends Enum<E> & StringRepresentable, V extends T, T> EnumObject<E, V> registerEnum(String name, E[] values, BiFunction<String, E, Supplier<? extends V>> register) {
     if (values.length == 0) {
       throw new IllegalArgumentException("Must have at least one value");
     }
     // note this cast only works because you cannot extend an enum
-    EnumObject.Builder<E,V> builder = new EnumObject.Builder<>(values[0].getDeclaringClass());
+    EnumObject.Builder<E, V> builder = new EnumObject.Builder<>(values[0].getDeclaringClass());
     for (E value : values) {
       builder.put(value, register.apply(name + "_" + value.getSerializedName(), value));
     }

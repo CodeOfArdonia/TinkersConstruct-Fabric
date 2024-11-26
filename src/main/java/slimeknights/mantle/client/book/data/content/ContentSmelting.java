@@ -29,21 +29,22 @@ import java.util.ArrayList;
 import static slimeknights.mantle.client.screen.book.Textures.TEX_SMELTING;
 
 public class ContentSmelting extends PageContent {
+
   public static final ResourceLocation ID = Mantle.getResource("smelting");
 
   private static final NonNullList<ItemStack> FUELS;
 
-  public static final transient int TEX_SIZE = 128;
-  public static final transient ImageData IMG_SMELTING = new ImageData(TEX_SMELTING, 0, 0, 110, 114, TEX_SIZE, TEX_SIZE);
+  public static final int TEX_SIZE = 128;
+  public static final ImageData IMG_SMELTING = new ImageData(TEX_SMELTING, 0, 0, 110, 114, TEX_SIZE, TEX_SIZE);
 
-  public static final transient int INPUT_X = 5;
-  public static final transient int INPUT_Y = 5;
-  public static final transient int RESULT_X = 74;
-  public static final transient int RESULT_Y = 41;
-  public static final transient int FUEL_X = 5;
-  public static final transient int FUEL_Y = 77;
+  public static final int INPUT_X = 5;
+  public static final int INPUT_Y = 5;
+  public static final int RESULT_X = 74;
+  public static final int RESULT_Y = 41;
+  public static final int FUEL_X = 5;
+  public static final int FUEL_Y = 77;
 
-  public static final transient float ITEM_SCALE = 2.0F;
+  public static final float ITEM_SCALE = 2.0F;
 
   @Getter
   public String title = "Smelting";
@@ -63,7 +64,7 @@ public class ContentSmelting extends PageContent {
       y = 0;
     } else {
       this.addTitle(list, this.title);
-      y = getTitleHeight();
+      y = this.getTitleHeight();
     }
 
     list.add(new ImageElement(x, y, IMG_SMELTING.width, IMG_SMELTING.height, IMG_SMELTING, book.appearance.slotColor));

@@ -85,7 +85,7 @@ public abstract class ModuleScreen<P extends MultiModuleScreen<?>, C extends Abs
    * Callback to draw background elements
    */
   public void handleDrawGuiContainerBackgroundLayer(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
-    this.renderBg(guiGraphics,partialTicks, mouseX, mouseY);
+    this.renderBg(guiGraphics, partialTicks, mouseX, mouseY);
   }
 
   /**

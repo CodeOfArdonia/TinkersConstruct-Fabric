@@ -9,6 +9,7 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class MantleRecipeSerializers {
+
   public static RecipeSerializer<?> CRAFTING_SHAPED_FALLBACK;
   public static RecipeSerializer<?> CRAFTING_SHAPED_RETEXTURED;
 }

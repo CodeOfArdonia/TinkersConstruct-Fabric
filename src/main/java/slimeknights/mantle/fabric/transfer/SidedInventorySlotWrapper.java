@@ -13,6 +13,7 @@ import net.minecraft.world.WorldlyContainer;
  * Wrapper around an {@link InventorySlotWrapper}, with additional canInsert and canExtract checks.
  */
 class SidedInventorySlotWrapper implements SingleSlotStorage<ItemVariant> {
+
   private final InventorySlotWrapper slotWrapper;
   private final WorldlyContainer sidedInventory;
   private final Direction direction;
@@ -25,49 +26,49 @@ class SidedInventorySlotWrapper implements SingleSlotStorage<ItemVariant> {
 
   @Override
   public long insert(ItemVariant resource, long maxAmount, TransactionContext transaction) {
-    if (!sidedInventory.canPlaceItemThroughFace(slotWrapper.slot, ((ItemVariantImpl) resource).getCachedStack(), direction)) {
+    if (!this.sidedInventory.canPlaceItemThroughFace(this.slotWrapper.slot, ((ItemVariantImpl) resource).getCachedStack(), this.direction)) {
       return 0;
     } else {
-      return slotWrapper.insert(resource, maxAmount, transaction);
+      return this.slotWrapper.insert(resource, maxAmount, transaction);
     }
   }
 
   @Override
   public long extract(ItemVariant resource, long maxAmount, TransactionContext transaction) {
-    if (!sidedInventory.canTakeItemThroughFace(slotWrapper.slot, ((ItemVariantImpl) resource).getCachedStack(), direction)) {
+    if (!this.sidedInventory.canTakeItemThroughFace(this.slotWrapper.slot, ((ItemVariantImpl) resource).getCachedStack(), this.direction)) {
       return 0;
     } else {
-      return slotWrapper.extract(resource, maxAmount, transaction);
+      return this.slotWrapper.extract(resource, maxAmount, transaction);
     }
   }
 
   @Override
   public boolean isResourceBlank() {
-    return slotWrapper.isResourceBlank();
+    return this.slotWrapper.isResourceBlank();
   }
 
   @Override
   public ItemVariant getResource() {
-    return slotWrapper.getResource();
+    return this.slotWrapper.getResource();
   }
 
   @Override
   public long getAmount() {
-    return slotWrapper.getAmount();
+    return this.slotWrapper.getAmount();
   }
 
   @Override
   public long getCapacity() {
-    return slotWrapper.getCapacity();
+    return this.slotWrapper.getCapacity();
   }
 
   @Override
   public StorageView<ItemVariant> getUnderlyingView() {
-    return slotWrapper.getUnderlyingView();
+    return this.slotWrapper.getUnderlyingView();
   }
 
   @Override
   public String toString() {
-    return "SidedInventorySlotWrapper[%s#%d/%s]".formatted(DebugMessages.forInventory(sidedInventory), slotWrapper.slot, direction.getName());
+    return "SidedInventorySlotWrapper[%s#%d/%s]".formatted(DebugMessages.forInventory(this.sidedInventory), this.slotWrapper.slot, this.direction.getName());
   }
 }

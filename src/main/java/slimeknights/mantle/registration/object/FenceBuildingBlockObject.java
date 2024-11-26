@@ -13,12 +13,14 @@ import java.util.function.Supplier;
  */
 @SuppressWarnings("unused")
 public class FenceBuildingBlockObject extends BuildingBlockObject {
+
   private final Supplier<? extends FenceBlock> fence;
 
   /**
    * Creates a new object from a building block object plus a fence.
-   * @param object  Previous building block object
-   * @param fence   Fence object
+   *
+   * @param object Previous building block object
+   * @param fence  Fence object
    */
   public FenceBuildingBlockObject(BuildingBlockObject object, Supplier<? extends FenceBlock> fence) {
     super(object);
@@ -34,13 +36,15 @@ public class FenceBuildingBlockObject extends BuildingBlockObject {
 //    this(object, castDelegate(fence.delegate));
 //  }
 
-  /** Gets the fence for this block */
+  /**
+   * Gets the fence for this block
+   */
   public FenceBlock getFence() {
-    return Objects.requireNonNull(fence.get(), "Fence Building Block Object missing fence");
+    return Objects.requireNonNull(this.fence.get(), "Fence Building Block Object missing fence");
   }
 
   @Override
   public List<Block> values() {
-    return Arrays.asList(get(), getSlab(), getStairs(), getFence());
+    return Arrays.asList(this.get(), this.getSlab(), this.getStairs(), this.getFence());
   }
 }

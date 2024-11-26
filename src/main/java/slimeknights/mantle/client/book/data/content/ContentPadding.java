@@ -3,10 +3,10 @@ package slimeknights.mantle.client.book.data.content;
 import lombok.Getter;
 import net.minecraft.resources.ResourceLocation;
 import slimeknights.mantle.Mantle;
-import slimeknights.mantle.client.book.transformer.BookTransformer;
 import slimeknights.mantle.client.book.data.BookData;
 import slimeknights.mantle.client.book.data.PageData;
 import slimeknights.mantle.client.book.data.SectionData;
+import slimeknights.mantle.client.book.transformer.BookTransformer;
 
 import java.util.Iterator;
 
@@ -15,31 +15,45 @@ import java.util.Iterator;
  */
 @Getter
 public abstract class ContentPadding extends ContentBlank {
+
   public static final ResourceLocation LEFT_ID = Mantle.getResource("left_padding");
   public static final ResourceLocation RIGHT_ID = Mantle.getResource("right_padding");
 
-  /** If true, this page is padding the left side, false pads the right side */
+  /**
+   * If true, this page is padding the left side, false pads the right side
+   */
   public abstract boolean isLeft();
 
-  /** Left variant */
+  /**
+   * Left variant
+   */
   public static class ContentLeftPadding extends ContentPadding {
+
     @Override
     public boolean isLeft() {
       return true;
     }
   }
 
-  /** Right variant */
+  /**
+   * Right variant
+   */
   public static class ContentRightPadding extends ContentPadding {
+
     @Override
     public boolean isLeft() {
       return false;
     }
   }
 
-  /** Transformer to make this page type work */
+  /**
+   * Transformer to make this page type work
+   */
   public static class PaddingBookTransformer extends BookTransformer {
-    /** Regular transformer considering indexes */
+
+    /**
+     * Regular transformer considering indexes
+     */
     public static final PaddingBookTransformer INSTANCE = new PaddingBookTransformer();
 
     private PaddingBookTransformer() {}

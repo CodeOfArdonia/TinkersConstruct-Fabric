@@ -11,32 +11,34 @@ import java.util.function.Function;
 
 /**
  * Loader for an object with a single enum key
- * @param <O>  Object type
- * @param <T>  Loader type
+ *
+ * @param <O> Object type
+ * @param <T> Loader type
  */
 public record EnumLoader<O extends IHaveLoader<?>, T extends Enum<T>>(
   String key,
   Class<T> enumClass,
-  Function<T,O> constructor,
-  Function<O,T> getter
+  Function<T, O> constructor,
+  Function<O, T> getter
 ) implements IGenericLoader<O> {
+
   @Override
   public O deserialize(JsonObject json) {
-    return constructor.apply(JsonHelper.getAsEnum(json, key, enumClass));
+    return this.constructor.apply(JsonHelper.getAsEnum(json, this.key, this.enumClass));
   }
 
   @Override
   public O fromNetwork(FriendlyByteBuf buffer) {
-    return constructor.apply(buffer.readEnum(enumClass));
+    return this.constructor.apply(buffer.readEnum(this.enumClass));
   }
 
   @Override
   public void serialize(O object, JsonObject json) {
-    json.addProperty(key, getter.apply(object).name().toLowerCase(Locale.ROOT));
+    json.addProperty(this.key, this.getter.apply(object).name().toLowerCase(Locale.ROOT));
   }
 
   @Override
   public void toNetwork(O object, FriendlyByteBuf buffer) {
-    buffer.writeEnum(getter.apply(object));
+    buffer.writeEnum(this.getter.apply(object));
   }
 }

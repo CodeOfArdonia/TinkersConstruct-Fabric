@@ -52,12 +52,13 @@ import slimeknights.mantle.registration.adapter.RegistryAdapter;
 
 /**
  * Mantle
- *
+ * <p>
  * Central mod object for Mantle
  *
  * @author Sunstrike <sun@sunstrike.io>
  */
 public class Mantle implements ModInitializer {
+
   public static final String modId = "mantle";
   public static final Logger logger = LogManager.getLogger("Mantle");
 
@@ -74,7 +75,7 @@ public class Mantle implements ModInitializer {
     MantleTags.init();
 
     instance = this;
-    commonSetup();
+    this.commonSetup();
     this.registerCapabilities();
     this.registerRecipeSerializers();
     this.registerBlockEntities();
@@ -186,8 +187,9 @@ public class Mantle implements ModInitializer {
 
   /**
    * Gets a resource location for Mantle
-   * @param name  Name
-   * @return  Resource location instance
+   *
+   * @param name Name
+   * @return Resource location instance
    */
   public static ResourceLocation getResource(String name) {
     return new ResourceLocation(modId, name);
@@ -195,9 +197,10 @@ public class Mantle implements ModInitializer {
 
   /**
    * Makes a translation key for the given name
-   * @param base  Base name, such as "block" or "gui"
-   * @param name  Object name
-   * @return  Translation key
+   *
+   * @param base Base name, such as "block" or "gui"
+   * @param name Object name
+   * @return Translation key
    */
   public static String makeDescriptionId(String base, String name) {
     return Util.makeDescriptionId(base, getResource(name));
@@ -205,9 +208,10 @@ public class Mantle implements ModInitializer {
 
   /**
    * Makes a translation text component for the given name
-   * @param base  Base name, such as "block" or "gui"
-   * @param name  Object name
-   * @return  Translation key
+   *
+   * @param base Base name, such as "block" or "gui"
+   * @param name Object name
+   * @return Translation key
    */
   public static MutableComponent makeComponent(String base, String name) {
     return Component.translatable(makeDescriptionId(base, name));

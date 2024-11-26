@@ -16,12 +16,16 @@ import slimeknights.mantle.client.book.data.JsonCondition;
 
 import java.lang.reflect.Type;
 
-/** Serializer for a forge condition */
+/**
+ * Serializer for a forge condition
+ */
 public interface ConditionDeserializer {
+
   Deserializer DESERIALIZER = new Deserializer();
   Serializer SERIALIZER = new Serializer();
 
   class Deserializer implements JsonDeserializer<JsonCondition> {
+
     @Override
     public JsonCondition deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
       JsonObject jsonObject = GsonHelper.convertToJsonObject(json, ResourceConditions.CONDITIONS_KEY);
@@ -35,6 +39,7 @@ public interface ConditionDeserializer {
   }
 
   class Serializer implements JsonSerializer<JsonCondition> {
+
     @Override
     public JsonElement serialize(JsonCondition src, Type typeOfSrc, JsonSerializationContext context) {
       if (src.getConditionJsonProvider() != null) {

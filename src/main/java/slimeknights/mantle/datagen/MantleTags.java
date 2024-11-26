@@ -5,13 +5,17 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.material.Fluid;
 import slimeknights.mantle.Mantle;
 
-/** List of all tags used directly by mantle */
+/**
+ * List of all tags used directly by mantle
+ */
 public class MantleTags {
+
   public static void init() {
     Fluids.init();
   }
 
   public static class Fluids {
+
     private static void init() {}
 
     /**

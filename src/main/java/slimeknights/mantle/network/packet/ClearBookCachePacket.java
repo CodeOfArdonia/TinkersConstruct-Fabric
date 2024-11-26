@@ -8,17 +8,20 @@ import slimeknights.mantle.network.packet.OpenNamedBookPacket.ClientOnly;
 
 import javax.annotation.Nullable;
 
-/** Packet sent by {@link slimeknights.mantle.command.ClearBookCacheCommand} to reset a book cache */
+/**
+ * Packet sent by {@link slimeknights.mantle.command.ClearBookCacheCommand} to reset a book cache
+ */
 public record ClearBookCachePacket(@Nullable ResourceLocation book) implements IThreadsafePacket {
+
   public ClearBookCachePacket(FriendlyByteBuf buffer) {
     this(buffer.readBoolean() ? buffer.readResourceLocation() : null);
   }
 
   @Override
   public void encode(FriendlyByteBuf buf) {
-    if (book != null) {
+    if (this.book != null) {
       buf.writeBoolean(true);
-      buf.writeResourceLocation(book);
+      buf.writeResourceLocation(this.book);
     } else {
       buf.writeBoolean(false);
     }
@@ -26,12 +29,12 @@ public record ClearBookCachePacket(@Nullable ResourceLocation book) implements I
 
   @Override
   public void handleThreadsafe(Context context) {
-    if (book != null) {
-      BookData bookData = BookLoader.getBook(book);
+    if (this.book != null) {
+      BookData bookData = BookLoader.getBook(this.book);
       if (bookData != null) {
         bookData.reset();
       } else {
-        ClientOnly.errorStatus(book);
+        ClientOnly.errorStatus(this.book);
       }
     } else {
       BookLoader.resetAllBooks();

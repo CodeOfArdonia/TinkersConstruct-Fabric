@@ -61,7 +61,7 @@ public class TemplateChunk extends EmptyLevelChunk {
 
   @Override
   public FluidState getFluidState(BlockPos pos) {
-    return getBlockState(pos).getFluidState();
+    return this.getBlockState(pos).getFluidState();
   }
 
   @Nullable

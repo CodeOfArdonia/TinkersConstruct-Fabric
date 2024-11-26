@@ -1,53 +1,50 @@
 package slimeknights.mantle.fluid.attributes;
 
-import javax.annotation.Nullable;
-
 import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.item.BucketItem;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.dimension.DimensionType;
-import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.level.BlockAndTintGetter;
-
-import java.util.function.BiFunction;
-import java.util.stream.Stream;
-
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.item.Rarity;
-import net.minecraft.client.renderer.BiomeColors;
-
 import net.minecraft.Util;
+import net.minecraft.client.renderer.BiomeColors;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BucketItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
+
+import javax.annotation.Nullable;
+import java.util.function.BiFunction;
+import java.util.stream.Stream;
 
 /**
  * Minecraft Forge Fluid Implementation
- *
+ * <p>
  * This class is a fluid (liquid or gas) equivalent to "Item." It describes the nature of a fluid
  * and contains its general properties.
- *
+ * <p>
  * These properties do not have inherent gameplay mechanics - they are provided so that mods may
  * choose to take advantage of them.
- *
+ * <p>
  * Fluid implementations are not required to actively use these properties, nor are objects
  * interfacing with fluids required to make use of them, but it is encouraged.
- *
+ * <p>
  * The default values can be used as a reference point for mods adding fluids such as oil or heavy
  * water.
- *
  */
 public class FluidAttributes {
-  private String translationKey;
+
+  private final String translationKey;
 
   private final ResourceLocation stillTexture;
   private final ResourceLocation flowingTexture;
@@ -60,7 +57,7 @@ public class FluidAttributes {
 
   /**
    * The light level emitted by this fluid.
-   *
+   * <p>
    * Default value is 0, as most fluids do not actively emit light.
    */
   private final int luminosity;
@@ -68,7 +65,7 @@ public class FluidAttributes {
   /**
    * Density of the fluid - completely arbitrary; negative density indicates that the fluid is
    * lighter than air.
-   *
+   * <p>
    * Default value is approximately the real-life density of water in kg/m^3.
    */
   private final int density;
@@ -76,7 +73,7 @@ public class FluidAttributes {
   /**
    * Temperature of the fluid - completely arbitrary; higher temperature indicates that the fluid is
    * hotter than air.
-   *
+   * <p>
    * Default value is approximately the real-life room temperature of water in degrees Kelvin.
    */
   private final int temperature;
@@ -84,25 +81,24 @@ public class FluidAttributes {
   /**
    * Viscosity ("thickness") of the fluid - completely arbitrary; negative values are not
    * permissible.
-   *
+   * <p>
    * Default value is approximately the real-life density of water in m/s^2 (x10^-3).
-   *
+   * <p>
    * Higher viscosity means that a fluid flows more slowly, like molasses.
    * Lower viscosity means that a fluid flows more quickly, like helium.
-   *
    */
   private final int viscosity;
 
   /**
    * This indicates if the fluid is gaseous.
-   *
+   * <p>
    * Generally this is associated with negative density fluids.
    */
   private final boolean isGaseous;
 
   /**
    * The rarity of the fluid.
-   *
+   * <p>
    * Used primarily in tool tips.
    */
   private final Rarity rarity;
@@ -110,16 +106,15 @@ public class FluidAttributes {
   /**
    * Color used by universal bucket and the ModelFluid baked model.
    * Note that this int includes the alpha so converting this to RGB with alpha would be
-   *   float r = ((color >> 16) & 0xFF) / 255f; // red
-   *   float g = ((color >> 8) & 0xFF) / 255f; // green
-   *   float b = ((color >> 0) & 0xFF) / 255f; // blue
-   *   float a = ((color >> 24) & 0xFF) / 255f; // alpha
+   * float r = ((color >> 16) & 0xFF) / 255f; // red
+   * float g = ((color >> 8) & 0xFF) / 255f; // green
+   * float b = ((color >> 0) & 0xFF) / 255f; // blue
+   * float a = ((color >> 24) & 0xFF) / 255f; // alpha
    */
   private final int color;
 
-  protected FluidAttributes(Builder builder, Fluid fluid)
-  {
-    this.translationKey = builder.translationKey != null ? builder.translationKey :  Util.makeDescriptionId("fluid", BuiltInRegistries.FLUID.getKey(fluid));
+  protected FluidAttributes(Builder builder, Fluid fluid) {
+    this.translationKey = builder.translationKey != null ? builder.translationKey : Util.makeDescriptionId("fluid", BuiltInRegistries.FLUID.getKey(fluid));
     this.stillTexture = builder.stillTexture;
     this.flowingTexture = builder.flowingTexture;
     this.overlayTexture = builder.overlayTexture;
@@ -134,33 +129,27 @@ public class FluidAttributes {
     this.rarity = builder.rarity;
   }
 
-  public ItemStack getBucket(FluidStack stack)
-  {
+  public ItemStack getBucket(FluidStack stack) {
     return new ItemStack(stack.getFluid().getBucket());
   }
 
-  public BlockState getBlock(BlockAndTintGetter reader, BlockPos pos, FluidState state)
-  {
+  public BlockState getBlock(BlockAndTintGetter reader, BlockPos pos, FluidState state) {
     return state.createLegacyBlock();
   }
 
-  public FluidState getStateForPlacement(BlockAndTintGetter reader, BlockPos pos, FluidStack state)
-  {
+  public FluidState getStateForPlacement(BlockAndTintGetter reader, BlockPos pos, FluidStack state) {
     return state.getFluid().defaultFluidState();
   }
 
-  public final boolean canBePlacedInWorld(BlockAndTintGetter reader, BlockPos pos, FluidState state)
-  {
-    return !getBlock(reader, pos, state).isAir();
+  public final boolean canBePlacedInWorld(BlockAndTintGetter reader, BlockPos pos, FluidState state) {
+    return !this.getBlock(reader, pos, state).isAir();
   }
 
-  public final boolean canBePlacedInWorld(BlockAndTintGetter reader, BlockPos pos, FluidStack state)
-  {
-    return !getBlock(reader, pos, getStateForPlacement(reader, pos, state)).isAir();
+  public final boolean canBePlacedInWorld(BlockAndTintGetter reader, BlockPos pos, FluidStack state) {
+    return !this.getBlock(reader, pos, this.getStateForPlacement(reader, pos, state)).isAir();
   }
 
-  public final boolean isLighterThanAir()
-  {
+  public final boolean isLighterThanAir() {
     return this.density <= 0;
   }
 
@@ -174,12 +163,10 @@ public class FluidAttributes {
    * @param pos        The position in the world the fluid block was going to be placed.
    * @param fluidStack The fluidStack that was going to be placed.
    */
-  public void vaporize(@Nullable Player player, Level worldIn, BlockPos pos, FluidStack fluidStack)
-  {
+  public void vaporize(@Nullable Player player, Level worldIn, BlockPos pos, FluidStack fluidStack) {
     worldIn.playSound(player, pos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.5F, 2.6F + (worldIn.random.nextFloat() - worldIn.random.nextFloat()) * 0.8F);
 
-    for (int l = 0; l < 8; ++l)
-    {
+    for (int l = 0; l < 8; ++l) {
       worldIn.addAlwaysVisibleParticle(ParticleTypes.LARGE_SMOKE, (double) pos.getX() + Math.random(), (double) pos.getY() + Math.random(), (double) pos.getZ() + Math.random(), 0.0D, 0.0D, 0.0D);
     }
   }
@@ -187,128 +174,132 @@ public class FluidAttributes {
   /**
    * Returns the localized name of this fluid.
    */
-  public Component getDisplayName(FluidStack stack)
-  {
-    return Component.translatable(getTranslationKey(stack));
+  public Component getDisplayName(FluidStack stack) {
+    return Component.translatable(this.getTranslationKey(stack));
   }
 
   /**
    * A FluidStack sensitive version of getTranslationKey
    */
-  public String getTranslationKey(FluidStack stack)
-  {
+  public String getTranslationKey(FluidStack stack) {
     return this.getTranslationKey();
   }
 
   /**
    * Returns the translation key of this fluid.
    */
-  public String getTranslationKey()
-  {
+  public String getTranslationKey() {
     return this.translationKey;
   }
 
   /* Default Accessors */
-  public final int getLuminosity()
-  {
+  public final int getLuminosity() {
     return this.luminosity;
   }
 
-  public final int getDensity()
-  {
+  public final int getDensity() {
     return this.density;
   }
 
-  public final int getTemperature()
-  {
+  public final int getTemperature() {
     return this.temperature;
   }
 
-  public final int getViscosity()
-  {
+  public final int getViscosity() {
     return this.viscosity;
   }
 
-  public final boolean isGaseous()
-  {
+  public final boolean isGaseous() {
     return this.isGaseous;
   }
 
-  public Rarity getRarity()
-  {
-    return rarity;
+  public Rarity getRarity() {
+    return this.rarity;
   }
 
-  public int getColor()
-  {
-    return color;
+  public int getColor() {
+    return this.color;
   }
 
-  public ResourceLocation getStillTexture()
-  {
-    return stillTexture;
+  public ResourceLocation getStillTexture() {
+    return this.stillTexture;
   }
 
-  public ResourceLocation getFlowingTexture()
-  {
-    return flowingTexture;
+  public ResourceLocation getFlowingTexture() {
+    return this.flowingTexture;
   }
 
   @Nullable
-  public ResourceLocation getOverlayTexture()
-  {
-    return overlayTexture;
+  public ResourceLocation getOverlayTexture() {
+    return this.overlayTexture;
   }
 
-  public SoundEvent getFillSound()
-  {
-    return fillSound;
+  public SoundEvent getFillSound() {
+    return this.fillSound;
   }
 
-  public SoundEvent getEmptySound()
-  {
-    return emptySound;
+  public SoundEvent getEmptySound() {
+    return this.emptySound;
   }
 
   /* Stack-based Accessors */
-  public int getLuminosity(FluidStack stack){ return getLuminosity(); }
-  public int getDensity(FluidStack stack){ return getDensity(); }
-  public int getTemperature(FluidStack stack){ return getTemperature(); }
-  public int getViscosity(FluidStack stack){ return getViscosity(); }
-  public boolean isGaseous(FluidStack stack){ return isGaseous(); }
-  public Rarity getRarity(FluidStack stack){ return getRarity(); }
-  public int getColor(FluidStack stack){ return getColor(); }
-  public ResourceLocation getStillTexture(FluidStack stack) { return getStillTexture(); }
-  public ResourceLocation getFlowingTexture(FluidStack stack) { return getFlowingTexture(); }
-  public SoundEvent getFillSound(FluidStack stack) { return getFillSound(); }
-  public SoundEvent getEmptySound(FluidStack stack) { return getEmptySound(); }
+  public int getLuminosity(FluidStack stack) {return this.getLuminosity();}
+
+  public int getDensity(FluidStack stack) {return this.getDensity();}
+
+  public int getTemperature(FluidStack stack) {return this.getTemperature();}
+
+  public int getViscosity(FluidStack stack) {return this.getViscosity();}
+
+  public boolean isGaseous(FluidStack stack) {return this.isGaseous();}
+
+  public Rarity getRarity(FluidStack stack) {return this.getRarity();}
+
+  public int getColor(FluidStack stack) {return this.getColor();}
+
+  public ResourceLocation getStillTexture(FluidStack stack) {return this.getStillTexture();}
+
+  public ResourceLocation getFlowingTexture(FluidStack stack) {return this.getFlowingTexture();}
+
+  public SoundEvent getFillSound(FluidStack stack) {return this.getFillSound();}
+
+  public SoundEvent getEmptySound(FluidStack stack) {return this.getEmptySound();}
 
   /* World-based Accessors */
-  public int getLuminosity(BlockAndTintGetter level, BlockPos pos){ return getLuminosity(); }
-  public int getDensity(BlockAndTintGetter level, BlockPos pos){ return getDensity(); }
-  public int getTemperature(BlockAndTintGetter level, BlockPos pos){ return getTemperature(); }
-  public int getViscosity(BlockAndTintGetter level, BlockPos pos){ return getViscosity(); }
-  public boolean isGaseous(BlockAndTintGetter level, BlockPos pos){ return isGaseous(); }
-  public Rarity getRarity(BlockAndTintGetter level, BlockPos pos){ return getRarity(); }
-  public int getColor(BlockAndTintGetter level, BlockPos pos){ return getColor(); }
-  public ResourceLocation getStillTexture(BlockAndTintGetter level, BlockPos pos) { return getStillTexture(); }
-  public ResourceLocation getFlowingTexture(BlockAndTintGetter level, BlockPos pos) { return getFlowingTexture(); }
-  public SoundEvent getFillSound(BlockAndTintGetter level, BlockPos pos) { return getFillSound(); }
-  public SoundEvent getEmptySound(BlockAndTintGetter level, BlockPos pos) { return getEmptySound(); }
+  public int getLuminosity(BlockAndTintGetter level, BlockPos pos) {return this.getLuminosity();}
+
+  public int getDensity(BlockAndTintGetter level, BlockPos pos) {return this.getDensity();}
+
+  public int getTemperature(BlockAndTintGetter level, BlockPos pos) {return this.getTemperature();}
+
+  public int getViscosity(BlockAndTintGetter level, BlockPos pos) {return this.getViscosity();}
+
+  public boolean isGaseous(BlockAndTintGetter level, BlockPos pos) {return this.isGaseous();}
+
+  public Rarity getRarity(BlockAndTintGetter level, BlockPos pos) {return this.getRarity();}
+
+  public int getColor(BlockAndTintGetter level, BlockPos pos) {return this.getColor();}
+
+  public ResourceLocation getStillTexture(BlockAndTintGetter level, BlockPos pos) {return this.getStillTexture();}
+
+  public ResourceLocation getFlowingTexture(BlockAndTintGetter level, BlockPos pos) {return this.getFlowingTexture();}
+
+  public SoundEvent getFillSound(BlockAndTintGetter level, BlockPos pos) {return this.getFillSound();}
+
+  public SoundEvent getEmptySound(BlockAndTintGetter level, BlockPos pos) {return this.getEmptySound();}
 
   public static Builder builder(ResourceLocation stillTexture, ResourceLocation flowingTexture) {
     return new Builder(stillTexture, flowingTexture, FluidAttributes::new);
   }
 
-  public Stream<ResourceLocation> getTextures()
-  {
-    if (overlayTexture != null)
-      return Stream.of(stillTexture, flowingTexture, overlayTexture);
-    return Stream.of(stillTexture, flowingTexture);
+  public Stream<ResourceLocation> getTextures() {
+    if (this.overlayTexture != null)
+      return Stream.of(this.stillTexture, this.flowingTexture, this.overlayTexture);
+    return Stream.of(this.stillTexture, this.flowingTexture);
   }
 
-  public static class Builder
-  {
+  public static class Builder {
+
     private final ResourceLocation stillTexture;
     private final ResourceLocation flowingTexture;
     private ResourceLocation overlayTexture;
@@ -322,97 +313,83 @@ public class FluidAttributes {
     private int viscosity = 1000;
     private boolean isGaseous;
     private Rarity rarity = Rarity.COMMON;
-    private BiFunction<Builder,Fluid,FluidAttributes> factory;
+    private final BiFunction<Builder, Fluid, FluidAttributes> factory;
 
-    protected Builder(ResourceLocation stillTexture, ResourceLocation flowingTexture, BiFunction<Builder,Fluid,FluidAttributes> factory) {
+    protected Builder(ResourceLocation stillTexture, ResourceLocation flowingTexture, BiFunction<Builder, Fluid, FluidAttributes> factory) {
       this.factory = factory;
       this.stillTexture = stillTexture;
       this.flowingTexture = flowingTexture;
     }
 
-    public final Builder translationKey(String translationKey)
-    {
+    public final Builder translationKey(String translationKey) {
       this.translationKey = translationKey;
       return this;
     }
 
-    public final Builder color(int color)
-    {
+    public final Builder color(int color) {
       this.color = color;
       return this;
     }
 
-    public final Builder overlay(ResourceLocation texture)
-    {
-      overlayTexture = texture;
+    public final Builder overlay(ResourceLocation texture) {
+      this.overlayTexture = texture;
       return this;
     }
 
-    public final Builder luminosity(int luminosity)
-    {
+    public final Builder luminosity(int luminosity) {
       this.luminosity = luminosity;
       return this;
     }
 
-    public final Builder density(int density)
-    {
+    public final Builder density(int density) {
       this.density = density;
       return this;
     }
 
-    public final Builder temperature(int temperature)
-    {
+    public final Builder temperature(int temperature) {
       this.temperature = temperature;
       return this;
     }
 
-    public final Builder viscosity(int viscosity)
-    {
+    public final Builder viscosity(int viscosity) {
       this.viscosity = viscosity;
       return this;
     }
 
-    public final Builder gaseous()
-    {
-      isGaseous = true;
+    public final Builder gaseous() {
+      this.isGaseous = true;
       return this;
     }
 
-    public final Builder rarity(Rarity rarity)
-    {
+    public final Builder rarity(Rarity rarity) {
       this.rarity = rarity;
       return this;
     }
 
-    public final Builder sound(SoundEvent sound)
-    {
+    public final Builder sound(SoundEvent sound) {
       this.fillSound = this.emptySound = sound;
       return this;
     }
 
-    public final Builder sound(SoundEvent fillSound, SoundEvent emptySound)
-    {
+    public final Builder sound(SoundEvent fillSound, SoundEvent emptySound) {
       this.fillSound = fillSound;
       this.emptySound = emptySound;
       return this;
     }
 
-    public FluidAttributes build(Fluid fluid)
-    {
-      return factory.apply(this, fluid);
+    public FluidAttributes build(Fluid fluid) {
+      return this.factory.apply(this, fluid);
     }
   }
 
-  public static class Water extends FluidAttributes
-  {
-    protected Water(Builder builder, Fluid fluid)
-    {
+  public static class Water extends FluidAttributes {
+
+    protected Water(Builder builder, Fluid fluid) {
       super(builder, fluid);
     }
 
     @Override
-    public int getColor(BlockAndTintGetter level, BlockPos pos)
-    {
+    public int getColor(BlockAndTintGetter level, BlockPos pos) {
       return BiomeColors.getAverageWaterColor(level, pos) | 0xFF000000;
     }
 

@@ -11,27 +11,32 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 @AllArgsConstructor
-public class ModelTextureIteratable implements Iterable<Map<String,Either<Material, String>>> {
-  /** Initial map for iteration */
+public class ModelTextureIteratable implements Iterable<Map<String, Either<Material, String>>> {
+
+  /**
+   * Initial map for iteration
+   */
   @Nullable
-  private final Map<String,Either<Material, String>> startMap;
-  /** Initial model for iteration */
+  private final Map<String, Either<Material, String>> startMap;
+  /**
+   * Initial model for iteration
+   */
   @Nullable
   private final BlockModel startModel;
 
   /**
    * Creates an iterable over the given model
-   * @param model  Model
+   *
+   * @param model Model
    */
   public ModelTextureIteratable(BlockModel model) {
     this(null, model);
   }
 
   /**
-   *
-   * @param owner     Model configuration owner
-   * @param fallback  Fallback in case the owner does not contain a block model
-   * @return  Iteratable over block model texture maps
+   * @param owner    Model configuration owner
+   * @param fallback Fallback in case the owner does not contain a block model
+   * @return Iteratable over block model texture maps
    */
   public static ModelTextureIteratable of(BlockModel owner, SimpleBlockModel fallback) {
     return new ModelTextureIteratable(fallback.getTextures(), fallback.getParent());
@@ -39,32 +44,37 @@ public class ModelTextureIteratable implements Iterable<Map<String,Either<Materi
 
   @Override
   public MapIterator iterator() {
-    return new MapIterator(startMap, startModel);
+    return new MapIterator(this.startMap, this.startModel);
   }
 
   @AllArgsConstructor
-  private static class MapIterator implements Iterator<Map<String,Either<Material, String>>> {
-    /** Initial map for iteration */
+  private static class MapIterator implements Iterator<Map<String, Either<Material, String>>> {
+
+    /**
+     * Initial map for iteration
+     */
     @Nullable
-    private Map<String,Either<Material, String>> initial;
-    /** current model in the iterator */
+    private Map<String, Either<Material, String>> initial;
+    /**
+     * current model in the iterator
+     */
     @Nullable
     private BlockModel model;
 
     @Override
     public boolean hasNext() {
-      return initial != null || model != null;
+      return this.initial != null || this.model != null;
     }
 
     @Override
-    public Map<String,Either<Material,String>> next() {
-      Map<String,Either<Material, String>> map;
-      if (initial != null) {
-        map = initial;
-        initial = null;
-      } else if (model != null) {
-        map = model.textureMap;
-        model = model.parent;
+    public Map<String, Either<Material, String>> next() {
+      Map<String, Either<Material, String>> map;
+      if (this.initial != null) {
+        map = this.initial;
+        this.initial = null;
+      } else if (this.model != null) {
+        map = this.model.textureMap;
+        this.model = this.model.parent;
       } else {
         throw new NoSuchElementException();
       }

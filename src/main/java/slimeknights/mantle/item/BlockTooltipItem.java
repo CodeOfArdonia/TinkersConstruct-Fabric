@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class BlockTooltipItem extends BlockItem {
+
   public BlockTooltipItem(Block blockIn, Properties builder) {
     super(blockIn, builder);
   }

@@ -14,8 +14,9 @@ import java.util.function.Function;
 
 /**
  * Loader that loads from another loader
- * @param <T>  Object being loaded
- * @param <N>  Nested object type
+ *
+ * @param <T> Object being loaded
+ * @param <N> Nested object type
  */
 public record NestedLoader<T extends IHaveLoader<?>, N extends IHaveLoader<N>>(
   String typeKey,
@@ -23,7 +24,10 @@ public record NestedLoader<T extends IHaveLoader<?>, N extends IHaveLoader<N>>(
   Function<N, T> constructor,
   Function<T, N> getter
 ) implements IGenericLoader<T> {
-  /** Moves the passed type key to "type" */
+
+  /**
+   * Moves the passed type key to "type"
+   */
   public static void mapType(JsonObject json, String typeKey) {
     // replace our type with the nested type, then run the nested loader
     json.addProperty("type", GsonHelper.getAsString(json, typeKey));
@@ -32,17 +36,18 @@ public record NestedLoader<T extends IHaveLoader<?>, N extends IHaveLoader<N>>(
 
   @Override
   public T deserialize(JsonObject json) {
-    mapType(json, typeKey);
-    return constructor.apply(nestedLoader.deserialize(json));
+    mapType(json, this.typeKey);
+    return this.constructor.apply(this.nestedLoader.deserialize(json));
   }
 
   /**
    * Serializes the passed object into the passed JSON
-   * @param json      JSON target for serializing
-   * @param typeKey   Key to use for "type" in the serialized value
-   * @param loader    Loader for serializing the value
-   * @param value     Value to serialized
-   * @param <N>  Type of value
+   *
+   * @param json    JSON target for serializing
+   * @param typeKey Key to use for "type" in the serialized value
+   * @param loader  Loader for serializing the value
+   * @param value   Value to serialized
+   * @param <N>     Type of value
    */
   public static <N extends IHaveLoader<N>> void serializeInto(JsonObject json, String typeKey, GenericLoaderRegistry<N> loader, N value) {
     JsonElement element = loader.serialize(value);
@@ -59,7 +64,7 @@ public record NestedLoader<T extends IHaveLoader<?>, N extends IHaveLoader<N>>(
         }
         json.add(key, entry.getValue());
       }
-    } else if (element.isJsonPrimitive()){
+    } else if (element.isJsonPrimitive()) {
       // if its a primitive, its the type ID, add just that by itself
       json.add(typeKey, element);
     } else {
@@ -69,16 +74,16 @@ public record NestedLoader<T extends IHaveLoader<?>, N extends IHaveLoader<N>>(
 
   @Override
   public void serialize(T object, JsonObject json) {
-    serializeInto(json, typeKey, nestedLoader, getter.apply(object));
+    serializeInto(json, this.typeKey, this.nestedLoader, this.getter.apply(object));
   }
 
   @Override
   public T fromNetwork(FriendlyByteBuf buffer) {
-    return constructor.apply(nestedLoader.fromNetwork(buffer));
+    return this.constructor.apply(this.nestedLoader.fromNetwork(buffer));
   }
 
   @Override
   public void toNetwork(T object, FriendlyByteBuf buffer) {
-    nestedLoader.toNetwork(getter.apply(object), buffer);
+    this.nestedLoader.toNetwork(this.getter.apply(object), buffer);
   }
 }

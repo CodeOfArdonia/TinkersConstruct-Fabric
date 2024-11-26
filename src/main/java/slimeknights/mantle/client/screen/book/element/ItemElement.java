@@ -42,7 +42,7 @@ public class ItemElement extends SizedBookElement {
   }
 
   public ItemElement(int x, int y, float scale, ItemStack item) {
-    this(x, y, scale, new ItemStack[] { item });
+    this(x, y, scale, new ItemStack[]{item});
   }
 
   public ItemElement(int x, int y, float scale, Collection<ItemStack> itemCycle) {
@@ -60,7 +60,7 @@ public class ItemElement extends SizedBookElement {
   public ItemElement(int x, int y, float scale, ItemStack[] itemCycle, @Nullable String action) {
     super(x, y, Mth.floor(ITEM_SIZE_HARDCODED * scale), Mth.floor(ITEM_SIZE_HARDCODED * scale));
 
-    lastTime = Util.getNanos();
+    this.lastTime = Util.getNanos();
 
     NonNullList<ItemStack> nonNullStacks = NonNullList.withSize(itemCycle.length, ItemStack.EMPTY);
     for (int i = 0; i < itemCycle.length; i++) {
@@ -79,7 +79,7 @@ public class ItemElement extends SizedBookElement {
     PoseStack matrixStack = guiGraphics.pose();
     long nano = Util.getNanos();
 
-    if(nano > lastTime + ITEM_SWITCH_TIME) {
+    if (nano > this.lastTime + ITEM_SWITCH_TIME) {
       this.lastTime = nano;
       this.currentItem++;
 
@@ -92,8 +92,8 @@ public class ItemElement extends SizedBookElement {
       // Lighting.turnBackOn(); TODO: still needed?
 
       matrixStack.pushPose();
-      matrixStack.translate(x, y, 0);
-      matrixStack.scale(scale, scale, 1.0F);
+      matrixStack.translate(this.x, this.y, 0);
+      matrixStack.scale(this.scale, this.scale, 1.0F);
 
       // Matrix stack -> old system
       PoseStack poses = RenderSystem.getModelViewStack();
@@ -103,7 +103,7 @@ public class ItemElement extends SizedBookElement {
       ItemStack stack = this.itemCycle.get(this.currentItem);
       guiGraphics.renderItem(stack, 0, 0);
       Font font = fontRenderer;//net.minecraftforge.client.RenderProperties.get(stack).getFont(stack);
-      if (font == null) font = mc.font;
+      if (font == null) font = this.mc.font;
       guiGraphics.renderItemDecorations(font, stack, 0, 0, null);
 
       matrixStack.popPose();
@@ -118,8 +118,7 @@ public class ItemElement extends SizedBookElement {
     if (this.isHovered(mouseX, mouseY) && this.currentItem < this.itemCycle.size()) {
       if (this.tooltip != null) {
         this.drawTooltip(guiGraphics, this.tooltip, mouseX, mouseY, fontRenderer);
-      }
-      else {
+      } else {
         this.renderToolTip(guiGraphics, fontRenderer, this.itemCycle.get(this.currentItem), mouseX, mouseY);
       }
     }

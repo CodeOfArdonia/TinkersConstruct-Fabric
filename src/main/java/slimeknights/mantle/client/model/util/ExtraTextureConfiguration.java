@@ -12,23 +12,26 @@ import java.util.Map;
  * Model configuration wrapper to add in an extra set of textures
  */
 public class ExtraTextureConfiguration extends ModelConfigurationWrapper {
-  private final Map<String,Material> textures;
+
+  private final Map<String, Material> textures;
 
   /**
    * Creates a new wrapper using the given textures
-   * @param base      Base configuration
-   * @param textures  Textures map, any textures in this map will take precedence over those in the base configuration
+   *
+   * @param base     Base configuration
+   * @param textures Textures map, any textures in this map will take precedence over those in the base configuration
    */
-  public ExtraTextureConfiguration(BlockModel base, Map<String,Material> textures) {
+  public ExtraTextureConfiguration(BlockModel base, Map<String, Material> textures) {
     super(base);
     this.textures = textures;
   }
 
   /**
    * Creates a new wrapper for a single texture
-   * @param base     Base configuration
-   * @param name     Texture name, if it matches texture is returned
-   * @param texture  Texture path
+   *
+   * @param base    Base configuration
+   * @param name    Texture name, if it matches texture is returned
+   * @param texture Texture path
    */
   public ExtraTextureConfiguration(BlockModel base, String name, ResourceLocation texture) {
     super(base);
@@ -37,7 +40,7 @@ public class ExtraTextureConfiguration extends ModelConfigurationWrapper {
 
   @Override
   public Material getMaterial(String name) {
-    Material connected = textures.get(name);
+    Material connected = this.textures.get(name);
     if (connected != null) {
       return connected;
     }
@@ -46,6 +49,6 @@ public class ExtraTextureConfiguration extends ModelConfigurationWrapper {
 
   @Override
   public boolean hasTexture(String name) {
-    return textures.containsKey(name) || super.hasTexture(name);
+    return this.textures.containsKey(name) || super.hasTexture(name);
   }
 }

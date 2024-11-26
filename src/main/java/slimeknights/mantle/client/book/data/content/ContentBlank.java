@@ -8,6 +8,7 @@ import slimeknights.mantle.client.screen.book.element.BookElement;
 import java.util.ArrayList;
 
 public class ContentBlank extends PageContent {
+
   public static final ResourceLocation ID = Mantle.getResource("blank");
 
   @Override

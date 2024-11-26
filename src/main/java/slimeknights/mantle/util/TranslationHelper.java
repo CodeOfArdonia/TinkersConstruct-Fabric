@@ -1,11 +1,11 @@
 package slimeknights.mantle.util;
 
+import io.github.fabricators_of_create.porting_lib.util.ForgeI18n;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import io.github.fabricators_of_create.porting_lib.util.ForgeI18n;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -19,8 +19,9 @@ public class TranslationHelper {
 
   /**
    * Checks if a key can be translated
-   * @param key  Key to check
-   * @return  True if its translatable
+   *
+   * @param key Key to check
+   * @return True if its translatable
    */
   public static boolean canTranslate(String key) {
     return !key.equals(ForgeI18n.getPattern(key));
@@ -28,9 +29,10 @@ public class TranslationHelper {
 
   /**
    * Better documented way to check if something is translated, use instead of {@link #canTranslate(String)} if you want to reuse the result.
-   * @param key        Key to check
-   * @param attempted  Attempted translation result
-   * @return  True if its translatable
+   *
+   * @param key       Key to check
+   * @param attempted Attempted translation result
+   * @return True if its translatable
    */
   public static boolean canTranslate(String key, String attempted) {
     return !key.equals(attempted);
@@ -38,8 +40,9 @@ public class TranslationHelper {
 
   /**
    * Adds localized tooltip to a stack if present
-   * @param stack    Stack
-   * @param tooltip  List of tooltips
+   *
+   * @param stack   Stack
+   * @param tooltip List of tooltips
    */
   public static void addOptionalTooltip(ItemStack stack, List<Component> tooltip) {
     addOptionalTooltip(stack.getDescriptionId() + ".tooltip", tooltip);
@@ -47,8 +50,9 @@ public class TranslationHelper {
 
   /**
    * Adds localized tooltip to a list of tooltips if present
-   * @param key      Translation key
-   * @param tooltip  List of tooltips
+   *
+   * @param key     Translation key
+   * @param tooltip List of tooltips
    */
   public static void addOptionalTooltip(String key, List<Component> tooltip) {
     String translated = ForgeI18n.getPattern(key);
@@ -59,8 +63,9 @@ public class TranslationHelper {
 
   /**
    * Adds the text into the tooltip, splitting on newlines
-   * @param text     Translated text to split
-   * @param tooltip  List of tooltip strings to add to
+   *
+   * @param text    Translated text to split
+   * @param tooltip List of tooltip strings to add to
    */
   public static void addEachLine(String text, List<Component> tooltip) {
     for (String string : text.split("\n")) {

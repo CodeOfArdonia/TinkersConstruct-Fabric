@@ -8,8 +8,11 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import slimeknights.mantle.util.OffhandCooldownTracker;
 
-/** Packet to tell a client to swing an entity arm, as the vanilla one resets cooldown */
+/**
+ * Packet to tell a client to swing an entity arm, as the vanilla one resets cooldown
+ */
 public class SwingArmPacket implements IThreadsafePacket {
+
   private final int entityId;
   private final InteractionHand hand;
 
@@ -25,8 +28,8 @@ public class SwingArmPacket implements IThreadsafePacket {
 
   @Override
   public void encode(FriendlyByteBuf buffer) {
-    buffer.writeVarInt(entityId);
-    buffer.writeEnum(hand);
+    buffer.writeVarInt(this.entityId);
+    buffer.writeEnum(this.hand);
   }
 
   @Override
@@ -35,6 +38,7 @@ public class SwingArmPacket implements IThreadsafePacket {
   }
 
   private static class HandleClient {
+
     private static void handle(SwingArmPacket packet) {
       Level world = Minecraft.getInstance().level;
       if (world != null) {

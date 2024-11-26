@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 @AllArgsConstructor
 public class DropLecternBookPacket implements IThreadsafePacket {
+
   private final BlockPos pos;
 
   public DropLecternBookPacket(FriendlyByteBuf buffer) {
@@ -24,39 +25,39 @@ public class DropLecternBookPacket implements IThreadsafePacket {
 
   @Override
   public void encode(FriendlyByteBuf buffer) {
-    buffer.writeBlockPos(pos);
+    buffer.writeBlockPos(this.pos);
   }
 
   @SuppressWarnings("deprecation")
   @Override
   public void handleThreadsafe(Context context) {
     ServerPlayer player = context.getSender();
-    if(player == null) {
+    if (player == null) {
       return;
     }
 
     ServerLevel world = player.serverLevel();
 
-    if(!world.hasChunkAt(pos)) {
+    if (!world.hasChunkAt(this.pos)) {
       return;
     }
 
-    BlockState state = world.getBlockState(pos);
+    BlockState state = world.getBlockState(this.pos);
 
-    if(state.getBlock() instanceof LecternBlock && state.getValue(LecternBlock.HAS_BOOK)) {
-      BlockEntity te = world.getBlockEntity(pos);
-      if(te instanceof LecternBlockEntity lecternTe) {
+    if (state.getBlock() instanceof LecternBlock && state.getValue(LecternBlock.HAS_BOOK)) {
+      BlockEntity te = world.getBlockEntity(this.pos);
+      if (te instanceof LecternBlockEntity lecternTe) {
         ItemStack book = lecternTe.getBook().copy();
-        if(!book.isEmpty()) {
-          if(!player.addItem(book)) {
+        if (!book.isEmpty()) {
+          if (!player.addItem(book)) {
             player.drop(book, false, false);
           }
 
           lecternTe.clearContent();
 
           // fix lectern state
-          world.setBlock(pos, state.setValue(LecternBlock.POWERED, false).setValue(LecternBlock.HAS_BOOK, false), 3);
-          world.updateNeighborsAt(pos.below(), state.getBlock());
+          world.setBlock(this.pos, state.setValue(LecternBlock.POWERED, false).setValue(LecternBlock.HAS_BOOK, false), 3);
+          world.updateNeighborsAt(this.pos.below(), state.getBlock());
         }
       }
     }

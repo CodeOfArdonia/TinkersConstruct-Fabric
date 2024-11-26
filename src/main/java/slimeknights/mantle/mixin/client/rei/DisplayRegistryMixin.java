@@ -13,8 +13,9 @@ import java.util.function.Function;
 
 @Mixin(value = DisplayRegistry.class, remap = false)
 public interface DisplayRegistryMixin {
+
   @Inject(method = "registerFiller(Ljava/lang/Class;Ljava/util/function/Function;)V", at = @At("HEAD"), cancellable = true)
-  default <T, D extends Display> void  mantle$disableTags(Class<T> typeClass, Function<? extends T, @Nullable D> filler, CallbackInfo ci) {
+  default <T, D extends Display> void mantle$disableTags(Class<T> typeClass, Function<? extends T, @Nullable D> filler, CallbackInfo ci) {
     if (typeClass == TagKey.class)
       ci.cancel();
   }

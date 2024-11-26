@@ -23,6 +23,7 @@ import io.github.fabricators_of_create.porting_lib.event.client.OverlayRenderCal
 import java.util.Random;
 
 public class ExtraHeartRenderHandler {
+
   private static final ResourceLocation ICON_HEARTS = new ResourceLocation(Mantle.modId, "textures/gui/hearts.png");
   private static final ResourceLocation ICON_ABSORB = new ResourceLocation(Mantle.modId, "textures/gui/absorb.png");
   private static final ResourceLocation ICON_VANILLA = Gui.GUI_ICONS_LOCATION;
@@ -39,14 +40,15 @@ public class ExtraHeartRenderHandler {
 
   /**
    * Draws a texture to the screen
-   * @param guiGraphics  gui graphics instance
-   * @param texture      The texture to draw
-   * @param x            X position
-   * @param y            Y position
-   * @param textureX     Texture X
-   * @param textureY     Texture Y
-   * @param width        Width to draw
-   * @param height       Height to draw
+   *
+   * @param guiGraphics gui graphics instance
+   * @param texture     The texture to draw
+   * @param x           X position
+   * @param y           Y position
+   * @param textureX    Texture X
+   * @param textureY    Texture Y
+   * @param width       Width to draw
+   * @param height      Height to draw
    */
   private void blit(GuiGraphics guiGraphics, ResourceLocation texture, int x, int y, int textureX, int textureY, int width, int height) {
     guiGraphics.blit(texture, x, y, textureX, textureY, width, height);
@@ -56,14 +58,15 @@ public class ExtraHeartRenderHandler {
 
   /**
    * Event listener
-   * @param guiGraphics  Event instance
+   *
+   * @param guiGraphics Event instance
    */
   public boolean renderHealthbar(GuiGraphics guiGraphics, float partialTicks, Window window, Types type) {
     if (!Config.EXTRA_HEART_RENDERER.get() || type != Types.PLAYER_HEALTH) {
       return false;
     }
     // ensure its visible
-    if (mc.options.hideGui || !(mc.gameMode.canHurtPlayer() && mc.getCameraEntity() instanceof Player)) {
+    if (this.mc.options.hideGui || !(this.mc.gameMode.canHurtPlayer() && this.mc.getCameraEntity() instanceof Player)) {
       return false;
     }
     Entity renderViewEnity = this.mc.getCameraEntity();
@@ -98,8 +101,7 @@ public class ExtraHeartRenderHandler {
     if (health < this.playerHealth && player.invulnerableTime > 0) {
       this.lastSystemTime = Util.getMillis();
       this.healthUpdateCounter = (updateCounter + 20);
-    }
-    else if (health > this.playerHealth && player.invulnerableTime > 0) {
+    } else if (health > this.playerHealth && player.invulnerableTime > 0) {
       this.lastSystemTime = Util.getMillis();
       this.healthUpdateCounter = (updateCounter + 10);
     }
@@ -142,7 +144,7 @@ public class ExtraHeartRenderHandler {
     final int TOP = 9 * (this.mc.level.getLevelData().isHardcore() ? 5 : 0);
     final int BACKGROUND = (highlight ? 25 : 16);
     int MARGIN = 16;
-    if      (player.hasEffect(MobEffects.POISON)) MARGIN += 36;
+    if (player.hasEffect(MobEffects.POISON)) MARGIN += 36;
     else if (player.hasEffect(MobEffects.WITHER)) MARGIN += 72;
     float absorbRemaining = absorb;
 
@@ -159,8 +161,7 @@ public class ExtraHeartRenderHandler {
       if (highlight) {
         if (i * 2 + 1 < healthLast) {
           this.blit(guiGraphics, Gui.GUI_ICONS_LOCATION, x, y, MARGIN + 54, TOP, 9, 9); //6
-        }
-        else if (i * 2 + 1 == healthLast) {
+        } else if (i * 2 + 1 == healthLast) {
           this.blit(guiGraphics, Gui.GUI_ICONS_LOCATION, x, y, MARGIN + 63, TOP, 9, 9); //7
         }
       }
@@ -169,17 +170,14 @@ public class ExtraHeartRenderHandler {
         if (absorbRemaining == absorb && absorb % 2.0F == 1.0F) {
           this.blit(guiGraphics, Gui.GUI_ICONS_LOCATION, x, y, MARGIN + 153, TOP, 9, 9); //17
           absorbRemaining -= 1.0F;
-        }
-        else {
+        } else {
           this.blit(guiGraphics, Gui.GUI_ICONS_LOCATION, x, y, MARGIN + 144, TOP, 9, 9); //16
           absorbRemaining -= 2.0F;
         }
-      }
-      else {
+      } else {
         if (i * 2 + 1 < health) {
           this.blit(guiGraphics, Gui.GUI_ICONS_LOCATION, x, y, MARGIN + 36, TOP, 9, 9); //4
-        }
-        else if (i * 2 + 1 == health) {
+        } else if (i * 2 + 1 == health) {
           this.blit(guiGraphics, Gui.GUI_ICONS_LOCATION, x, y, MARGIN + 45, TOP, 9, 9); //5
         }
       }
@@ -200,8 +198,9 @@ public class ExtraHeartRenderHandler {
 
   /**
    * Gets the texture from potion effects
-   * @param player  Player instance
-   * @return  Texture offset for potion effects
+   *
+   * @param player Player instance
+   * @return Texture offset for potion effects
    */
   private int getPotionOffset(Player player) {
     int potionOffset = 0;
@@ -222,10 +221,11 @@ public class ExtraHeartRenderHandler {
 
   /**
    * Renders the health above 10 hearts
-   * @param guiGraphics  Gui graphics instance
-   * @param xBasePos     Health bar top corner
-   * @param yBasePos     Health bar top corner
-   * @param player       Player instance
+   *
+   * @param guiGraphics Gui graphics instance
+   * @param xBasePos    Health bar top corner
+   * @param yBasePos    Health bar top corner
+   * @param player      Player instance
    */
   private void renderExtraHearts(GuiGraphics guiGraphics, int xBasePos, int yBasePos, Player player) {
     int potionOffset = this.getPotionOffset(player);
@@ -237,10 +237,11 @@ public class ExtraHeartRenderHandler {
 
   /**
    * Renders the absorption health above 10 hearts
-   * @param guiGraphics  Gui graphics instance
-   * @param xBasePos     Health bar top corner
-   * @param yBasePos     Health bar top corner
-   * @param player       Player instance
+   *
+   * @param guiGraphics Gui graphics instance
+   * @param xBasePos    Health bar top corner
+   * @param yBasePos    Health bar top corner
+   * @param player      Player instance
    */
   private void renderExtraAbsorption(GuiGraphics guiGraphics, int xBasePos, int yBasePos, Player player) {
     int potionOffset = this.getPotionOffset(player);
@@ -252,8 +253,9 @@ public class ExtraHeartRenderHandler {
 
   /**
    * Gets the texture offset from the regen effect
-   * @param i       Heart index
-   * @param offset  Current offset
+   *
+   * @param i      Heart index
+   * @param offset Current offset
    */
   private int getYRegenOffset(int i, int offset) {
     return i + offset == this.regen ? -2 : 0;
@@ -261,6 +263,7 @@ public class ExtraHeartRenderHandler {
 
   /**
    * Shared logic to render custom hearts
+   *
    * @param guiGraphics  Gui graphics instance
    * @param texture      Texture to draw
    * @param xBasePos     Health bar top corner

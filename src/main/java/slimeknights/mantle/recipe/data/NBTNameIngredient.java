@@ -16,6 +16,7 @@ import java.util.stream.Stream;
  * Ingredient for a NBT sensitive item from another mod, should never be used outside datagen
  */
 public class NBTNameIngredient extends Ingredient {
+
   private final ResourceLocation name;
   @Nullable
   private final CompoundTag nbt;
@@ -28,9 +29,10 @@ public class NBTNameIngredient extends Ingredient {
 
   /**
    * Creates an ingredient for the given name and NBT
-   * @param name  Item name
-   * @param nbt   NBT
-   * @return  Ingredient
+   *
+   * @param name Item name
+   * @param nbt  NBT
+   * @return Ingredient
    */
   public static NBTNameIngredient from(ResourceLocation name, CompoundTag nbt) {
     return new NBTNameIngredient(name, nbt);
@@ -38,8 +40,9 @@ public class NBTNameIngredient extends Ingredient {
 
   /**
    * Creates an ingredient for an item that must have no NBT
-   * @param name  Item name
-   * @return  Ingredient
+   *
+   * @param name Item name
+   * @return Ingredient
    */
   public static NBTNameIngredient from(ResourceLocation name) {
     return new NBTNameIngredient(name, null);
@@ -55,13 +58,13 @@ public class NBTNameIngredient extends Ingredient {
     JsonObject json = new JsonObject();
     json.addProperty("fabric:type", "fabric:nbt");
     JsonObject item = new JsonObject();
-    item.addProperty("item", name.toString());
+    item.addProperty("item", this.name.toString());
 
     json.add("base", item);
     json.addProperty("strict", true);
 
-    if (nbt != null) {
-      json.add("nbt", NbtOps.INSTANCE.convertTo(JsonOps.INSTANCE, nbt));
+    if (this.nbt != null) {
+      json.add("nbt", NbtOps.INSTANCE.convertTo(JsonOps.INSTANCE, this.nbt));
     }
 
     return json;

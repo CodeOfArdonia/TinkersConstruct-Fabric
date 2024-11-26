@@ -41,22 +41,33 @@ import java.util.stream.Collectors;
  * Shared logic for fluids rendering in blocks below between Ceramics and Tinkers Construct
  */
 public class FaucetFluidLoader extends SimpleJsonResourceReloadListener implements IdentifiableResourceReloadListener {
-  /** GSON instance for this */
+
+  /**
+   * GSON instance for this
+   */
   private static final Gson GSON = new GsonBuilder()
     .setPrettyPrinting()
     .disableHtmlEscaping()
     .create();
 
-  /** Singleton instance */
+  /**
+   * Singleton instance
+   */
   private static final FaucetFluidLoader INSTANCE = new FaucetFluidLoader();
 
-  /** Name of the default fluid model, shared between Ceramics and Tinkers Construct */
+  /**
+   * Name of the default fluid model, shared between Ceramics and Tinkers Construct
+   */
   private static final ResourceLocation DEFAULT_NAME = Mantle.getResource("_default");
 
-  /** Map of fluids */
-  private final Map<BlockState,FaucetFluid> fluidMap = new HashMap<>();
+  /**
+   * Map of fluids
+   */
+  private final Map<BlockState, FaucetFluid> fluidMap = new HashMap<>();
 
-  /** Used to prevent being initialized multiple times */
+  /**
+   * Used to prevent being initialized multiple times
+   */
   private static boolean initialized = false;
 
   /**
@@ -70,33 +81,36 @@ public class FaucetFluidLoader extends SimpleJsonResourceReloadListener implemen
     ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(INSTANCE);
   }
 
-  /** Default fluid model for blocks with no model */
+  /**
+   * Default fluid model for blocks with no model
+   */
   private FaucetFluid defaultFluid;
+
   private FaucetFluidLoader() {
     super(GSON, "models/faucet_fluid");
-    defaultFluid = FaucetFluid.EMPTY;
+    this.defaultFluid = FaucetFluid.EMPTY;
   }
 
   @Override
-  protected void apply(Map<ResourceLocation,JsonElement> map, ResourceManager resourceManager, ProfilerFiller profiler) {
+  protected void apply(Map<ResourceLocation, JsonElement> map, ResourceManager resourceManager, ProfilerFiller profiler) {
     // parse default first
     JsonElement def = map.get(DEFAULT_NAME);
     if (def == null || !def.isJsonObject()) {
       Mantle.logger.warn("Found no default fluid model, this is likely a problem with the resource pack");
-      defaultFluid = FaucetFluid.EMPTY;
+      this.defaultFluid = FaucetFluid.EMPTY;
     } else {
       try {
-        defaultFluid = FaucetFluid.parseDefault(def.getAsJsonObject());
+        this.defaultFluid = FaucetFluid.parseDefault(def.getAsJsonObject());
       } catch (Exception exception) {
         Mantle.logger.error("Failed to load default faucet fluid model {}", DEFAULT_NAME, exception);
       }
     }
 
     // parse remaining models
-    for (Entry<ResourceLocation,JsonElement> entry : map.entrySet()) {
+    for (Entry<ResourceLocation, JsonElement> entry : map.entrySet()) {
       // skip default, already parsed
       ResourceLocation location = entry.getKey();
-      if(location.equals(DEFAULT_NAME)) {
+      if (location.equals(DEFAULT_NAME)) {
         continue;
       }
 
@@ -110,13 +124,13 @@ public class FaucetFluidLoader extends SimpleJsonResourceReloadListener implemen
         JsonObject json = GsonHelper.convertToJsonObject(entry.getValue(), "");
         JsonObject variants = GsonHelper.getAsJsonObject(json, "variants");
         Block block = BuiltInRegistries.BLOCK.get(location);
-        if(block != null && block != Blocks.AIR) {
-          StateDefinition<Block,BlockState> container = block.getStateDefinition();
+        if (block != null && block != Blocks.AIR) {
+          StateDefinition<Block, BlockState> container = block.getStateDefinition();
           List<BlockState> validStates = container.getPossibleStates();
           for (Entry<String, JsonElement> variant : variants.entrySet()) {
             // parse fluid
-            FaucetFluid fluid = FaucetFluid.fromJson(GsonHelper.convertToJsonObject(variant.getValue(), variant.getKey()), defaultFluid);
-            validStates.stream().filter(ModelBakeryAccessor.port_lib$predicate(container, variant.getKey())).forEach(state -> fluidMap.put(state, fluid));
+            FaucetFluid fluid = FaucetFluid.fromJson(GsonHelper.convertToJsonObject(variant.getValue(), variant.getKey()), this.defaultFluid);
+            validStates.stream().filter(ModelBakeryAccessor.port_lib$predicate(container, variant.getKey())).forEach(state -> this.fluidMap.put(state, fluid));
           }
         } else {
           Mantle.logger.debug("Skipping loading faucet fluid model '{}' as no coorsponding block exists", location);
@@ -129,8 +143,9 @@ public class FaucetFluidLoader extends SimpleJsonResourceReloadListener implemen
 
   /**
    * Gets faucet fluid data for the given block
-   * @param state  Block state
-   * @return  Faucet fluid data
+   *
+   * @param state Block state
+   * @return Faucet fluid data
    */
   public static FaucetFluid get(BlockState state) {
     return INSTANCE.fluidMap.getOrDefault(state, INSTANCE.defaultFluid);
@@ -138,15 +153,16 @@ public class FaucetFluidLoader extends SimpleJsonResourceReloadListener implemen
 
   /**
    * Renders faucet fluids at the relevant location
-   * @param world       World instance
-   * @param pos         Base position
-   * @param direction   Direction to render
-   * @param matrices    Matrix instance
-   * @param buffer      Builder instance
-   * @param still       Still fluid texture
-   * @param flowing     Flowing fluid texture
-   * @param color       Color to tint fluid
-   * @param light       Fluid light value
+   *
+   * @param world     World instance
+   * @param pos       Base position
+   * @param direction Direction to render
+   * @param matrices  Matrix instance
+   * @param buffer    Builder instance
+   * @param still     Still fluid texture
+   * @param flowing   Flowing fluid texture
+   * @param color     Color to tint fluid
+   * @param light     Fluid light value
    */
   public static void renderFaucetFluids(LevelAccessor world, BlockPos pos, Direction direction, PoseStack matrices, VertexConsumer buffer, TextureAtlasSprite still, TextureAtlasSprite flowing, int color, int light) {
     int i = 0;
@@ -174,12 +190,19 @@ public class FaucetFluidLoader extends SimpleJsonResourceReloadListener implemen
    * Data class for faucet data for each region
    */
   public static class FaucetFluid {
+
     private static final FaucetFluid EMPTY = new FaucetFluid(Collections.emptyList(), Collections.emptyList(), false);
-    /** Fluid region below the faucet */
+    /**
+     * Fluid region below the faucet
+     */
     private final List<FluidCuboid> side;
-    /** Fluid region below a centered faucet */
+    /**
+     * Fluid region below a centered faucet
+     */
     private final List<FluidCuboid> center;
-    /** If true, continues into the block below */
+    /**
+     * If true, continues into the block below
+     */
     private final boolean cont;
 
     public FaucetFluid(List<FluidCuboid> side, List<FluidCuboid> center, boolean cont) {
@@ -190,28 +213,31 @@ public class FaucetFluidLoader extends SimpleJsonResourceReloadListener implemen
 
     /**
      * Gets the list of fluids for the given direction
-     * @param dir  Faucet direction
-     * @return  List of fluids to render below
+     *
+     * @param dir Faucet direction
+     * @return List of fluids to render below
      */
     public List<FluidCuboid> getFluids(Direction dir) {
       if (dir.getAxis() == Axis.Y) {
-        return center;
+        return this.center;
       }
-      return side;
+      return this.side;
     }
 
     /**
      * Returns true if the fluid continues into the block below
-     * @return  true if continues
+     *
+     * @return true if continues
      */
     public boolean isContinued() {
-      return cont;
+      return this.cont;
     }
 
     /**
      * Creates a new fluid from JSON, without defaulting for sections. Used for parsing the default
-     * @param json  Fluid to create
-     * @return  New fluid
+     *
+     * @param json Fluid to create
+     * @return New fluid
      */
     protected static FaucetFluid parseDefault(JsonObject json) {
       List<FluidCuboid> side = FluidCuboid.listFromJson(json, "side");
@@ -221,9 +247,10 @@ public class FaucetFluidLoader extends SimpleJsonResourceReloadListener implemen
 
     /**
      * Creates a new fluid from JSON
-     * @param json  Fluid to create
-     * @param def   Default fluid for extension
-     * @return  New fluid
+     *
+     * @param json Fluid to create
+     * @param def  Default fluid for extension
+     * @return New fluid
      */
     protected static FaucetFluid fromJson(JsonObject json, FaucetFluid def) {
       List<FluidCuboid> side = parseFluids(json, "side", def.side);
@@ -234,10 +261,11 @@ public class FaucetFluidLoader extends SimpleJsonResourceReloadListener implemen
 
     /**
      * Parses the fluids for the given side, defaulting as relevant
-     * @param json  Json object to parse
-     * @param tag   Tag name to parse
-     * @param def   Default list for this region
-     * @return  List of fluid cuboids
+     *
+     * @param json Json object to parse
+     * @param tag  Tag name to parse
+     * @param def  Default list for this region
+     * @return List of fluid cuboids
      */
     private static List<FluidCuboid> parseFluids(JsonObject json, String tag, List<FluidCuboid> def) {
       JsonElement element;

@@ -9,6 +9,7 @@ import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import javax.annotation.Nullable;
 
 public class WoodenDoorBlock extends DoorBlock implements LandPathNodeTypesRegistry.StaticPathNodeTypeProvider {
+
   public WoodenDoorBlock(Properties builder, BlockSetType blockSetType) {
     super(builder, blockSetType);
     LandPathNodeTypesRegistry.register(this, this);

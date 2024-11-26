@@ -16,15 +16,19 @@ import java.util.function.Supplier;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RegistrationHelper {
-  /** Wood types to register with the texture atlas */
+
+  /**
+   * Wood types to register with the texture atlas
+   */
   private static final List<WoodType> WOOD_TYPES = new ArrayList<>();
 
   /**
    * Creates a supplier for a specific registry entry instance based on the delegate to a general instance.
    * Note that this performs an unchecked cast, be certain that the right type is returned
-   * @param delegate  Delegate instance
-   * @param <I>  Forge registry type
-   * @return  Supplier for the given instance
+   *
+   * @param delegate Delegate instance
+   * @param <I>      Forge registry type
+   * @return Supplier for the given instance
    */
   @SuppressWarnings("unchecked")
   public static <I> Supplier<I> castDelegate(I delegate) {
@@ -33,9 +37,10 @@ public class RegistrationHelper {
 
   /**
    * Handles missing mappings for the given registry
-   * @param event    Mappings event
-   * @param handler  Mapping handler
-   * @param <T>      Event type
+   *
+   * @param event   Mappings event
+   * @param handler Mapping handler
+   * @param <T>     Event type
    */
   public static void handleMissingMappingsBlock(DataFixerBuilder builder, Function<String, String> handler) {
     Schema schema = builder.addSchema(0, DataFixers.SAME_NAMESPACED);
@@ -50,14 +55,18 @@ public class RegistrationHelper {
 //    }
   }
 
-  /** Registers a wood type to be injected into the atlas, should be called before client setup */
+  /**
+   * Registers a wood type to be injected into the atlas, should be called before client setup
+   */
   public static void registerWoodType(WoodType type) {
     synchronized (WOOD_TYPES) {
       WOOD_TYPES.add(type);
     }
   }
 
-  /** Runs the given consumer for each wood type registered */
+  /**
+   * Runs the given consumer for each wood type registered
+   */
   public static void forEachWoodType(Consumer<WoodType> consumer) {
     WOOD_TYPES.forEach(consumer);
   }

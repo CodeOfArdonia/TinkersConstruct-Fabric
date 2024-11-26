@@ -18,6 +18,7 @@ public class REIPlugin implements REIClientPlugin {
   }
 
   private static class MultiModuleContainerHandler<C extends MultiModuleContainerMenu<?>> implements ExclusionZonesProvider<MultiModuleScreen<C>> {
+
     @Override
     public Collection<Rectangle> provide(MultiModuleScreen<C> guiContainer) {
       return guiContainer.getModuleAreas().stream().map(rect2i -> {

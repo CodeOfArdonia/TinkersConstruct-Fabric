@@ -32,24 +32,31 @@ import java.util.stream.StreamSupport;
  * Ingredient accepting an entity or an entity tag as an input
  */
 public abstract class EntityIngredient implements Predicate<EntityType<?>> {
-  /** Empty entity ingredient, matching nothing */
+
+  /**
+   * Empty entity ingredient, matching nothing
+   */
   public static final EntityIngredient EMPTY = new SetMatch(Collections.emptySet());
 
   /**
    * Gets a list of entity types matched by this ingredient
-   * @return  List of types
+   *
+   * @return List of types
    */
   public abstract Collection<EntityType<?>> getTypes();
 
   /**
    * Serializes this ingredient to JSON
-   * @return  Json element of this ingredient
+   *
+   * @return Json element of this ingredient
    */
   public abstract JsonElement serialize();
 
-  /** Writes this ingredient to the packet buffer */
+  /**
+   * Writes this ingredient to the packet buffer
+   */
   public void write(FriendlyByteBuf buffer) {
-    Collection<EntityType<?>> collection = getTypes();
+    Collection<EntityType<?>> collection = this.getTypes();
     buffer.writeVarInt(collection.size());
     for (EntityType<?> type : collection) {
       buffer.writeVarInt(BuiltInRegistries.ENTITY_TYPE.getId(type));
@@ -73,7 +80,7 @@ public abstract class EntityIngredient implements Predicate<EntityType<?>> {
   /**
    * Creates an ingredient to match a set of types
    */
-  public static EntityIngredient of(EntityType<?> ... types) {
+  public static EntityIngredient of(EntityType<?>... types) {
     return of(ImmutableSet.copyOf(types));
   }
 
@@ -93,8 +100,9 @@ public abstract class EntityIngredient implements Predicate<EntityType<?>> {
 
   /**
    * Reads an ingredient from the packet buffer
-   * @param buffer  Buffer instance
-   * @return  Ingredient instnace
+   *
+   * @param buffer Buffer instance
+   * @return Ingredient instnace
    */
   public static EntityIngredient read(FriendlyByteBuf buffer) {
     int count = buffer.readVarInt();
@@ -110,8 +118,9 @@ public abstract class EntityIngredient implements Predicate<EntityType<?>> {
 
   /**
    * Finds an entity type for the given key
-   * @param name  Entity type name
-   * @return  Entity type
+   *
+   * @param name Entity type name
+   * @return Entity type
    */
   private static EntityType<?> findEntityType(ResourceLocation name) {
     if (BuiltInRegistries.ENTITY_TYPE.containsKey(name)) {
@@ -125,8 +134,9 @@ public abstract class EntityIngredient implements Predicate<EntityType<?>> {
 
   /**
    * Deserializes an ingredient from JSON
-   * @param root  Json
-   * @return  Ingredient
+   *
+   * @param root Json
+   * @return Ingredient
    */
   public static EntityIngredient deserialize(JsonElement root) {
     if (root.isJsonArray()) {
@@ -161,9 +171,12 @@ public abstract class EntityIngredient implements Predicate<EntityType<?>> {
     throw new JsonSyntaxException("Invalid entity type ingredient, must have 'type', 'types', or 'tag'");
   }
 
-  /** Ingredient matching a single type */
+  /**
+   * Ingredient matching a single type
+   */
   @RequiredArgsConstructor
   private static class Single extends EntityIngredient {
+
     private final EntityType<?> type;
 
     @Override
@@ -173,37 +186,40 @@ public abstract class EntityIngredient implements Predicate<EntityType<?>> {
 
     @Override
     public List<EntityType<?>> getTypes() {
-      return Collections.singletonList(type);
+      return Collections.singletonList(this.type);
     }
 
     @Override
     public JsonElement serialize() {
       JsonObject object = new JsonObject();
-      object.addProperty("type", Objects.requireNonNull(BuiltInRegistries.ENTITY_TYPE.getKey(type)).toString());
+      object.addProperty("type", Objects.requireNonNull(BuiltInRegistries.ENTITY_TYPE.getKey(this.type)).toString());
       return object;
     }
   }
 
-  /** Ingredient that matches any entity from a set */
+  /**
+   * Ingredient that matches any entity from a set
+   */
   @RequiredArgsConstructor
   private static class SetMatch extends EntityIngredient {
+
     private final Set<EntityType<?>> types;
 
     @Override
     public boolean test(EntityType<?> type) {
-      return types.contains(type);
+      return this.types.contains(type);
     }
 
     @Override
     public Set<EntityType<?>> getTypes() {
-      return types;
+      return this.types;
     }
 
     @Override
     public JsonElement serialize() {
       JsonObject object = new JsonObject();
       JsonArray array = new JsonArray();
-      for (EntityType<?> type : getTypes()) {
+      for (EntityType<?> type : this.getTypes()) {
         array.add(Objects.requireNonNull(BuiltInRegistries.ENTITY_TYPE.getKey(type)).toString());
       }
       object.add("types", array);
@@ -211,32 +227,35 @@ public abstract class EntityIngredient implements Predicate<EntityType<?>> {
     }
   }
 
-  /** Ingredient that matches any entity from a tag */
+  /**
+   * Ingredient that matches any entity from a tag
+   */
   @RequiredArgsConstructor
   private static class TagMatch extends EntityIngredient {
+
     private final TagKey<EntityType<?>> tag;
     private List<EntityType<?>> types;
 
     @Override
     public boolean test(EntityType<?> type) {
-      return type.is(tag);
+      return type.is(this.tag);
     }
 
     @Override
     public List<EntityType<?>> getTypes() {
-      if (types == null) {
-        types = StreamSupport.stream(BuiltInRegistries.ENTITY_TYPE.getTagOrEmpty(tag).spliterator(), false)
-                             .filter(Holder::isBound)
-                             .map(Holder::value)
-                             .collect(Collectors.toList());
+      if (this.types == null) {
+        this.types = StreamSupport.stream(BuiltInRegistries.ENTITY_TYPE.getTagOrEmpty(this.tag).spliterator(), false)
+          .filter(Holder::isBound)
+          .map(Holder::value)
+          .collect(Collectors.toList());
       }
-      return types;
+      return this.types;
     }
 
     @Override
     public JsonElement serialize() {
       JsonObject object = new JsonObject();
-      object.addProperty("tag", tag.location().toString());
+      object.addProperty("tag", this.tag.location().toString());
       return object;
     }
   }
@@ -246,12 +265,13 @@ public abstract class EntityIngredient implements Predicate<EntityType<?>> {
    */
   @RequiredArgsConstructor
   private static class Compound extends EntityIngredient {
+
     private final List<EntityIngredient> ingredients;
     private List<EntityType<?>> allTypes;
 
     @Override
     public boolean test(EntityType<?> type) {
-      for (EntityIngredient ingredient : ingredients) {
+      for (EntityIngredient ingredient : this.ingredients) {
         if (ingredient.test(type)) {
           return true;
         }
@@ -261,19 +281,19 @@ public abstract class EntityIngredient implements Predicate<EntityType<?>> {
 
     @Override
     public Collection<EntityType<?>> getTypes() {
-      if (allTypes == null) {
-        allTypes = ingredients.stream()
-                              .flatMap(ingredient -> ingredient.getTypes().stream())
-                              .distinct()
-                              .collect(Collectors.toList());
+      if (this.allTypes == null) {
+        this.allTypes = this.ingredients.stream()
+          .flatMap(ingredient -> ingredient.getTypes().stream())
+          .distinct()
+          .collect(Collectors.toList());
       }
-      return allTypes;
+      return this.allTypes;
     }
 
     @Override
     public JsonElement serialize() {
       JsonArray array = new JsonArray();
-      for (EntityIngredient ingredient : ingredients) {
+      for (EntityIngredient ingredient : this.ingredients) {
         array.add(ingredient.serialize());
       }
       return array;

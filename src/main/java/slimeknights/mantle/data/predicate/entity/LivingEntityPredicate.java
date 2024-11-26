@@ -13,21 +13,36 @@ import slimeknights.mantle.data.predicate.OrJsonPredicate;
 
 import java.util.function.Predicate;
 
-/** Predicate matching an entity */
+/**
+ * Predicate matching an entity
+ */
 public interface LivingEntityPredicate extends IJsonPredicate<LivingEntity> {
-  /** Predicate that matches all entities */
+
+  /**
+   * Predicate that matches all entities
+   */
   LivingEntityPredicate ANY = simple(entity -> true);
 
-  /** Loader for block state predicates */
+  /**
+   * Loader for block state predicates
+   */
   GenericLoaderRegistry<IJsonPredicate<LivingEntity>> LOADER = new GenericLoaderRegistry<>(ANY, true);
-  /** Loader for inverted conditions */
+  /**
+   * Loader for inverted conditions
+   */
   InvertedJsonPredicate.Loader<LivingEntity> INVERTED = new InvertedJsonPredicate.Loader<>(LOADER);
-  /** Loader for and conditions */
-  NestedJsonPredicateLoader<LivingEntity,AndJsonPredicate<LivingEntity>> AND = AndJsonPredicate.createLoader(LOADER, INVERTED);
-  /** Loader for or conditions */
-  NestedJsonPredicateLoader<LivingEntity,OrJsonPredicate<LivingEntity>> OR = OrJsonPredicate.createLoader(LOADER, INVERTED);
+  /**
+   * Loader for and conditions
+   */
+  NestedJsonPredicateLoader<LivingEntity, AndJsonPredicate<LivingEntity>> AND = AndJsonPredicate.createLoader(LOADER, INVERTED);
+  /**
+   * Loader for or conditions
+   */
+  NestedJsonPredicateLoader<LivingEntity, OrJsonPredicate<LivingEntity>> OR = OrJsonPredicate.createLoader(LOADER, INVERTED);
 
-  /** Gets an inverted condition */
+  /**
+   * Gets an inverted condition
+   */
   @Override
   default IJsonPredicate<LivingEntity> inverted() {
     return INVERTED.create(this);
@@ -35,28 +50,48 @@ public interface LivingEntityPredicate extends IJsonPredicate<LivingEntity> {
 
   /* Singletons */
 
-  /** Predicate that matches water sensitive entities */
+  /**
+   * Predicate that matches water sensitive entities
+   */
   LivingEntityPredicate WATER_SENSITIVE = simple(LivingEntity::isSensitiveToWater);
-  /** Predicate that matches fire immune entities */
+  /**
+   * Predicate that matches fire immune entities
+   */
   LivingEntityPredicate FIRE_IMMUNE = simple(Entity::fireImmune);
-  /** Predicate that matches fire immune entities */
+  /**
+   * Predicate that matches fire immune entities
+   */
   LivingEntityPredicate ON_FIRE = simple(Entity::isOnFire);
-  /** Checks if the entity is on the ground */
+  /**
+   * Checks if the entity is on the ground
+   */
   LivingEntityPredicate ON_GROUND = simple(Entity::onGround);
-  /** Entities that are in the air */
+  /**
+   * Entities that are in the air
+   */
   LivingEntityPredicate CROUCHING = simple(Entity::isCrouching);
 
   // water
-  /** Entities with eyes in water */
+  /**
+   * Entities with eyes in water
+   */
   LivingEntityPredicate EYES_IN_WATER = simple(entity -> entity.wasEyeInWater);
-  /** Entities with feet in water */
+  /**
+   * Entities with feet in water
+   */
   LivingEntityPredicate FEET_IN_WATER = simple(Entity::isInWater);
-  /** Entities with head and feet are in water */
+  /**
+   * Entities with head and feet are in water
+   */
   LivingEntityPredicate UNDERWATER = simple(Entity::isUnderWater);
-  /** Checks if the entity is being hit by rain at their location */
+  /**
+   * Checks if the entity is being hit by rain at their location
+   */
   LivingEntityPredicate RAINING = simple(entity -> entity.level().isRainingAt(entity.blockPosition()));
 
-  /** Creates a new predicate singleton */
+  /**
+   * Creates a new predicate singleton
+   */
   static LivingEntityPredicate simple(Predicate<LivingEntity> predicate) {
     return SingletonLoader.singleton(loader -> new LivingEntityPredicate() {
       @Override

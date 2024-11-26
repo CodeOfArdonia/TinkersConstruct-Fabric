@@ -18,17 +18,26 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Page content for building an index, instantiate either through {@link ContentIndex} or {@link ContentListingSectionTransformer} */
+/**
+ * Page content for building an index, instantiate either through {@link ContentIndex} or {@link ContentListingSectionTransformer}
+ */
 public class ContentListing extends PageContent {
+
   public static final int LINE_HEIGHT = 10;
 
-  /** Title to display in the listing */
+  /**
+   * Title to display in the listing
+   */
   @Getter
   public String title = null;
-  /** Text to display below the title and before the index */
+  /**
+   * Text to display below the title and before the index
+   */
   public String subText = null;
 
-  /** Outer list represents all columns, inner list represents entries in a column */
+  /**
+   * Outer list represents all columns, inner list represents entries in a column
+   */
   private transient final List<List<TextData>> entries = Util.make(() -> {
     List<List<TextData>> lists = new ArrayList<>(1);
     lists.add(new ArrayList<>());
@@ -37,9 +46,10 @@ public class ContentListing extends PageContent {
 
   /**
    * Adds an entry to the list
-   * @param text        Title of entry
-   * @param link        Page to link to
-   * @param subSection  If true, this entry is a subsection and will be bold with no bullet point
+   *
+   * @param text       Title of entry
+   * @param link       Page to link to
+   * @param subSection If true, this entry is a subsection and will be bold with no bullet point
    */
   public void addEntry(String text, @Nullable PageData link, boolean subSection) {
     TextData data = new TextData(text);
@@ -52,14 +62,17 @@ public class ContentListing extends PageContent {
 
   /**
    * Adds an entry to the list that is not a subsection
-   * @param text        Title of entry
-   * @param link        Page to link to
+   *
+   * @param text Title of entry
+   * @param link Page to link to
    */
   public void addEntry(String text, @Nullable PageData link) {
-    addEntry(text, link, false);
+    this.addEntry(text, link, false);
   }
 
-  /** Forces a column break */
+  /**
+   * Forces a column break
+   */
   public void addColumnBreak() {
     if (!this.entries.get(this.entries.size() - 1).isEmpty()) {
       if (this.entries.size() == 3) {
@@ -69,12 +82,16 @@ public class ContentListing extends PageContent {
     }
   }
 
-  /** If true, there are entries in this listing */
+  /**
+   * If true, there are entries in this listing
+   */
   public boolean hasEntries() {
     return this.entries.get(0).size() > 0;
   }
 
-  /** Gets the height for a column in pixels */
+  /**
+   * Gets the height for a column in pixels
+   */
   private static int getColumnHeight(int yOff) {
     int columnHeight = BookScreen.PAGE_HEIGHT - yOff - 16;
     if (columnHeight % LINE_HEIGHT != 0) {
@@ -83,7 +100,9 @@ public class ContentListing extends PageContent {
     return columnHeight;
   }
 
-  /** Gets the number of elements that fits in a column, inefficient so suggest not calling this frequently */
+  /**
+   * Gets the number of elements that fits in a column, inefficient so suggest not calling this frequently
+   */
   public int getEntriesInColumn(SectionData sectionData) {
     int yOff = 0;
     if (this.title != null) {
@@ -148,9 +167,9 @@ public class ContentListing extends PageContent {
           // int height = this.parent.parent.parent.fontRenderer.wordWrapHeight(text, width) * LINE_HEIGHT / 9;
           int height;
           if (data.bold) {
-            height = TextDataRenderer.getLinesForString(text, ChatFormatting.BOLD.toString(), width, "", parent.parent.parent.fontRenderer) * LINE_HEIGHT;
+            height = TextDataRenderer.getLinesForString(text, ChatFormatting.BOLD.toString(), width, "", this.parent.parent.parent.fontRenderer) * LINE_HEIGHT;
           } else {
-            height = TextDataRenderer.getLinesForString(text, "", width, "- ", parent.parent.parent.fontRenderer) * LINE_HEIGHT;
+            height = TextDataRenderer.getLinesForString(text, "", width, "- ", this.parent.parent.parent.fontRenderer) * LINE_HEIGHT;
           }
           list.add(new ListingLeftElement(x, y + yOff, width, height, data.bold, data));
           y += height;

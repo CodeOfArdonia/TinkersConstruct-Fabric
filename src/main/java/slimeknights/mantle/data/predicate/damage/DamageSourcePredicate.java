@@ -19,16 +19,27 @@ import static slimeknights.mantle.data.GenericLoaderRegistry.SingletonLoader.sin
  * Predicate testing for damage sources
  */
 public interface DamageSourcePredicate extends IJsonPredicate<DamageSource> {
-  /** Predicate that matches all sources */
+
+  /**
+   * Predicate that matches all sources
+   */
   DamageSourcePredicate ANY = simple(source -> true);
-  /** Loader for item predicates */
+  /**
+   * Loader for item predicates
+   */
   GenericLoaderRegistry<IJsonPredicate<DamageSource>> LOADER = new GenericLoaderRegistry<>(ANY, true);
-  /** Loader for inverted conditions */
+  /**
+   * Loader for inverted conditions
+   */
   InvertedJsonPredicate.Loader<DamageSource> INVERTED = new InvertedJsonPredicate.Loader<>(LOADER, false);
-  /** Loader for and conditions */
-  NestedJsonPredicateLoader<DamageSource,AndJsonPredicate<DamageSource>> AND = AndJsonPredicate.createLoader(LOADER, INVERTED);
-  /** Loader for or conditions */
-  NestedJsonPredicateLoader<DamageSource,OrJsonPredicate<DamageSource>> OR = OrJsonPredicate.createLoader(LOADER, INVERTED);
+  /**
+   * Loader for and conditions
+   */
+  NestedJsonPredicateLoader<DamageSource, AndJsonPredicate<DamageSource>> AND = AndJsonPredicate.createLoader(LOADER, INVERTED);
+  /**
+   * Loader for or conditions
+   */
+  NestedJsonPredicateLoader<DamageSource, OrJsonPredicate<DamageSource>> OR = OrJsonPredicate.createLoader(LOADER, INVERTED);
 
   /* Vanilla getters */
   DamageSourcePredicate PROJECTILE = simple(damageSource -> damageSource.is(DamageTypeTags.IS_PROJECTILE));
@@ -41,9 +52,13 @@ public interface DamageSourcePredicate extends IJsonPredicate<DamageSource> {
   DamageSourcePredicate MAGIC = simple(damageSource -> damageSource.is(DamageTypes.MAGIC));
   DamageSourcePredicate FALL = simple(damageSource -> damageSource.is(DamageTypeTags.IS_FALL));
 
-  /** Damage that protection works against */
+  /**
+   * Damage that protection works against
+   */
   DamageSourcePredicate CAN_PROTECT = simple(source -> !source.is(DamageTypeTags.BYPASSES_EFFECTS) && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY));
-  /** Custom concept: damage dealt by non-projectile entities */
+  /**
+   * Custom concept: damage dealt by non-projectile entities
+   */
   DamageSourcePredicate MELEE = simple(source -> {
     if (source.is(DamageTypeTags.IS_PROJECTILE)) {
       return false;
@@ -64,7 +79,9 @@ public interface DamageSourcePredicate extends IJsonPredicate<DamageSource> {
     return INVERTED.create(this);
   }
 
-  /** Creates a simple predicate with no parameters */
+  /**
+   * Creates a simple predicate with no parameters
+   */
   static DamageSourcePredicate simple(Predicate<DamageSource> predicate) {
     return singleton(loader -> new DamageSourcePredicate() {
       @Override

@@ -8,6 +8,7 @@ import org.jetbrains.annotations.UnmodifiableView;
 import java.util.List;
 
 public interface IInventoryStorage extends SlottedStackStorage {
+
   /**
    * Retrieve an unmodifiable list of the wrappers for the slots in this inventory.
    * Each wrapper corresponds to a single slot in the inventory.
@@ -18,11 +19,11 @@ public interface IInventoryStorage extends SlottedStackStorage {
 
   @Override
   default int getSlotCount() {
-    return getSlots().size();
+    return this.getSlots().size();
   }
 
   @Override
   default SingleSlotStorage<ItemVariant> getSlot(int slot) {
-    return getSlots().get(slot);
+    return this.getSlots().get(slot);
   }
 }

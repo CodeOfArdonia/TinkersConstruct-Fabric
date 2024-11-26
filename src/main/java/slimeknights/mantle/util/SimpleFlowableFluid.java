@@ -24,6 +24,7 @@ import java.util.function.Supplier;
 
 // from Registrate
 public abstract class SimpleFlowableFluid extends FlowingFluid {
+
   private final Supplier<? extends Fluid> flowing;
   private final Supplier<? extends Fluid> still;
   @Nullable
@@ -35,7 +36,7 @@ public abstract class SimpleFlowableFluid extends FlowingFluid {
   private final int levelDecreasePerBlock;
   private final float blastResistance;
   private final int tickRate;
-  
+
   protected SimpleFlowableFluid(Properties properties) {
     this.flowing = properties.flowing;
     this.still = properties.still;
@@ -47,113 +48,116 @@ public abstract class SimpleFlowableFluid extends FlowingFluid {
     this.blastResistance = properties.blastResistance;
     this.tickRate = properties.tickRate;
   }
-  
+
   @Override
   public Fluid getFlowing() {
-    return flowing.get();
+    return this.flowing.get();
   }
-  
+
   @Override
   public Fluid getSource() {
-    return still.get();
+    return this.still.get();
   }
-  
+
   @Override
   protected boolean canConvertToSource(Level level) {
-    return infinite;
+    return this.infinite;
   }
-  
+
   @Override
   protected void beforeDestroyingBlock(LevelAccessor world, BlockPos pos, BlockState state) {
     BlockEntity blockEntity = state.hasBlockEntity() ? world.getBlockEntity(pos) : null;
     Block.dropResources(state, world, pos, blockEntity);
   }
-  
+
   @Override
   protected int getSlopeFindDistance(LevelReader world) {
-    return flowSpeed;
+    return this.flowSpeed;
   }
-  
+
   @Override
   protected int getDropOff(LevelReader worldIn) {
-    return levelDecreasePerBlock;
+    return this.levelDecreasePerBlock;
   }
-  
+
   @Override
   public Item getBucket() {
-    return bucket != null ? bucket.get() : Items.AIR;
+    return this.bucket != null ? this.bucket.get() : Items.AIR;
   }
-  
+
   @Override
   protected boolean canBeReplacedWith(FluidState state, BlockGetter world, BlockPos pos, Fluid fluid, Direction direction) {
-    return direction == Direction.DOWN && !isSame(fluid);
+    return direction == Direction.DOWN && !this.isSame(fluid);
   }
-  
+
   @Override
   public int getTickDelay(LevelReader world) {
-    return tickRate;
+    return this.tickRate;
   }
-  
+
   @Override
   protected float getExplosionResistance() {
-    return blastResistance;
+    return this.blastResistance;
   }
-  
+
   @Override
   protected BlockState createLegacyBlock(FluidState state) {
-    if (block != null) {
-      return block.get().defaultBlockState().setValue(LiquidBlock.LEVEL, getLegacyLevel(state));
+    if (this.block != null) {
+      return this.block.get().defaultBlockState().setValue(LiquidBlock.LEVEL, getLegacyLevel(state));
     }
     return Blocks.AIR.defaultBlockState();
   }
-  
+
   @Override
   public boolean isSame(Fluid fluid) {
-    return fluid == still.get() || fluid == flowing.get();
+    return fluid == this.still.get() || fluid == this.flowing.get();
   }
-  
+
   public static class Flowing extends SimpleFlowableFluid {
+
     public Flowing(Properties properties) {
       super(properties);
-      registerDefaultState(getStateDefinition().any().setValue(LEVEL, 7));
+      this.registerDefaultState(this.getStateDefinition().any().setValue(LEVEL, 7));
     }
-    
+
     @Override
     protected void createFluidStateDefinition(StateDefinition.Builder<Fluid, FluidState> builder) {
       super.createFluidStateDefinition(builder);
       builder.add(LEVEL);
     }
-    
+
     @Override
     public int getAmount(FluidState state) {
       return state.getValue(LEVEL);
     }
-    
+
     @Override
     public boolean isSource(FluidState state) {
       return false;
     }
   }
-  
+
   public static class Still extends SimpleFlowableFluid {
+
     public Still(Properties properties) {
       super(properties);
     }
-    
+
     @Override
     public int getAmount(FluidState state) {
       return 8;
     }
-    
+
     @Override
     public boolean isSource(FluidState state) {
       return true;
     }
   }
-  
+
   public static class Properties {
-    private Supplier<? extends Fluid> still;
-    private Supplier<? extends Fluid> flowing;
+
+    private final Supplier<? extends Fluid> still;
+    private final Supplier<? extends Fluid> flowing;
     public FluidAttributes.Builder attributes;
     private boolean infinite;
     private Supplier<? extends Item> bucket;
@@ -162,43 +166,43 @@ public abstract class SimpleFlowableFluid extends FlowingFluid {
     private int levelDecreasePerBlock = 1;
     private float blastResistance = 1;
     private int tickRate = 5;
-    
+
     public Properties(Supplier<? extends Fluid> still, Supplier<? extends Fluid> flowing, FluidAttributes.Builder attributes) {
       this.still = still;
       this.flowing = flowing;
       this.attributes = attributes;
     }
-    
+
     public Properties canMultiply() {
-      infinite = true;
+      this.infinite = true;
       return this;
     }
-    
+
     public Properties bucket(Supplier<? extends Item> bucket) {
       this.bucket = bucket;
       return this;
     }
-    
+
     public Properties block(Supplier<? extends LiquidBlock> block) {
       this.block = block;
       return this;
     }
-    
+
     public Properties flowSpeed(int flowSpeed) {
       this.flowSpeed = flowSpeed;
       return this;
     }
-    
+
     public Properties levelDecreasePerBlock(int levelDecreasePerBlock) {
       this.levelDecreasePerBlock = levelDecreasePerBlock;
       return this;
     }
-    
+
     public Properties blastResistance(float blastResistance) {
       this.blastResistance = blastResistance;
       return this;
     }
-    
+
     public Properties tickRate(int tickRate) {
       this.tickRate = tickRate;
       return this;

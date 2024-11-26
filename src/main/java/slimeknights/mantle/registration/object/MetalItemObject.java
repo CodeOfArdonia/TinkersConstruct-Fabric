@@ -9,8 +9,11 @@ import net.minecraft.world.level.block.Block;
 
 import java.util.function.Supplier;
 
-/** Object wrapper containing ingots, nuggets, and blocks */
+/**
+ * Object wrapper containing ingots, nuggets, and blocks
+ */
 public class MetalItemObject extends ItemObject<Block> {
+
   private final Supplier<? extends Item> ingot;
   private final Supplier<? extends Item> nugget;
   @Getter
@@ -32,20 +35,25 @@ public class MetalItemObject extends ItemObject<Block> {
     this.nuggetTag = getTag(tagName + "_nuggets");
   }
 
-  /** Gets the ingot for this object */
+  /**
+   * Gets the ingot for this object
+   */
   public Item getIngot() {
-    return ingot.get();
+    return this.ingot.get();
   }
 
-  /** Gets the ingot for this object */
+  /**
+   * Gets the ingot for this object
+   */
   public Item getNugget() {
-    return nugget.get();
+    return this.nugget.get();
   }
 
   /**
    * Creates a tag for a resource
-   * @param name  Tag name
-   * @return  Tag
+   *
+   * @param name Tag name
+   * @return Tag
    */
   private static TagKey<Item> getTag(String name) {
     return TagKey.create(Registries.ITEM, new ResourceLocation("c", name));

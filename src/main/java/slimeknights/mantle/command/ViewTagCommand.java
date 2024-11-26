@@ -18,29 +18,38 @@ import net.minecraft.tags.TagKey;
 import java.util.Collection;
 import java.util.Objects;
 
-/** Command that lists all values in a tag */
+/**
+ * Command that lists all values in a tag
+ */
 public class ViewTagCommand {
-  /** Tag has no values */
+
+  /**
+   * Tag has no values
+   */
   private static final Component EMPTY = Component.translatable("command.mantle.tag.empty");
-  /** Tag type cannot be found */
+  /**
+   * Tag type cannot be found
+   */
   protected static final Dynamic2CommandExceptionType TAG_NOT_FOUND = new Dynamic2CommandExceptionType((type, name) -> Component.translatable("command.mantle.tag.not_found", type, name));
 
   /**
    * Registers this sub command with the root command
-   * @param subCommand  Command builder
+   *
+   * @param subCommand Command builder
    */
   public static void register(LiteralArgumentBuilder<CommandSourceStack> subCommand) {
     subCommand.requires(source -> MantleCommand.requiresDebugInfoOrOp(source, MantleCommand.PERMISSION_GAME_COMMANDS))
-              .then(Commands.argument("type", RegistryArgument.registry()).suggests(MantleCommand.REGISTRY)
-                            .then(Commands.argument("name", ResourceLocationArgument.id()).suggests(MantleCommand.VALID_TAGS)
-                                          .executes(ViewTagCommand::run)));
+      .then(Commands.argument("type", RegistryArgument.registry()).suggests(MantleCommand.REGISTRY)
+        .then(Commands.argument("name", ResourceLocationArgument.id()).suggests(MantleCommand.VALID_TAGS)
+          .executes(ViewTagCommand::run)));
   }
 
   /**
    * Runs the view-tag command with the generic registry type, done to make generics happy
-   * @param context  Tag context
-   * @return  Integer return
-   * @throws CommandSyntaxException  If invalid values are passed
+   *
+   * @param context Tag context
+   * @return Integer return
+   * @throws CommandSyntaxException If invalid values are passed
    */
   private static <T> int runGeneric(CommandContext<CommandSourceStack> context, Registry<T> registry) throws CommandSyntaxException {
     ResourceLocation name = context.getArgument("name", ResourceLocation.class);
@@ -55,9 +64,9 @@ public class ViewTagCommand {
         output.append("\n* ").append(EMPTY);
       } else {
         values.stream()
-              .map(registry::getKey)
-              .sorted((a, b) -> Objects.requireNonNull(a).compareNamespaced(Objects.requireNonNull(b)))
-              .forEach(value -> output.append("\n* " + Objects.requireNonNull(value)));
+          .map(registry::getKey)
+          .sorted((a, b) -> Objects.requireNonNull(a).compareNamespaced(Objects.requireNonNull(b)))
+          .forEach(value -> output.append("\n* " + Objects.requireNonNull(value)));
       }
       context.getSource().sendSuccess(() -> output, true);
       return values.size();
@@ -67,9 +76,10 @@ public class ViewTagCommand {
 
   /**
    * Runs the view-tag command
-   * @param context  Tag context
-   * @return  Integer return
-   * @throws CommandSyntaxException  If invalid values are passed
+   *
+   * @param context Tag context
+   * @return Integer return
+   * @throws CommandSyntaxException If invalid values are passed
    */
   private static int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
     return runGeneric(context, RegistryArgument.getResult(context, "type"));

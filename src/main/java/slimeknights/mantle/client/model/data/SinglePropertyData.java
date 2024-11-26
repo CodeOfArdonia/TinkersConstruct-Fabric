@@ -9,17 +9,20 @@ import javax.annotation.Nullable;
 /**
  * IModelData instance that holds a single model data property. Will be more efficient than the map implementation in cases without more properties.
  * If you need more than one model property, use {@link ModelDataMap} instead.
- * @param <D>  Property type, for data validation
+ *
+ * @param <D> Property type, for data validation
  */
 @RequiredArgsConstructor
 public class SinglePropertyData<D> implements IModelData {
+
   private final ModelProperty<D> property;
   private D data = null;
 
   /**
    * Creates an instance with a property and preset data
-   * @param property  Property for this instance
-   * @param data      Original data
+   *
+   * @param property Property for this instance
+   * @param data     Original data
    */
   public SinglePropertyData(ModelProperty<D> property, @Nullable D data) {
     Preconditions.checkArgument(property.test(data), "Value is invalid for this property");
@@ -37,7 +40,7 @@ public class SinglePropertyData<D> implements IModelData {
   @Override
   public <T> T getData(ModelProperty<T> prop) {
     if (prop == this.property) {
-      return (T) data;
+      return (T) this.data;
     }
     return null;
   }

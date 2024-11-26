@@ -5,10 +5,14 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import slimeknights.mantle.client.book.data.element.TextData;
 
-/** Element within a {@link slimeknights.mantle.client.book.data.content.ContentListing} */
+/**
+ * Element within a {@link slimeknights.mantle.client.book.data.content.ContentListing}
+ */
 public class ListingLeftElement extends TextElement {
+
   private final boolean isClickable;
   private final int textStart;
+
   public ListingLeftElement(int x, int y, int width, int height, boolean subSection, TextData... text) {
     super(x, y, width, height, text);
     // determine if there should be hover text
@@ -31,24 +35,24 @@ public class ListingLeftElement extends TextElement {
 
   @Override
   public void draw(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks, Font fontRenderer) {
-    if (isClickable) {
+    if (this.isClickable) {
       if (this.isHovered(mouseX, mouseY)) {
         // update bullet
-        if (textStart == 1) {
+        if (this.textStart == 1) {
           this.text[0].text = "> ";
         }
         // update color and style
-        for (int i = textStart; i < this.text.length; i++) {
+        for (int i = this.textStart; i < this.text.length; i++) {
           this.text[i].color = "dark red";
           this.text[i].underlined = true;
         }
       } else {
         // restore bullet
-        if (textStart == 1) {
+        if (this.textStart == 1) {
           this.text[0].text = "- ";
         }
         // restore color and style
-        for (int i = textStart; i < this.text.length; i++) {
+        for (int i = this.textStart; i < this.text.length; i++) {
           this.text[i].color = "black";
           this.text[i].underlined = false;
         }

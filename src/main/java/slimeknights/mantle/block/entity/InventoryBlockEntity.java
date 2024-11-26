@@ -28,12 +28,15 @@ import javax.annotation.Nonnull;
 
 // Updated version of InventoryLogic in Mantle. Also contains a few bugfixes DOES NOT OVERRIDE createMenu
 public abstract class InventoryBlockEntity extends NameableBlockEntity implements Container, MenuProvider, Nameable, SidedStorageBlockEntity {
+
   private static final String TAG_INVENTORY_SIZE = "InventorySize";
   private static final String TAG_ITEMS = "Items";
   private static final String TAG_SLOT = "Slot";
 
   private NonNullList<ItemStack> inventory;
-  /** If true, the inventory size is saved to NBT, false means you are responsible for serializing it if it changes */
+  /**
+   * If true, the inventory size is saved to NBT, false means you are responsible for serializing it if it changes
+   */
   private final boolean saveSizeToNBT;
   protected int stackSizeLimit;
   @Getter
@@ -183,7 +186,7 @@ public abstract class InventoryBlockEntity extends NameableBlockEntity implement
   @Override
   public boolean stillValid(Player entityplayer) {
     // block changed/got broken?
-    if (level == null || this.level.getBlockEntity(this.worldPosition) != this || this.getBlockState().getBlock() == Blocks.AIR) {
+    if (this.level == null || this.level.getBlockEntity(this.worldPosition) != this || this.getBlockState().getBlock() == Blocks.AIR) {
       return false;
     }
 
@@ -201,7 +204,7 @@ public abstract class InventoryBlockEntity extends NameableBlockEntity implement
   @Override
   public void load(CompoundTag tags) {
     super.load(tags);
-    if (saveSizeToNBT) {
+    if (this.saveSizeToNBT) {
       this.resizeInternal(tags.getInt(TAG_INVENTORY_SIZE));
     }
     this.readInventoryFromNBT(tags);
@@ -211,11 +214,11 @@ public abstract class InventoryBlockEntity extends NameableBlockEntity implement
   public void saveSynced(CompoundTag tags) {
     super.saveSynced(tags);
     // only sync the size to the client by default
-    if (saveSizeToNBT) {
+    if (this.saveSizeToNBT) {
       tags.putInt(TAG_INVENTORY_SIZE, this.inventory.size());
     }
   }
-  
+
   @Override
   public void saveAdditional(CompoundTag tags) {
     super.saveAdditional(tags);

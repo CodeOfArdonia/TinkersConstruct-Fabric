@@ -1,8 +1,5 @@
 package slimeknights.mantle.fabric.transfer;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.StoragePreconditions;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageUtil;
@@ -15,7 +12,12 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 class PlayerInventoryStorage extends InventoryStorage {
+
   private final DroppedStacks droppedStacks;
   private final Inventory playerInventory;
 
@@ -27,18 +29,18 @@ class PlayerInventoryStorage extends InventoryStorage {
 
   @Override
   public long insert(ItemVariant resource, long maxAmount, TransactionContext transaction) {
-    return offer(resource, maxAmount, transaction);
+    return this.offer(resource, maxAmount, transaction);
   }
 
   public long offer(ItemVariant resource, long amount, TransactionContext tx) {
     StoragePreconditions.notBlankNotNegative(resource, amount);
     long initialAmount = amount;
 
-    List<SingleSlotStorage<ItemVariant>> mainSlots = getSlots().subList(0, Inventory.INVENTORY_SIZE);
+    List<SingleSlotStorage<ItemVariant>> mainSlots = this.getSlots().subList(0, Inventory.INVENTORY_SIZE);
 
     // Stack into the main stack first and the offhand stack second.
     for (InteractionHand hand : InteractionHand.values()) {
-      SingleSlotStorage<ItemVariant> handSlot = getHandSlot(hand);
+      SingleSlotStorage<ItemVariant> handSlot = this.getHandSlot(hand);
 
       if (handSlot.getResource().equals(resource)) {
         amount -= handSlot.insert(resource, amount, tx);
@@ -58,20 +60,20 @@ class PlayerInventoryStorage extends InventoryStorage {
 
     // Drop in the world on the server side (will be synced by the game with the client).
     // Dropping items is server-side only because it involves randomness.
-    if (amount > 0 && !playerInventory.player.level().isClientSide()) {
-      droppedStacks.addDrop(variant, amount, throwRandomly, retainOwnership, transaction);
+    if (amount > 0 && !this.playerInventory.player.level().isClientSide()) {
+      this.droppedStacks.addDrop(variant, amount, throwRandomly, retainOwnership, transaction);
     }
   }
 
   public SingleSlotStorage<ItemVariant> getHandSlot(InteractionHand hand) {
     if (Objects.requireNonNull(hand) == InteractionHand.MAIN_HAND) {
-      if (Inventory.isHotbarSlot(playerInventory.selected)) {
-        return getSlot(playerInventory.selected);
+      if (Inventory.isHotbarSlot(this.playerInventory.selected)) {
+        return this.getSlot(this.playerInventory.selected);
       } else {
-        throw new RuntimeException("Unexpected player selected slot: " + playerInventory.selected);
+        throw new RuntimeException("Unexpected player selected slot: " + this.playerInventory.selected);
       }
     } else if (hand == InteractionHand.OFF_HAND) {
-      return getSlot(Inventory.SLOT_OFFHAND);
+      return this.getSlot(Inventory.SLOT_OFFHAND);
     } else {
       throw new UnsupportedOperationException("Unknown hand: " + hand);
     }
@@ -79,20 +81,21 @@ class PlayerInventoryStorage extends InventoryStorage {
 
   @Override
   public String toString() {
-    return "PlayerInventoryStorage[" + DebugMessages.forInventory(playerInventory) + "]";
+    return "PlayerInventoryStorage[" + DebugMessages.forInventory(this.playerInventory) + "]";
   }
 
   private class DroppedStacks extends SnapshotParticipant<Integer> {
+
     final List<Entry> entries = new ArrayList<>();
 
     void addDrop(ItemVariant key, long amount, boolean throwRandomly, boolean retainOwnership, TransactionContext transaction) {
-      updateSnapshots(transaction);
-      entries.add(new Entry(key, amount, throwRandomly, retainOwnership));
+      this.updateSnapshots(transaction);
+      this.entries.add(new Entry(key, amount, throwRandomly, retainOwnership));
     }
 
     @Override
     protected Integer createSnapshot() {
-      return entries.size();
+      return this.entries.size();
     }
 
     @Override
@@ -100,25 +103,25 @@ class PlayerInventoryStorage extends InventoryStorage {
       // effectively cancel dropping the stacks
       int previousSize = snapshot;
 
-      while (entries.size() > previousSize) {
-        entries.remove(entries.size() - 1);
+      while (this.entries.size() > previousSize) {
+        this.entries.remove(this.entries.size() - 1);
       }
     }
 
     @Override
     protected void onFinalCommit() {
       // actually drop the stacks
-      for (Entry entry : entries) {
+      for (Entry entry : this.entries) {
         long remainder = entry.amount;
 
         while (remainder > 0) {
           int dropped = (int) Math.min(entry.key.getItem().getMaxStackSize(), remainder);
-          playerInventory.player.drop(entry.key.toStack(dropped), entry.throwRandomly, entry.retainOwnership);
+          PlayerInventoryStorage.this.playerInventory.player.drop(entry.key.toStack(dropped), entry.throwRandomly, entry.retainOwnership);
           remainder -= dropped;
         }
       }
 
-      entries.clear();
+      this.entries.clear();
     }
 
     private record Entry(ItemVariant key, long amount, boolean throwRandomly, boolean retainOwnership) {
@@ -130,14 +133,14 @@ class PlayerInventoryStorage extends InventoryStorage {
    *
    * <p>Note: This function has full transaction support, and will not actually drop the items until the outermost transaction is committed.
    *
-   * @param variant The variant to drop.
-   * @param amount How many of the variant to drop.
+   * @param variant         The variant to drop.
+   * @param amount          How many of the variant to drop.
    * @param retainOwnership If true, set the {@code Thrower} NBT data to the player's UUID.
-   * @param transaction The transaction this operation is part of.
+   * @param transaction     The transaction this operation is part of.
    * @see Player#drop(ItemStack, boolean, boolean)
    */
   public void drop(ItemVariant variant, long amount, boolean retainOwnership, TransactionContext transaction) {
-    drop(variant, amount, false, retainOwnership, transaction);
+    this.drop(variant, amount, false, retainOwnership, transaction);
   }
 
   /**
@@ -145,12 +148,12 @@ class PlayerInventoryStorage extends InventoryStorage {
    *
    * <p>Note: This function has full transaction support, and will not actually drop the items until the outermost transaction is committed.
    *
-   * @param variant The variant to drop.
-   * @param amount How many of the variant to drop.
+   * @param variant     The variant to drop.
+   * @param amount      How many of the variant to drop.
    * @param transaction The transaction this operation is part of.
    * @see Player#drop(ItemStack, boolean, boolean)
    */
   public void drop(ItemVariant variant, long amount, TransactionContext transaction) {
-    drop(variant, amount, false, transaction);
+    this.drop(variant, amount, false, transaction);
   }
 }

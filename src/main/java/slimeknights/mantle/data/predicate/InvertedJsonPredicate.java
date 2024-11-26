@@ -13,63 +13,74 @@ import slimeknights.mantle.data.loader.NestedLoader;
  */
 @RequiredArgsConstructor
 public class InvertedJsonPredicate<I> implements IJsonPredicate<I> {
+
   private final Loader<I> loader;
   private final IJsonPredicate<I> base;
 
   @Override
   public boolean matches(I input) {
-    return !base.matches(input);
+    return !this.base.matches(input);
   }
 
   @Override
   public IGenericLoader<? extends IJsonPredicate<I>> getLoader() {
-    return loader;
+    return this.loader;
   }
 
   @Override
   public IJsonPredicate<I> inverted() {
-    return base;
+    return this.base;
   }
 
-  /** Loader for an inverted JSON predicate */
+  /**
+   * Loader for an inverted JSON predicate
+   */
   @RequiredArgsConstructor
   public static class Loader<I> implements IGenericLoader<InvertedJsonPredicate<I>> {
-    /** Loader for predicates of this type */
+
+    /**
+     * Loader for predicates of this type
+     */
     private final GenericLoaderRegistry<IJsonPredicate<I>> loader;
-    /** If true, will support the nested method for predicates as a fallback, will still prefer the non-nested method for serializing */
+    /**
+     * If true, will support the nested method for predicates as a fallback, will still prefer the non-nested method for serializing
+     */
     private final boolean allowNested;
 
     public Loader(GenericLoaderRegistry<IJsonPredicate<I>> loader) {
       this(loader, true);
     }
 
-    /** Creates a new instance of an inverted predicate */
+    /**
+     * Creates a new instance of an inverted predicate
+     */
     public InvertedJsonPredicate<I> create(IJsonPredicate<I> predicate) {
       return new InvertedJsonPredicate<>(this, predicate);
     }
 
     @Override
     public InvertedJsonPredicate<I> deserialize(JsonObject json) {
-      if (allowNested && json.has("predicate")) {
-        return create(loader.getAndDeserialize(json, "predicate"));
+      if (this.allowNested && json.has("predicate")) {
+        return this.create(this.loader.getAndDeserialize(json, "predicate"));
       }
       NestedLoader.mapType(json, "inverted_type");
-      return create(loader.deserialize(json));
+      return this.create(this.loader.deserialize(json));
     }
 
     @Override
     public InvertedJsonPredicate<I> fromNetwork(FriendlyByteBuf buffer) {
-      return create(loader.fromNetwork(buffer));
+      return this.create(this.loader.fromNetwork(buffer));
     }
 
     @Override
     public void serialize(InvertedJsonPredicate<I> object, JsonObject json) {
-      NestedLoader.serializeInto(json, "inverted_type", loader, object.base);
+      NestedLoader.serializeInto(json, "inverted_type", this.loader, object.base);
     }
 
     @Override
     public void toNetwork(InvertedJsonPredicate<I> object, FriendlyByteBuf buffer) {
-      loader.toNetwork(object.base, buffer);
+      this.loader.toNetwork(object.base, buffer);
     }
-  };
+  }
+
 }

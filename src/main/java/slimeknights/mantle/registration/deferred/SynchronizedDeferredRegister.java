@@ -8,25 +8,34 @@ import net.minecraft.resources.ResourceKey;
 
 import java.util.function.Supplier;
 
-/** Deferred register instance that synchronizes register calls */
+/**
+ * Deferred register instance that synchronizes register calls
+ */
 @RequiredArgsConstructor(staticName = "create")
 public class SynchronizedDeferredRegister<T> {
+
   private final LazyRegistrar<T> internal;
 
-  /** Creates a new instance for the given resource key */
+  /**
+   * Creates a new instance for the given resource key
+   */
   public static <T> SynchronizedDeferredRegister<T> create(ResourceKey<? extends Registry<T>> key, String modid) {
     return create(LazyRegistrar.create(key, modid));
   }
 
-  /** Creates a new instance for the given forge registry */
+  /**
+   * Creates a new instance for the given forge registry
+   */
   public static <B> SynchronizedDeferredRegister<B> create(Registry<B> registry, String modid) {
     return create(LazyRegistrar.create(registry, modid));
   }
 
-  /** Registers the given object, synchronized over the internal register */
+  /**
+   * Registers the given object, synchronized over the internal register
+   */
   public <I extends T> RegistryObject<I> register(final String name, final Supplier<? extends I> sup) {
-    synchronized (internal) {
-      return internal.register(name, sup);
+    synchronized (this.internal) {
+      return this.internal.register(name, sup);
     }
   }
 
@@ -34,6 +43,6 @@ public class SynchronizedDeferredRegister<T> {
    * Registers the internal register with the event bus
    */
   public void register() {
-    internal.register();
+    this.internal.register();
   }
 }

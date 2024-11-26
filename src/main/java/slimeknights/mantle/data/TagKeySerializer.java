@@ -21,11 +21,12 @@ import java.lang.reflect.Type;
  */
 @RequiredArgsConstructor
 public class TagKeySerializer<T> implements JsonSerializer<TagKey<T>>, JsonDeserializer<TagKey<T>> {
+
   private final ResourceKey<Registry<T>> registry;
 
   @Override
   public TagKey<T> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-    return TagKey.create(registry, JsonHelper.convertToResourceLocation(json, "tag"));
+    return TagKey.create(this.registry, JsonHelper.convertToResourceLocation(json, "tag"));
   }
 
   @Override

@@ -56,7 +56,7 @@ public class ImageElement extends SizedBookElement {
     this.height = height;
     this.colorMultiplier = colorMultiplier;
 
-    if(image.item != null) {
+    if (image.item != null) {
       this.itemElement = new ItemElement(0, 0, 1F, image.item.getItems());
     }
   }
@@ -72,8 +72,7 @@ public class ImageElement extends SizedBookElement {
 
     if (this.image.item == null) {
       blitRaw(guiGraphics, requireNonNullElse(this.image.location, TextureManager.INTENTIONAL_MISSING_TEXTURE), this.x, this.y, this.width, this.height, this.image.u, this.image.u + this.image.uw, this.image.v, this.image.v + this.image.vh, this.image.texWidth, this.image.texHeight);
-    }
-    else {
+    } else {
       matrixStack.pushPose();
       matrixStack.translate(this.x, this.y, 0F);
       matrixStack.scale(this.width / 16F, this.height / 16F, 1F);

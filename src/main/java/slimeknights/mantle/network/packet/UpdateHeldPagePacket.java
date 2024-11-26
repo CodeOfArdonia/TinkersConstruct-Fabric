@@ -12,8 +12,10 @@ import slimeknights.mantle.client.book.BookHelper;
  */
 @RequiredArgsConstructor
 public class UpdateHeldPagePacket implements IThreadsafePacket {
+
   private final InteractionHand hand;
   private final String page;
+
   public UpdateHeldPagePacket(FriendlyByteBuf buffer) {
     this.hand = buffer.readEnum(InteractionHand.class);
     this.page = buffer.readUtf(100);
@@ -21,7 +23,7 @@ public class UpdateHeldPagePacket implements IThreadsafePacket {
 
   @Override
   public void encode(FriendlyByteBuf buf) {
-    buf.writeEnum(hand);
+    buf.writeEnum(this.hand);
     buf.writeUtf(this.page);
   }
 
@@ -29,7 +31,7 @@ public class UpdateHeldPagePacket implements IThreadsafePacket {
   public void handleThreadsafe(Context context) {
     Player player = context.getSender();
     if (player != null && this.page != null) {
-      ItemStack stack = player.getItemInHand(hand);
+      ItemStack stack = player.getItemInHand(this.hand);
       if (!stack.isEmpty()) {
         BookHelper.writeSavedPageToBook(stack, this.page);
       }

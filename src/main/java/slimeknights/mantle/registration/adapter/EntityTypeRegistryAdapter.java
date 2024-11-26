@@ -11,24 +11,30 @@ import slimeknights.mantle.Mantle;
  */
 @SuppressWarnings("unused")
 public class EntityTypeRegistryAdapter extends RegistryAdapter<EntityType<?>> {
-  /** @inheritDoc */
+
+  /**
+   * @inheritDoc
+   */
   public EntityTypeRegistryAdapter(String modId) {
     super(BuiltInRegistries.ENTITY_TYPE, modId);
   }
 
-  /** @inheritDoc */
+  /**
+   * @inheritDoc
+   */
   public EntityTypeRegistryAdapter() {
     super(BuiltInRegistries.ENTITY_TYPE, Mantle.modId);
   }
 
   /**
    * Registers an entity type from a builder
-   * @param builder  Builder instance
-   * @param name     Type name
-   * @param <T>      Entity type
-   * @return  Registered entity type
+   *
+   * @param builder Builder instance
+   * @param name    Type name
+   * @param <T>     Entity type
+   * @return Registered entity type
    */
   public <T extends Entity> EntityType<T> register(FabricEntityTypeBuilder<T> builder, String name) {
-    return register(builder.build(), name);
+    return this.register(builder.build(), name);
   }
 }

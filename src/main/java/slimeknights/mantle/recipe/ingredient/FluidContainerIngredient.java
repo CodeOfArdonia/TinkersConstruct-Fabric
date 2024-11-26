@@ -8,6 +8,7 @@ import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelp
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredient;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -16,8 +17,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.material.Fluid;
-
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.registration.object.FluidObject;
 import slimeknights.mantle.util.JsonHelper;
@@ -26,33 +25,47 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-/** Ingredient that matches a container of fluid */
+/**
+ * Ingredient that matches a container of fluid
+ */
 public class FluidContainerIngredient implements CustomIngredient {
+
   public static final ResourceLocation ID = Mantle.getResource("fluid_container");
   public static final Serializer SERIALIZER = new Serializer();
 
-  /** Ingredient to use for matching */
+  /**
+   * Ingredient to use for matching
+   */
   private final FluidIngredient fluidIngredient;
-  /** Internal ingredient to display the ingredient recipe viewers */
+  /**
+   * Internal ingredient to display the ingredient recipe viewers
+   */
   @Nullable
   private final Ingredient display;
   private ItemStack[] displayStacks;
+
   protected FluidContainerIngredient(FluidIngredient fluidIngredient, @Nullable Ingredient display) {
     this.fluidIngredient = fluidIngredient;
     this.display = display;
   }
 
-  /** Creates an instance from a fluid ingredient with a display container */
+  /**
+   * Creates an instance from a fluid ingredient with a display container
+   */
   public static FluidContainerIngredient fromIngredient(FluidIngredient ingredient, Ingredient display) {
     return new FluidContainerIngredient(ingredient, display);
   }
 
-  /** Creates an instance from a fluid ingredient with no display, not recommended */
+  /**
+   * Creates an instance from a fluid ingredient with no display, not recommended
+   */
   public static FluidContainerIngredient fromIngredient(FluidIngredient ingredient) {
     return new FluidContainerIngredient(ingredient, null);
   }
 
-  /** Creates an instance from a fluid ingredient with a display container */
+  /**
+   * Creates an instance from a fluid ingredient with a display container
+   */
   public static FluidContainerIngredient fromFluid(FluidObject<?> fluid, boolean forgeTag) {
     return fromIngredient(FluidIngredient.of(forgeTag ? fluid.getForgeTag() : fluid.getLocalTag(), FluidConstants.BUCKET), Ingredient.of(fluid));
   }
@@ -63,7 +76,7 @@ public class FluidContainerIngredient implements CustomIngredient {
     return stack != null && !stack.isEmpty() && Optional.ofNullable(FluidStorage.ITEM.find(stack, ContainerItemContext.withConstant(stack))).flatMap(cap -> {
       // second, must contain enough fluid
       FluidStack contained = TransferUtil.getFirstFluid(cap);
-      if (!contained.isEmpty() && fluidIngredient.getAmount(contained.getFluid()) == contained.getAmount() && fluidIngredient.test(contained.getFluid())) {
+      if (!contained.isEmpty() && this.fluidIngredient.getAmount(contained.getFluid()) == contained.getAmount() && this.fluidIngredient.test(contained.getFluid())) {
         // so far so good, from this point on we are forced to make copies as we need to try draining, so copy and fetch the copy's cap
         ItemStack copy = ItemHandlerHelper.copyStackWithSize(stack, 1);
         return Optional.ofNullable(copy);
@@ -73,7 +86,7 @@ public class FluidContainerIngredient implements CustomIngredient {
       // alright, we know it has the fluid, the question is just whether draining the fluid will give us the desired result
       Storage<FluidVariant> storage = FluidStorage.ITEM.find(cap, ContainerItemContext.withConstant(cap));
       Fluid fluid = TransferUtil.getFirstFluid(storage).getFluid();
-      long amount = fluidIngredient.getAmount(fluid);
+      long amount = this.fluidIngredient.getAmount(fluid);
       FluidStack drained = TransferUtil.extractAnyFluid(storage, amount);
       // we need an exact match, and we need the resulting container item to be the same as the item stack's container item
       return drained.getFluid() == fluid && drained.getAmount() == amount && ItemStack.matches(stack.getItem().getCraftingRemainingItem().getDefaultInstance(), cap);
@@ -87,17 +100,16 @@ public class FluidContainerIngredient implements CustomIngredient {
 
   @Override
   public List<ItemStack> getMatchingStacks() {
-    if (displayStacks == null) {
+    if (this.displayStacks == null) {
       // no container? unfortunately hard to display this recipe so show nothing
-      if (display == null) {
-        displayStacks = new ItemStack[0];
+      if (this.display == null) {
+        this.displayStacks = new ItemStack[0];
       } else {
-        displayStacks = display.getItems();
+        this.displayStacks = this.display.getItems();
       }
     }
-    return List.of(displayStacks);
+    return List.of(this.displayStacks);
   }
-
 
 
   @Override
@@ -105,8 +117,11 @@ public class FluidContainerIngredient implements CustomIngredient {
     return SERIALIZER;
   }
 
-  /** Serializer logic */
+  /**
+   * Serializer logic
+   */
   private static class Serializer implements CustomIngredientSerializer<FluidContainerIngredient> {
+
     @Override
     public ResourceLocation getIdentifier() {
       return ID;

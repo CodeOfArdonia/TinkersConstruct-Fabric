@@ -9,13 +9,16 @@ import slimeknights.mantle.data.predicate.IJsonPredicate;
 
 import java.util.Set;
 
-/** Predicate matching entities from a set */
+/**
+ * Predicate matching entities from a set
+ */
 public record EntitySetPredicate(Set<EntityType<?>> entities) implements LivingEntityPredicate {
+
   public static final IGenericLoader<EntitySetPredicate> LOADER = new RegistrySetLoader<>("entities", BuiltInRegistries.ENTITY_TYPE, EntitySetPredicate::new, EntitySetPredicate::entities);
 
   @Override
   public boolean matches(LivingEntity entity) {
-    return entities.contains(entity.getType());
+    return this.entities.contains(entity.getType());
   }
 
   @Override

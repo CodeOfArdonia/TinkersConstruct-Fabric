@@ -164,6 +164,7 @@ public class BookLoader implements SimpleSynchronousResourceReloadListener {
 
   /**
    * Gets the instance of the given book
+   *
    * @param id The ID of the book to retrieve
    * @return The book object, or null if it doesn't exist
    */
@@ -174,9 +175,10 @@ public class BookLoader implements SimpleSynchronousResourceReloadListener {
 
   /**
    * Updates the saved page of a held book
-   * @param player  Player instance
-   * @param hand    Hand
-   * @param page    New page
+   *
+   * @param player Player instance
+   * @param hand   Hand
+   * @param page   New page
    */
   public static void updateSavedPage(@Nullable Player player, InteractionHand hand, String page) {
     if (player != null) {
@@ -190,18 +192,19 @@ public class BookLoader implements SimpleSynchronousResourceReloadListener {
 
   /**
    * Updates the saved page of a held book
-   * @param pos     Position being changed
-   * @param page    New page
+   *
+   * @param pos  Position being changed
+   * @param page New page
    */
   public static void updateSavedPage(BlockPos pos, String page) {
     MantleNetwork.INSTANCE.network.sendToServer(new UpdateLecternPagePacket(pos, page));
   }
 
   public static Gson getGson() {
-    if(gson == null || gsonDirty) {
+    if (gson == null || gsonDirty) {
       GsonBuilder builder = new GsonBuilder();
 
-      for(Type type : gsonTypeAdapters.keySet()) {
+      for (Type type : gsonTypeAdapters.keySet()) {
         builder.registerTypeAdapter(type, gsonTypeAdapters.get(type));
       }
 
@@ -217,12 +220,16 @@ public class BookLoader implements SimpleSynchronousResourceReloadListener {
     gsonDirty = true;
   }
 
-  /** Reloads all the books, used in the command and the resource manager reloading */
+  /**
+   * Reloads all the books, used in the command and the resource manager reloading
+   */
   public static void resetAllBooks() {
     books.forEach((s, bookData) -> bookData.reset());
   }
 
-  /** Reloads all the books, called when the resource manager reloads, such as when the resource pack or the language is change */
+  /**
+   * Reloads all the books, called when the resource manager reloads, such as when the resource pack or the language is change
+   */
   @Override
   public void onResourceManagerReload(ResourceManager resourceManager) {
     resetAllBooks();

@@ -14,14 +14,16 @@ import java.util.function.Supplier;
  */
 @SuppressWarnings("WeakerAccess")
 public class BuildingBlockObject extends ItemObject<Block> {
+
   private final Supplier<? extends SlabBlock> slab;
   private final Supplier<? extends StairBlock> stairs;
 
   /**
    * Creates a new building block object from three blocks
-   * @param block   Base block
-   * @param slab    Slab block, should be an instance of SlabBlock
-   * @param stairs  Stairs block, should be an instance of StairsBlock
+   *
+   * @param block  Base block
+   * @param slab   Slab block, should be an instance of SlabBlock
+   * @param stairs Stairs block, should be an instance of StairsBlock
    */
   public BuildingBlockObject(Block block, Block slab, Block stairs) {
     super(block);
@@ -31,9 +33,10 @@ public class BuildingBlockObject extends ItemObject<Block> {
 
   /**
    * Creates a new object from a ItemObject and some suppliers.
-   * @param block   Base block
-   * @param slab    Slab block
-   * @param stairs  Stairs block
+   *
+   * @param block  Base block
+   * @param slab   Slab block
+   * @param stairs Stairs block
    */
   public BuildingBlockObject(ItemObject<? extends Block> block, Supplier<? extends SlabBlock> slab, Supplier<? extends StairBlock> stairs) {
     super(block);
@@ -43,7 +46,8 @@ public class BuildingBlockObject extends ItemObject<Block> {
 
   /**
    * Creates a new object from another building block object, intended to be used in subclasses to copy properties
-   * @param object   Object to copy
+   *
+   * @param object Object to copy
    */
   protected BuildingBlockObject(BuildingBlockObject object) {
     super(object);
@@ -51,21 +55,26 @@ public class BuildingBlockObject extends ItemObject<Block> {
     this.stairs = object.stairs;
   }
 
-  /** Gets the slab for this block */
+  /**
+   * Gets the slab for this block
+   */
   public SlabBlock getSlab() {
-    return Objects.requireNonNull(slab.get(), "Building Block Object missing slab");
+    return Objects.requireNonNull(this.slab.get(), "Building Block Object missing slab");
   }
 
-  /** Gets the stairs for this block */
+  /**
+   * Gets the stairs for this block
+   */
   public StairBlock getStairs() {
-    return Objects.requireNonNull(stairs.get(), "Building Block Object missing stairs");
+    return Objects.requireNonNull(this.stairs.get(), "Building Block Object missing stairs");
   }
 
   /**
    * Gets an array of the blocks in this object
-   * @return  Array of the blocks in this object
+   *
+   * @return Array of the blocks in this object
    */
   public List<Block> values() {
-    return Arrays.asList(get(), getSlab(), getStairs());
+    return Arrays.asList(this.get(), this.getSlab(), this.getStairs());
   }
 }

@@ -11,34 +11,37 @@ import javax.annotation.Nullable;
  */
 public interface INameableMenuProvider extends MenuProvider, Nameable {
 
-	/**
-	 * Gets the default name of this tile entity
-	 * @return  Default name
-	 */
-	Component getDefaultName();
+  /**
+   * Gets the default name of this tile entity
+   *
+   * @return Default name
+   */
+  Component getDefaultName();
 
-	/**
-	 * Gets the custom name for this tile entity
-	 * @return  Custom name
-	 */
-	@Override
-	@Nullable
-	Component getCustomName();
+  /**
+   * Gets the custom name for this tile entity
+   *
+   * @return Custom name
+   */
+  @Override
+  @Nullable
+  Component getCustomName();
 
-	/**
-	 * Sets the name for this tile entity
-	 * @param name  New custom name
-	 */
-	void setCustomName(Component name);
+  /**
+   * Sets the name for this tile entity
+   *
+   * @param name New custom name
+   */
+  void setCustomName(Component name);
 
-	@Override
-	default Component getName() {
-		Component customTitle = getCustomName();
-		return customTitle != null ? customTitle : getDefaultName();
-	}
+  @Override
+  default Component getName() {
+    Component customTitle = this.getCustomName();
+    return customTitle != null ? customTitle : this.getDefaultName();
+  }
 
-	@Override
-	default Component getDisplayName() {
-		return getName();
-	}
+  @Override
+  default Component getDisplayName() {
+    return this.getName();
+  }
 }

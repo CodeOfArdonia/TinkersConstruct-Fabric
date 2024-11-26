@@ -6,6 +6,7 @@ import slimeknights.mantle.fluid.attributes.FluidAttributes;
 
 // This class only exists to bypass class loading
 public class ClientFluidAttributeRegistry {
+
   public static void register(Fluid fluid, FluidAttributes attributes) {
     FluidRenderHandlerRegistry.INSTANCE.register(fluid, new FluidAttributeClientHandler(attributes));
   }

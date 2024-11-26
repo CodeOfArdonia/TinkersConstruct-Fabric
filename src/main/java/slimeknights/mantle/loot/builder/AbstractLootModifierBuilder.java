@@ -6,22 +6,31 @@ import slimeknights.mantle.data.GlobalLootModifierProvider;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Base builder for a global loot modifier during datagen, intended to be used with {@link GlobalLootModifierProvider} */
+/**
+ * Base builder for a global loot modifier during datagen, intended to be used with {@link GlobalLootModifierProvider}
+ */
 public abstract class AbstractLootModifierBuilder<B extends AbstractLootModifierBuilder<B>> {
+
   private final List<LootItemCondition> conditions = new ArrayList<>();
 
-  /** Adds a condition to the builder */
+  /**
+   * Adds a condition to the builder
+   */
   @SuppressWarnings("unchecked")
   public B addCondition(LootItemCondition condition) {
-    conditions.add(condition);
+    this.conditions.add(condition);
     return (B) this;
   }
 
-  /** Gets the built list of conditions */
+  /**
+   * Gets the built list of conditions
+   */
   protected LootItemCondition[] getConditions() {
-    return conditions.toArray(new LootItemCondition[0]);
+    return this.conditions.toArray(new LootItemCondition[0]);
   }
 
-  /** Builds the GLM */
+  /**
+   * Builds the GLM
+   */
   public abstract void build(String name, GlobalLootModifierProvider provider);
 }

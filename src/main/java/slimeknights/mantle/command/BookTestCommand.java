@@ -15,13 +15,17 @@ import slimeknights.mantle.network.packet.OpenNamedBookPacket;
 import java.util.HashSet;
 import java.util.Set;
 
-/** Command that opens a test book */
+/**
+ * Command that opens a test book
+ */
 public class BookTestCommand {
+
   private static final Set<ResourceLocation> BOOK_SUGGESTIONS = new HashSet<>();
 
   /**
    * Registers this sub command with the root command
-   * @param subCommand  Command builder
+   *
+   * @param subCommand Command builder
    */
   public static void register(LiteralArgumentBuilder<CommandSourceStack> subCommand) {
     subCommand.requires(source -> source.hasPermission(MantleCommand.PERMISSION_GAME_COMMANDS) && source.getEntity() instanceof ServerPlayer)
@@ -32,6 +36,7 @@ public class BookTestCommand {
 
   /**
    * Adds a book suggestion to the list of suggestions
+   *
    * @param suggestion The suggestion to be added
    */
   public static void addBookSuggestion(ResourceLocation suggestion) {
@@ -40,6 +45,7 @@ public class BookTestCommand {
 
   /**
    * Gets all book suggestions
+   *
    * @return The suggestions as stream
    */
   public static Iterable<ResourceLocation> getBookSuggestions() {
@@ -48,9 +54,10 @@ public class BookTestCommand {
 
   /**
    * Runs the book-test command for specific book
-   * @param context  Command context
-   * @return  Integer return
-   * @throws  CommandSyntaxException if sender is not a player
+   *
+   * @param context Command context
+   * @return Integer return
+   * @throws CommandSyntaxException if sender is not a player
    */
   private static int runBook(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
     ResourceLocation book = ResourceLocationArgument.getId(context, "id");
@@ -62,9 +69,10 @@ public class BookTestCommand {
 
   /**
    * Runs the book-test command
-   * @param context  Command context
-   * @return  Integer return
-   * @throws  CommandSyntaxException if sender is not a player
+   *
+   * @param context Command context
+   * @return Integer return
+   * @throws CommandSyntaxException if sender is not a player
    */
   private static int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
     CommandSourceStack source = context.getSource();

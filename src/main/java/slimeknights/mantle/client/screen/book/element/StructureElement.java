@@ -50,7 +50,7 @@ public class StructureElement extends SizedBookElement {
 
     this.renderInfo = new StructureInfo(structure);
 
-    this.structureWorld = new TemplateLevel(structure, renderInfo);
+    this.structureWorld = new TemplateLevel(structure, this.renderInfo);
 
     this.transX = x + width / 2F;
     this.transY = y + height / 2F;
@@ -111,8 +111,8 @@ public class StructureElement extends SizedBookElement {
                 overlay = OverlayTexture.NO_OVERLAY;
 
               blockRender.getModelRenderer().tesselateBlock(
-                structureWorld, blockRender.getBlockModel(state), state, pos, transform,
-                buffer.getBuffer(MantleRenderTypes.TRANSLUCENT_FULLBRIGHT), false, structureWorld.random, state.getSeed(pos),
+                this.structureWorld, blockRender.getBlockModel(state), state, pos, transform,
+                buffer.getBuffer(MantleRenderTypes.TRANSLUCENT_FULLBRIGHT), false, this.structureWorld.random, state.getSeed(pos),
                 overlay
               );
 
@@ -149,7 +149,7 @@ public class StructureElement extends SizedBookElement {
   public void mouseDragged(double clickX, double clickY, double mouseX, double mouseY, double lastX, double lastY, int button) {
     double dx = mouseX - lastX;
     double dy = mouseY - lastY;
-    this.additionalTransform = forRotation(dx * 80D / 104, dy * 0.8).compose(this.additionalTransform);
+    this.additionalTransform = this.forRotation(dx * 80D / 104, dy * 0.8).compose(this.additionalTransform);
   }
 
   @Override

@@ -26,7 +26,7 @@ import java.util.List;
 
 public class ContentStructure extends PageContent {
 
-  public static final transient ResourceLocation ID = Mantle.getResource("structure");
+  public static final ResourceLocation ID = Mantle.getResource("structure");
 
   @Getter
   public String title;
@@ -75,7 +75,7 @@ public class ContentStructure extends PageContent {
 
   @Override
   public void build(BookData book, ArrayList<BookElement> list, boolean rightSide) {
-    int y = getTitleHeight();
+    int y = this.getTitleHeight();
 
     if (this.title == null || this.title.isEmpty()) {
       y = 0;

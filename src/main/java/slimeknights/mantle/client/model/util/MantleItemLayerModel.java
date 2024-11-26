@@ -44,25 +44,32 @@ import java.util.function.Function;
  */
 @RequiredArgsConstructor
 public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerModel> {
-  /** Model loader instance */
+
+  /**
+   * Model loader instance
+   */
   public static final Loader LOADER = new Loader();
 
   private static final Direction[] HORIZONTALS = {Direction.UP, Direction.DOWN};
   private static final Direction[] VERTICALS = {Direction.WEST, Direction.EAST};
 
-  /** Layers in the model */
+  /**
+   * Layers in the model
+   */
   private final List<LayerData> layers;
 
-  /** Gets the layer at the given index */
+  /**
+   * Gets the layer at the given index
+   */
   private LayerData getLayer(int index) {
-    if (index < 0 || index >= layers.size()) {
+    if (index < 0 || index >= this.layers.size()) {
       return LayerData.DEFAULT;
     }
-    return layers.get(index);
+    return this.layers.get(index);
   }
 
   @Override
-  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation, boolean isGui3d) {
+  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation, boolean isGui3d) {
     ImmutableList.Builder<Material> materialBuilder = ImmutableList.builder();
     for (int i = 0; owner.hasTexture("layer" + i); i++) {
       materialBuilder.add(owner.getMaterial("layer" + i));
@@ -77,7 +84,7 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
     Transformation transform = modelTransform.getRotation();
     for (int i = textures.size() - 1; i >= 0; i--) {
       TextureAtlasSprite sprite = spriteGetter.apply(textures.get(i));
-      LayerData data = getLayer(i);
+      LayerData data = this.getLayer(i);
       builder.add(getQuadsForSprite(data.color(), data.noTint() ? -1 : i, sprite, transform, data.luminosity(), pixels));
     }
     // transform data
@@ -91,12 +98,13 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
 
   /**
    * Gets all quads for an item layer for the given sprite
-   * @param color       Color for the sprite in AARRGGBB format.
-   * @param tint        Tint index for {@link net.minecraft.client.color.block.BlockColors} and {@link net.minecraft.client.color.item.ItemColors}. Generally unused
-   * @param sprite      Sprite to convert into quads
-   * @param transform   Transforms to apply
-   * @param luminosity  Extra light to add to the quad from 0-15, makes it appear to glow a bit
-   * @return  List of baked quads
+   *
+   * @param color      Color for the sprite in AARRGGBB format.
+   * @param tint       Tint index for {@link net.minecraft.client.color.block.BlockColors} and {@link net.minecraft.client.color.item.ItemColors}. Generally unused
+   * @param sprite     Sprite to convert into quads
+   * @param transform  Transforms to apply
+   * @param luminosity Extra light to add to the quad from 0-15, makes it appear to glow a bit
+   * @return List of baked quads
    */
   public static Mesh getQuadsForSprite(int color, int tint, TextureAtlasSprite sprite, Transformation transform, int luminosity) {
     return getQuadsForSprite(color, tint, sprite, transform, luminosity, null);
@@ -104,13 +112,14 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
 
   /**
    * Gets all quads for an item layer for the given sprite
-   * @param color       Color for the sprite in AARRGGBB format.
-   * @param tint        Tint index for {@link net.minecraft.client.color.block.BlockColors} and {@link net.minecraft.client.color.item.ItemColors}. Generally unused
-   * @param sprite      Sprite to convert into quads
-   * @param transform   Transforms to apply
-   * @param luminosity  Extra light to add to the quad from 0-15, makes it appear to glow a bit
-   * @param pixels      Object to keep track of used pixels across multiple layers to help prevent z-fighting. To effective use, sprites must be built in reverse order. Use null to skip this logic
-   * @return  List of baked quads
+   *
+   * @param color      Color for the sprite in AARRGGBB format.
+   * @param tint       Tint index for {@link net.minecraft.client.color.block.BlockColors} and {@link net.minecraft.client.color.item.ItemColors}. Generally unused
+   * @param sprite     Sprite to convert into quads
+   * @param transform  Transforms to apply
+   * @param luminosity Extra light to add to the quad from 0-15, makes it appear to glow a bit
+   * @param pixels     Object to keep track of used pixels across multiple layers to help prevent z-fighting. To effective use, sprites must be built in reverse order. Use null to skip this logic
+   * @return List of baked quads
    */
   public static Mesh getQuadsForSprite(int color, int tint, TextureAtlasSprite sprite, Transformation transform, int luminosity, @Nullable ItemLayerPixels pixels) {
     MeshBuilder mesh = RendererAccess.INSTANCE.getRenderer().meshBuilder();
@@ -120,13 +129,13 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
     FaceData faceData = new FaceData(uMax, vMax);
     boolean translucent = false;
 
-    for(int f = 0; f < sprite.contents().getFrameCount(); f++) {
+    for (int f = 0; f < sprite.contents().getFrameCount(); f++) {
       boolean ptu;
       boolean[] ptv = new boolean[uMax];
       Arrays.fill(ptv, true);
-      for(int v = 0; v < vMax; v++) {
+      for (int v = 0; v < vMax; v++) {
         ptu = true;
-        for(int u = 0; u < uMax; u++) {
+        for (int u = 0; u < uMax; u++) {
           int alpha = sprite.contents().getPixelRGBA(f, u, vMax - v - 1) >> 24 & 0xFF;
           boolean t = alpha / 255f <= 0.1f;
 
@@ -134,30 +143,30 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
             translucent = true;
           }
 
-          if(ptu && !t) { // left - transparent, right - opaque
+          if (ptu && !t) { // left - transparent, right - opaque
             faceData.set(Direction.WEST, u, v);
           }
-          if(!ptu && t) { // left - opaque, right - transparent
-            faceData.set(Direction.EAST, u-1, v);
+          if (!ptu && t) { // left - opaque, right - transparent
+            faceData.set(Direction.EAST, u - 1, v);
           }
-          if(ptv[u] && !t) { // up - transparent, down - opaque
+          if (ptv[u] && !t) { // up - transparent, down - opaque
             faceData.set(Direction.UP, u, v);
           }
-          if(!ptv[u] && t) { // up - opaque, down - transparent
-            faceData.set(Direction.DOWN, u, v-1);
+          if (!ptv[u] && t) { // up - opaque, down - transparent
+            faceData.set(Direction.DOWN, u, v - 1);
           }
 
           ptu = t;
           ptv[u] = t;
         }
-        if(!ptu) { // last - opaque
-          faceData.set(Direction.EAST, uMax-1, v);
+        if (!ptu) { // last - opaque
+          faceData.set(Direction.EAST, uMax - 1, v);
         }
       }
       // last line
-      for(int u = 0; u < uMax; u++) {
-        if(!ptv[u]) {
-          faceData.set(Direction.DOWN, u, vMax-1);
+      for (int u = 0; u < uMax; u++) {
+        if (!ptv[u]) {
+          faceData.set(Direction.DOWN, u, vMax - 1);
         }
       }
     }
@@ -192,7 +201,7 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
         if (building) { // build remaining quad
           // make quad [uStart, uEnd]
           int off = facing == Direction.DOWN ? 1 : 0;
-          buildSideQuad(mesh, transform, facing, color, tint, sprite, uStart, v+off, uEnd-uStart, luminosity);
+          buildSideQuad(mesh, transform, facing, color, tint, sprite, uStart, v + off, uEnd - uStart, luminosity);
         }
       }
     }
@@ -227,7 +236,7 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
         if (building) { // build remaining quad
           // make quad [vStart, vEnd]
           int off = facing == Direction.EAST ? 1 : 0;
-          buildSideQuad(mesh, transform, facing, color, tint, sprite, u+off, vStart, vEnd-vStart, luminosity);
+          buildSideQuad(mesh, transform, facing, color, tint, sprite, u + off, vStart, vEnd - vStart, luminosity);
         }
       }
     }
@@ -256,8 +265,8 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
       // of these, 2 would give the most accurate result. However, its also the hardest to calculate
       // of the remaining methods, 3 is both more accurate and easier to calculate than 1, so I opted for that approach
       if (sprite.contents().getFrameCount() > 0) {
-        for(int v = 0; v < vMax; v++) {
-          for(int u = 0; u < uMax; u++) {
+        for (int v = 0; v < vMax; v++) {
+          for (int u = 0; u < uMax; u++) {
             int alpha = sprite.contents().getPixelRGBA(0, u, vMax - v - 1) >> 24 & 0xFF;
             if (alpha / 255f > 0.1f) {
               pixels.set(u, v, uMax, vMax);
@@ -272,6 +281,7 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
 
   /**
    * Builds a single quad on the side of the sprite
+   *
    * @param transform  Transforms to apply
    * @param side       Side to build
    * @param color      Color for the sprite
@@ -281,7 +291,7 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
    * @param v          Sprite V
    * @param size       Size of the quad in the correct direction (depth is always 1 pixel)
    * @param luminosity Extra light to add to the quad between 0 and 15
-   * @return  Baked quad
+   * @return Baked quad
    */
   private static void buildSideQuad(MeshBuilder builder, Transformation transform, Direction side, int color, int tint, TextureAtlasSprite sprite, int u, int v, int size, int luminosity) {
     final float eps = 1e-2f;
@@ -291,7 +301,7 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
     float y0 = (float) v / height;
     float x1 = x0, y1 = y0;
     float z0 = 7.5f / 16f, z1 = 8.5f / 16f;
-    switch(side) {
+    switch (side) {
       case WEST:
         z0 = 8.5f / 16f;
         z1 = 7.5f / 16f;
@@ -328,19 +338,20 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
 
   /**
    * Builds a single quad in the model, based on the method in {@link ItemLayerModel} but with color added
-   * @param transform    Model transforms
-   * @param side         Quad side
-   * @param sprite       Sprite to use in the quad
-   * @param color        Color for the sprite in AARRGGBB format
-   * @param tint         Tint index for {@link net.minecraft.client.color.block.BlockColors} and {@link net.minecraft.client.color.item.ItemColors}
+   *
+   * @param transform  Model transforms
+   * @param side       Quad side
+   * @param sprite     Sprite to use in the quad
+   * @param color      Color for the sprite in AARRGGBB format
+   * @param tint       Tint index for {@link net.minecraft.client.color.block.BlockColors} and {@link net.minecraft.client.color.item.ItemColors}
    * @param luminosity Extra light to add to the quad between 0 and 15
-   * @return  Final quad
+   * @return Final quad
    */
   protected static void buildQuad(MeshBuilder builder, Transformation transform, Direction side, TextureAtlasSprite sprite, int color, int tint, int luminosity,
-                                       float x0, float y0, float z0, float u0, float v0,
-                                       float x1, float y1, float z1, float u1, float v1,
-                                       float x2, float y2, float z2, float u2, float v2,
-                                       float x3, float y3, float z3, float u3, float v3) {
+                                  float x0, float y0, float z0, float u0, float v0,
+                                  float x1, float y1, float z1, float u1, float v1,
+                                  float x2, float y2, float z2, float u2, float v2,
+                                  float x3, float y3, float z3, float u3, float v3) {
     QuadEmitter emitter = builder.getEmitter();
     MaterialFinder material = RendererAccess.INSTANCE.getRenderer().materialFinder();
     emitter.spriteBake(sprite, MutableQuadView.BAKE_ROTATE_NONE);
@@ -358,6 +369,7 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
 
   /**
    * Clone of the method in {@link ItemLayerModel} with the color parameter added
+   *
    * @param consumer   Vertex consumer
    * @param side       Side for the quad
    * @param x          Quad X position
@@ -372,8 +384,8 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
     consumer.pos(vertexIndex, x, y, z);
 
     float r = ((color >> 16) & 0xFF) / 255f;
-    float g = ((color >>  8) & 0xFF) / 255f;
-    float b = ((color      ) & 0xFF) / 255f;
+    float g = ((color >> 8) & 0xFF) / 255f;
+    float b = ((color) & 0xFF) / 255f;
     float a = ((color >> 24) & 0xFF) / 255f;
     consumer.spriteColor(vertexIndex, 0, encodeQuadColor(r, g, b, a));
 
@@ -399,30 +411,33 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
       (r & 0xFF);
   }
 
-  /** Cloned from {@link ItemLayerModel}'s FaceData subclass */
+  /**
+   * Cloned from {@link ItemLayerModel}'s FaceData subclass
+   */
   private static class FaceData {
-    private final EnumMap<Direction,BitSet> data = new EnumMap<>(Direction.class);
+
+    private final EnumMap<Direction, BitSet> data = new EnumMap<>(Direction.class);
     private final int vMax;
 
     FaceData(int uMax, int vMax) {
       this.vMax = vMax;
 
-      data.put(Direction.WEST, new BitSet(uMax * vMax));
-      data.put(Direction.EAST, new BitSet(uMax * vMax));
-      data.put(Direction.UP,   new BitSet(uMax * vMax));
-      data.put(Direction.DOWN, new BitSet(uMax * vMax));
+      this.data.put(Direction.WEST, new BitSet(uMax * vMax));
+      this.data.put(Direction.EAST, new BitSet(uMax * vMax));
+      this.data.put(Direction.UP, new BitSet(uMax * vMax));
+      this.data.put(Direction.DOWN, new BitSet(uMax * vMax));
     }
 
     public void set(Direction facing, int u, int v) {
-      data.get(facing).set(getIndex(u, v));
+      this.data.get(facing).set(this.getIndex(u, v));
     }
 
     public boolean get(Direction facing, int u, int v) {
-      return data.get(facing).get(getIndex(u, v));
+      return this.data.get(facing).get(this.getIndex(u, v));
     }
 
     private int getIndex(int u, int v) {
-      return v * vMax + u;
+      return v * this.vMax + u;
     }
   }
 
@@ -430,6 +445,7 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
    * Class holding details about a single layer in the model
    */
   private record LayerData(int color, int luminosity, boolean noTint) {
+
     private static final LayerData DEFAULT = new LayerData(-1, 0, false);
 
     /**
@@ -444,6 +460,7 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
   }
 
   private static class Loader implements IGeometryLoader<MantleItemLayerModel> {
+
     @Override
     public MantleItemLayerModel read(JsonObject modelContents, JsonDeserializationContext deserializationContext) {
       List<LayerData> layers = JsonHelper.parseList(modelContents, "layers", LayerData::fromJson);

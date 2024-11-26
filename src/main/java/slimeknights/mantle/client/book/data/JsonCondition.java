@@ -9,6 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import javax.annotation.Nullable;
 
 public class JsonCondition {
+
   @Getter
   private final ConditionJsonProvider conditionJsonProvider;
   @Getter
@@ -42,8 +43,8 @@ public class JsonCondition {
   }
 
   public boolean test() {
-    if (conditionId == null || object == null)
+    if (this.conditionId == null || this.object == null)
       return false;
-    return ResourceConditions.get(conditionId).test(object);
+    return ResourceConditions.get(this.conditionId).test(this.object);
   }
 }

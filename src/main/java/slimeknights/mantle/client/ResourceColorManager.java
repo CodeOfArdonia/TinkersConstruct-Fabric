@@ -28,17 +28,28 @@ import java.util.Map.Entry;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Log4j2
 public class ResourceColorManager implements ISafeManagerReloadListener, IdentifiableResourceReloadListener {
-  /** Modifier file to load, has merging behavior but forge prevents multiple mods from loading the same file */
+
+  /**
+   * Modifier file to load, has merging behavior but forge prevents multiple mods from loading the same file
+   */
   private static final String COLORS_PATH = "mantle/colors.json";
-  /** Modifier file to load, has merging behavior but forge prevents multiple mods from loading the same file */
+  /**
+   * Modifier file to load, has merging behavior but forge prevents multiple mods from loading the same file
+   */
   private static final String FALLBACK_PATH = "tinkering/colors.json";
-  /** Default color so the getter can be nonnull */
+  /**
+   * Default color so the getter can be nonnull
+   */
   public static final TextColor WHITE = TextColor.fromRgb(-1);
-  /** Instance of this manager */
+  /**
+   * Instance of this manager
+   */
   public static final ResourceColorManager INSTANCE = new ResourceColorManager();
 
-  /** Model overrides, if not in this map the default is used */
-  private static Map<String,TextColor> COLORS = Collections.emptyMap();
+  /**
+   * Model overrides, if not in this map the default is used
+   */
+  private static Map<String, TextColor> COLORS = Collections.emptyMap();
 
   /**
    * Initializes this manager, registering it with the resource manager
@@ -47,10 +58,12 @@ public class ResourceColorManager implements ISafeManagerReloadListener, Identif
     ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(INSTANCE);
   }
 
-  /** Recursively parses the given objects */
-  private static void parseRecursive(String prefix, JsonObject json, Map<String,TextColor> colors) {
+  /**
+   * Recursively parses the given objects
+   */
+  private static void parseRecursive(String prefix, JsonObject json, Map<String, TextColor> colors) {
     // right now just do simply key value pairs
-    for (Entry<String,JsonElement> entry : json.entrySet()) {
+    for (Entry<String, JsonElement> entry : json.entrySet()) {
       String key = entry.getKey();
       JsonElement element = entry.getValue();
       // json means we combine the keys
@@ -77,7 +90,7 @@ public class ResourceColorManager implements ISafeManagerReloadListener, Identif
   @Override
   public void onReloadSafe(ResourceManager manager) {
     // start building the model map
-    Map<String,TextColor> colors = new HashMap<>();
+    Map<String, TextColor> colors = new HashMap<>();
 
     // get a list of files from all namespaces
     List<JsonObject> jsonFiles = JsonHelper.getFileInAllDomainsAndPacks(manager, COLORS_PATH, null);
@@ -95,18 +108,24 @@ public class ResourceColorManager implements ISafeManagerReloadListener, Identif
     COLORS = colors;
   }
 
-  /** Gets the text color at the given path, or null if undefined */
+  /**
+   * Gets the text color at the given path, or null if undefined
+   */
   @Nullable
   public static TextColor getOrNull(String path) {
     return COLORS.get(path);
   }
 
-  /** Gets the text color at the given path */
+  /**
+   * Gets the text color at the given path
+   */
   public static TextColor getTextColor(String path) {
     return COLORS.getOrDefault(path, WHITE);
   }
 
-  /** Gets an integer color for the given path */
+  /**
+   * Gets an integer color for the given path
+   */
   public static int getColor(String path) {
     return getTextColor(path).getValue();
   }

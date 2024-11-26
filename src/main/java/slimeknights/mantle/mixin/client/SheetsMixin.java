@@ -22,7 +22,7 @@ public class SheetsMixin {
   @Inject(method = "createSignMaterial", at = @At("HEAD"), cancellable = true)
   private static void fixMantleSigns(WoodType oldWoodType, CallbackInfoReturnable<Material> cir) {
     RegistrationHelper.forEachWoodType(woodType -> {
-      if(woodType == oldWoodType) {
+      if (woodType == oldWoodType) {
         ResourceLocation location = new ResourceLocation(woodType.name());
         cir.setReturnValue(new Material(SIGN_SHEET, new ResourceLocation(location.getNamespace(), "entity/signs/" + location.getPath())));
       }

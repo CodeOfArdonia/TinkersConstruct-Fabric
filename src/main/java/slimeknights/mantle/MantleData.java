@@ -6,6 +6,7 @@ import slimeknights.mantle.datagen.MantleFluidTagProvider;
 import slimeknights.mantle.datagen.MantleFluidTooltipProvider;
 
 public class MantleData implements DataGeneratorEntrypoint {
+
   @Override
   public void onInitializeDataGenerator(FabricDataGenerator generator) {
     FabricDataGenerator.Pack pack = generator.createPack();

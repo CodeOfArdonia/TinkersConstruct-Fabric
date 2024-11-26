@@ -49,30 +49,42 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("WeakerAccess")
 public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
-  /** Model loader for vanilla block model, mainly intended for use in fallback registration */
+
+  /**
+   * Model loader for vanilla block model, mainly intended for use in fallback registration
+   */
   public static final Loader LOADER = new Loader();
-  /** Location used for baking dynamic models, name does not matter so just using a constant */
+  /**
+   * Location used for baking dynamic models, name does not matter so just using a constant
+   */
   static final ResourceLocation BAKE_LOCATION = Mantle.getResource("dynamic_model_baking");
 
-  /** Parent model location, used to fetch parts and for textures if the owner is not a block model */
+  /**
+   * Parent model location, used to fetch parts and for textures if the owner is not a block model
+   */
   @Getter
   @Nullable
   private ResourceLocation parentLocation;
-  /** Model parts for baked model, if empty uses parent parts */
+  /**
+   * Model parts for baked model, if empty uses parent parts
+   */
   private final List<BlockElement> parts;
-  /** Fallback textures in case the owner does not contain a block model */
+  /**
+   * Fallback textures in case the owner does not contain a block model
+   */
   @Getter
-  private final Map<String,Either<Material, String>> textures;
+  private final Map<String, Either<Material, String>> textures;
   @Getter
   private BlockModel parent;
 
   /**
    * Creates a new simple block model
-   * @param parentLocation  Location of the parent model, if unset has no parent
-   * @param textures        List of textures for iteration, in case the owner is not BlockModel
-   * @param parts           List of parts in the model
+   *
+   * @param parentLocation Location of the parent model, if unset has no parent
+   * @param textures       List of textures for iteration, in case the owner is not BlockModel
+   * @param parts          List of parts in the model
    */
-  public SimpleBlockModel(@Nullable ResourceLocation parentLocation, Map<String,Either<Material,String>> textures, List<BlockElement> parts) {
+  public SimpleBlockModel(@Nullable ResourceLocation parentLocation, Map<String, Either<Material, String>> textures, List<BlockElement> parts) {
     this.parts = parts;
     this.textures = textures;
     this.parentLocation = parentLocation;
@@ -83,22 +95,24 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
 
   /**
    * Gets the elements in this simple block model
-   * @return  Elements in the model
+   *
+   * @return Elements in the model
    */
   @SuppressWarnings("deprecation")
   public List<BlockElement> getElements() {
-    return parts.isEmpty() && parent != null ? parent.getElements() : parts;
+    return this.parts.isEmpty() && this.parent != null ? this.parent.getElements() : this.parts;
   }
 
   /* Textures */
 
   /**
    * Fetches parent models for this model and its parents
-   * @param modelGetter  Model getter function
+   *
+   * @param modelGetter Model getter function
    */
-  public void fetchParent(BlockModel owner, Function<ResourceLocation,UnbakedModel> modelGetter) {
+  public void fetchParent(BlockModel owner, Function<ResourceLocation, UnbakedModel> modelGetter) {
     // no work if no parent or the parent is fetched already
-    if (parent != null || parentLocation == null) {
+    if (this.parent != null || this.parentLocation == null) {
       return;
     }
 
@@ -106,15 +120,15 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
     Set<UnbakedModel> chain = Sets.newLinkedHashSet();
 
     // load the first model directly
-    parent = getParent(modelGetter, chain, parentLocation, owner.name);
+    this.parent = getParent(modelGetter, chain, this.parentLocation, owner.name);
     // null means no model, so set missing
-    if (parent == null) {
-      parent = getMissing(modelGetter);
-      parentLocation = ModelBakery.MISSING_MODEL_LOCATION;
+    if (this.parent == null) {
+      this.parent = getMissing(modelGetter);
+      this.parentLocation = ModelBakery.MISSING_MODEL_LOCATION;
     }
 
     // loop through each parent, adding in parents
-    for (BlockModel link = parent; link.parentLocation != null && link.parent == null; link = link.parent) {
+    for (BlockModel link = this.parent; link.parentLocation != null && link.parent == null; link = link.parent) {
       chain.add(link);
 
       // fetch model parent
@@ -130,14 +144,15 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
 
   /**
    * Gets the parent for a model
-   * @param modelGetter  Model getter function
-   * @param chain        Chain of models that are in progress
-   * @param location     Location to fetch
-   * @param name         Name of the model being fetched
-   * @return  Block model instance, null if there was an error
+   *
+   * @param modelGetter Model getter function
+   * @param chain       Chain of models that are in progress
+   * @param location    Location to fetch
+   * @param name        Name of the model being fetched
+   * @return Block model instance, null if there was an error
    */
   @Nullable
-  private static BlockModel getParent(Function<ResourceLocation,UnbakedModel> modelGetter, Set<UnbakedModel> chain, ResourceLocation location, String name) {
+  private static BlockModel getParent(Function<ResourceLocation, UnbakedModel> modelGetter, Set<UnbakedModel> chain, ResourceLocation location, String name) {
     // model must exist
     UnbakedModel unbaked = modelGetter.apply(location);
     if (unbaked == null) {
@@ -158,11 +173,12 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
 
   /**
    * Gets the missing model, ensuring its the right type
-   * @param modelGetter  Model getter function
-   * @return  Missing model as a {@link BlockModel}
+   *
+   * @param modelGetter Model getter function
+   * @return Missing model as a {@link BlockModel}
    */
   @Nonnull
-  private static BlockModel getMissing(Function<ResourceLocation,UnbakedModel> modelGetter) {
+  private static BlockModel getMissing(Function<ResourceLocation, UnbakedModel> modelGetter) {
     UnbakedModel model = modelGetter.apply(ModelBakery.MISSING_MODEL_LOCATION);
     if (!(model instanceof BlockModel)) {
       throw new IllegalStateException("Failed to load missing model");
@@ -172,17 +188,18 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
 
   /**
    * Gets the texture dependencies for a list of elements, allows calling outside a simple block model
-   * @param owner                 Model configuration
-   * @param elements              List of elements to check for textures
-   * @param missingTextureErrors  Missing texture set
-   * @return  Textures dependencies
+   *
+   * @param owner                Model configuration
+   * @param elements             List of elements to check for textures
+   * @param missingTextureErrors Missing texture set
+   * @return Textures dependencies
    */
-  public static Collection<Material> getTextures(BlockModel owner, List<BlockElement> elements, Set<Pair<String,String>> missingTextureErrors) {
+  public static Collection<Material> getTextures(BlockModel owner, List<BlockElement> elements, Set<Pair<String, String>> missingTextureErrors) {
     // always need a particle texture
     Set<Material> textures = Sets.newHashSet(owner.getMaterial("particle"));
     // iterate all elements, fetching needed textures from the material
-    for(BlockElement part : elements) {
-      for(BlockElementFace face : part.faces.values()) {
+    for (BlockElement part : elements) {
+      for (BlockElementFace face : part.faces.values()) {
         Material material = owner.getMaterial(face.texture);
         if (Objects.equals(material.texture(), MissingTextureAtlasSprite.getLocation())) {
           missingTextureErrors.add(Pair.of(face.texture, owner.name));
@@ -196,10 +213,10 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
   /**
    * Gets the model dependencies for a block model
    *
-   * @param owner                Model configuration
-   * @param modelGetter          Model getter to fetch parent models
+   * @param owner       Model configuration
+   * @param modelGetter Model getter to fetch parent models
    */
-  public void resolveParents(Function<ResourceLocation,UnbakedModel> modelGetter, BlockModel owner) {
+  public void resolveParents(Function<ResourceLocation, UnbakedModel> modelGetter, BlockModel owner) {
     this.fetchParent(owner, modelGetter);
   }
 
@@ -207,15 +224,16 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
 
   /**
    * Bakes a single part of the model into the builder
-   * @param builder       Baked model builder
-   * @param owner         Model owner
-   * @param part          Part to bake
-   * @param transform     Model transforms
-   * @param spriteGetter  Sprite getter
-   * @param location      Model location
+   *
+   * @param builder      Baked model builder
+   * @param owner        Model owner
+   * @param part         Part to bake
+   * @param transform    Model transforms
+   * @param spriteGetter Sprite getter
+   * @param location     Model location
    */
-  public static void bakePart(SimpleBakedModel.Builder builder, BlockModel owner, BlockElement part, ModelState transform, Function<Material,TextureAtlasSprite> spriteGetter, ResourceLocation location) {
-    for(Direction direction : part.faces.keySet()) {
+  public static void bakePart(SimpleBakedModel.Builder builder, BlockModel owner, BlockElement part, ModelState transform, Function<Material, TextureAtlasSprite> spriteGetter, ResourceLocation location) {
+    for (Direction direction : part.faces.keySet()) {
       BlockElementFace face = part.faces.get(direction);
       // ensure the name is not prefixed (it always is)
       String texture = face.texture;
@@ -236,19 +254,20 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
 
   /**
    * Bakes a list of block part elements into a model
-   * @param owner         Model configuration
-   * @param elements      Model elements
-   * @param transform     Model transform
-   * @param overrides     Model overrides
-   * @param spriteGetter  Sprite getter instance
-   * @param location      Model bake location
-   * @return  Baked model
+   *
+   * @param owner        Model configuration
+   * @param elements     Model elements
+   * @param transform    Model transform
+   * @param overrides    Model overrides
+   * @param spriteGetter Sprite getter instance
+   * @param location     Model bake location
+   * @return Baked model
    */
-  public static BakedModel bakeModel(BlockModel owner, List<BlockElement> elements, ModelState transform, ItemOverrides overrides, Function<Material,TextureAtlasSprite> spriteGetter, ResourceLocation location) {
+  public static BakedModel bakeModel(BlockModel owner, List<BlockElement> elements, ModelState transform, ItemOverrides overrides, Function<Material, TextureAtlasSprite> spriteGetter, ResourceLocation location) {
     // iterate parts, adding to the builder
     TextureAtlasSprite particle = spriteGetter.apply(owner.getMaterial("particle"));
     SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(owner.hasAmbientOcclusion(), owner.getGuiLight().lightLikeBlock(), true, owner.getTransforms(), overrides).particle(particle);
-    for(BlockElement part : elements) {
+    for (BlockElement part : elements) {
       bakePart(builder, owner, part, transform, spriteGetter, location);
     }
     return builder.build();
@@ -256,9 +275,10 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
 
   /**
    * Same as {@link #bakeModel(BlockModel, List, ModelState, ItemOverrides, Function, ResourceLocation)}, but passes in sensible defaults for values unneeded in dynamic models
-   * @param owner      Model configuration
-   * @param elements   Elements to bake
-   * @param transform  Model transform
+   *
+   * @param owner     Model configuration
+   * @param elements  Elements to bake
+   * @param transform Model transform
    * @return Baked model
    */
   public static BakedModel bakeDynamic(BlockModel owner, List<BlockElement> elements, ModelState transform) {
@@ -267,27 +287,29 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
 
   /**
    * Bakes the given block model
-   * @param owner         Model configuration
-   * @param transform     Transform to apply
-   * @param overrides     Item overrides in baking
-   * @param spriteGetter  Sprite getter instance
-   * @param location      Bake location
-   * @return  Baked model
+   *
+   * @param owner        Model configuration
+   * @param transform    Transform to apply
+   * @param overrides    Item overrides in baking
+   * @param spriteGetter Sprite getter instance
+   * @param location     Bake location
+   * @return Baked model
    */
-  public BakedModel bakeModel(BlockModel owner, ModelState transform, ItemOverrides overrides, Function<Material,TextureAtlasSprite> spriteGetter, ResourceLocation location) {
+  public BakedModel bakeModel(BlockModel owner, ModelState transform, ItemOverrides overrides, Function<Material, TextureAtlasSprite> spriteGetter, ResourceLocation location) {
     return bakeModel(owner, this.getElements(), transform, overrides, spriteGetter, location);
   }
 
   @Override
-  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location, boolean isGui3d) {
-    return bakeModel(owner, transform, overrides, spriteGetter, location);
+  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location, boolean isGui3d) {
+    return this.bakeModel(owner, transform, overrides, spriteGetter, location);
   }
 
   /**
    * Same as {@link #bakeModel(BlockModel, ModelState, ItemOverrides, Function, ResourceLocation)}, but passes in sensible defaults for values unneeded in dynamic models
-   * @param owner         Model configuration
-   * @param transform     Transform to apply
-   * @return  Baked model
+   *
+   * @param owner     Model configuration
+   * @param transform Transform to apply
+   * @return Baked model
    */
   public BakedModel bakeDynamic(BlockModel owner, ModelState transform) {
     return bakeDynamic(owner, this.getElements(), transform);
@@ -298,9 +320,10 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
 
   /**
    * Deserializes a SimpleBlockModel from JSON
-   * @param context  Json Context
-   * @param json     Json element containing the model
-   * @return  Serialized JSON
+   *
+   * @param context Json Context
+   * @param json    Json element containing the model
+   * @return Serialized JSON
    */
   public static SimpleBlockModel deserialize(JsonDeserializationContext context, JsonObject json) {
     // parent, null if missing
@@ -313,7 +336,7 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
       ImmutableMap.Builder<String, Either<Material, String>> builder = new ImmutableMap.Builder<>();
       ResourceLocation atlas = InventoryMenu.BLOCK_ATLAS;
       JsonObject textures = GsonHelper.getAsJsonObject(json, "textures");
-      for(Entry<String, JsonElement> entry : textures.entrySet()) {
+      for (Entry<String, JsonElement> entry : textures.entrySet()) {
         builder.put(entry.getKey(), BlockModel.Deserializer.parseTextureLocationOrReference(atlas, entry.getValue().getAsString()));
       }
       textureMap = builder.build();
@@ -333,9 +356,10 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
 
   /**
    * Gets a list of models from a JSON array
-   * @param context  Json Context
-   * @param array    Json array
-   * @return  Model list
+   *
+   * @param context Json Context
+   * @param array   Json array
+   * @return Model list
    */
   public static List<BlockElement> getModelElements(JsonDeserializationContext context, JsonElement array, String name) {
     // if just one element, array is optional
@@ -345,8 +369,8 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
     // if an array, get array of elements
     if (array.isJsonArray()) {
       ImmutableList.Builder<BlockElement> builder = ImmutableList.builder();
-      for(JsonElement json : array.getAsJsonArray()) {
-        builder.add((BlockElement)context.deserialize(json, BlockElement.class));
+      for (JsonElement json : array.getAsJsonArray()) {
+        builder.add((BlockElement) context.deserialize(json, BlockElement.class));
       }
       return builder.build();
     }
@@ -354,8 +378,11 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
     throw new JsonSyntaxException("Missing " + name + ", expected to find a JsonArray or JsonObject");
   }
 
-  /** Logic to implement a vanilla block model */
+  /**
+   * Logic to implement a vanilla block model
+   */
   private static class Loader implements IGeometryLoader<SimpleBlockModel> {
+
     @Override
     public SimpleBlockModel read(JsonObject json, JsonDeserializationContext context) {
       return deserialize(context, json);

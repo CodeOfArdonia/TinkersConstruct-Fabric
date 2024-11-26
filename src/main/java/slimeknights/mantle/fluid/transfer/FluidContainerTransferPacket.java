@@ -9,9 +9,12 @@ import slimeknights.mantle.network.packet.IThreadsafePacket;
 
 import java.util.Set;
 
-/** Packet to sync fluid container transfer */
+/**
+ * Packet to sync fluid container transfer
+ */
 @RequiredArgsConstructor
 public class FluidContainerTransferPacket implements IThreadsafePacket {
+
   private final Set<Item> items;
 
   public FluidContainerTransferPacket(FriendlyByteBuf buffer) {
@@ -25,14 +28,14 @@ public class FluidContainerTransferPacket implements IThreadsafePacket {
 
   @Override
   public void encode(FriendlyByteBuf buffer) {
-    buffer.writeVarInt(items.size());
-    for (Item item : items) {
+    buffer.writeVarInt(this.items.size());
+    for (Item item : this.items) {
       buffer.writeVarInt(BuiltInRegistries.ITEM.getId(item));
     }
   }
 
   @Override
   public void handleThreadsafe(Context context) {
-    FluidContainerTransferManager.INSTANCE.setContainerItems(items);
+    FluidContainerTransferManager.INSTANCE.setContainerItems(this.items);
   }
 }

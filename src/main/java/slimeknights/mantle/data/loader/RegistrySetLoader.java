@@ -17,8 +17,9 @@ import java.util.function.Function;
 
 /**
  * Generic loader for reading a loadable object with a set of registry objects
- * @param <R>  Registry type
- * @param <T>  Loader object type
+ *
+ * @param <R> Registry type
+ * @param <T> Loader object type
  * @see RegistryEntryLoader
  */
 public record RegistrySetLoader<R, T extends IHaveLoader<?>>(
@@ -27,25 +28,26 @@ public record RegistrySetLoader<R, T extends IHaveLoader<?>>(
   Function<Set<R>, T> constructor,
   Function<T, Set<R>> getter
 ) implements IGenericLoader<T> {
+
   @Override
   public T deserialize(JsonObject json) {
-    Set<R> set = ImmutableSet.copyOf(JsonHelper.parseList(json, key, (element, jsonKey) -> {
+    Set<R> set = ImmutableSet.copyOf(JsonHelper.parseList(json, this.key, (element, jsonKey) -> {
       ResourceLocation objectKey = JsonHelper.convertToResourceLocation(element, jsonKey);
-      if (registry.containsKey(objectKey)) {
-        return registry.get(objectKey);
+      if (this.registry.containsKey(objectKey)) {
+        return this.registry.get(objectKey);
       }
-      throw new JsonSyntaxException("Unknown " + key + " '" + objectKey + "'");
+      throw new JsonSyntaxException("Unknown " + this.key + " '" + objectKey + "'");
     }));
-    return constructor.apply(set);
+    return this.constructor.apply(set);
   }
 
   @Override
   public void serialize(T object, JsonObject json) {
     JsonArray array = new JsonArray();
-    for (R entry : getter.apply(object)) {
-      array.add(Objects.requireNonNull(registry.getKey(entry)).toString());
+    for (R entry : this.getter.apply(object)) {
+      array.add(Objects.requireNonNull(this.registry.getKey(entry)).toString());
     }
-    json.add(key, array);
+    json.add(this.key, array);
   }
 
   @Override
@@ -53,17 +55,17 @@ public record RegistrySetLoader<R, T extends IHaveLoader<?>>(
     ImmutableSet.Builder<R> builder = ImmutableSet.builder();
     int max = buffer.readVarInt();
     for (int i = 0; i < max; i++) {
-      builder.add(registry.byId(buffer.readVarInt()));
+      builder.add(this.registry.byId(buffer.readVarInt()));
     }
-    return constructor.apply(builder.build());
+    return this.constructor.apply(builder.build());
   }
 
   @Override
   public void toNetwork(T object, FriendlyByteBuf buffer) {
-    Set<R> set = getter.apply(object);
+    Set<R> set = this.getter.apply(object);
     buffer.writeVarInt(set.size());
     for (R entry : set) {
-      buffer.writeVarInt(registry.getId(entry));
+      buffer.writeVarInt(this.registry.getId(entry));
     }
   }
 }

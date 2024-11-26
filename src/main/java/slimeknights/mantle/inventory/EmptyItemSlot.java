@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
 public class EmptyItemSlot implements SingleSlotStorage<ItemVariant> {
+
   public static final EmptyItemSlot INSTANCE = new EmptyItemSlot();
 
   @Override

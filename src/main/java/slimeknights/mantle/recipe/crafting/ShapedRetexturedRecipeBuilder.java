@@ -17,12 +17,14 @@ import java.util.function.Consumer;
 @SuppressWarnings("unused")
 @RequiredArgsConstructor(staticName = "fromShaped")
 public class ShapedRetexturedRecipeBuilder {
+
   private final ShapedRecipeBuilder parent;
   private Ingredient texture;
   private boolean matchAll;
 
   /**
    * Sets the texture source to the given ingredient
+   *
    * @param texture Ingredient to use for texture
    * @return Builder instance
    */
@@ -33,6 +35,7 @@ public class ShapedRetexturedRecipeBuilder {
 
   /**
    * Sets the texture source to the given tag
+   *
    * @param tag Tag to use for texture
    * @return Builder instance
    */
@@ -44,6 +47,7 @@ public class ShapedRetexturedRecipeBuilder {
   /**
    * Sets the match first property on the recipe.
    * If set, the recipe uses the first ingredient match for the texture. If unset, all items that match the ingredient must be the same or no texture is applied
+   *
    * @return Builder instance
    */
   public ShapedRetexturedRecipeBuilder setMatchAll() {
@@ -53,34 +57,38 @@ public class ShapedRetexturedRecipeBuilder {
 
   /**
    * Builds the recipe with the default name using the given consumer
+   *
    * @param consumer Recipe consumer
    */
   public void build(Consumer<FinishedRecipe> consumer) {
     this.validate();
-    parent.save(base -> consumer.accept(new Result(base, texture, matchAll)));
+    this.parent.save(base -> consumer.accept(new Result(base, this.texture, this.matchAll)));
   }
 
   /**
    * Builds the recipe using the given consumer
+   *
    * @param consumer Recipe consumer
    * @param location Recipe location
    */
   public void build(Consumer<FinishedRecipe> consumer, ResourceLocation location) {
     this.validate();
-    parent.save(base -> consumer.accept(new Result(base, texture, matchAll)), location);
+    this.parent.save(base -> consumer.accept(new Result(base, this.texture, this.matchAll)), location);
   }
 
   /**
    * Ensures this recipe can be built
+   *
    * @throws IllegalStateException If the recipe cannot be built
    */
   private void validate() {
-    if (texture == null) {
+    if (this.texture == null) {
       throw new IllegalStateException("No texture defined for texture recipe");
     }
   }
 
   private static class Result implements FinishedRecipe {
+
     private final FinishedRecipe base;
     private final Ingredient texture;
     private final boolean matchAll;
@@ -98,26 +106,26 @@ public class ShapedRetexturedRecipeBuilder {
 
     @Override
     public ResourceLocation getId() {
-      return base.getId();
+      return this.base.getId();
     }
 
     @Override
     public void serializeRecipeData(JsonObject json) {
-      base.serializeRecipeData(json);
-      json.add("texture", texture.toJson());
-      json.addProperty("match_all", matchAll);
+      this.base.serializeRecipeData(json);
+      json.add("texture", this.texture.toJson());
+      json.addProperty("match_all", this.matchAll);
     }
 
     @Nullable
     @Override
     public JsonObject serializeAdvancement() {
-      return base.serializeAdvancement();
+      return this.base.serializeAdvancement();
     }
 
     @Nullable
     @Override
     public ResourceLocation getAdvancementId() {
-      return base.getAdvancementId();
+      return this.base.getAdvancementId();
     }
   }
 }

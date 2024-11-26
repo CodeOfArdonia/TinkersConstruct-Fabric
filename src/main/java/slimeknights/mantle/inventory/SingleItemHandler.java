@@ -36,7 +36,7 @@ public abstract class SingleItemHandler<T extends MantleBlockEntity> implements 
    */
   public void setStack(ItemStack newStack) {
     this.stack = newStack;
-    parent.setChangedFast();
+    this.parent.setChangedFast();
   }
 
   /**
@@ -52,7 +52,7 @@ public abstract class SingleItemHandler<T extends MantleBlockEntity> implements 
 
   @Override
   public boolean isItemValid(int slot, ItemVariant stack, int count) {
-    return slot == 0 && isItemValid(stack);
+    return slot == 0 && this.isItemValid(stack);
   }
 
   @Override
@@ -62,14 +62,14 @@ public abstract class SingleItemHandler<T extends MantleBlockEntity> implements 
 
   @Override
   public int getSlotLimit(int slot) {
-    return maxStackSize;
+    return this.maxStackSize;
   }
 
   @Nonnull
   @Override
   public ItemStack getStackInSlot(int slot) {
     if (slot == 0) {
-      return stack;
+      return this.stack;
     }
     return ItemStack.EMPTY;
   }
@@ -80,7 +80,7 @@ public abstract class SingleItemHandler<T extends MantleBlockEntity> implements 
   @Override
   public void setStackInSlot(int slot, ItemStack stack) {
     if (slot == 0) {
-      setStack(stack);
+      this.setStack(stack);
     }
   }
 
@@ -101,12 +101,12 @@ public abstract class SingleItemHandler<T extends MantleBlockEntity> implements 
 
   @Override
   public long insert(ItemVariant resource, long maxAmount, TransactionContext transaction) {
-    return getSlot(0).insert(resource, maxAmount, transaction);
+    return this.getSlot(0).insert(resource, maxAmount, transaction);
   }
 
   @Override
   public long extract(ItemVariant resource, long maxAmount, TransactionContext transaction) {
-    return getSlot(0).extract(resource, maxAmount, transaction);
+    return this.getSlot(0).extract(resource, maxAmount, transaction);
   }
 
   /**
@@ -116,8 +116,8 @@ public abstract class SingleItemHandler<T extends MantleBlockEntity> implements 
    */
   public CompoundTag writeToNBT() {
     CompoundTag nbt = new CompoundTag();
-    if (!stack.isEmpty()) {
-      stack.save(nbt);
+    if (!this.stack.isEmpty()) {
+      this.stack.save(nbt);
     }
     return nbt;
   }
@@ -128,6 +128,6 @@ public abstract class SingleItemHandler<T extends MantleBlockEntity> implements 
    * @param nbt NBT
    */
   public void readFromNBT(CompoundTag nbt) {
-    stack = ItemStack.of(nbt);
+    this.stack = ItemStack.of(nbt);
   }
 }

@@ -21,65 +21,73 @@ import java.util.function.Supplier;
 public interface IRecipeHelper {
   /* Location helpers */
 
-  /** Gets the ID of the mod adding recipes */
+  /**
+   * Gets the ID of the mod adding recipes
+   */
   String getModId();
 
   /**
    * Gets a resource location for the mod
-   * @param name  Location path
-   * @return  Location for the mod
+   *
+   * @param name Location path
+   * @return Location for the mod
    */
   default ResourceLocation modResource(String name) {
-    return new ResourceLocation(getModId(), name);
+    return new ResourceLocation(this.getModId(), name);
   }
 
   /**
    * Gets a resource location string for Tinkers
-   * @param id  Location path
-   * @return  Location for Tinkers
+   *
+   * @param id Location path
+   * @return Location for Tinkers
    */
   default String modPrefix(String id) {
-    return getModId() + ":" + id;
+    return this.getModId() + ":" + id;
   }
 
   /**
    * Prefixes the resource location path with the given value
-   * @param loc     Name to use
-   * @param prefix  Prefix value
-   * @return  Resource location path
+   *
+   * @param loc    Name to use
+   * @param prefix Prefix value
+   * @return Resource location path
    */
   default ResourceLocation wrap(ResourceLocation loc, String prefix, String suffix) {
-    return modResource(prefix + loc.getPath() + suffix);
+    return this.modResource(prefix + loc.getPath() + suffix);
   }
 
   /**
    * Prefixes the resource location path with the given value
-   * @param entry    Item registry name to use
-   * @param prefix  Prefix value
-   * @return  Resource location path
+   *
+   * @param entry  Item registry name to use
+   * @param prefix Prefix value
+   * @return Resource location path
    */
   default ResourceLocation wrap(Item entry, String prefix, String suffix) {
-    return wrap(Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(entry)), prefix, suffix);
+    return this.wrap(Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(entry)), prefix, suffix);
   }
 
   /**
    * Prefixes the resource location path with the given value
-   * @param entry    Item registry name to use
-   * @param prefix  Prefix value
-   * @return  Resource location path
+   *
+   * @param entry  Item registry name to use
+   * @param prefix Prefix value
+   * @return Resource location path
    */
   default ResourceLocation wrap(Supplier<Item> entry, String prefix, String suffix) {
-    return wrap(entry.get(), prefix, suffix);
+    return this.wrap(entry.get(), prefix, suffix);
   }
 
   /**
    * Prefixes the resource location path with the given value
-   * @param location  Entry registry name to use
-   * @param prefix    Prefix value
-   * @return  Resource location path
+   *
+   * @param location Entry registry name to use
+   * @param prefix   Prefix value
+   * @return Resource location path
    */
   default ResourceLocation prefix(ResourceLocation location, String prefix) {
-    return modResource(prefix + location.getPath());
+    return this.modResource(prefix + location.getPath());
   }
 
 
@@ -87,9 +95,10 @@ public interface IRecipeHelper {
 
   /**
    * Gets a tag by name
-   * @param modId  Mod ID for tag
-   * @param name   Tag name
-   * @return  Tag instance
+   *
+   * @param modId Mod ID for tag
+   * @param name  Tag name
+   * @return Tag instance
    */
   default TagKey<Item> getItemTag(String modId, String name) {
     return TagKey.create(Registries.ITEM, new ResourceLocation(modId, name));
@@ -97,9 +106,10 @@ public interface IRecipeHelper {
 
   /**
    * Gets a tag by name
-   * @param modId  Mod ID for tag
-   * @param name   Tag name
-   * @return  Tag instance
+   *
+   * @param modId Mod ID for tag
+   * @param name  Tag name
+   * @return Tag instance
    */
   default TagKey<Fluid> getFluidTag(String modId, String name) {
     return TagKey.create(Registries.FLUID, new ResourceLocation(modId, name));
@@ -107,18 +117,20 @@ public interface IRecipeHelper {
 
   /**
    * Creates a condition for a tag existing
-   * @param name  Forge tag name
-   * @return  Condition for tag existing
+   *
+   * @param name Forge tag name
+   * @return Condition for tag existing
    */
   default ConditionJsonProvider tagCondition(String name) {
-    return DefaultResourceConditions.tagsPopulated(getItemTag("c", name));
+    return DefaultResourceConditions.tagsPopulated(this.getItemTag("c", name));
   }
 
   /**
    * Creates a consumer instance with the added conditions
-   * @param consumer    Base consumer
-   * @param conditions  Extra conditions
-   * @return  Wrapped consumer
+   *
+   * @param consumer   Base consumer
+   * @param conditions Extra conditions
+   * @return Wrapped consumer
    */
   default Consumer<FinishedRecipe> withCondition(Consumer<FinishedRecipe> consumer, ConditionJsonProvider... conditions) {
     ConsumerWrapperBuilder builder = ConsumerWrapperBuilder.wrap();

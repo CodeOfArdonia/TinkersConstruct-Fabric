@@ -1,8 +1,8 @@
 package slimeknights.mantle.client.model;
 
-import java.util.function.Predicate;
-
 import com.google.common.base.Predicates;
+
+import java.util.function.Predicate;
 
 // Reimplementing 1.18 forge code because I am lazy
 public class ModelProperty<T> implements Predicate<T> {
@@ -19,6 +19,6 @@ public class ModelProperty<T> implements Predicate<T> {
 
   @Override
   public boolean test(T t) {
-    return pred.test(t);
+    return this.pred.test(t);
   }
 }

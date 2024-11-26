@@ -66,29 +66,39 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
 
-  /** Property of the connections cache key. Contains a 6 bit number with each bit representing a direction */
+  /**
+   * Property of the connections cache key. Contains a 6 bit number with each bit representing a direction
+   */
   private static final ModelProperty<Byte> CONNECTIONS = new ModelProperty<>();
 
-  /** Parent model */
+  /**
+   * Parent model
+   */
   private final SimpleBlockModel model;
-  /** Map of texture name to index of suffixes (indexed as 0bENWS) */
-  private final Map<String,String[]> connectedTextures;
-  /** Function to run to check if this block connects to another */
-  private final BiPredicate<BlockState,BlockState> connectionPredicate;
-  /** List of sides to check when getting block directions */
+  /**
+   * Map of texture name to index of suffixes (indexed as 0bENWS)
+   */
+  private final Map<String, String[]> connectedTextures;
+  /**
+   * Function to run to check if this block connects to another
+   */
+  private final BiPredicate<BlockState, BlockState> connectionPredicate;
+  /**
+   * List of sides to check when getting block directions
+   */
   private final Set<Direction> sides;
 
   @Override
   public void resolveParents(Function<ResourceLocation, UnbakedModel> modelGetter, BlockModel context) {
-    model.resolveParents(modelGetter, context);
+    this.model.resolveParents(modelGetter, context);
   }
 
   @Override
-  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location, boolean isGui3d) {
+  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location, boolean isGui3d) {
     // for all connected textures, add suffix textures
     // Map of full texture name to the resulting material
     Map<String, Material> extraTextures = new HashMap<>();
-    for (Entry<String,String[]> entry : connectedTextures.entrySet()) {
+    for (Entry<String, String[]> entry : this.connectedTextures.entrySet()) {
       // fetch data from the base texture
       String name = entry.getKey();
       // skip if missing
@@ -123,7 +133,7 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
       }
     }
     // copy extra textures into immutable for better performance
-    BakedModel baked = model.bakeModel(owner, transform, overrides, spriteGetter, location);
+    BakedModel baked = this.model.bakeModel(owner, transform, overrides, spriteGetter, location);
     return new Baked(this, new ExtraTextureConfiguration(owner, ImmutableMap.copyOf(extraTextures)), transform, baked);
   }
 
@@ -233,7 +243,7 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
       // otherwise, iterate into the parent models, trying to find a match
       String check = key;
       String found = "";
-      for (Map<String, Either<Material, String>> textures : modelTextures) {
+      for (Map<String, Either<Material, String>> textures : this.modelTextures) {
         Either<Material, String> either = textures.get(check);
         if (either != null) {
           // if no name, its not connected
@@ -243,7 +253,7 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
           }
           // if the name is connected, we are done
           check = newName.get();
-          if (parent.connectedTextures.containsKey(check)) {
+          if (this.parent.connectedTextures.containsKey(check)) {
             found = check;
             break;
           }
@@ -263,10 +273,10 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
         key = key.substring(1);
       }
       // if the name is connected, we are done
-      if (parent.connectedTextures.containsKey(key)) {
+      if (this.parent.connectedTextures.containsKey(key)) {
         return key;
       }
-      return nameMappingCache.computeIfAbsent(key, this::getConnectedNameUncached);
+      return this.nameMappingCache.computeIfAbsent(key, this::getConnectedNameUncached);
     }
 
     /**
@@ -286,7 +296,7 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
         }
       }
       // if empty, do not prefix
-      String[] suffixes = parent.connectedTextures.get(texture);
+      String[] suffixes = this.parent.connectedTextures.get(texture);
       assert suffixes != null;
       String suffix = suffixes[key];
       if (suffix.isEmpty()) {
@@ -304,7 +314,7 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
     private BakedModel applyConnections(byte connections) {
       // copy each element with updated faces
       List<BlockElement> elements = Lists.newArrayList();
-      for (BlockElement part : parent.model.getElements()) {
+      for (BlockElement part : this.parent.model.getElements()) {
         Map<Direction, BlockElementFace> partFaces = new EnumMap<>(Direction.class);
         for (Entry<Direction, BlockElementFace> entry : part.faces.entrySet()) {
           // first, determine which texture to use on this side
@@ -314,10 +324,10 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
 
           // follow the texture name back to the original name
           // if it never reaches a connected texture, skip
-          String connectedTexture = getConnectedName(original.texture);
+          String connectedTexture = this.getConnectedName(original.texture);
           if (!connectedTexture.isEmpty()) {
             // if empty string, we can keep the old face
-            String suffix = getTextureSuffix(connectedTexture, connections, getTransform(dir, original.uv));
+            String suffix = this.getTextureSuffix(connectedTexture, connections, getTransform(dir, original.uv));
             if (!suffix.isEmpty()) {
               // suffix the texture
               String fullTexture = connectedTexture + suffix;
@@ -332,7 +342,7 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
       }
 
       // bake the model
-      return SimpleBlockModel.bakeDynamic(owner, elements, transforms);
+      return SimpleBlockModel.bakeDynamic(this.owner, elements, this.transforms);
     }
 
     /**
@@ -365,42 +375,42 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
       }
 
       // gather connections data
-      Transformation rotation = transforms.getRotation();
-      data.setData(CONNECTIONS, getConnections((dir) -> parent.sides.contains(dir) && parent.connectionPredicate.test(state, world.getBlockState(pos.relative(rotation.rotateTransform(dir))))));
+      Transformation rotation = this.transforms.getRotation();
+      data.setData(CONNECTIONS, getConnections((dir) -> this.parent.sides.contains(dir) && this.parent.connectionPredicate.test(state, world.getBlockState(pos.relative(rotation.rotateTransform(dir))))));
       return data;
     }
 
     /**
      * Shared logic to get quads from a connections array
      *
-     * @param connections Byte with 6 bits for the 6 different sides
-     * @param blockView       The world
-     * @param state           Block state instance
-     * @param randomSupplier  Random instance
-     * @param context         Render context
+     * @param connections    Byte with 6 bits for the 6 different sides
+     * @param blockView      The world
+     * @param state          Block state instance
+     * @param randomSupplier Random instance
+     * @param context        Render context
      */
     protected synchronized void getCachedQuads(byte connections, BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, RenderContext context) {
       // bake a new model if the orientation is not yet baked
-      if (cache[connections] == null) {
-        cache[connections] = applyConnections(connections);
+      if (this.cache[connections] == null) {
+        this.cache[connections] = this.applyConnections(connections);
       }
 
       // get the model for the given orientation
-      ((FabricBakedModel) cache[connections]).emitBlockQuads(blockView, state, pos, randomSupplier, context);
+      this.cache[connections].emitBlockQuads(blockView, state, pos, randomSupplier, context);
     }
 
     @Override
     public void emitBlockQuads(BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, RenderContext context) {
-      SinglePropertyData<Byte> data = getModelData(blockView, pos, state, new SinglePropertyData<>(CONNECTIONS));
+      SinglePropertyData<Byte> data = this.getModelData(blockView, pos, state, new SinglePropertyData<>(CONNECTIONS));
       // try model data first
       Byte connections = data.getData(CONNECTIONS);
       // if model data failed, try block state
       // temporary fallback until Forge has model data in multipart/weighted random
       if (connections == null) {
         // this will return original if the state is missing all properties
-        Transformation rotation = transforms.getRotation();
+        Transformation rotation = this.transforms.getRotation();
         connections = getConnections((dir) -> {
-          if (!parent.sides.contains(dir)) {
+          if (!this.parent.sides.contains(dir)) {
             return false;
           }
           BooleanProperty prop = IMultipartConnectedBlock.CONNECTED_DIRECTIONS.get(rotation.rotateTransform(dir));
@@ -408,13 +418,18 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
         });
       }
       // get quads using connections
-      getCachedQuads(connections, blockView, state, pos, randomSupplier, context);
+      this.getCachedQuads(connections, blockView, state, pos, randomSupplier, context);
     }
   }
 
-  /** Loader class containing singleton instance */
+  /**
+   * Loader class containing singleton instance
+   */
   public static class Loader implements IGeometryLoader<ConnectedModel> {
-    /** Shared loader instance */
+
+    /**
+     * Shared loader instance
+     */
     public static final Loader INSTANCE = new Loader();
 
     @Override
@@ -431,8 +446,8 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
       }
 
       // build texture list
-      ImmutableMap.Builder<String,String[]> connectedTextures = new ImmutableMap.Builder<>();
-      for (Entry<String,JsonElement> entry : connected.entrySet()) {
+      ImmutableMap.Builder<String, String[]> connectedTextures = new ImmutableMap.Builder<>();
+      for (Entry<String, JsonElement> entry : connected.entrySet()) {
         // don't validate texture as it may be contained in a child model that is not yet loaded
         // get type, put in map
         String name = entry.getKey();
@@ -457,7 +472,7 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
       }
 
       // other data
-      BiPredicate<BlockState,BlockState> predicate = ConnectedModelRegistry.deserializePredicate(data, "predicate");
+      BiPredicate<BlockState, BlockState> predicate = ConnectedModelRegistry.deserializePredicate(data, "predicate");
 
       // final model instance
       return new ConnectedModel(model, connectedTextures.build(), predicate, sides);

@@ -15,19 +15,24 @@ import net.minecraft.resources.ResourceLocation;
  * Argument type that supports any vanilla registry. Due to the lack of context, not a true argument type but rather helpers
  */
 public class RegistryArgument {
+
   /* Name is invalid */
   private static final DynamicCommandExceptionType NOT_FOUND = new DynamicCommandExceptionType(name -> Component.translatable("command.mantle.registry.not_found", name));
 
-  /** Creates an argument instance */
+  /**
+   * Creates an argument instance
+   */
   public static ArgumentType<ResourceLocation> registry() {
     return ResourceLocationArgument.id();
   }
 
-  /** Gets the result of this argument */
+  /**
+   * Gets the result of this argument
+   */
   public static Registry<?> getResult(CommandContext<? extends SharedSuggestionProvider> pContext, String pName) throws CommandSyntaxException {
     ResourceLocation name = pContext.getArgument(pName, ResourceLocation.class);
     return pContext.getSource().registryAccess()
-                   .registry(ResourceKey.createRegistryKey(name))
-                   .orElseThrow(() -> NOT_FOUND.create(name));
+      .registry(ResourceKey.createRegistryKey(name))
+      .orElseThrow(() -> NOT_FOUND.create(name));
   }
 }

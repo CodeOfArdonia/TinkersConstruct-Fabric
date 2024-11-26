@@ -29,7 +29,7 @@ public class StructureInfo implements Predicate<BlockPos> {
       structureHeight = Math.max(structureHeight, block.pos().getY() + 1);
       structureWidth = Math.max(structureWidth, block.pos().getZ() + 1);
       structureLength = Math.max(structureLength, block.pos().getX() + 1);
-      data.put(block.pos(), block);
+      this.data.put(block.pos(), block);
     }
 
     this.maxBlockIndex = this.blockIndex = structureHeight * structureLength * structureWidth;
@@ -39,7 +39,7 @@ public class StructureInfo implements Predicate<BlockPos> {
   }
 
   public void setShowLayer(int layer) {
-    showLayer = layer;
+    this.showLayer = layer;
 
     if (layer < 0)
       this.reset();

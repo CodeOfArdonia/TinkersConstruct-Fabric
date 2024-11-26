@@ -11,8 +11,11 @@ import java.util.Collections;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-/** Implementation of an entity getter for a world with no entities */
+/**
+ * Implementation of an entity getter for a world with no entities
+ */
 public class FakeEntityGetter implements LevelEntityGetter<Entity> {
+
   public static final FakeEntityGetter INSTANCE = new FakeEntityGetter();
 
   private FakeEntityGetter() {}
@@ -35,11 +38,11 @@ public class FakeEntityGetter implements LevelEntityGetter<Entity> {
   }
 
   @Override
-  public <U extends Entity> void get(EntityTypeTest<Entity,U> typeTest, AbortableIterationConsumer<U> successConsumer) {}
+  public <U extends Entity> void get(EntityTypeTest<Entity, U> typeTest, AbortableIterationConsumer<U> successConsumer) {}
 
   @Override
   public void get(AABB aabb, Consumer<Entity> successConsumer) {}
 
   @Override
-  public <U extends Entity> void get(EntityTypeTest<Entity,U> typeTest, AABB aabb, AbortableIterationConsumer<U> successConsumer) {}
+  public <U extends Entity> void get(EntityTypeTest<Entity, U> typeTest, AABB aabb, AbortableIterationConsumer<U> successConsumer) {}
 }

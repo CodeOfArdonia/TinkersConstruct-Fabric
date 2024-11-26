@@ -12,7 +12,10 @@ import slimeknights.mantle.network.packet.UpdateHeldPagePacket;
 import slimeknights.mantle.network.packet.UpdateLecternPagePacket;
 
 public class MantleNetwork {
-  /** Network instance */
+
+  /**
+   * Network instance
+   */
   public static final NetworkWrapper INSTANCE = new NetworkWrapper(Mantle.getResource("network"));
 
   /**

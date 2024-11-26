@@ -50,7 +50,8 @@ import static net.minecraft.client.renderer.Sheets.SIGN_SHEET;
 
 @SuppressWarnings("unused")
 public class ClientEvents implements ClientModInitializer {
-  private static final Function<OffhandCooldownTracker,Float> COOLDOWN_TRACKER = OffhandCooldownTracker::getCooldown;
+
+  private static final Function<OffhandCooldownTracker, Float> COOLDOWN_TRACKER = OffhandCooldownTracker::getCooldown;
 
   static void registerEntityRenderers() {
     BlockEntityRenderers.register(MantleRegistrations.SIGN, SignRenderer::new);
@@ -65,7 +66,7 @@ public class ClientEvents implements ClientModInitializer {
 
   @Override
   public void onInitializeClient() {
-    RegistrationHelper.forEachWoodType(woodType ->  {
+    RegistrationHelper.forEachWoodType(woodType -> {
       ResourceLocation location = new ResourceLocation(woodType.name());
       Sheets.SIGN_MATERIALS.put(woodType, new Material(SIGN_SHEET, new ResourceLocation(location.getNamespace(), "entity/signs/" + location.getPath())));
     });
@@ -134,7 +135,7 @@ public class ClientEvents implements ClientModInitializer {
             // integer division makes this a pain to line up, there might be a simplier version of this formula but I cannot think of one
             int y = (scaledHeight / 2) - 14 + (2 * (scaledHeight % 2));
             int x = minecraft.getWindow().getGuiScaledWidth() / 2 - 8;
-            int width = (int)(cooldown * 17.0F);
+            int width = (int) (cooldown * 17.0F);
             guiGraphics.blit(Gui.GUI_ICONS_LOCATION, x, y, 36, 94, 16, 4);
             guiGraphics.blit(Gui.GUI_ICONS_LOCATION, x, y, 52, 94, width, 4);
           }
@@ -151,7 +152,7 @@ public class ClientEvents implements ClientModInitializer {
           } else {
             x = centerWidth + 91 + 6 + 32;
           }
-          int l1 = (int)(cooldown * 19.0F);
+          int l1 = (int) (cooldown * 19.0F);
           RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
           guiGraphics.blit(Gui.GUI_ICONS_LOCATION, x, y, 0, 94, 18, 18);
           guiGraphics.blit(Gui.GUI_ICONS_LOCATION, x, y + 18 - l1, 18, 112 - l1, 18, l1);

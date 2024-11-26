@@ -6,12 +6,17 @@ import slimeknights.mantle.Mantle;
 
 @SuppressWarnings("unused")
 public class ContainerTypeRegistryAdapter extends RegistryAdapter<MenuType<?>> {
-  /** @inheritDoc */
+
+  /**
+   * @inheritDoc
+   */
   public ContainerTypeRegistryAdapter(String modId) {
     super(BuiltInRegistries.MENU, modId);
   }
 
-  /** @inheritDoc */
+  /**
+   * @inheritDoc
+   */
   public ContainerTypeRegistryAdapter() {
     super(BuiltInRegistries.MENU, Mantle.modId);
   }

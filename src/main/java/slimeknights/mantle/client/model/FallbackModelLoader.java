@@ -26,7 +26,10 @@ import java.util.function.Function;
  */
 @RequiredArgsConstructor
 public class FallbackModelLoader implements IGeometryLoader<FallbackModelLoader.BlockModelWrapper> {
-  /** Loader instance */
+
+  /**
+   * Loader instance
+   */
   public static final FallbackModelLoader INSTANCE = new FallbackModelLoader();
 
   @Override
@@ -72,14 +75,15 @@ public class FallbackModelLoader implements IGeometryLoader<FallbackModelLoader.
    * Final baked model will still be the original instance, which is what is important
    */
   record BlockModelWrapper(BlockModel model) implements IUnbakedGeometry<BlockModelWrapper> {
+
     @Override
-    public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation, boolean isGui3d) {
-      return model.bake(baker, model, spriteGetter, modelTransform, modelLocation, true);
+    public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation, boolean isGui3d) {
+      return this.model.bake(baker, this.model, spriteGetter, modelTransform, modelLocation, true);
     }
 
     @Override
-    public void resolveParents(Function<ResourceLocation,UnbakedModel> modelGetter, BlockModel owner) {
-      model.resolveParents(modelGetter);
+    public void resolveParents(Function<ResourceLocation, UnbakedModel> modelGetter, BlockModel owner) {
+      this.model.resolveParents(modelGetter);
     }
   }
 }

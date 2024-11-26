@@ -23,21 +23,24 @@ import java.util.Objects;
 
 /**
  * Logic for a dynamically retexturable block item. This will ensure all the NBT is in the expected format on the item NBT.
- *
+ * <p>
  * Use alongside {@link IRetexturedBlockEntity} and {@link RetexturedBlock}
  */
 @SuppressWarnings("WeakerAccess")
 public class RetexturedBlockItem extends BlockTooltipItem {
 
-  /** Tag used for getting the texture */
+  /**
+   * Tag used for getting the texture
+   */
   protected final TagKey<Item> textureTag;
+
   public RetexturedBlockItem(Block block, TagKey<Item> textureTag, Properties builder) {
     super(block, builder);
     this.textureTag = textureTag;
   }
 
   public void fillItemCategory(CreativeModeTab.Output items) {
-    addTagVariants(this.getBlock(), textureTag, items, true);
+    addTagVariants(this.getBlock(), this.textureTag, items, true);
   }
 
   @Override
@@ -51,8 +54,9 @@ public class RetexturedBlockItem extends BlockTooltipItem {
 
   /**
    * Gets the texture name from a stack
-   * @param stack  Stack
-   * @return  Texture, or empty string if none
+   *
+   * @param stack Stack
+   * @return Texture, or empty string if none
    */
   public static String getTextureName(ItemStack stack) {
     return RetexturedHelper.getTextureName(stack.getTag());
@@ -60,8 +64,9 @@ public class RetexturedBlockItem extends BlockTooltipItem {
 
   /**
    * Gets the texture from a stack
-   * @param stack  Stack to fetch texture
-   * @return  Texture, or {@link Blocks#AIR} if none
+   *
+   * @param stack Stack to fetch texture
+   * @return Texture, or {@link Blocks#AIR} if none
    */
   public static Block getTexture(ItemStack stack) {
     return RetexturedHelper.getBlock(getTextureName(stack));
@@ -69,8 +74,9 @@ public class RetexturedBlockItem extends BlockTooltipItem {
 
   /**
    * Adds the texture block to the tooltip
-   * @param stack    Stack instance
-   * @param tooltip  Tooltip
+   *
+   * @param stack   Stack instance
+   * @param tooltip Tooltip
    */
   public static void addTooltip(ItemStack stack, List<Component> tooltip) {
     Block block = getTexture(stack);
@@ -78,10 +84,12 @@ public class RetexturedBlockItem extends BlockTooltipItem {
       tooltip.add(block.getName());
     }
   }
+
   /**
    * Creates a new item stack with the given block as it's texture tag
-   * @param stack  Stack to modify
-   * @param name   Block name to set. If empty, clears the tag
+   *
+   * @param stack Stack to modify
+   * @param name  Block name to set. If empty, clears the tag
    * @return The item stack with the proper NBT
    */
   public static ItemStack setTexture(ItemStack stack, String name) {
@@ -95,6 +103,7 @@ public class RetexturedBlockItem extends BlockTooltipItem {
 
   /**
    * Creates a new item stack with the given block as it's texture tag
+   *
    * @param stack Stack to modify
    * @param block Block to set
    * @return The item stack with the proper NBT
@@ -108,10 +117,11 @@ public class RetexturedBlockItem extends BlockTooltipItem {
 
   /**
    * Adds all blocks from the block tag to the specified block for fillItemGroup
-   * @param block             Dynamic texture item instance
-   * @param tag               Tag for texturing
-   * @param list              List of texture blocks
-   * @param showAllVariants   If true, shows all variants. If false, shows just the first
+   *
+   * @param block           Dynamic texture item instance
+   * @param tag             Tag for texturing
+   * @param list            List of texture blocks
+   * @param showAllVariants If true, shows all variants. If false, shows just the first
    */
   public static void addTagVariants(ItemLike block, TagKey<Item> tag, CreativeModeTab.Output list, boolean showAllVariants) {
     boolean added = false;
@@ -126,7 +136,7 @@ public class RetexturedBlockItem extends BlockTooltipItem {
       if (!(item instanceof BlockItem)) {
         continue;
       }
-      Block textureBlock = ((BlockItem)item).getBlock();
+      Block textureBlock = ((BlockItem) item).getBlock();
       // Don't add instances of the block itself, see Inspirations enlightened bushes
       if (clazz.isInstance(textureBlock)) {
         continue;

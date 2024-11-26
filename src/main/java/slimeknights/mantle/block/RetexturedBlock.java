@@ -1,5 +1,6 @@
 package slimeknights.mantle.block;
 
+import net.fabricmc.fabric.api.block.BlockPickInteractionAware;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -10,8 +11,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.HitResult;
-
-import net.fabricmc.fabric.api.block.BlockPickInteractionAware;
 import slimeknights.mantle.block.entity.IRetexturedBlockEntity;
 import slimeknights.mantle.item.RetexturedBlockItem;
 import slimeknights.mantle.util.BlockEntityHelper;
@@ -23,6 +22,7 @@ import javax.annotation.Nullable;
  */
 @SuppressWarnings("WeakerAccess")
 public abstract class RetexturedBlock extends Block implements EntityBlock, BlockPickInteractionAware {
+
   public RetexturedBlock(Properties properties) {
     super(properties);
   }
@@ -43,6 +43,7 @@ public abstract class RetexturedBlock extends Block implements EntityBlock, Bloc
 
   /**
    * Call in {@link Block#setPlacedBy(Level, BlockPos, BlockState, LivingEntity, ItemStack)} to set the texture tag to the Tile Entity
+   *
    * @param world World where the block was placed
    * @param pos   Block position
    * @param stack Item stack
@@ -55,6 +56,7 @@ public abstract class RetexturedBlock extends Block implements EntityBlock, Bloc
 
   /**
    * Called in blocks to get the item stack for the current block
+   *
    * @param world World
    * @param pos   Pos
    * @param state State

@@ -9,9 +9,14 @@ import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 
-/** Class to add one level of static indirection to client only lookups */
+/**
+ * Class to add one level of static indirection to client only lookups
+ */
 public class SafeClientAccess {
-  /** Gets the currently pressed key for tooltips, returns UNKNOWN on a server */
+
+  /**
+   * Gets the currently pressed key for tooltips, returns UNKNOWN on a server
+   */
   public static TooltipKey getTooltipKey() {
     if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
       return ClientOnly.getPressedKey();
@@ -19,7 +24,9 @@ public class SafeClientAccess {
     return TooltipKey.UNKNOWN;
   }
 
-  /** Gets the client player entity, or null on a server */
+  /**
+   * Gets the client player entity, or null on a server
+   */
   @Nullable
   public static Player getPlayer() {
     if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
@@ -28,7 +35,9 @@ public class SafeClientAccess {
     return null;
   }
 
-  /** Gets the client player entity, or null on a server */
+  /**
+   * Gets the client player entity, or null on a server
+   */
   @Nullable
   public static Level getLevel() {
     if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
@@ -37,9 +46,14 @@ public class SafeClientAccess {
     return null;
   }
 
-  /** This class is only loaded on the client, so is safe to reference client only methods */
+  /**
+   * This class is only loaded on the client, so is safe to reference client only methods
+   */
   private static class ClientOnly {
-    /** Gets the currently pressed key modifier for tooltips */
+
+    /**
+     * Gets the currently pressed key modifier for tooltips
+     */
     public static TooltipKey getPressedKey() {
       if (Screen.hasShiftDown()) {
         return TooltipKey.SHIFT;
@@ -53,13 +67,17 @@ public class SafeClientAccess {
       return TooltipKey.NORMAL;
     }
 
-    /** Gets the client player instance */
+    /**
+     * Gets the client player instance
+     */
     @Nullable
     public static Player getClientPlayer() {
       return Minecraft.getInstance().player;
     }
 
-    /** Gets the client level instance */
+    /**
+     * Gets the client level instance
+     */
     @Nullable
     public static Level getClientLevel() {
       return Minecraft.getInstance().level;

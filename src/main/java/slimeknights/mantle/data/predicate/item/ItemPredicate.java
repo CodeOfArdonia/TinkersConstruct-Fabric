@@ -12,18 +12,31 @@ import slimeknights.mantle.data.predicate.OrJsonPredicate;
 
 import java.util.function.Predicate;
 
-/** Simple serializable item predicate */
+/**
+ * Simple serializable item predicate
+ */
 public interface ItemPredicate extends IJsonPredicate<Item> {
-  /** Predicate that matches all items */
+
+  /**
+   * Predicate that matches all items
+   */
   ItemPredicate ANY = simple(item -> true);
-  /** Loader for item predicates */
+  /**
+   * Loader for item predicates
+   */
   GenericLoaderRegistry<IJsonPredicate<Item>> LOADER = new GenericLoaderRegistry<>(ANY, true);
-  /** Loader for inverted conditions */
+  /**
+   * Loader for inverted conditions
+   */
   InvertedJsonPredicate.Loader<Item> INVERTED = new InvertedJsonPredicate.Loader<>(LOADER);
-  /** Loader for and conditions */
-  NestedJsonPredicateLoader<Item,AndJsonPredicate<Item>> AND = AndJsonPredicate.createLoader(LOADER, INVERTED);
-  /** Loader for or conditions */
-  NestedJsonPredicateLoader<Item,OrJsonPredicate<Item>> OR = OrJsonPredicate.createLoader(LOADER, INVERTED);
+  /**
+   * Loader for and conditions
+   */
+  NestedJsonPredicateLoader<Item, AndJsonPredicate<Item>> AND = AndJsonPredicate.createLoader(LOADER, INVERTED);
+  /**
+   * Loader for or conditions
+   */
+  NestedJsonPredicateLoader<Item, OrJsonPredicate<Item>> OR = OrJsonPredicate.createLoader(LOADER, INVERTED);
 
 
   @Override
@@ -31,7 +44,9 @@ public interface ItemPredicate extends IJsonPredicate<Item> {
     return INVERTED.create(this);
   }
 
-  /** Creates a new predicate singleton */
+  /**
+   * Creates a new predicate singleton
+   */
   static ItemPredicate simple(Predicate<Item> predicate) {
     return SingletonLoader.singleton(loader -> new ItemPredicate() {
       @Override

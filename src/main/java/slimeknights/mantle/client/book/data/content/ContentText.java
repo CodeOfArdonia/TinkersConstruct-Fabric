@@ -12,6 +12,7 @@ import slimeknights.mantle.client.screen.book.element.TextElement;
 import java.util.ArrayList;
 
 public class ContentText extends PageContent {
+
   public static final ResourceLocation ID = Mantle.getResource("text");
 
   @Getter
@@ -25,7 +26,7 @@ public class ContentText extends PageContent {
       y = 0;
     } else {
       this.addTitle(list, this.title);
-      y = getTitleHeight();
+      y = this.getTitleHeight();
     }
     if (this.text != null && this.text.length > 0) {
       list.add(new TextElement(0, y, BookScreen.PAGE_WIDTH, BookScreen.PAGE_HEIGHT - y, this.text));

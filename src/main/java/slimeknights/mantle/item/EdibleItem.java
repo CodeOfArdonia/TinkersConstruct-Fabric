@@ -17,8 +17,10 @@ import java.util.List;
 
 public class EdibleItem extends Item {
 
-  /** if false, does not display effects of food in tooltip */
-  private boolean displayEffectsTooltip;
+  /**
+   * if false, does not display effects of food in tooltip
+   */
+  private final boolean displayEffectsTooltip;
 
   public EdibleItem(FoodProperties foodIn) {
     this(foodIn, true);

@@ -17,17 +17,24 @@ import slimeknights.mantle.fluid.attributes.FluidAttributes;
 
 import java.util.function.Supplier;
 
-/** Fluid with a bucket form, but no block form (hence no flowing) */
+/**
+ * Fluid with a bucket form, but no block form (hence no flowing)
+ */
 @AllArgsConstructor
 public class UnplaceableFluid extends Fluid {
-  /** Bucket form of the liquid, use a supplier to air if no bucket form */
+
+  /**
+   * Bucket form of the liquid, use a supplier to air if no bucket form
+   */
   private final Supplier<? extends Item> bucket;
-  /** Forge fluid attributes builder */
+  /**
+   * Forge fluid attributes builder
+   */
   private final FluidAttributes.Builder builder;
 
   @Override
   public Item getBucket() {
-    return bucket.get();
+    return this.bucket.get();
   }
 
   @Override
@@ -50,9 +57,8 @@ public class UnplaceableFluid extends Fluid {
     return Blocks.AIR.defaultBlockState();
   }
 
-  public FluidAttributes createAttributes()
-  {
-    return builder.build(this);
+  public FluidAttributes createAttributes() {
+    return this.builder.build(this);
   }
 
   /* Required methods */

@@ -9,11 +9,12 @@ import net.minecraft.world.item.ItemStack;
  */
 @AllArgsConstructor
 public class InventorySlotWrapper implements ISingleStackContainer {
+
   private final Container parent;
   private final int index;
 
   @Override
   public ItemStack getStack() {
-    return parent.getItem(index);
+    return this.parent.getItem(this.index);
   }
 }

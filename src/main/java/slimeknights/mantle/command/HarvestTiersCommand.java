@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import io.github.fabricators_of_create.porting_lib.util.TagUtil;
 import io.github.fabricators_of_create.porting_lib.util.TierSortingRegistry;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -18,7 +19,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.level.block.Block;
 import slimeknights.mantle.Mantle;
-import io.github.fabricators_of_create.porting_lib.util.TagUtil;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -28,11 +28,18 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
-/** Command to dump global loot modifiers */
+/**
+ * Command to dump global loot modifiers
+ */
 public class HarvestTiersCommand {
-  /** Resource location of the global loot manager "tag" */
+
+  /**
+   * Resource location of the global loot manager "tag"
+   */
   protected static final ResourceLocation HARVEST_TIERS = new ResourceLocation("mantle", "item_tier_ordering.json");
-  /** Path for saving the loot modifiers */
+  /**
+   * Path for saving the loot modifiers
+   */
   private static final String HARVEST_TIER_PATH = HARVEST_TIERS.getNamespace() + "/" + HARVEST_TIERS.getPath();
 
   // loot modifiers
@@ -41,22 +48,27 @@ public class HarvestTiersCommand {
 
   /**
    * Registers this sub command with the root command
-   * @param subCommand  Command builder
+   *
+   * @param subCommand Command builder
    */
   public static void register(LiteralArgumentBuilder<CommandSourceStack> subCommand) {
     subCommand.requires(sender -> sender.hasPermission(MantleCommand.PERMISSION_EDIT_SPAWN))
-              .then(Commands.literal("save").executes(source -> run(source, true)))
-              .then(Commands.literal("log").executes(source -> run(source, false)))
-              .then(Commands.literal("list").executes(HarvestTiersCommand::list));
+      .then(Commands.literal("save").executes(source -> run(source, true)))
+      .then(Commands.literal("log").executes(source -> run(source, false)))
+      .then(Commands.literal("list").executes(HarvestTiersCommand::list));
   }
 
-  /** Creates a clickable component for a block tag */
+  /**
+   * Creates a clickable component for a block tag
+   */
   private static Object getTagComponent(TagKey<Block> tag) {
     ResourceLocation id = tag.location();
     return Component.literal(id.toString()).withStyle(style -> style.withUnderlined(true).withClickEvent(new ClickEvent(Action.SUGGEST_COMMAND, "/mantle dump_tag " + Registries.BLOCK.location() + " " + id + " save")));
   }
 
-  /** Runs the command, dumping the tag */
+  /**
+   * Runs the command, dumping the tag
+   */
   private static int list(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
     List<Tier> sortedTiers = TierSortingRegistry.getSortedTiers();
 
@@ -81,7 +93,9 @@ public class HarvestTiersCommand {
     return sortedTiers.size();
   }
 
-  /** Runs the command, dumping the tag */
+  /**
+   * Runs the command, dumping the tag
+   */
   private static int run(CommandContext<CommandSourceStack> context, boolean saveFile) throws CommandSyntaxException {
     List<Tier> sortedTiers = TierSortingRegistry.getSortedTiers();
 

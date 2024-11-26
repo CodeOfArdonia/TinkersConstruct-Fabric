@@ -12,10 +12,11 @@ import slimeknights.mantle.registration.RegistrationHelper;
 
 @Mixin(ModelLayers.class)
 public class ModelLayersMixin {
+
   @Inject(method = "createSignModelName", at = @At("HEAD"), cancellable = true)
   private static void fixSignLocation(WoodType oldWoodType, CallbackInfoReturnable<ModelLayerLocation> cir) {
     RegistrationHelper.forEachWoodType(woodType -> {
-      if(woodType == oldWoodType) {
+      if (woodType == oldWoodType) {
         ResourceLocation location = new ResourceLocation(woodType.name());
         cir.setReturnValue(new ModelLayerLocation(new ResourceLocation(location.getNamespace(), "sign/" + location.getPath()), "main"));
       }

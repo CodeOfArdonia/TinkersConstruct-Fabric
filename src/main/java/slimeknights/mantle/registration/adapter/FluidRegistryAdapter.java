@@ -9,12 +9,17 @@ import slimeknights.mantle.Mantle;
  */
 @SuppressWarnings("unused")
 public class FluidRegistryAdapter extends RegistryAdapter<Fluid> {
-  /** @inheritDoc */
+
+  /**
+   * @inheritDoc
+   */
   public FluidRegistryAdapter() {
     super(BuiltInRegistries.FLUID, Mantle.modId);
   }
 
-  /** @inheritDoc */
+  /**
+   * @inheritDoc
+   */
   public FluidRegistryAdapter(String modId) {
     super(BuiltInRegistries.FLUID, modId);
   }

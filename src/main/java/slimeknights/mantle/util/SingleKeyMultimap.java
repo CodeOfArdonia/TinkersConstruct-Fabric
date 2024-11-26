@@ -22,11 +22,13 @@ import java.util.Set;
 
 /**
  * Implementation of a multimap using a single key and a backing collection of values
- * @param <K>  Key type
- * @param <V>  Value type
+ *
+ * @param <K> Key type
+ * @param <V> Value type
  */
 @RequiredArgsConstructor
-public class SingleKeyMultimap<K,V> implements Multimap<K,V> {
+public class SingleKeyMultimap<K, V> implements Multimap<K, V> {
+
   @Getter
   @Nonnull
   private final K key;
@@ -34,7 +36,9 @@ public class SingleKeyMultimap<K,V> implements Multimap<K,V> {
   @Nonnull
   private final Collection<V> values;
 
-  /** Validates the given key is the correct one for this map */
+  /**
+   * Validates the given key is the correct one for this map
+   */
   private void validateKey(@Nullable Object key) {
     if (key != this.key) {
       throw new IllegalArgumentException("Cannot modify a single key multimap with mismatching key");
@@ -43,12 +47,12 @@ public class SingleKeyMultimap<K,V> implements Multimap<K,V> {
 
   @Override
   public int size() {
-    return values.size();
+    return this.values.size();
   }
 
   @Override
   public boolean isEmpty() {
-    return values.isEmpty();
+    return this.values.isEmpty();
   }
 
   @Override
@@ -59,26 +63,26 @@ public class SingleKeyMultimap<K,V> implements Multimap<K,V> {
   @SuppressWarnings("SuspiciousMethodCalls")
   @Override
   public boolean containsValue(@Nullable Object value) {
-    return values.contains(value);
+    return this.values.contains(value);
   }
 
   @SuppressWarnings("SuspiciousMethodCalls")
   @Override
   public boolean containsEntry(@Nullable Object key, @Nullable Object value) {
-    return key == this.key && values.contains(value);
+    return key == this.key && this.values.contains(value);
   }
 
   @Override
   public boolean put(@Nullable K key, @Nullable V value) {
     this.validateKey(key);
-    return values.add(value);
+    return this.values.add(value);
   }
 
   @SuppressWarnings("SuspiciousMethodCalls")
   @Override
   public boolean remove(@Nullable Object key, @Nullable Object value) {
     this.validateKey(key);
-    return values.remove(value);
+    return this.values.remove(value);
   }
 
   @Override
@@ -92,10 +96,10 @@ public class SingleKeyMultimap<K,V> implements Multimap<K,V> {
   }
 
   @Override
-  public boolean putAll(Multimap<? extends K,? extends V> multimap) {
+  public boolean putAll(Multimap<? extends K, ? extends V> multimap) {
     boolean didChange = false;
     for (Entry<? extends K, ? extends V> entry : multimap.entries()) {
-      didChange |= put(entry.getKey(), entry.getValue());
+      didChange |= this.put(entry.getKey(), entry.getValue());
     }
     return didChange;
   }
@@ -110,8 +114,8 @@ public class SingleKeyMultimap<K,V> implements Multimap<K,V> {
   @Override
   public Collection<V> replaceValues(@Nullable K key, Iterable<? extends V> values) {
     this.validateKey(key);
-    Collection<V> returnValues = removeAll(key);
-    putAll(key, values);
+    Collection<V> returnValues = this.removeAll(key);
+    this.putAll(key, values);
     return returnValues;
   }
 
@@ -123,79 +127,90 @@ public class SingleKeyMultimap<K,V> implements Multimap<K,V> {
   @Override
   public Collection<V> get(@Nullable K key) {
     if (key == this.key) {
-      return values;
+      return this.values;
     }
     return Collections.emptyList();
   }
 
-  /** Cached unmodifiable view of {@link #values()} */
+  /**
+   * Cached unmodifiable view of {@link #values()}
+   */
   private transient Collection<V> unmodifiableValues;
 
   @Override
   public Collection<V> values() {
-    if (unmodifiableValues == null) {
-      unmodifiableValues = Collections.unmodifiableCollection(values);
+    if (this.unmodifiableValues == null) {
+      this.unmodifiableValues = Collections.unmodifiableCollection(this.values);
     }
-    return unmodifiableValues;
+    return this.unmodifiableValues;
   }
 
-  /** Cached set of the single key */
+  /**
+   * Cached set of the single key
+   */
   private transient Set<K> keySet;
 
   @Override
   public Set<K> keySet() {
-    if (keySet == null) {
-      keySet = Collections.singleton(this.key);
+    if (this.keySet == null) {
+      this.keySet = Collections.singleton(this.key);
     }
-    return keySet;
+    return this.keySet;
   }
 
-  /** Cached multiset of the single key */
+  /**
+   * Cached multiset of the single key
+   */
   private transient Multiset<K> keyMultiset;
 
   @Override
   public Multiset<K> keys() {
-    if (keyMultiset == null) {
-      keyMultiset = ImmutableMultiset.of(key);
+    if (this.keyMultiset == null) {
+      this.keyMultiset = ImmutableMultiset.of(this.key);
     }
-    return keyMultiset;
+    return this.keyMultiset;
   }
 
-  /** Cached map of all values */
-  private transient Map<K,Collection<V>> asMap;
+  /**
+   * Cached map of all values
+   */
+  private transient Map<K, Collection<V>> asMap;
 
   @Override
-  public Map<K,Collection<V>> asMap() {
-    if (asMap == null) {
-      asMap = ImmutableMap.of(key, values);
+  public Map<K, Collection<V>> asMap() {
+    if (this.asMap == null) {
+      this.asMap = ImmutableMap.of(this.key, this.values);
     }
-    return asMap;
+    return this.asMap;
   }
 
-  /** Cached entries collection */
-  private transient Collection<Entry<K,V>> entries;
+  /**
+   * Cached entries collection
+   */
+  private transient Collection<Entry<K, V>> entries;
 
   @Override
-  public Collection<Entry<K,V>> entries() {
-    if (entries == null) {
-      entries = new SingleKeyEntries();
+  public Collection<Entry<K, V>> entries() {
+    if (this.entries == null) {
+      this.entries = new SingleKeyEntries();
     }
-    return entries;
+    return this.entries;
   }
 
-  private class SingleKeyEntries extends AbstractCollection<Entry<K,V>> {
-    private SingleKeyMultimap<K,V> getMap() {
+  private class SingleKeyEntries extends AbstractCollection<Entry<K, V>> {
+
+    private SingleKeyMultimap<K, V> getMap() {
       return SingleKeyMultimap.this;
     }
 
     @Override
-    public Iterator<Entry<K,V>> iterator() {
+    public Iterator<Entry<K, V>> iterator() {
       return new SingleKeyIterator();
     }
 
     @Override
     public boolean contains(@Nullable Object o) {
-      if (o instanceof Entry<?,?> entry) {
+      if (o instanceof Entry<?, ?> entry) {
         return SingleKeyMultimap.this.containsEntry(entry.getKey(), entry.getValue());
       }
       return false;
@@ -203,7 +218,7 @@ public class SingleKeyMultimap<K,V> implements Multimap<K,V> {
 
     @Override
     public boolean remove(@Nullable Object o) {
-      if (o instanceof Entry<?,?> entry) {
+      if (o instanceof Entry<?, ?> entry) {
         return SingleKeyMultimap.this.remove(entry.getKey(), entry.getValue());
       }
       return false;
@@ -211,7 +226,7 @@ public class SingleKeyMultimap<K,V> implements Multimap<K,V> {
 
     @Override
     public int size() {
-      return values.size();
+      return SingleKeyMultimap.this.values.size();
     }
 
     @Override
@@ -233,13 +248,14 @@ public class SingleKeyMultimap<K,V> implements Multimap<K,V> {
       if (obj.getClass() != this.getClass()) {
         return false;
       }
-      SingleKeyMultimap<?,?> otherMap = ((SingleKeyEntries)obj).getMap();
+      SingleKeyMultimap<?, ?> otherMap = ((SingleKeyEntries) obj).getMap();
       return otherMap.key.equals(SingleKeyMultimap.this.key) && otherMap.values.equals(SingleKeyMultimap.this.values);
     }
   }
 
   @AllArgsConstructor
-  private class SingleKeyEntry implements Entry<K,V> {
+  private class SingleKeyEntry implements Entry<K, V> {
+
     private V value;
 
     @Override
@@ -249,7 +265,7 @@ public class SingleKeyMultimap<K,V> implements Multimap<K,V> {
 
     @Override
     public V getValue() {
-      return value;
+      return this.value;
     }
 
     @Override
@@ -274,18 +290,20 @@ public class SingleKeyMultimap<K,V> implements Multimap<K,V> {
     }
   }
 
-  private class SingleKeyIterator extends AbstractIterator<Entry<K,V>> {
+  private class SingleKeyIterator extends AbstractIterator<Entry<K, V>> {
+
     private final Iterator<V> values;
+
     private SingleKeyIterator() {
       this.values = SingleKeyMultimap.this.values.iterator();
     }
 
     @Override
-    protected Entry<K,V> computeNext() {
-      if (!values.hasNext()) {
-        return endOfData();
+    protected Entry<K, V> computeNext() {
+      if (!this.values.hasNext()) {
+        return this.endOfData();
       }
-      return new SingleKeyEntry(values.next());
+      return new SingleKeyEntry(this.values.next());
     }
   }
 }

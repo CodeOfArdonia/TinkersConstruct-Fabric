@@ -17,35 +17,42 @@ import java.io.File;
  * Dumps all tags to a folder
  */
 public class DumpAllTagsCommand {
+
   private static final String TAG_DUMP_PATH = "./mantle_data_dump";
   private static final int EXTENSION_LENGTH = ".json".length();
 
   /**
    * Registers this sub command with the root command
-   * @param subCommand  Command builder
+   *
+   * @param subCommand Command builder
    */
   public static void register(LiteralArgumentBuilder<CommandSourceStack> subCommand) {
     subCommand.requires(sender -> sender.hasPermission(MantleCommand.PERMISSION_EDIT_SPAWN))
-              .executes(DumpAllTagsCommand::runAll)
-              .then(Commands.argument("type", RegistryArgument.registry()).suggests(MantleCommand.REGISTRY)
-                            .executes(DumpAllTagsCommand::runType));
+      .executes(DumpAllTagsCommand::runAll)
+      .then(Commands.argument("type", RegistryArgument.registry()).suggests(MantleCommand.REGISTRY)
+        .executes(DumpAllTagsCommand::runType));
   }
 
-  /** Gets the path for the output */
+  /**
+   * Gets the path for the output
+   */
   protected static File getOutputFile(CommandContext<CommandSourceStack> context) {
     return context.getSource().getServer().getFile(TAG_DUMP_PATH);
   }
 
   /**
    * Makes a clickable text component for the output folder
-   * @param file  File
-   * @return  Clickable text component
+   *
+   * @param file File
+   * @return Clickable text component
    */
   protected static Component getOutputComponent(File file) {
     return Component.literal(file.getAbsolutePath()).withStyle(style -> style.withUnderlined(true).withClickEvent(new ClickEvent(Action.OPEN_FILE, file.getAbsolutePath())));
   }
 
-  /** Dumps all tags to the game directory */
+  /**
+   * Dumps all tags to the game directory
+   */
   private static int runAll(CommandContext<CommandSourceStack> context) {
     File output = getOutputFile(context);
     int tagsDumped = context.getSource().registryAccess().registries().mapToInt(r -> runForFolder(context, r.key(), output)).sum();
@@ -54,7 +61,9 @@ public class DumpAllTagsCommand {
     return tagsDumped;
   }
 
-  /** Dumps a single type of tags to the game directory */
+  /**
+   * Dumps a single type of tags to the game directory
+   */
   private static int runType(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
     File output = getOutputFile(context);
     Registry<?> registry = RegistryArgument.getResult(context, "type");
@@ -66,8 +75,9 @@ public class DumpAllTagsCommand {
 
   /**
    * Runs the view-tag command
-   * @param context  Tag context
-   * @return  Integer return
+   *
+   * @param context Tag context
+   * @return Integer return
    */
   private static int runForFolder(CommandContext<CommandSourceStack> context, ResourceKey<? extends Registry<?>> key, File output) {
 //    Map<ResourceLocation, Tag.Builder> foundTags = Maps.newHashMap();

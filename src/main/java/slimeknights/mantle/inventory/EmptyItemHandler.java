@@ -15,6 +15,7 @@ import javax.annotation.Nonnull;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EmptyItemHandler implements SlottedStackStorage {
+
   public static final EmptyItemHandler INSTANCE = new EmptyItemHandler();
 
   @Override

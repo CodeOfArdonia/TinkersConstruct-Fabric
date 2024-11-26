@@ -17,18 +17,31 @@ import java.util.function.Predicate;
  * Simple serializable block predicate
  */
 public interface BlockPredicate extends IJsonPredicate<BlockState> {
-  /** Predicate that matches any block */
-  BlockPredicate ANY = simple(state -> true);
-  /** Loader for block state predicates */
-  GenericLoaderRegistry<IJsonPredicate<BlockState>> LOADER = new GenericLoaderRegistry<>(ANY, true);
-  /** Loader for inverted conditions */
-  InvertedJsonPredicate.Loader<BlockState> INVERTED = new InvertedJsonPredicate.Loader<>(LOADER);
-  /** Loader for and conditions */
-  NestedJsonPredicateLoader<BlockState,AndJsonPredicate<BlockState>> AND = AndJsonPredicate.createLoader(LOADER, INVERTED);
-  /** Loader for or conditions */
-  NestedJsonPredicateLoader<BlockState,OrJsonPredicate<BlockState>> OR = OrJsonPredicate.createLoader(LOADER, INVERTED);
 
-  /** Gets an inverted condition */
+  /**
+   * Predicate that matches any block
+   */
+  BlockPredicate ANY = simple(state -> true);
+  /**
+   * Loader for block state predicates
+   */
+  GenericLoaderRegistry<IJsonPredicate<BlockState>> LOADER = new GenericLoaderRegistry<>(ANY, true);
+  /**
+   * Loader for inverted conditions
+   */
+  InvertedJsonPredicate.Loader<BlockState> INVERTED = new InvertedJsonPredicate.Loader<>(LOADER);
+  /**
+   * Loader for and conditions
+   */
+  NestedJsonPredicateLoader<BlockState, AndJsonPredicate<BlockState>> AND = AndJsonPredicate.createLoader(LOADER, INVERTED);
+  /**
+   * Loader for or conditions
+   */
+  NestedJsonPredicateLoader<BlockState, OrJsonPredicate<BlockState>> OR = OrJsonPredicate.createLoader(LOADER, INVERTED);
+
+  /**
+   * Gets an inverted condition
+   */
   @Override
   default IJsonPredicate<BlockState> inverted() {
     return INVERTED.create(this);
@@ -37,10 +50,14 @@ public interface BlockPredicate extends IJsonPredicate<BlockState> {
 
   /* Singleton */
 
-  /** Predicate that matches blocks with no harvest tool */
+  /**
+   * Predicate that matches blocks with no harvest tool
+   */
   BlockPredicate REQUIRES_TOOL = simple(BlockStateBase::requiresCorrectToolForDrops);
 
-  /** Creates a new simple predicate */
+  /**
+   * Creates a new simple predicate
+   */
   static BlockPredicate simple(Predicate<BlockState> predicate) {
     return SingletonLoader.singleton(loader -> new BlockPredicate() {
       @Override

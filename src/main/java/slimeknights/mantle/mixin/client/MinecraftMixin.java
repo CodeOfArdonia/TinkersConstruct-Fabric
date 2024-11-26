@@ -30,7 +30,7 @@ public class MinecraftMixin {
     locals = LocalCapture.CAPTURE_FAILHARD)
   private void rightClickAir(CallbackInfo ci, InteractionHand[] var1, int var2, int var3, InteractionHand interactionHand, ItemStack itemStack) {
     if (itemStack.isEmpty() && (this.hitResult == null || this.hitResult.getType() == HitResult.Type.MISS)) {
-      ClientRightClickAir.EVENT.invoker().click(player, interactionHand);
+      ClientRightClickAir.EVENT.invoker().click(this.player, interactionHand);
     }
   }
 }

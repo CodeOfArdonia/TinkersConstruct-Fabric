@@ -12,6 +12,7 @@ import java.util.function.Predicate;
  * TODO 1.19: move to {@code slimeknights.data.listener}
  */
 public class ResourceValidator implements IEarlySafeManagerReloadListener, Predicate<ResourceLocation> {
+
   private final String folder;
   private final int trim;
   private final String extension;
@@ -19,9 +20,10 @@ public class ResourceValidator implements IEarlySafeManagerReloadListener, Predi
 
   /**
    * Gets a resource validator instance
-   * @param folder     Folder to search
-   * @param trim       Text to trim off resource locations
-   * @param extension  File extension
+   *
+   * @param folder    Folder to search
+   * @param trim      Text to trim off resource locations
+   * @param extension File extension
    */
   public ResourceValidator(String folder, String trim, String extension) {
     this.folder = folder;
@@ -32,27 +34,27 @@ public class ResourceValidator implements IEarlySafeManagerReloadListener, Predi
 
   @Override
   public void onReloadSafe(ResourceManager manager) {
-    int extensionLength = extension.length();
+    int extensionLength = this.extension.length();
     // FIXME: this does not validate folder names
-    this.resources = manager.listResources(folder, (loc) -> {
+    this.resources = manager.listResources(this.folder, (loc) -> {
       // must have proper extension and contain valid characters
-      return loc.getPath().endsWith(extension);
+      return loc.getPath().endsWith(this.extension);
     }).keySet();
   }
 
   private static boolean isPathValid(String path) {
-      return path.chars().allMatch((c) -> c >= '0' && c <= '9' || c >= 'a' && c <= 'z' || c == '_' || c == '/' || c == '.' || c == '-');
+    return path.chars().allMatch((c) -> c >= '0' && c <= '9' || c >= 'a' && c <= 'z' || c == '_' || c == '/' || c == '.' || c == '-');
   }
 
   @Override
   public boolean test(ResourceLocation location) {
-    return resources.contains(location);
+    return this.resources.contains(location);
   }
 
   /**
    * Clears the resource cache, saves RAM as there could be a lot of locations
    */
   public void clear() {
-    resources = ImmutableSet.of();
+    this.resources = ImmutableSet.of();
   }
 }

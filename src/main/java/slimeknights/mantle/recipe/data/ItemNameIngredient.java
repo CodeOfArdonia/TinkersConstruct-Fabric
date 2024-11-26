@@ -18,18 +18,24 @@ import java.util.List;
  * Ingredient for a non-NBT sensitive item from another mod, should never be used outside datagen
  */
 public class ItemNameIngredient extends Ingredient {
+
   private final List<ResourceLocation> names;
+
   protected ItemNameIngredient(List<ResourceLocation> names) {
     super(names.stream().map(NamedValue::new));
     this.names = names;
   }
 
-  /** Creates a new ingredient from a list of names */
+  /**
+   * Creates a new ingredient from a list of names
+   */
   public static ItemNameIngredient from(List<ResourceLocation> names) {
     return new ItemNameIngredient(names);
   }
 
-  /** Creates a new ingredient from a list of names */
+  /**
+   * Creates a new ingredient from a list of names
+   */
   public static ItemNameIngredient from(ResourceLocation... names) {
     return from(Arrays.asList(names));
   }
@@ -39,7 +45,9 @@ public class ItemNameIngredient extends Ingredient {
     throw new UnsupportedOperationException();
   }
 
-  /** Creates a JSON object for a name */
+  /**
+   * Creates a JSON object for a name
+   */
   private static JsonObject forName(ResourceLocation name) {
     JsonObject json = new JsonObject();
     json.addProperty("item", name.toString());
@@ -48,11 +56,11 @@ public class ItemNameIngredient extends Ingredient {
 
   @Override
   public JsonElement toJson() {
-    if (names.size() == 1) {
-      return forName(names.get(0));
+    if (this.names.size() == 1) {
+      return forName(this.names.get(0));
     }
     JsonArray array = new JsonArray();
-    for (ResourceLocation name : names) {
+    for (ResourceLocation name : this.names) {
       array.add(forName(name));
     }
     return array;
@@ -60,6 +68,7 @@ public class ItemNameIngredient extends Ingredient {
 
   @RequiredArgsConstructor
   public static class NamedValue implements Value {
+
     private final ResourceLocation name;
 
     @Override
@@ -70,7 +79,7 @@ public class ItemNameIngredient extends Ingredient {
     @Override
     public JsonObject serialize() {
       JsonObject json = new JsonObject();
-      json.addProperty("item", name.toString());
+      json.addProperty("item", this.name.toString());
       return json;
     }
   }

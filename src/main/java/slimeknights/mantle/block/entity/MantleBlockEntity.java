@@ -26,14 +26,14 @@ public class MantleBlockEntity extends BlockEntity {
    */
   @SuppressWarnings("deprecation")
   public void setChangedFast() {
-    if (level != null) {
-      if (level.hasChunkAt(worldPosition)) {
-        level.getChunkAt(worldPosition).setUnsaved(true);
+    if (this.level != null) {
+      if (this.level.hasChunkAt(this.worldPosition)) {
+        this.level.getChunkAt(this.worldPosition).setUnsaved(true);
       }
     }
   }
-  
-  
+
+
   /* Syncing */
 
   /**
@@ -49,25 +49,26 @@ public class MantleBlockEntity extends BlockEntity {
   @Nullable
   public ClientboundBlockEntityDataPacket getUpdatePacket() {
     // number is just used for vanilla, -1 ensures it skips all instanceof checks as its not a vanilla TE
-    return shouldSyncOnUpdate() ? ClientboundBlockEntityDataPacket.create(this) : null;
+    return this.shouldSyncOnUpdate() ? ClientboundBlockEntityDataPacket.create(this) : null;
   }
 
   /**
    * Write to NBT that is synced to the client in {@link #getUpdateTag()} and in {@link #saveAdditional(CompoundTag)}
-   * @param nbt  NBT
+   *
+   * @param nbt NBT
    */
   protected void saveSynced(CompoundTag nbt) {}
 
   @Override
   public CompoundTag getUpdateTag() {
     CompoundTag nbt = new CompoundTag();
-    saveSynced(nbt);
+    this.saveSynced(nbt);
     return nbt;
   }
 
   @Override
   public void saveAdditional(CompoundTag nbt) {
     super.saveAdditional(nbt);
-    saveSynced(nbt);
+    this.saveSynced(nbt);
   }
 }

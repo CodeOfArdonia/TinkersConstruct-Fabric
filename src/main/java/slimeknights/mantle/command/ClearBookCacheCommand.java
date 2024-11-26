@@ -11,23 +11,28 @@ import net.minecraft.server.level.ServerPlayer;
 import slimeknights.mantle.network.MantleNetwork;
 import slimeknights.mantle.network.packet.ClearBookCachePacket;
 
-/** Command that clears the cache of a book or all books, faster than resource pack reloading for book writing */
+/**
+ * Command that clears the cache of a book or all books, faster than resource pack reloading for book writing
+ */
 public class ClearBookCacheCommand {
+
   /**
    * Registers this sub command with the root command
-   * @param subCommand  Command builder
+   *
+   * @param subCommand Command builder
    */
   public static void register(LiteralArgumentBuilder<CommandSourceStack> subCommand) {
     subCommand.requires(source -> source.getEntity() instanceof ServerPlayer)
-              .then(Commands.argument("id", ResourceLocationArgument.id()).suggests(MantleCommand.REGISTERED_BOOKS)
-                            .executes(ClearBookCacheCommand::runBook))
-              .executes(ClearBookCacheCommand::runAll);
+      .then(Commands.argument("id", ResourceLocationArgument.id()).suggests(MantleCommand.REGISTERED_BOOKS)
+        .executes(ClearBookCacheCommand::runBook))
+      .executes(ClearBookCacheCommand::runAll);
   }
 
   /**
    * Runs the book-test command for specific book
-   * @param context  Command context
-   * @return  Integer return
+   *
+   * @param context Command context
+   * @return Integer return
    * @throws CommandSyntaxException if sender is not a player
    */
   private static int runBook(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
@@ -38,12 +43,13 @@ public class ClearBookCacheCommand {
 
   /**
    * Runs the book-test command
-   * @param context  Command context
-   * @return  Integer return
-   * @throws  CommandSyntaxException if sender is not a player
+   *
+   * @param context Command context
+   * @return Integer return
+   * @throws CommandSyntaxException if sender is not a player
    */
   private static int runAll(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-    MantleNetwork.INSTANCE.sendTo(new ClearBookCachePacket((ResourceLocation)null), context.getSource().getPlayerOrException());
+    MantleNetwork.INSTANCE.sendTo(new ClearBookCachePacket((ResourceLocation) null), context.getSource().getPlayerOrException());
     return 0;
   }
 }

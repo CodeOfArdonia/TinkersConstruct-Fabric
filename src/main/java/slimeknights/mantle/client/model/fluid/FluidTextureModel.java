@@ -35,20 +35,27 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-/** Fluid model that allows a resource pack to control the textures of a block. Use alongside {@link ModelFluidAttributes} */
+/**
+ * Fluid model that allows a resource pack to control the textures of a block. Use alongside {@link ModelFluidAttributes}
+ */
 @RequiredArgsConstructor
 public class FluidTextureModel implements IUnbakedGeometry<FluidTextureModel> {
+
   public static Loader LOADER = new Loader();
 
   private final int color;
 
-  /** Checks if a texture is missing */
+  /**
+   * Checks if a texture is missing
+   */
   private static boolean isMissing(Material material) {
     return MissingTextureAtlasSprite.getLocation().equals(material.texture());
   }
 
-  /** Gets the texture, or null if missing */
-  private static void getTexture(BlockModel owner, String name, Collection<Material> textures, Set<Pair<String,String>> missingTextureErrors) {
+  /**
+   * Gets the texture, or null if missing
+   */
+  private static void getTexture(BlockModel owner, String name, Collection<Material> textures, Set<Pair<String, String>> missingTextureErrors) {
     Material material = owner.getMaterial(name);
     if (isMissing(material)) {
       missingTextureErrors.add(Pair.of(name, owner.name));
@@ -69,17 +76,20 @@ public class FluidTextureModel implements IUnbakedGeometry<FluidTextureModel> {
 //  }
 
   @Override
-  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation, boolean isGui3d) {
+  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation, boolean isGui3d) {
     Material still = owner.getMaterial("still");
     Material flowing = owner.getMaterial("flowing");
     Material overlay = owner.getMaterial("overlay");
     ResourceLocation overlayLocation = isMissing(overlay) ? null : overlay.texture();
     BakedModel baked = new SimpleBakedModel.Builder(owner.hasAmbientOcclusion(), owner.getGuiLight().lightLikeBlock(), true, owner.getTransforms(), overrides).particle(spriteGetter.apply(still)).build();
-    return new Baked(baked, still.texture(), flowing.texture(), overlayLocation, color);
+    return new Baked(baked, still.texture(), flowing.texture(), overlayLocation, this.color);
   }
 
-  /** Data holder class, has no quads */
+  /**
+   * Data holder class, has no quads
+   */
   private static class Baked extends ForwardingBakedModel {
+
     @Getter
     private final ResourceLocation still;
     @Getter
@@ -88,8 +98,9 @@ public class FluidTextureModel implements IUnbakedGeometry<FluidTextureModel> {
     private final ResourceLocation overlay;
     @Getter
     private final int color;
+
     public Baked(BakedModel originalModel, ResourceLocation still, ResourceLocation flowing, @Nullable ResourceLocation overlay, int color) {
-      wrapped = originalModel;
+      this.wrapped = originalModel;
       this.still = still;
       this.flowing = flowing;
       this.overlay = overlay;
@@ -97,52 +108,59 @@ public class FluidTextureModel implements IUnbakedGeometry<FluidTextureModel> {
     }
   }
 
-  /** Model loader, also doubles as the fluid model provider */
+  /**
+   * Model loader, also doubles as the fluid model provider
+   */
   private static class Loader implements IGeometryLoader<FluidTextureModel>, IFluidModelProvider, SimpleSynchronousResourceReloadListener {
-    private final Map<Fluid,Baked> modelCache = new ConcurrentHashMap<>();
 
-    /** Gets a model for a fluid */
+    private final Map<Fluid, Baked> modelCache = new ConcurrentHashMap<>();
+
+    /**
+     * Gets a model for a fluid
+     */
     @Nullable
     private Baked getFluidModel(Fluid fluid) {
       return ModelHelper.getBakedModel(fluid.defaultFluidState().createLegacyBlock(), Baked.class);
     }
 
-    /** Gets a model for a fluid from the cache */
+    /**
+     * Gets a model for a fluid from the cache
+     */
     @Nullable
     private Baked getCachedModel(Fluid fluid) {
-      return modelCache.computeIfAbsent(fluid, this::getFluidModel);
+      return this.modelCache.computeIfAbsent(fluid, this::getFluidModel);
     }
 
     @Override
     @Nullable
     public ResourceLocation getStillTexture(Fluid fluid) {
-      Baked model = getCachedModel(fluid);
+      Baked model = this.getCachedModel(fluid);
       return model == null ? null : model.getStill();
     }
 
     @Override
     @Nullable
     public ResourceLocation getFlowingTexture(Fluid fluid) {
-      Baked model = getCachedModel(fluid);
+      Baked model = this.getCachedModel(fluid);
       return model == null ? null : model.getFlowing();
     }
 
     @Override
     @Nullable
     public ResourceLocation getOverlayTexture(Fluid fluid) {
-      Baked model = getCachedModel(fluid);
+      Baked model = this.getCachedModel(fluid);
       return model == null ? null : model.getOverlay();
     }
 
     @Override
     public int getColor(Fluid fluid) {
-      Baked model = getCachedModel(fluid);
+      Baked model = this.getCachedModel(fluid);
       return model == null ? -1 : model.getColor();
     }
 
     @Override
     public void onResourceManagerReload(ResourceManager resourceManager) {
-      modelCache.clear();
+      this.modelCache.clear();
     }
 
     @Override
@@ -156,7 +174,7 @@ public class FluidTextureModel implements IUnbakedGeometry<FluidTextureModel> {
           throw new JsonSyntaxException("Invalid color '" + colorString + "'");
         }
         try {
-          color = (int)Long.parseLong(colorString, 16);
+          color = (int) Long.parseLong(colorString, 16);
           // for 6 length, make fully opaque
           if (length == 6) {
             color |= 0xFF000000;

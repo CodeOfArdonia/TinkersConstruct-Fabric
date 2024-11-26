@@ -30,21 +30,32 @@ import slimeknights.mantle.registration.adapter.RegistryAdapter;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 //@ObjectHolder(value = Mantle.modId)
 public class MantleLoot {
+
   public static final Codec<LootItemFunction[]> LOOT_ITEM_FUNCTION_CODEC = Codec.PASSTHROUGH.flatXmap(dynamic -> {
     LootItemFunction[] functions = AddEntryLootModifier.GSON.fromJson(IGlobalLootModifier.getJson(dynamic), LootItemFunction[].class);
     return DataResult.success(functions);
   }, lootItemFunctions -> DataResult.success(new Dynamic<>(JsonOps.INSTANCE, AddEntryLootModifier.GSON.toJsonTree(lootItemFunctions, LootItemFunction[].class))));
 
-  /** Condition to match a block tag and property predicate */
+  /**
+   * Condition to match a block tag and property predicate
+   */
   public static LootItemConditionType BLOCK_TAG_CONDITION;
-  /** Function to add block entity texture to a dropped item */
+  /**
+   * Function to add block entity texture to a dropped item
+   */
   public static LootItemFunctionType RETEXTURED_FUNCTION;
-  /** Function to add a fluid to an item fluid capability */
+  /**
+   * Function to add a fluid to an item fluid capability
+   */
   public static LootItemFunctionType SET_FLUID_FUNCTION;
 
-  /** Loot modifier to get loot from an entry for generated loot */
+  /**
+   * Loot modifier to get loot from an entry for generated loot
+   */
   public static Codec<AddEntryLootModifier> ADD_ENTRY;
-  /** Loot modifier to replace all instances of one item with another */
+  /**
+   * Loot modifier to replace all instances of one item with another
+   */
   public static Codec<ReplaceItemLootModifier> REPLACE_ITEM;
 
   /**
@@ -70,9 +81,10 @@ public class MantleLoot {
 
   /**
    * Registers a loot function
-   * @param name        Loot function name
-   * @param serializer  Loot function serializer
-   * @return  Registered loot function
+   *
+   * @param name       Loot function name
+   * @param serializer Loot function serializer
+   * @return Registered loot function
    */
   private static LootItemFunctionType registerFunction(String name, Serializer<? extends LootItemFunction> serializer) {
     return Registry.register(BuiltInRegistries.LOOT_FUNCTION_TYPE, Mantle.getResource(name), new LootItemFunctionType(serializer));
@@ -80,9 +92,10 @@ public class MantleLoot {
 
   /**
    * Registers a loot function
-   * @param name        Loot function name
-   * @param serializer  Loot function serializer
-   * @return  Registered loot function
+   *
+   * @param name       Loot function name
+   * @param serializer Loot function serializer
+   * @return Registered loot function
    */
   private static LootItemConditionType registerCondition(String name, Serializer<? extends LootItemCondition> serializer) {
     return Registry.register(BuiltInRegistries.LOOT_CONDITION_TYPE, Mantle.getResource(name), new LootItemConditionType(serializer));
@@ -90,8 +103,9 @@ public class MantleLoot {
 
   /**
    * Registers a loot condition
-   * @param id            Loot condition id
-   * @param deserializer  Loot condition deserializer
+   *
+   * @param id           Loot condition id
+   * @param deserializer Loot condition deserializer
    */
   private static void registerCondition(ResourceLocation id, JsonDeserializer<? extends ILootModifierCondition> deserializer) {
     ILootModifierCondition.MODIFIER_CONDITIONS.registerDeserializer(id, deserializer);

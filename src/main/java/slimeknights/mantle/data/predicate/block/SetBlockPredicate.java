@@ -14,13 +14,14 @@ import java.util.Set;
  */
 @RequiredArgsConstructor
 public class SetBlockPredicate implements BlockPredicate {
+
   public static final IGenericLoader<SetBlockPredicate> LOADER = new RegistrySetLoader<>("blocks", BuiltInRegistries.BLOCK, SetBlockPredicate::new, predicate -> predicate.blocks);
 
   private final Set<Block> blocks;
 
   @Override
   public boolean matches(BlockState state) {
-    return blocks.contains(state.getBlock());
+    return this.blocks.contains(state.getBlock());
   }
 
   @Override

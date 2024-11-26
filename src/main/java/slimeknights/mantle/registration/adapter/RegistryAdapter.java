@@ -1,7 +1,6 @@
 package slimeknights.mantle.registration.adapter;
 
 import lombok.RequiredArgsConstructor;
-
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -20,6 +19,7 @@ import java.util.Objects;
 @SuppressWarnings("WeakerAccess")
 @RequiredArgsConstructor
 public class RegistryAdapter<T> {
+
   private final Registry<T> registry;
   private final String modId;
 
@@ -34,24 +34,27 @@ public class RegistryAdapter<T> {
 
   /**
    * Construct a resource location that belongs to the given namespace. Usually your mod.
-   * @param name  Name for location
+   *
+   * @param name Name for location
    */
   public ResourceLocation getResource(String name) {
-    return new ResourceLocation(modId, name);
+    return new ResourceLocation(this.modId, name);
   }
 
   /**
    * Construct a resource location string that belongs to the given namespace. Usually your mod.
-   * @param name  Name for location
+   *
+   * @param name Name for location
    */
   public String resourceName(String name) {
-    return modId + ":" + name;
+    return this.modId + ":" + name;
   }
 
   /**
    * General purpose registration method. Just pass the name you want your thing registered as.
-   * @param entry  Entry to register
-   * @param name   Registry name
+   *
+   * @param entry Entry to register
+   * @param name  Registry name
    * @return Registry entry
    */
   public <I extends T> I register(I entry, String name) {
@@ -60,23 +63,24 @@ public class RegistryAdapter<T> {
 
   /**
    * Registers an entry using the name from another entry
-   * @param entry  Entry to register
-   * @param name   Entry name to copy
-   * @param <I>    Value type
-   * @return  Registered entry
+   *
+   * @param entry Entry to register
+   * @param name  Entry name to copy
+   * @param <I>   Value type
+   * @return Registered entry
    */
   public <I extends T> I register(I entry, Object name) {
     return this.register(entry, Objects.requireNonNull(getRegistryName(name)));
   }
 
   public static ResourceLocation getRegistryName(Object obj) {
-    if(obj instanceof Block block)
+    if (obj instanceof Block block)
       return BuiltInRegistries.BLOCK.getKey(block);
-    if(obj instanceof Item item)
+    if (obj instanceof Item item)
       return BuiltInRegistries.ITEM.getKey(item);
-    if(obj instanceof Fluid fluid)
+    if (obj instanceof Fluid fluid)
       return BuiltInRegistries.FLUID.getKey(fluid);
-    if(obj instanceof EntityType<?> entityType)
+    if (obj instanceof EntityType<?> entityType)
       return BuiltInRegistries.ENTITY_TYPE.getKey(entityType);
     return null;
   }
@@ -86,11 +90,12 @@ public class RegistryAdapter<T> {
    * You should probably use the special purpose methods instead of this.
    * <p>
    * Note: changes the things registry name. Do not call this with already registered objects!
-   * @param entry     Entry to register
-   * @param location  Registry name
+   *
+   * @param entry    Entry to register
+   * @param location Registry name
    * @return Registry entry
    */
   public <I extends T> I register(I entry, ResourceLocation location) {
-    return Registry.register(registry, location, entry);
+    return Registry.register(this.registry, location, entry);
   }
 }

@@ -31,7 +31,9 @@ public class SectionData implements IDataItem, IConditional {
   public String data = "";
   public JsonCondition condition = new JsonCondition(TrueCondition.ID, new JsonObject());
 
-  /** Contains arbitrary data to be used by custom transformers and other things */
+  /**
+   * Contains arbitrary data to be used by custom transformers and other things
+   */
   public Map<ResourceLocation, JsonElement> extraData = Collections.emptyMap();
 
   public transient int unnamedPageCounter = 0;
@@ -141,6 +143,6 @@ public class SectionData implements IDataItem, IConditional {
 
   @Override
   public boolean isConditionMet() {
-    return condition.test();
+    return this.condition.test();
   }
 }

@@ -18,19 +18,20 @@ import java.util.ArrayList;
 import static slimeknights.mantle.client.screen.book.Textures.TEX_MISC;
 
 public class ContentSmithing extends PageContent {
+
   public static final ResourceLocation ID = Mantle.getResource("smithing");
 
-  public static final transient int TEX_SIZE = 512;
-  public static final transient ImageData IMG_SMITHING = new ImageData(TEX_MISC, 88, 0, 210, 42, TEX_SIZE, TEX_SIZE);
+  public static final int TEX_SIZE = 512;
+  public static final ImageData IMG_SMITHING = new ImageData(TEX_MISC, 88, 0, 210, 42, TEX_SIZE, TEX_SIZE);
 
-  public static final transient int INPUT_X = 5;
-  public static final transient int INPUT_Y = 5;
-  public static final transient int MODIFIER_X = 89;
-  public static final transient int MODIFIER_Y = 5;
-  public static final transient int RESULT_X = 173;
-  public static final transient int RESULT_Y = 5;
+  public static final int INPUT_X = 5;
+  public static final int INPUT_Y = 5;
+  public static final int MODIFIER_X = 89;
+  public static final int MODIFIER_Y = 5;
+  public static final int RESULT_X = 173;
+  public static final int RESULT_Y = 5;
 
-  public static final transient float ITEM_SCALE = 2.0F;
+  public static final float ITEM_SCALE = 2.0F;
 
   @Getter
   public String title = "Smithing";
@@ -42,7 +43,7 @@ public class ContentSmithing extends PageContent {
   @Override
   public void build(BookData book, ArrayList<BookElement> list, boolean rightSide) {
     int x = BookScreen.PAGE_WIDTH / 2 - IMG_SMITHING.width / 2;
-    int y = getTitleHeight();
+    int y = this.getTitleHeight();
 
     if (this.title == null || this.title.isEmpty()) {
       y = 0;

@@ -3,6 +3,7 @@ package slimeknights.mantle.client.book.action.protocol;
 import slimeknights.mantle.client.screen.book.BookScreen;
 
 public class ProtocolGoToPage extends ActionProtocol {
+
   private final boolean returner;
 
   public ProtocolGoToPage(boolean returner) {

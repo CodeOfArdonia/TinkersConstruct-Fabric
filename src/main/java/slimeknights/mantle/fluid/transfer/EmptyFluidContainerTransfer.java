@@ -28,9 +28,12 @@ import slimeknights.mantle.util.JsonHelper;
 import java.lang.reflect.Type;
 import java.util.function.Consumer;
 
-/** Fluid transfer info that empties a fluid from an item */
+/**
+ * Fluid transfer info that empties a fluid from an item
+ */
 @RequiredArgsConstructor
 public class EmptyFluidContainerTransfer implements IFluidContainerTransfer {
+
   public static final ResourceLocation ID = Mantle.getResource("empty_item");
 
   private final Ingredient input;
@@ -39,25 +42,27 @@ public class EmptyFluidContainerTransfer implements IFluidContainerTransfer {
 
   @Override
   public void addRepresentativeItems(Consumer<Item> consumer) {
-    for (ItemStack stack : input.getItems()) {
+    for (ItemStack stack : this.input.getItems()) {
       consumer.accept(stack.getItem());
     }
   }
 
   @Override
   public boolean matches(ItemStack stack, FluidStack fluid) {
-    return input.test(stack);
+    return this.input.test(stack);
   }
 
-  /** Gets the contained fluid in the given stack */
+  /**
+   * Gets the contained fluid in the given stack
+   */
   protected FluidStack getFluid(ItemStack stack) {
-    return fluid;
+    return this.fluid;
   }
 
   @Override
   public TransferResult transfer(ItemStack stack, FluidStack fluid, Storage<FluidVariant> handler) {
-    FluidStack contained = getFluid(stack);
-    long simulated = StorageUtil.simulateInsert(handler,contained.getType(), contained.getAmount(), null);
+    FluidStack contained = this.getFluid(stack);
+    long simulated = StorageUtil.simulateInsert(handler, contained.getType(), contained.getAmount(), null);
     if (simulated == this.fluid.getAmount()) {
       try (Transaction t = TransferUtil.getTransaction()) {
         long actual = handler.insert(contained.getType(), contained.getAmount(), t);
@@ -65,7 +70,7 @@ public class EmptyFluidContainerTransfer implements IFluidContainerTransfer {
           if (actual != this.fluid.getAmount()) {
             Mantle.logger.error("Wrong amount filled from {}, expected {}, filled {}", BuiltInRegistries.ITEM.getKey(stack.getItem()), this.fluid.getAmount(), actual);
           }
-          return new TransferResult(filled.get().copy(), contained, false);
+          return new TransferResult(this.filled.get().copy(), contained, false);
         }
         t.commit();
       }
@@ -77,26 +82,30 @@ public class EmptyFluidContainerTransfer implements IFluidContainerTransfer {
   public JsonObject serialize(JsonSerializationContext context) {
     JsonObject json = new JsonObject();
     json.addProperty("type", ID.toString());
-    json.add("input", input.toJson());
-    json.add("filled", filled.serialize());
-    json.add("fluid", RecipeHelper.serializeFluidStack(fluid));
+    json.add("input", this.input.toJson());
+    json.add("filled", this.filled.serialize());
+    json.add("fluid", RecipeHelper.serializeFluidStack(this.fluid));
     return json;
   }
 
-  /** Unique loader instance */
+  /**
+   * Unique loader instance
+   */
   public static final JsonDeserializer<EmptyFluidContainerTransfer> DESERIALIZER = new Deserializer<>(EmptyFluidContainerTransfer::new);
 
   /**
    * Generic deserializer
    */
-  public record Deserializer<T extends EmptyFluidContainerTransfer>(TriFunction<Ingredient,ItemOutput,FluidStack,T> factory) implements JsonDeserializer<T> {
+  public record Deserializer<T extends EmptyFluidContainerTransfer>(
+    TriFunction<Ingredient, ItemOutput, FluidStack, T> factory) implements JsonDeserializer<T> {
+
     @Override
     public T deserialize(JsonElement element, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
       JsonObject json = element.getAsJsonObject();
       Ingredient input = Ingredient.fromJson(JsonHelper.getElement(json, "input"));
       ItemOutput filled = ItemOutput.fromJson(JsonHelper.getElement(json, "filled"));
       FluidStack fluid = RecipeHelper.deserializeFluidStack(GsonHelper.getAsJsonObject(json, "fluid"));
-      return factory.apply(input, filled, fluid);
+      return this.factory.apply(input, filled, fluid);
     }
   }
 }

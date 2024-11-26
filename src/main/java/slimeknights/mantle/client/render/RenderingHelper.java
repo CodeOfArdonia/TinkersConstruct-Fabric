@@ -18,9 +18,10 @@ public class RenderingHelper {
 
   /**
    * Applies horizontal rotation to the given TESR
-   * @param matrices  Matrix stack
-   * @param state     Block state, checked for {@link BlockStateProperties#HORIZONTAL_FACING}
-   * @return  True if rotation was applied. Caller is expected to call {@link PoseStack#popPose()} if true
+   *
+   * @param matrices Matrix stack
+   * @param state    Block state, checked for {@link BlockStateProperties#HORIZONTAL_FACING}
+   * @return True if rotation was applied. Caller is expected to call {@link PoseStack#popPose()} if true
    */
   public static boolean applyRotation(PoseStack matrices, BlockState state) {
     if (state.hasProperty(BlockStateProperties.HORIZONTAL_FACING)) {
@@ -31,9 +32,10 @@ public class RenderingHelper {
 
   /**
    * Applies horizontal rotation to the given TESR
-   * @param matrices  Matrix stack
-   * @param facing    Direction of rotation
-   * @return  True if rotation was applied. Caller is expected to call {@link PoseStack#popPose()} if true
+   *
+   * @param matrices Matrix stack
+   * @param facing   Direction of rotation
+   * @return True if rotation was applied. Caller is expected to call {@link PoseStack#popPose()} if true
    */
   public static boolean applyRotation(PoseStack matrices, Direction facing) {
     // south has a facing of 0, no rotation needed
@@ -52,11 +54,12 @@ public class RenderingHelper {
 
   /**
    * Renders a single item in a TESR
-   * @param matrices    Matrix stack inst ance
-   * @param buffer      Buffer instance
-   * @param item        Item to render
-   * @param modelItem   Model items for render information
-   * @param light       Model light
+   *
+   * @param matrices  Matrix stack inst ance
+   * @param buffer    Buffer instance
+   * @param item      Item to render
+   * @param modelItem Model items for render information
+   * @param light     Model light
    */
   public static void renderItem(PoseStack matrices, MultiBufferSource buffer, ItemStack item, ModelItem modelItem, int light) {
     // if the item says skip, skip

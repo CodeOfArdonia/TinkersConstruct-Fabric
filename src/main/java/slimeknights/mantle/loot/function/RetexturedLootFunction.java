@@ -23,17 +23,21 @@ import java.util.Set;
  */
 @SuppressWarnings("WeakerAccess")
 public class RetexturedLootFunction extends LootItemConditionalFunction {
+
   public static final Serializer SERIALIZER = new Serializer();
 
   /**
    * Creates a new instance from the given conditions
+   *
    * @param conditions Conditions list
    */
   public RetexturedLootFunction(LootItemCondition[] conditions) {
     super(conditions);
   }
 
-  /** Creates a new instance with no conditions */
+  /**
+   * Creates a new instance with no conditions
+   */
   public RetexturedLootFunction() {
     super(new LootItemCondition[0]);
   }
@@ -61,6 +65,7 @@ public class RetexturedLootFunction extends LootItemConditionalFunction {
   }
 
   private static class Serializer extends LootItemConditionalFunction.Serializer<RetexturedLootFunction> {
+
     @Override
     public RetexturedLootFunction deserialize(JsonObject json, JsonDeserializationContext ctx, LootItemCondition[] conditions) {
       return new RetexturedLootFunction(conditions);

@@ -15,8 +15,10 @@ import slimeknights.mantle.util.BlockEntityHelper;
  */
 @AllArgsConstructor
 public class UpdateLecternPagePacket implements IThreadsafePacket {
+
   private final BlockPos pos;
   private final String page;
+
   public UpdateLecternPagePacket(FriendlyByteBuf buffer) {
     this.pos = buffer.readBlockPos();
     this.page = buffer.readUtf(100);
@@ -24,8 +26,8 @@ public class UpdateLecternPagePacket implements IThreadsafePacket {
 
   @Override
   public void encode(FriendlyByteBuf buf) {
-    buf.writeBlockPos(pos);
-    buf.writeUtf(page);
+    buf.writeBlockPos(this.pos);
+    buf.writeUtf(this.page);
   }
 
   @Override

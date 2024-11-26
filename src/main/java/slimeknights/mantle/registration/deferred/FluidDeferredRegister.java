@@ -32,8 +32,10 @@ import java.util.function.Supplier;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
+
   private final SynchronizedDeferredRegister<Block> blockRegister;
   private final SynchronizedDeferredRegister<Item> itemRegister;
+
   public FluidDeferredRegister(String modID) {
     super(Registries.FLUID, modID);
     this.blockRegister = SynchronizedDeferredRegister.create(Registries.BLOCK, modID);
@@ -43,42 +45,44 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
   @Override
   public void register() {
     super.register();
-    blockRegister.register();
-    itemRegister.register();
+    this.blockRegister.register();
+    this.itemRegister.register();
   }
 
   /**
    * Registers a fluid to the registry
-   * @param name  Name of the fluid to register
-   * @param sup   Fluid supplier
-   * @param <I>   Fluid type
-   * @return  Fluid to supply
+   *
+   * @param name Name of the fluid to register
+   * @param sup  Fluid supplier
+   * @param <I>  Fluid type
+   * @return Fluid to supply
    */
   public <I extends Fluid> RegistryObject<I> registerFluid(final String name, final Supplier<? extends I> sup) {
-    return register.register(name, sup);
+    return this.register.register(name, sup);
   }
 
   /**
    * Registers a fluid with still, flowing, block, and bucket
-   * @param name     Fluid name
-   * @param tagName  Name for tagging under forge
-   * @param builder  Properties builder
-   * @param still    Function to create still from the properties
-   * @param flowing  Function to create flowing from the properties
-   * @param block    Function to create block from the fluid supplier
-   * @param <F>      Fluid type
-   * @return  Fluid object
+   *
+   * @param name    Fluid name
+   * @param tagName Name for tagging under forge
+   * @param builder Properties builder
+   * @param still   Function to create still from the properties
+   * @param flowing Function to create flowing from the properties
+   * @param block   Function to create block from the fluid supplier
+   * @param <F>     Fluid type
+   * @return Fluid object
    */
-  public <F extends SimpleFlowableFluid> FluidObject<F> register(String name, String tagName, FluidBuilder builder, Function<Properties,? extends F> still,
-                                                                 Function<Properties,? extends F> flowing, Function<Supplier<? extends FlowingFluid>,? extends LiquidBlock> block) {
+  public <F extends SimpleFlowableFluid> FluidObject<F> register(String name, String tagName, FluidBuilder builder, Function<Properties, ? extends F> still,
+                                                                 Function<Properties, ? extends F> flowing, Function<Supplier<? extends FlowingFluid>, ? extends LiquidBlock> block) {
 
     // have to create still and flowing later, as the props need these suppliers
     DelayedSupplier<F> stillDelayed = new DelayedSupplier<>();
     DelayedSupplier<F> flowingDelayed = new DelayedSupplier<>();
 
     // create block and bucket, they just need a still supplier
-    RegistryObject<LiquidBlock> blockObj = blockRegister.register(name + "_fluid", () -> block.apply(stillDelayed));
-    builder.bucket(itemRegister.register(name + "_bucket", () -> new BucketItem(stillDelayed.get(), ItemProperties.BUCKET_PROPS)));
+    RegistryObject<LiquidBlock> blockObj = this.blockRegister.register(name + "_fluid", () -> block.apply(stillDelayed));
+    builder.bucket(this.itemRegister.register(name + "_bucket", () -> new BucketItem(stillDelayed.get(), ItemProperties.BUCKET_PROPS)));
 
     // create props with the suppliers
     Properties props = builder.block(blockObj).build(stillDelayed, flowingDelayed);
@@ -97,38 +101,40 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
     flowingDelayed.setSupplier(flowingSup);
 
     // return the final nice object
-    return new FluidObject<>(resource(name), tagName, stillSup, flowingSup, blockObj);
+    return new FluidObject<>(this.resource(name), tagName, stillSup, flowingSup, blockObj);
   }
 
   /**
    * Registers a fluid with still, flowing, block, bucket, and a common forgen name
-   * @param name     Fluid name
-   * @param builder  Properties builder
-   * @param still    Function to create still from the properties
-   * @param flowing  Function to create flowing from the properties
-   * @param block    Function to create block from the fluid supplier
-   * @param <F>      Fluid type
-   * @return  Fluid object
+   *
+   * @param name    Fluid name
+   * @param builder Properties builder
+   * @param still   Function to create still from the properties
+   * @param flowing Function to create flowing from the properties
+   * @param block   Function to create block from the fluid supplier
+   * @param <F>     Fluid type
+   * @return Fluid object
    */
-  public <F extends SimpleFlowableFluid> FluidObject<F> register(String name, FluidBuilder builder, Function<Properties,? extends F> still,
-      Function<Properties,? extends F> flowing, Function<Supplier<? extends FlowingFluid>,? extends LiquidBlock> block) {
-    return register(name, name, builder, still, flowing, block);
+  public <F extends SimpleFlowableFluid> FluidObject<F> register(String name, FluidBuilder builder, Function<Properties, ? extends F> still,
+                                                                 Function<Properties, ? extends F> flowing, Function<Supplier<? extends FlowingFluid>, ? extends LiquidBlock> block) {
+    return this.register(name, name, builder, still, flowing, block);
   }
 
   /**
    * Registers a fluid with still, flowing, block, and bucket using the default fluid block
+   *
    * @param name       Fluid name
    * @param tagName    Name for tagging under forge
    * @param builder    Properties builder
    * @param still      Function to create still from the properties
    * @param flowing    Function to create flowing from the properties
    * @param lightLevel Block light level
-   * @param <F>      Fluid type
-   * @return  Fluid object
+   * @param <F>        Fluid type
+   * @return Fluid object
    */
   public <F extends SimpleFlowableFluid> FluidObject<F> register(String name, String tagName, FluidAttributes.Builder builder, Function<BlockBehaviour.Properties, BlockBehaviour.Properties> settingsConsumer,
-                                                                 Function<Properties,? extends F> still, Function<Properties,? extends F> flowing, int lightLevel) {
-    return register(
+                                                                 Function<Properties, ? extends F> still, Function<Properties, ? extends F> flowing, int lightLevel) {
+    return this.register(
       name, tagName, new FluidBuilder(builder.luminosity(lightLevel)).explosionResistance(100f), still, flowing,
       fluid -> new LiquidBlock(fluid.get(), settingsConsumer.apply(FabricBlockSettings.of().noCollission().strength(100.0F).noLootTable().lightLevel(state -> lightLevel)))
     );
@@ -136,25 +142,26 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
 
   /**
    * Registers a fluid with still, flowing, block, and bucket
-   * @param name     Fluid name
-   * @param tagName  Name for tagging under forge
-   * @param builder  Properties builder
-   * @param still    Function to create still from the properties
-   * @param flowing  Function to create flowing from the properties
-   * @param block    Function to create block from the fluid supplier
-   * @param <F>      Fluid type
-   * @return  Fluid object
+   *
+   * @param name    Fluid name
+   * @param tagName Name for tagging under forge
+   * @param builder Properties builder
+   * @param still   Function to create still from the properties
+   * @param flowing Function to create flowing from the properties
+   * @param block   Function to create block from the fluid supplier
+   * @param <F>     Fluid type
+   * @return Fluid object
    */
-  public <F extends SimpleDirectionalFluid> FluidObject<F> registerUpsideDown(String name, String tagName, FluidBuilder builder, Function<SimpleDirectionalFluid.Properties,? extends F> still,
-                                                                              Function<SimpleDirectionalFluid.Properties,? extends F> flowing, Function<Supplier<? extends FlowingFluid>,? extends LiquidBlock> block) {
+  public <F extends SimpleDirectionalFluid> FluidObject<F> registerUpsideDown(String name, String tagName, FluidBuilder builder, Function<SimpleDirectionalFluid.Properties, ? extends F> still,
+                                                                              Function<SimpleDirectionalFluid.Properties, ? extends F> flowing, Function<Supplier<? extends FlowingFluid>, ? extends LiquidBlock> block) {
 
     // have to create still and flowing later, as the props need these suppliers
     DelayedSupplier<F> stillDelayed = new DelayedSupplier<>();
     DelayedSupplier<F> flowingDelayed = new DelayedSupplier<>();
 
     // create block and bucket, they just need a still supplier
-    RegistryObject<LiquidBlock> blockObj = blockRegister.register(name + "_fluid", () -> block.apply(stillDelayed));
-    builder.bucket(itemRegister.register(name + "_bucket", () -> new BucketItem(stillDelayed.get(), ItemProperties.BUCKET_PROPS)));
+    RegistryObject<LiquidBlock> blockObj = this.blockRegister.register(name + "_fluid", () -> block.apply(stillDelayed));
+    builder.bucket(this.itemRegister.register(name + "_bucket", () -> new BucketItem(stillDelayed.get(), ItemProperties.BUCKET_PROPS)));
 
     // create props with the suppliers
     SimpleDirectionalFluid.Properties props = builder.block(blockObj).buildUpsideDownFluid(stillDelayed, flowingDelayed);
@@ -172,38 +179,40 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
     flowingDelayed.setSupplier(flowingSup);
 
     // return the final nice object
-    return new FluidObject<>(resource(name), tagName, stillSup, flowingSup, blockObj);
+    return new FluidObject<>(this.resource(name), tagName, stillSup, flowingSup, blockObj);
   }
 
   /**
    * Registers a fluid with still, flowing, block, and bucket using the default fluid block
+   *
    * @param name       Fluid name
    * @param builder    Properties builder
    * @param still      Function to create still from the properties
    * @param flowing    Function to create flowing from the properties
    * @param lightLevel Block light level
-   * @param <F>      Fluid type
-   * @return  Fluid object
+   * @param <F>        Fluid type
+   * @return Fluid object
    */
   public <F extends SimpleDirectionalFluid> FluidObject<F> registerUpsideDown(String name, FluidAttributes.Builder builder, Function<BlockBehaviour.Properties, BlockBehaviour.Properties> settingsConsumer,
-                                                                              Function<SimpleDirectionalFluid.Properties,? extends F> still, Function<SimpleDirectionalFluid.Properties,? extends F> flowing, int lightLevel) {
-    return registerUpsideDown(name, name, builder, settingsConsumer, still, flowing, lightLevel);
+                                                                              Function<SimpleDirectionalFluid.Properties, ? extends F> still, Function<SimpleDirectionalFluid.Properties, ? extends F> flowing, int lightLevel) {
+    return this.registerUpsideDown(name, name, builder, settingsConsumer, still, flowing, lightLevel);
   }
 
   /**
    * Registers a fluid with still, flowing, block, and bucket using the default fluid block
+   *
    * @param name       Fluid name
    * @param tagName    Name for tagging under forge
    * @param builder    Properties builder
    * @param still      Function to create still from the properties
    * @param flowing    Function to create flowing from the properties
    * @param lightLevel Block light level
-   * @param <F>      Fluid type
-   * @return  Fluid object
+   * @param <F>        Fluid type
+   * @return Fluid object
    */
   public <F extends SimpleDirectionalFluid> FluidObject<F> registerUpsideDown(String name, String tagName, FluidAttributes.Builder builder, Function<BlockBehaviour.Properties, BlockBehaviour.Properties> settingsConsumer,
-                                                                              Function<SimpleDirectionalFluid.Properties,? extends F> still, Function<SimpleDirectionalFluid.Properties,? extends F> flowing, int lightLevel) {
-    return registerUpsideDown(
+                                                                              Function<SimpleDirectionalFluid.Properties, ? extends F> still, Function<SimpleDirectionalFluid.Properties, ? extends F> flowing, int lightLevel) {
+    return this.registerUpsideDown(
       name, tagName, new FluidBuilder(builder.luminosity(lightLevel)).explosionResistance(100f), still, flowing,
       fluid -> new LiquidBlock(fluid.get(), settingsConsumer.apply(Block.Properties.of().noCollission().strength(100.0F).noLootTable().lightLevel(state -> lightLevel)))
     );
@@ -211,39 +220,42 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
 
   /**
    * Registers a fluid with generic still, flowing, block, and bucket using the default Forge fluid
+   *
    * @param name       Fluid name
    * @param tagName    Name for tagging under forge
    * @param builder    Properties builder
    * @param lightLevel Block light level
-   * @return  Fluid object
+   * @return Fluid object
    */
   public FluidObject<SimpleFlowableFluid> register(String name, String tagName, FluidAttributes.Builder builder, Function<BlockBehaviour.Properties, BlockBehaviour.Properties> settingsConsumer, int lightLevel) {
-    return register(name, tagName, builder, settingsConsumer, SimpleFlowableFluid.Still::new, SimpleFlowableFluid.Flowing::new, lightLevel);
+    return this.register(name, tagName, builder, settingsConsumer, SimpleFlowableFluid.Still::new, SimpleFlowableFluid.Flowing::new, lightLevel);
   }
 
   /**
    * Registers a fluid with generic still, flowing, block, and bucket using the default Forge fluid
+   *
    * @param name       Fluid name
    * @param builder    Properties builder
    * @param lightLevel Block light level
-   * @return  Fluid object
+   * @return Fluid object
    */
   public FluidObject<SimpleFlowableFluid> register(String name, FluidAttributes.Builder builder, Function<BlockBehaviour.Properties, BlockBehaviour.Properties> settingsConsumer, int lightLevel) {
-    return register(name, name, builder, settingsConsumer, lightLevel);
+    return this.register(name, name, builder, settingsConsumer, lightLevel);
   }
 
   /**
    * Registers a fluid with still, flowing, block, and bucket using the default fluid block
+   *
    * @param name       Fluid name
    * @param builder    Properties builder
    * @param still      Function to create still from the properties
    * @param flowing    Function to create flowing from the properties
    * @param lightLevel Block light level
-   * @param <F>      Fluid type
-   * @return  Fluid object
+   * @param <F>        Fluid type
+   * @return Fluid object
    */
   public <F extends SimpleFlowableFluid> FluidObject<F> register(String name, FluidAttributes.Builder builder, Function<BlockBehaviour.Properties, BlockBehaviour.Properties> settingsConsumer,
-                                                                 Function<Properties,? extends F> still, Function<Properties,? extends F> flowing, int lightLevel) {
-    return register(name, name, builder, settingsConsumer, still, flowing, lightLevel);
+                                                                 Function<Properties, ? extends F> still, Function<Properties, ? extends F> flowing, int lightLevel) {
+    return this.register(name, name, builder, settingsConsumer, still, flowing, lightLevel);
   }
 }

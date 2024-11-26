@@ -12,18 +12,20 @@ import java.util.concurrent.Executor;
  * TODO 1.19: move to {@code slimeknights.data.listener}
  */
 public interface IEarlySafeManagerReloadListener extends PreparableReloadListener {
+
   @Override
   default CompletableFuture<Void> reload(PreparationBarrier stage, ResourceManager resourceManager, ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler, Executor backgroundExecutor, Executor gameExecutor) {
     return CompletableFuture.runAsync(() -> {
 //      if (ModLoader.isLoadingStateValid()) {
-        onReloadSafe(resourceManager);
+      this.onReloadSafe(resourceManager);
 //      }
     }, backgroundExecutor).thenCompose(stage::wait);
   }
 
   /**
    * Safely handle a resource manager reload. Only runs if the mod loading state is valid
-   * @param resourceManager  Resource manager
+   *
+   * @param resourceManager Resource manager
    */
   void onReloadSafe(ResourceManager resourceManager);
 }

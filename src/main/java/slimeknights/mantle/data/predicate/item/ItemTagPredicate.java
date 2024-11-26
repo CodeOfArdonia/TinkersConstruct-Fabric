@@ -8,13 +8,16 @@ import slimeknights.mantle.data.predicate.IJsonPredicate;
 import slimeknights.mantle.data.predicate.TagPredicateLoader;
 import slimeknights.mantle.util.RegistryHelper;
 
-/** Predicate matching an item tag */
+/**
+ * Predicate matching an item tag
+ */
 public record ItemTagPredicate(TagKey<Item> tag) implements ItemPredicate {
-  public static final TagPredicateLoader<Item,ItemTagPredicate> LOADER = new TagPredicateLoader<>(Registries.ITEM, ItemTagPredicate::new, c -> c.tag);
+
+  public static final TagPredicateLoader<Item, ItemTagPredicate> LOADER = new TagPredicateLoader<>(Registries.ITEM, ItemTagPredicate::new, c -> c.tag);
 
   @Override
   public boolean matches(Item item) {
-    return RegistryHelper.contains(tag, item);
+    return RegistryHelper.contains(this.tag, item);
   }
 
   @Override

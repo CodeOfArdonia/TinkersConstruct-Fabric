@@ -11,6 +11,7 @@ import slimeknights.mantle.item.ILecternBookItem;
  */
 @AllArgsConstructor
 public class OpenLecternBookPacket implements IThreadsafePacket {
+
   private final BlockPos pos;
   private final ItemStack book;
 
@@ -21,14 +22,14 @@ public class OpenLecternBookPacket implements IThreadsafePacket {
 
   @Override
   public void encode(FriendlyByteBuf buffer) {
-    buffer.writeBlockPos(pos);
-    buffer.writeItem(book);
+    buffer.writeBlockPos(this.pos);
+    buffer.writeItem(this.book);
   }
 
   @Override
   public void handleThreadsafe(Context context) {
-    if (book.getItem() instanceof ILecternBookItem) {
-      ((ILecternBookItem)book.getItem()).openLecternScreenClient(pos, book);
+    if (this.book.getItem() instanceof ILecternBookItem) {
+      ((ILecternBookItem) this.book.getItem()).openLecternScreenClient(this.pos, this.book);
     }
   }
 }

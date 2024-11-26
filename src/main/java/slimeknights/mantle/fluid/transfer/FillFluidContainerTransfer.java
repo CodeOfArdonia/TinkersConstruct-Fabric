@@ -42,14 +42,14 @@ public class FillFluidContainerTransfer implements IFluidContainerTransfer {
 
   @Override
   public void addRepresentativeItems(Consumer<Item> consumer) {
-    for (ItemStack stack : input.getItems()) {
+    for (ItemStack stack : this.input.getItems()) {
       consumer.accept(stack.getItem());
     }
   }
 
   @Override
   public boolean matches(ItemStack stack, FluidStack fluid) {
-    return input.test(stack) && this.fluid.test(fluid);
+    return this.input.test(stack) && this.fluid.test(fluid);
   }
 
   /**
@@ -73,7 +73,7 @@ public class FillFluidContainerTransfer implements IFluidContainerTransfer {
         }
         t.commit();
       }
-      return new TransferResult(getFilled(toDrain), toDrain, true);
+      return new TransferResult(this.getFilled(toDrain), toDrain, true);
     }
     return null;
   }
@@ -82,9 +82,9 @@ public class FillFluidContainerTransfer implements IFluidContainerTransfer {
   public JsonObject serialize(JsonSerializationContext context) {
     JsonObject json = new JsonObject();
     json.addProperty("type", ID.toString());
-    json.add("input", input.toJson());
-    json.add("filled", filled.serialize());
-    json.add("fluid", fluid.serialize());
+    json.add("input", this.input.toJson());
+    json.add("filled", this.filled.serialize());
+    json.add("fluid", this.fluid.serialize());
     return json;
   }
 
@@ -102,7 +102,7 @@ public class FillFluidContainerTransfer implements IFluidContainerTransfer {
       Ingredient input = Ingredient.fromJson(JsonHelper.getElement(json, "input"));
       ItemOutput filled = ItemOutput.fromJson(JsonHelper.getElement(json, "filled"));
       FluidIngredient fluid = FluidIngredient.deserialize(json, "fluid");
-      return factory.apply(input, filled, fluid);
+      return this.factory.apply(input, filled, fluid);
     }
   }
 }

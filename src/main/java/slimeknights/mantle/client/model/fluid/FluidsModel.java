@@ -26,33 +26,41 @@ import java.util.function.Function;
  */
 @AllArgsConstructor
 public class FluidsModel implements IUnbakedGeometry<FluidsModel> {
+
   private final SimpleBlockModel model;
   private final List<FluidCuboid> fluids;
 
   @Override
-  public void resolveParents(Function<ResourceLocation,UnbakedModel> modelGetter, BlockModel owner) {
-    model.resolveParents(modelGetter, owner);
+  public void resolveParents(Function<ResourceLocation, UnbakedModel> modelGetter, BlockModel owner) {
+    this.model.resolveParents(modelGetter, owner);
   }
 
   @Override
-  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location, boolean isGui3d) {
-    BakedModel baked = model.bakeModel(owner, transform, overrides, spriteGetter, location);
-    return new Baked(baked, fluids);
+  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location, boolean isGui3d) {
+    BakedModel baked = this.model.bakeModel(owner, transform, overrides, spriteGetter, location);
+    return new Baked(baked, this.fluids);
   }
 
-  /** Baked model, mostly a data wrapper around a normal model */
+  /**
+   * Baked model, mostly a data wrapper around a normal model
+   */
   @SuppressWarnings("WeakerAccess")
   public static class Baked extends ForwardingBakedModel {
+
     @Getter
     private final List<FluidCuboid> fluids;
+
     public Baked(BakedModel originalModel, List<FluidCuboid> fluids) {
-      wrapped = originalModel;
+      this.wrapped = originalModel;
       this.fluids = fluids;
     }
   }
 
-  /** Loader for this model */
+  /**
+   * Loader for this model
+   */
   public static class Loader implements IGeometryLoader<FluidsModel> {
+
     /**
      * Shared loader instance
      */

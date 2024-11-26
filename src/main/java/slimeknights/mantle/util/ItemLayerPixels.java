@@ -6,11 +6,16 @@ import java.util.BitSet;
  * Keeps track of used pixels that have been "used" in an item layer model, to prevent z-fighting
  */
 public class ItemLayerPixels {
-  /** Each bitset represents whether pixels are used in the given row */
+
+  /**
+   * Each bitset represents whether pixels are used in the given row
+   */
   private BitSet[] rows = new BitSet[0];
   private int width = 0;
 
-  /** Calculates the GCD of two numbers using the Euclidean algorithm */
+  /**
+   * Calculates the GCD of two numbers using the Euclidean algorithm
+   */
   private static int gcd(int a, int b) {
     while (b > 0) {
       int orig = b;
@@ -20,12 +25,16 @@ public class ItemLayerPixels {
     return a;
   }
 
-  /** Calculates the LCM of two numbers using the Euclidean algorithm */
+  /**
+   * Calculates the LCM of two numbers using the Euclidean algorithm
+   */
   private static int lcm(int a, int b) {
     return a * (b / gcd(a, b));
   }
 
-  /** Ensures the given size fits for setting */
+  /**
+   * Ensures the given size fits for setting
+   */
   private void ensureSizeFits(int checkWidth, int checkHeight) {
     // if the size is currently 0, means we have just not instantiated anything yet, so use the value for the size
     int oldHeight = this.rows.length;
@@ -63,7 +72,7 @@ public class ItemLayerPixels {
             int start = y * ySpacing;
             newRows[start] = oldRow;
             for (int i = 1; i < ySpacing; i++) {
-              newRows[start+i] = (BitSet) oldRow.clone();
+              newRows[start + i] = (BitSet) oldRow.clone();
             }
             newRows[y * ySpacing] = oldRow;
           }
@@ -73,10 +82,12 @@ public class ItemLayerPixels {
     }
   }
 
-  /** Checks if the given pixel is set using internal coordinates */
+  /**
+   * Checks if the given pixel is set using internal coordinates
+   */
   private boolean getInternal(int x, int y) {
-    if (y <= rows.length) {
-      BitSet set = rows[y];
+    if (y <= this.rows.length) {
+      BitSet set = this.rows[y];
       if (set != null) {
         return set.get(x);
       }
@@ -86,11 +97,12 @@ public class ItemLayerPixels {
 
   /**
    * Checks if the given pixel is set
-   * @param x       X coordinate to get
-   * @param y       Y coordinate to get
-   * @param width   Width to scale the X coordinate
-   * @param height  Height to scale the Y coordinate
-   * @return  True if the bit is set, false if unset or out of bounds
+   *
+   * @param x      X coordinate to get
+   * @param y      Y coordinate to get
+   * @param width  Width to scale the X coordinate
+   * @param height Height to scale the Y coordinate
+   * @return True if the bit is set, false if unset or out of bounds
    */
   public boolean get(int x, int y, int width, int height) {
     // if we have no data, obviously not here
@@ -107,15 +119,16 @@ public class ItemLayerPixels {
       return false;
     }
     // finish scaling coordinates
-    return getInternal(x / width, y / height);
+    return this.getInternal(x / width, y / height);
   }
 
   /**
    * Set the pixel for the given size
-   * @param x       X coordinate to set
-   * @param y       Y coordinate to set
-   * @param width   Width to scale the X coordinate
-   * @param height  Height to scale the Y coordinate
+   *
+   * @param x      X coordinate to set
+   * @param y      Y coordinate to set
+   * @param width  Width to scale the X coordinate
+   * @param height Height to scale the Y coordinate
    */
   public void set(int x, int y, int width, int height) {
     if (x < 0 || x >= width) {
@@ -125,7 +138,7 @@ public class ItemLayerPixels {
       throw new IllegalArgumentException("Parameter Y must be between 0 and height");
     }
     // resize if needed
-    ensureSizeFits(width, height);
+    this.ensureSizeFits(width, height);
     // set all bits within a square represented by the "pixel size"
     // for instance, if using 32x textures and we are given a 16x, it will set 2x2 squares
     int xSize = this.width / width;
@@ -133,11 +146,11 @@ public class ItemLayerPixels {
     x *= xSize;
     y *= ySize;
     for (int dy = 0; dy < ySize; dy++) {
-      BitSet set = rows[y+dy];
+      BitSet set = this.rows[y + dy];
       if (set == null) {
-        set = rows[y+dy] = new BitSet(this.width);
+        set = this.rows[y + dy] = new BitSet(this.width);
       }
-      set.set(x, x+xSize);
+      set.set(x, x + xSize);
     }
   }
 
@@ -148,9 +161,9 @@ public class ItemLayerPixels {
     for (int y = 0; y < this.rows.length; y++) {
       StringBuilder rowBuilder = new StringBuilder();
       for (int x = 0; x < this.width; x++) {
-        rowBuilder.append(getInternal(x, y) ? 'X' : '_');
+        rowBuilder.append(this.getInternal(x, y) ? 'X' : '_');
       }
-      builder.append(rowBuilder.toString()).append('\n');
+      builder.append(rowBuilder).append('\n');
     }
     return builder.toString();
   }

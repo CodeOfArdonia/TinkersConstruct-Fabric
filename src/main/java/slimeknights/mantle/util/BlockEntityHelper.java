@@ -20,13 +20,15 @@ import java.util.Optional;
 @SuppressWarnings("WeakerAccess")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BlockEntityHelper {
+
   /**
    * Gets a tile entity if present and the right type
-   * @param clazz  Tile entity class
-   * @param world  World instance
-   * @param pos    Tile entity position
-   * @param <T>    Tile entity type
-   * @return  Optional of the tile entity, empty if missing or wrong class
+   *
+   * @param clazz Tile entity class
+   * @param world World instance
+   * @param pos   Tile entity position
+   * @param <T>   Tile entity type
+   * @return Optional of the tile entity, empty if missing or wrong class
    */
   public static <T> Optional<T> get(Class<T> clazz, @Nullable BlockGetter world, BlockPos pos) {
     return get(clazz, world, pos, false);
@@ -34,12 +36,13 @@ public class BlockEntityHelper {
 
   /**
    * Gets a tile entity if present and the right type
-   * @param clazz         Tile entity class
-   * @param world         World instance
-   * @param pos           Tile entity position
-   * @param logWrongType  If true, logs a warning if the type is wrong
-   * @param <T>    Tile entity type
-   * @return  Optional of the tile entity, empty if missing or wrong class
+   *
+   * @param clazz        Tile entity class
+   * @param world        World instance
+   * @param pos          Tile entity position
+   * @param logWrongType If true, logs a warning if the type is wrong
+   * @param <T>          Tile entity type
+   * @return Optional of the tile entity, empty if missing or wrong class
    */
   public static <T> Optional<T> get(Class<T> clazz, @Nullable BlockGetter world, BlockPos pos, boolean logWrongType) {
     if (!isBlockLoaded(world, pos)) {
@@ -63,9 +66,10 @@ public class BlockEntityHelper {
 
   /**
    * Checks if the given block is loaded
-   * @param world  World instance
-   * @param pos    Position to check
-   * @return  True if its loaded
+   *
+   * @param world World instance
+   * @param pos   Position to check
+   * @return True if its loaded
    */
   @SuppressWarnings("deprecation")
   public static boolean isBlockLoaded(@Nullable BlockGetter world, BlockPos pos) {
@@ -78,14 +82,18 @@ public class BlockEntityHelper {
     return true;
   }
 
-  /** Handles the unchecked cast for a block entity ticker */
+  /**
+   * Handles the unchecked cast for a block entity ticker
+   */
   @SuppressWarnings("unchecked")
   @Nullable
   public static <HAVE extends BlockEntity, RET extends BlockEntity> BlockEntityTicker<RET> castTicker(BlockEntityType<RET> expected, BlockEntityType<HAVE> have, BlockEntityTicker<? super HAVE> ticker) {
-    return have == expected ? (BlockEntityTicker<RET>)ticker : null;
+    return have == expected ? (BlockEntityTicker<RET>) ticker : null;
   }
 
-  /** Handles the unchecked cast for a block entity ticker */
+  /**
+   * Handles the unchecked cast for a block entity ticker
+   */
   @Nullable
   public static <HAVE extends BlockEntity, RET extends BlockEntity> BlockEntityTicker<RET> serverTicker(Level level, BlockEntityType<RET> expected, BlockEntityType<HAVE> have, BlockEntityTicker<? super HAVE> ticker) {
     return level.isClientSide ? null : castTicker(expected, have, ticker);

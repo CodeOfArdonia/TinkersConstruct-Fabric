@@ -7,6 +7,9 @@ import net.minecraft.world.item.Items;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ItemProperties {
-  /** Properties for a standard bucket item */
+
+  /**
+   * Properties for a standard bucket item
+   */
   public static final Item.Properties BUCKET_PROPS = new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1);
 }

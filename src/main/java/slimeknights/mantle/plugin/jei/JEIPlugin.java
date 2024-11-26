@@ -20,6 +20,7 @@ import java.util.List;
 
 @JeiPlugin
 public class JEIPlugin implements IModPlugin {
+
   static IRecipeManager recipeManager;
   static ICraftingGridHelper vanillaCraftingHelper;
   static IModIdHelper modIdHelper;
@@ -52,6 +53,7 @@ public class JEIPlugin implements IModPlugin {
   }
 
   private static class MultiModuleContainerHandler<C extends MultiModuleContainerMenu<?>> implements IGuiContainerHandler<MultiModuleScreen<C>> {
+
     @Override
     public List<Rect2i> getGuiExtraAreas(MultiModuleScreen<C> guiContainer) {
       return guiContainer.getModuleAreas();

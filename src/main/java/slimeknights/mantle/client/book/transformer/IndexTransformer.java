@@ -19,12 +19,15 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class IndexTransformer extends BookTransformer {
+
   public static final IndexTransformer INSTANCE = new IndexTransformer();
   public static final ResourceLocation INDEX_EXTRA_DATA = Mantle.getResource("index");
 
   private static final Set<ResourceLocation> hiddenPageTypes = new HashSet<>();
 
-  /** Divides a number by the given divisor, rounding up */
+  /**
+   * Divides a number by the given divisor, rounding up
+   */
   private static int ceilingDivide(int value, int divisor) {
     int result = value / divisor;
     if (value % divisor != 0) result++;
@@ -44,7 +47,7 @@ public class IndexTransformer extends BookTransformer {
         this.pages.clear();
 
         // find how many other sections to draw
-        List<SectionData> visibleSections = getVisibleSections(advancementCache, book);
+        List<SectionData> visibleSections = IndexTransformer.this.getVisibleSections(advancementCache, book);
         if (visibleSections.isEmpty()) {
           return;
         }
@@ -68,7 +71,7 @@ public class IndexTransformer extends BookTransformer {
       }
     };
     // add in some blank pages so the padding transformer has an accurate count
-    List<SectionData> visibleSections = getVisibleSections(null, book);
+    List<SectionData> visibleSections = this.getVisibleSections(null, book);
     if (!visibleSections.isEmpty()) {
       PageData[] pages = new PageData[ceilingDivide(visibleSections.size() - 1, sectionsPerPage)];
       for (int i = 0; i < pages.length; i++) {
@@ -85,11 +88,12 @@ public class IndexTransformer extends BookTransformer {
 
   /**
    * Tests whether a given page is hidden for the purposes of index transformers
+   *
    * @param page The page to test
    * @return whether the page is hidden
    */
   public static boolean isPageHidden(PageData page) {
-    if(hiddenPageTypes.contains(page.type)) {
+    if (hiddenPageTypes.contains(page.type)) {
       return true;
     }
 
@@ -111,11 +115,12 @@ public class IndexTransformer extends BookTransformer {
 
   /**
    * Tests whether a given section is hidden for the purposes of index transformers
+   *
    * @param section The section to test
    * @return whether the section is hidden
    */
   public static boolean isSectionHidden(SectionData section) {
-    if(section.extraData.containsKey(INDEX_EXTRA_DATA)) {
+    if (section.extraData.containsKey(INDEX_EXTRA_DATA)) {
       JsonElement data = section.extraData.get(INDEX_EXTRA_DATA);
       if (data.isJsonObject()) {
         JsonObject dataObject = data.getAsJsonObject();
@@ -133,6 +138,7 @@ public class IndexTransformer extends BookTransformer {
 
   /**
    * Filters the given pages, removing any sections that are marked to be hidden for index purposes
+   *
    * @param pages The pages to filter
    * @return A list that only contains non-hidden pages
    */
@@ -142,6 +148,7 @@ public class IndexTransformer extends BookTransformer {
 
   /**
    * Filters the given sections, removing any sections that are marked to be hidden for index purposes
+   *
    * @param sections The sections to filter
    * @return A list that only contains non-hidden sections
    */
@@ -151,8 +158,9 @@ public class IndexTransformer extends BookTransformer {
 
   /**
    * Adds a page type to be implicitly hidden from all indexes
-   * @apiNote This will implicitly hide this page type from all books, not just your own, so caution is advised
+   *
    * @param pageType The type of page to implicitly hide
+   * @apiNote This will implicitly hide this page type from all books, not just your own, so caution is advised
    */
   public static void addHiddenPageType(ResourceLocation pageType) {
     hiddenPageTypes.add(pageType);

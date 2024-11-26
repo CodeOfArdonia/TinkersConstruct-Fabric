@@ -12,11 +12,12 @@ import slimeknights.mantle.data.predicate.IJsonPredicate;
  * Predicate that checks if the given entity has the given enchantment on any of their equipment
  */
 public record HasEnchantmentEntityPredicate(Enchantment enchantment) implements LivingEntityPredicate {
+
   public static final IGenericLoader<HasEnchantmentEntityPredicate> LOADER = new RegistryEntryLoader<>("enchantment", BuiltInRegistries.ENCHANTMENT, HasEnchantmentEntityPredicate::new, HasEnchantmentEntityPredicate::enchantment);
 
   @Override
   public boolean matches(LivingEntity entity) {
-    return EnchantmentHelper.getEnchantmentLevel(enchantment, entity) > 0;
+    return EnchantmentHelper.getEnchantmentLevel(this.enchantment, entity) > 0;
   }
 
   @Override

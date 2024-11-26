@@ -24,6 +24,7 @@ import net.minecraft.world.entity.player.Inventory;
  * However, the access to implementations can happen on multiple threads concurrently, which is why we use a thread-safe wrapper map.
  */
 public class InventoryStorage extends CombinedStorage<ItemVariant, SingleSlotStorage<ItemVariant>> implements IInventoryStorage {
+
   /**
    * Global wrapper concurrent map.
    *
@@ -66,29 +67,29 @@ public class InventoryStorage extends CombinedStorage<ItemVariant, SingleSlotSto
 
   @Override
   public List<SingleSlotStorage<ItemVariant>> getSlots() {
-    return parts;
+    return this.parts;
   }
 
   /**
    * Resize slot list to match the current size of the inventory.
    */
   private void resizeSlotList() {
-    int inventorySize = inventory.getContainerSize();
+    int inventorySize = this.inventory.getContainerSize();
 
     // If the public-facing list must change...
-    if (inventorySize != parts.size()) {
+    if (inventorySize != this.parts.size()) {
       // Ensure we have enough wrappers in the backing list.
-      while (backingList.size() < inventorySize) {
-        backingList.add(new InventorySlotWrapper(this, backingList.size()));
+      while (this.backingList.size() < inventorySize) {
+        this.backingList.add(new InventorySlotWrapper(this, this.backingList.size()));
       }
 
       // Update the public-facing list.
-      parts = Collections.unmodifiableList(backingList.subList(0, inventorySize));
+      this.parts = Collections.unmodifiableList(this.backingList.subList(0, inventorySize));
     }
   }
 
   private IInventoryStorage getSidedWrapper(@Nullable Direction direction) {
-    if (inventory instanceof WorldlyContainer && direction != null) {
+    if (this.inventory instanceof WorldlyContainer && direction != null) {
       return new SidedInventoryStorage(this, direction);
     } else {
       return this;
@@ -97,26 +98,27 @@ public class InventoryStorage extends CombinedStorage<ItemVariant, SingleSlotSto
 
   @Override
   public String toString() {
-    return "InventoryStorage[" + DebugMessages.forInventory(inventory) + "]";
+    return "InventoryStorage[" + DebugMessages.forInventory(this.inventory) + "]";
   }
 
   @Override
   public ItemStack getStackInSlot(int slot) {
-    return inventory.getItem(slot);
+    return this.inventory.getItem(slot);
   }
 
   @Override
   public void setStackInSlot(int slot, ItemStack stack) {
-    inventory.setItem(slot, stack);
+    this.inventory.setItem(slot, stack);
   }
 
   @Override
   public int getSlotLimit(int slot) {
-    return inventory.getItem(slot).getMaxStackSize();
+    return this.inventory.getItem(slot).getMaxStackSize();
   }
 
   // Boolean is used to prevent allocation. Null values are not allowed by SnapshotParticipant.
   class MarkDirtyParticipant extends SnapshotParticipant<Boolean> {
+
     @Override
     protected Boolean createSnapshot() {
       return Boolean.TRUE;
@@ -128,7 +130,7 @@ public class InventoryStorage extends CombinedStorage<ItemVariant, SingleSlotSto
 
     @Override
     protected void onFinalCommit() {
-      inventory.setChanged();
+      InventoryStorage.this.inventory.setChanged();
     }
   }
 }

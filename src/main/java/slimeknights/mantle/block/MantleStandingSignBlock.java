@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.state.properties.WoodType;
 import slimeknights.mantle.block.entity.MantleSignBlockEntity;
 
 public class MantleStandingSignBlock extends StandingSignBlock {
+
   public MantleStandingSignBlock(Properties props, WoodType type) {
     super(props, type);
   }

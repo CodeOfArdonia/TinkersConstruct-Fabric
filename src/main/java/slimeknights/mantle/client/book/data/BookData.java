@@ -44,7 +44,9 @@ public class BookData implements IDataItem {
     this.repositories = new ArrayList<>(Arrays.asList(repositories));
   }
 
-  /** Reinitializes the given book */
+  /**
+   * Reinitializes the given book
+   */
   public void reset() {
     this.initialized = false;
   }
@@ -186,13 +188,17 @@ public class BookData implements IDataItem {
     Mantle.logger.info("Finished loading book");
   }
 
-  /** Finds the section with the given name, ignoring advancements */
+  /**
+   * Finds the section with the given name, ignoring advancements
+   */
   @Nullable
   public SectionData findSection(String name) {
     return this.findSection(name, null);
   }
 
-  /** Finds the section with the given name, advancement sensitive */
+  /**
+   * Finds the section with the given name, advancement sensitive
+   */
   @Nullable
   public SectionData findSection(String name, @Nullable BookScreen.AdvancementCache advancementCache) {
     for (SectionData section : this.sections) {
@@ -206,7 +212,9 @@ public class BookData implements IDataItem {
     return null;
   }
 
-  /** Gets the number corresponding to the first page */
+  /**
+   * Gets the number corresponding to the first page
+   */
   public int getFirstPageNumber(SectionData section, @Nullable BookScreen.AdvancementCache advancementCache) {
     int pages = 0;
 
@@ -227,7 +235,9 @@ public class BookData implements IDataItem {
     return -1;
   }
 
-  /** Gets the page data for the given page number */
+  /**
+   * Gets the page data for the given page number
+   */
   @Nullable
   public PageData findPage(int number, @Nullable BookScreen.AdvancementCache advancementCache) {
     if (number < 0) {
@@ -253,19 +263,25 @@ public class BookData implements IDataItem {
     return null;
   }
 
-  /** Gets the page data for the given location */
+  /**
+   * Gets the page data for the given location
+   */
   @SuppressWarnings("unused") // API
   @Nullable
   public PageData findPage(String location, @Nullable BookScreen.AdvancementCache advancementCache) {
     return this.findPage(this.findPageNumber(location, advancementCache), advancementCache);
   }
 
-  /** Gets the page number for the given location, ignoring advancements */
+  /**
+   * Gets the page number for the given location, ignoring advancements
+   */
   public int findPageNumber(String location) {
     return this.findPageNumber(location, null);
   }
 
-  /** Gets the page number for the given location, advancement sensitive */
+  /**
+   * Gets the page number for the given location, advancement sensitive
+   */
   public int findPageNumber(String location, @Nullable BookScreen.AdvancementCache advancementCache) {
     location = location.toLowerCase();
 
@@ -303,7 +319,9 @@ public class BookData implements IDataItem {
     return -1;
   }
 
-  /** Gets the number of individual pages */
+  /**
+   * Gets the number of individual pages
+   */
   public int getPageCount(@Nullable BookScreen.AdvancementCache advancementCache) {
     int pages = 0;
     for (SectionData section : this.sections) {
@@ -314,12 +332,16 @@ public class BookData implements IDataItem {
     return pages;
   }
 
-  /** Gets the number of pages the book can be on, effectively half the individual page count */
+  /**
+   * Gets the number of pages the book can be on, effectively half the individual page count
+   */
   public int getFullPageCount(@Nullable BookScreen.AdvancementCache advancementCache) {
     return (int) Math.ceil((this.getPageCount(advancementCache) - 1) / 2F) + 1;
   }
 
-  /** Gets a list of all visible sections, sensitive to current advancements */
+  /**
+   * Gets a list of all visible sections, sensitive to current advancements
+   */
   public List<SectionData> getVisibleSections(@Nullable BookScreen.AdvancementCache advancementCache) {
     List<SectionData> visible = new ArrayList<>();
 
@@ -332,7 +354,9 @@ public class BookData implements IDataItem {
     return visible;
   }
 
-  /** Translates the given string using the book language */
+  /**
+   * Translates the given string using the book language
+   */
   public String translate(String string) {
     String out = this.strings.get(string);
     return out != null ? out : string;
@@ -340,9 +364,10 @@ public class BookData implements IDataItem {
 
   /**
    * Generic method to open the book GUI
-   * @param title        Screen title
-   * @param page         Starting page
-   * @param pageUpdater  Function to call to save the page
+   *
+   * @param title       Screen title
+   * @param page        Starting page
+   * @param pageUpdater Function to call to save the page
    */
   public void openGui(Component title, String page, @Nullable Consumer<String> pageUpdater) {
     this.openGui(title, page, pageUpdater, null);
@@ -350,9 +375,10 @@ public class BookData implements IDataItem {
 
   /**
    * Generic method to open the book GUI in a situation when the book can be picked up (i.e. lectern)
-   * @param title        Screen title
-   * @param page         Starting page
-   * @param pageUpdater  Function to call to save the page
+   *
+   * @param title       Screen title
+   * @param page        Starting page
+   * @param pageUpdater Function to call to save the page
    */
   public void openGui(Component title, String page, @Nullable Consumer<String> pageUpdater, @Nullable Consumer<?> bookPickup) {
     this.load();
@@ -361,18 +387,20 @@ public class BookData implements IDataItem {
 
   /**
    * Opens the GUI for a held book
-   * @param hand   Hand containing the book
-   * @param stack  Book stack
+   *
+   * @param hand  Hand containing the book
+   * @param stack Book stack
    */
   public void openGui(InteractionHand hand, ItemStack stack) {
     String page = BookHelper.getCurrentSavedPage(stack);
-    openGui(stack.getHoverName(), page, newPage -> BookLoader.updateSavedPage(Minecraft.getInstance().player, hand, newPage));
+    this.openGui(stack.getHoverName(), page, newPage -> BookLoader.updateSavedPage(Minecraft.getInstance().player, hand, newPage));
   }
 
   /**
    * Opens the GUI for a lectern containing the book
-   * @param pos    Position of the lectern
-   * @param stack  Item in the lectern
+   *
+   * @param pos   Position of the lectern
+   * @param stack Item in the lectern
    */
   @SuppressWarnings("unused") // API
   public void openGui(BlockPos pos, ItemStack stack) {
@@ -380,12 +408,13 @@ public class BookData implements IDataItem {
 
     Consumer<?> bookPickup = (v) -> MantleNetwork.INSTANCE.network.sendToServer(new DropLecternBookPacket(pos));
 
-    openGui(stack.getHoverName(), page, newPage -> BookLoader.updateSavedPage(pos, newPage), bookPickup);
+    this.openGui(stack.getHoverName(), page, newPage -> BookLoader.updateSavedPage(pos, newPage), bookPickup);
   }
 
   /**
    * Adds a new repository to the book
-   * @param repository  Repository to add
+   *
+   * @param repository Repository to add
    */
   @SuppressWarnings("unused") // API
   public void addRepository(@Nullable BookRepository repository) {
@@ -396,7 +425,8 @@ public class BookData implements IDataItem {
 
   /**
    * Adds a new transformer to the book
-   * @param transformer  Transformer to add
+   *
+   * @param transformer Transformer to add
    */
   public void addTransformer(@Nullable BookTransformer transformer) {
     if (transformer != null && !this.transformers.contains(transformer)) {

@@ -19,31 +19,35 @@ import net.minecraft.tags.TagManager;
 
 import java.util.List;
 
-/** Command that dumps a tag into a JSON object */
+/**
+ * Command that dumps a tag into a JSON object
+ */
 public class DumpTagCommand {
+
   protected static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
   private static final Dynamic2CommandExceptionType ERROR_READING_TAG = new Dynamic2CommandExceptionType((type, name) -> Component.translatable("command.mantle.dump_tag.read_error", type, name));
   private static final Component SUCCESS_LOG = Component.translatable("command.mantle.dump_tag.success_log");
 
   /**
    * Registers this sub command with the root command
-   * @param subCommand  Command builder
+   *
+   * @param subCommand Command builder
    */
   public static void register(LiteralArgumentBuilder<CommandSourceStack> subCommand) {
     subCommand.requires(sender -> sender.hasPermission(MantleCommand.PERMISSION_EDIT_SPAWN))
-              .then(Commands.argument("type", RegistryArgument.registry()).suggests(MantleCommand.REGISTRY)
-                            .then(Commands.argument("name", ResourceLocationArgument.id()).suggests(MantleCommand.VALID_TAGS)
-                                          .executes(context -> run(context, false))
-                                          .then(Commands.literal("log").executes(context -> run(context, false)))
-                                          .then(Commands.literal("save").executes(context -> run(context, true)))));
+      .then(Commands.argument("type", RegistryArgument.registry()).suggests(MantleCommand.REGISTRY)
+        .then(Commands.argument("name", ResourceLocationArgument.id()).suggests(MantleCommand.VALID_TAGS)
+          .executes(context -> run(context, false))
+          .then(Commands.literal("log").executes(context -> run(context, false)))
+          .then(Commands.literal("save").executes(context -> run(context, true)))));
   }
 
   /**
    * Runs the view-tag command
    *
-   * @param context  Tag context
-   * @return  Integer return
-   * @throws CommandSyntaxException  If invalid values are passed
+   * @param context Tag context
+   * @return Integer return
+   * @throws CommandSyntaxException If invalid values are passed
    */
   private static int run(CommandContext<CommandSourceStack> context, boolean saveFile) throws CommandSyntaxException {
     return runGeneric(context, RegistryArgument.getResult(context, "type"), saveFile);
@@ -52,10 +56,10 @@ public class DumpTagCommand {
   /**
    * Runs the view-tag command, with the generic for the registry so those don't get mad
    *
-   * @param context   Tag context
-   * @param registry  Registry
-   * @return  Integer return
-   * @throws CommandSyntaxException  If invalid values are passed
+   * @param context  Tag context
+   * @param registry Registry
+   * @return Integer return
+   * @throws CommandSyntaxException If invalid values are passed
    */
   private static <T> int runGeneric(CommandContext<CommandSourceStack> context, Registry<T> registry, boolean saveFile) throws CommandSyntaxException {
     ResourceLocation regName = registry.key().location();

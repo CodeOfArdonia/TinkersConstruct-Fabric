@@ -26,33 +26,41 @@ import java.util.function.Function;
  */
 @AllArgsConstructor
 public class InventoryModel implements IUnbakedGeometry<InventoryModel> {
+
   protected final SimpleBlockModel model;
   protected final List<ModelItem> items;
 
   @Override
-  public void resolveParents(Function<ResourceLocation,UnbakedModel> modelGetter, BlockModel owner) {
-    model.resolveParents(modelGetter, owner);
+  public void resolveParents(Function<ResourceLocation, UnbakedModel> modelGetter, BlockModel owner) {
+    this.model.resolveParents(modelGetter, owner);
   }
 
   @Override
-  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location, boolean isGui3d) {
-    BakedModel baked = model.bakeModel(owner, transform, overrides, spriteGetter, location);
-    return new Baked(baked, items);
+  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location, boolean isGui3d) {
+    BakedModel baked = this.model.bakeModel(owner, transform, overrides, spriteGetter, location);
+    return new Baked(baked, this.items);
   }
 
-  /** Baked model, mostly a data wrapper around a normal model */
+  /**
+   * Baked model, mostly a data wrapper around a normal model
+   */
   @SuppressWarnings("WeakerAccess")
   public static class Baked extends ForwardingBakedModel {
+
     @Getter
     private final List<ModelItem> items;
+
     public Baked(BakedModel originalModel, List<ModelItem> items) {
-      wrapped = originalModel;
+      this.wrapped = originalModel;
       this.items = items;
     }
   }
 
-  /** Loader for this model */
+  /**
+   * Loader for this model
+   */
   public static class Loader implements IGeometryLoader<InventoryModel> {
+
     /**
      * Shared loader instance
      */

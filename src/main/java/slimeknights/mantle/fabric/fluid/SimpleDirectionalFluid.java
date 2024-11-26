@@ -52,17 +52,17 @@ public abstract class SimpleDirectionalFluid extends StarFluid {
 
   @Override
   public Fluid getFlowing() {
-    return flowing.get();
+    return this.flowing.get();
   }
 
   @Override
   public Fluid getSource() {
-    return still.get();
+    return this.still.get();
   }
 
   @Override
   protected boolean canConvertToSource(Level level) {
-    return infinite;
+    return this.infinite;
   }
 
   @Override
@@ -73,51 +73,52 @@ public abstract class SimpleDirectionalFluid extends StarFluid {
 
   @Override
   protected int getSlopeFindDistance(LevelReader world) {
-    return flowSpeed;
+    return this.flowSpeed;
   }
 
   @Override
   protected int getDropOff(LevelReader worldIn) {
-    return levelDecreasePerBlock;
+    return this.levelDecreasePerBlock;
   }
 
   @Override
   public Item getBucket() {
-    return bucket != null ? bucket.get() : Items.AIR;
+    return this.bucket != null ? this.bucket.get() : Items.AIR;
   }
 
   @Override
   protected boolean canBeReplacedWith(FluidState state, BlockGetter world, BlockPos pos, Fluid fluid, Direction direction) {
-    return direction == Direction.DOWN && !isSame(fluid);
+    return direction == Direction.DOWN && !this.isSame(fluid);
   }
 
   @Override
   public int getTickDelay(LevelReader world) {
-    return tickRate;
+    return this.tickRate;
   }
 
   @Override
   protected float getExplosionResistance() {
-    return blastResistance;
+    return this.blastResistance;
   }
 
   @Override
   protected BlockState createLegacyBlock(FluidState state) {
-    if (block != null) {
-      return block.get().defaultBlockState().setValue(LiquidBlock.LEVEL, getLegacyLevel(state));
+    if (this.block != null) {
+      return this.block.get().defaultBlockState().setValue(LiquidBlock.LEVEL, getLegacyLevel(state));
     }
     return Blocks.AIR.defaultBlockState();
   }
 
   @Override
   public boolean isSame(Fluid fluid) {
-    return fluid == still.get() || fluid == flowing.get();
+    return fluid == this.still.get() || fluid == this.flowing.get();
   }
 
   public static class Flowing extends SimpleFlowableFluid {
+
     public Flowing(Properties properties) {
       super(properties);
-      registerDefaultState(getStateDefinition().any().setValue(LEVEL, 7));
+      this.registerDefaultState(this.getStateDefinition().any().setValue(LEVEL, 7));
     }
 
     @Override
@@ -138,6 +139,7 @@ public abstract class SimpleDirectionalFluid extends StarFluid {
   }
 
   public static class Still extends SimpleFlowableFluid {
+
     public Still(Properties properties) {
       super(properties);
     }
@@ -154,8 +156,9 @@ public abstract class SimpleDirectionalFluid extends StarFluid {
   }
 
   public static class Properties {
-    private Supplier<? extends Fluid> still;
-    private Supplier<? extends Fluid> flowing;
+
+    private final Supplier<? extends Fluid> still;
+    private final Supplier<? extends Fluid> flowing;
     public FluidAttributes.Builder attributes;
     private boolean infinite;
     private Supplier<? extends Item> bucket;
@@ -173,7 +176,7 @@ public abstract class SimpleDirectionalFluid extends StarFluid {
     }
 
     public Properties canMultiply() {
-      infinite = true;
+      this.infinite = true;
       return this;
     }
 

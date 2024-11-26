@@ -20,40 +20,43 @@ import java.util.function.Supplier;
 public class EntityTypeDeferredRegister extends DeferredRegisterWrapper<EntityType<?>> {
 
   private final SynchronizedDeferredRegister<Item> itemRegistry;
+
   public EntityTypeDeferredRegister(String modID) {
     super(Registries.ENTITY_TYPE, modID);
-    itemRegistry = SynchronizedDeferredRegister.create(Registries.ITEM, modID);
+    this.itemRegistry = SynchronizedDeferredRegister.create(Registries.ITEM, modID);
   }
 
   @Override
   public void register() {
     super.register();
-    itemRegistry.register();
+    this.itemRegistry.register();
   }
 
   /**
    * Registers a entity type for the given entity type builder
-   * @param name  Entity name
-   * @param sup   Entity builder instance
-   * @param <T>   Entity class type
-   * @return  Entity registry object
+   *
+   * @param name Entity name
+   * @param sup  Entity builder instance
+   * @param <T>  Entity class type
+   * @return Entity registry object
    */
   public <T extends Entity> RegistryObject<EntityType<T>> register(String name, Supplier<FabricEntityTypeBuilder<T>> sup) {
-    return register.register(name, () -> sup.get().build());
+    return this.register.register(name, () -> sup.get().build());
   }
 
   /**
    * Registers a entity type for the given entity type builder, and registers a spawn egg for it
-   * @param name       Entity name
-   * @param sup        Entity builder instance
-   * @param primary    Primary egg color
-   * @param secondary  Secondary egg color
-   * @param <T>   Entity class type
-   * @return  Entity registry object
+   *
+   * @param name      Entity name
+   * @param sup       Entity builder instance
+   * @param primary   Primary egg color
+   * @param secondary Secondary egg color
+   * @param <T>       Entity class type
+   * @return Entity registry object
    */
   public <T extends Mob> RegistryObject<EntityType<T>> registerWithEgg(String name, Supplier<FabricEntityTypeBuilder<T>> sup, int primary, int secondary) {
-    RegistryObject<EntityType<T>> object = register(name, sup);
-    var spawnEgg = itemRegistry.register(name + "_spawn_egg", () -> new LazySpawnEggItem(object, primary, secondary, new Item.Properties()));
+    RegistryObject<EntityType<T>> object = this.register(name, sup);
+    var spawnEgg = this.itemRegistry.register(name + "_spawn_egg", () -> new LazySpawnEggItem(object, primary, secondary, new Item.Properties()));
     ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.SPAWN_EGGS).register(entries -> entries.accept(spawnEgg.get()));
     return object;
   }

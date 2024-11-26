@@ -3,8 +3,8 @@ package slimeknights.mantle.client.model.data;
 import org.jetbrains.annotations.Nullable;
 import slimeknights.mantle.client.model.ModelProperty;
 
-public interface IModelData
-{
+public interface IModelData {
+
   /**
    * Check if this data has a property, even if the value is {@code null}. Can be
    * used by code that intends to fill in data for a render pipeline, such as the

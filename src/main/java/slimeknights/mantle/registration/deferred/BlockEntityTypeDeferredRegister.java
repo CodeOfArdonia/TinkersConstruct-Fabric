@@ -20,60 +20,65 @@ import java.util.function.Supplier;
  * Deferred register to register tile entity instances
  */
 public class BlockEntityTypeDeferredRegister extends DeferredRegisterWrapper<BlockEntityType<?>> {
+
   public BlockEntityTypeDeferredRegister(String modID) {
     super(Registries.BLOCK_ENTITY_TYPE, modID);
   }
 
   /**
    * Gets the data fixer type for the tile entity instance
-   * @param name  Tile entity name
-   * @return  Data fixer type
+   *
+   * @param name Tile entity name
+   * @return Data fixer type
    */
   @Nullable
   private Type<?> getType(String name) {
-    return Util.fetchChoiceType(References.BLOCK_ENTITY, resourceName(name));
+    return Util.fetchChoiceType(References.BLOCK_ENTITY, this.resourceName(name));
   }
 
   /**
    * Registers a tile entity type for a single block
-   * @param name     Tile entity name
-   * @param factory  Tile entity factory
-   * @param block    Single block to add
-   * @param <T>      Tile entity type
-   * @return  Registry object instance
+   *
+   * @param name    Tile entity name
+   * @param factory Tile entity factory
+   * @param block   Single block to add
+   * @param <T>     Tile entity type
+   * @return Registry object instance
    */
   @SuppressWarnings("ConstantConditions")
   public <T extends BlockEntity> RegistryObject<BlockEntityType<T>> register(String name, BlockEntitySupplier<? extends T> factory, Supplier<? extends Block> block) {
-    return register.register(name, () ->  BlockEntityType.Builder.<T>of(factory, block.get()).build(getType(name)));
+    return this.register.register(name, () -> BlockEntityType.Builder.<T>of(factory, block.get()).build(this.getType(name)));
   }
 
   /**
    * Registers a new tile entity type using a tile entity factory and a block supplier
-   * @param name     Tile entity name
-   * @param factory  Tile entity factory
-   * @param blocks   Enum object
-   * @param <T>      Tile entity type
-   * @return  Tile entity type registry object
+   *
+   * @param name    Tile entity name
+   * @param factory Tile entity factory
+   * @param blocks  Enum object
+   * @param <T>     Tile entity type
+   * @return Tile entity type registry object
    */
   @SuppressWarnings("ConstantConditions")
   public <T extends BlockEntity> RegistryObject<BlockEntityType<T>> register(String name, BlockEntitySupplier<? extends T> factory, EnumObject<?, ? extends Block> blocks) {
-    return register.register(name, () ->  new BlockEntityType<>(factory, ImmutableSet.copyOf(blocks.values()), getType(name)));
+    return this.register.register(name, () -> new BlockEntityType<>(factory, ImmutableSet.copyOf(blocks.values()), this.getType(name)));
   }
 
   /**
    * Registers a new tile entity type using a tile entity factory and a block supplier
-   * @param name             Tile entity name
-   * @param factory          Tile entity factory
-   * @param blockCollector   Function to get block list
-   * @param <T>              Tile entity type
-   * @return  Tile entity type registry object
+   *
+   * @param name           Tile entity name
+   * @param factory        Tile entity factory
+   * @param blockCollector Function to get block list
+   * @param <T>            Tile entity type
+   * @return Tile entity type registry object
    */
   @SuppressWarnings("ConstantConditions")
   public <T extends BlockEntity> RegistryObject<BlockEntityType<T>> register(String name, BlockEntitySupplier<? extends T> factory, Consumer<ImmutableSet.Builder<Block>> blockCollector) {
-    return register.register(name, () ->  {
+    return this.register.register(name, () -> {
       ImmutableSet.Builder<Block> blocks = new ImmutableSet.Builder<>();
       blockCollector.accept(blocks);
-      return new BlockEntityType<>(factory, blocks.build(), getType(name));
+      return new BlockEntityType<>(factory, blocks.build(), this.getType(name));
     });
   }
 }

@@ -29,8 +29,8 @@ public class ContentError extends PageContent {
   public void build(BookData book, ArrayList<BookElement> list, boolean rightSide) {
     this.addTitle(list, "Error");
 
-    if (exception instanceof BookLoadException) {
-      buildSimple(list);
+    if (this.exception instanceof BookLoadException) {
+      this.buildSimple(list);
       return;
     }
 
@@ -72,7 +72,7 @@ public class ContentError extends PageContent {
   public void buildSimple(ArrayList<BookElement> list) {
     TextData[] text = new TextData[1];
 
-    text[0] = new TextData(exception.getMessage());
+    text[0] = new TextData(this.exception.getMessage());
     text[0].color = "dark_red";
 
     list.add(new TextElement(0, TITLE_HEIGHT, BookScreen.PAGE_WIDTH, BookScreen.PAGE_HEIGHT - TITLE_HEIGHT, text));

@@ -14,6 +14,7 @@ import slimeknights.mantle.client.screen.book.element.TextElement;
 import java.util.ArrayList;
 
 public class ContentImageText extends PageContent {
+
   public static final ResourceLocation ID = Mantle.getResource("image_text");
 
   @Getter
@@ -24,7 +25,7 @@ public class ContentImageText extends PageContent {
 
   @Override
   public void build(BookData book, ArrayList<BookElement> list, boolean rightSide) {
-    int y = getTitleHeight();
+    int y = this.getTitleHeight();
 
     if (this.title == null || this.title.isEmpty()) {
       y = 0;
@@ -35,7 +36,7 @@ public class ContentImageText extends PageContent {
     if (this.image != null && this.image.location != null) {
       int x = 0;
       int width = BookScreen.PAGE_WIDTH;
-      if (centerImage && this.image.width != -1) {
+      if (this.centerImage && this.image.width != -1) {
         x = (BookScreen.PAGE_WIDTH - this.image.width) / 2;
         width = this.image.width;
       }

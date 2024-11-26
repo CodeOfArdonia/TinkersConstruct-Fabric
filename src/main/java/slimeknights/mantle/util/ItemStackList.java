@@ -24,7 +24,8 @@ public class ItemStackList extends NonNullList<ItemStack> {
 
   /**
    * Creates a new list from the given stacks
-   * @param delegate  List of stacks
+   *
+   * @param delegate List of stacks
    */
   protected ItemStackList(List<ItemStack> delegate) {
     super(delegate, ItemStack.EMPTY);
@@ -32,7 +33,8 @@ public class ItemStackList extends NonNullList<ItemStack> {
 
   /**
    * Creates an empty item stack list no size
-   * @return  Empty list
+   *
+   * @return Empty list
    */
   public static ItemStackList create() {
     return new ItemStackList();
@@ -83,7 +85,7 @@ public class ItemStackList extends NonNullList<ItemStack> {
    * @return true if the itemstack at index <i>index</i> is not empty, false otherwise or if the index is out of bounds
    */
   public boolean hasItem(int index) {
-    return index >= 0 && index < size() && !get(index).isEmpty();
+    return index >= 0 && index < this.size() && !this.get(index).isEmpty();
   }
 
   /**
@@ -93,19 +95,20 @@ public class ItemStackList extends NonNullList<ItemStack> {
    * @param index The index to set empty
    */
   public void setEmpty(int index) {
-    if (index >= 0 && index < size()) {
-      set(index, ItemStack.EMPTY);
+    if (index >= 0 && index < this.size()) {
+      this.set(index, ItemStack.EMPTY);
     }
   }
 
   /**
    * Creates a new list with the same content. ItemStacks are shared between lists!
+   *
    * @param fixed If true the list will have fixed size
    */
   public ItemStackList copy(boolean fixed) {
     ItemStackList copy = fixed ? withSize(this.size()) : create();
-    for (int i = 0; i < size(); i++) {
-      copy.set(i, get(i));
+    for (int i = 0; i < this.size(); i++) {
+      copy.set(i, this.get(i));
     }
     return copy;
   }
@@ -113,12 +116,13 @@ public class ItemStackList extends NonNullList<ItemStack> {
   /**
    * Creates a new list with the same content, but Itemstacks are copied too,
    * meaning changes to the copy will not affect the itemstacks in the original list.
+   *
    * @param fixed If true the list will have fixed size
    */
   public ItemStackList deepCopy(boolean fixed) {
     ItemStackList copy = fixed ? withSize(this.size()) : create();
-    for (int i = 0; i < size(); i++) {
-      copy.set(i, get(i).copy());
+    for (int i = 0; i < this.size(); i++) {
+      copy.set(i, this.get(i).copy());
     }
     return copy;
   }

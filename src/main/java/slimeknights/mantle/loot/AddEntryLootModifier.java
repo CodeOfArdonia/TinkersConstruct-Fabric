@@ -30,9 +30,12 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-/** Loot modifier to inject an additional loot entry into an existing table */
+/**
+ * Loot modifier to inject an additional loot entry into an existing table
+ */
 public class AddEntryLootModifier extends LootModifier {
-	static final Gson GSON = Deserializers.createFunctionSerializer().registerTypeHierarchyAdapter(ILootModifierCondition.class, ILootModifierCondition.MODIFIER_CONDITIONS).create();
+
+  static final Gson GSON = Deserializers.createFunctionSerializer().registerTypeHierarchyAdapter(ILootModifierCondition.class, ILootModifierCondition.MODIFIER_CONDITIONS).create();
 
   public static final Codec<AddEntryLootModifier> CODEC = RecordCodecBuilder.create(inst -> {
     Codec<ILootModifierCondition[]> modifierConditionsCodec = Codec.PASSTHROUGH.flatXmap(dynamic -> {
@@ -54,54 +57,68 @@ public class AddEntryLootModifier extends LootModifier {
       .apply(inst, AddEntryLootModifier::new);
   });
 
-  /** Additional conditions that can consider the previously generated loot */
+  /**
+   * Additional conditions that can consider the previously generated loot
+   */
   private final ILootModifierCondition[] modifierConditions;
-  /** Entry for generating loot */
-	private final LootPoolEntryContainer entry;
-  /** Functions to apply to the entry, allows adding functions to parented loot entries such as alternatives */
-	private final LootItemFunction[] functions;
-  /** Functions merged into a single function for ease of use */
-	private final BiFunction<ItemStack, LootContext, ItemStack> combinedFunctions;
+  /**
+   * Entry for generating loot
+   */
+  private final LootPoolEntryContainer entry;
+  /**
+   * Functions to apply to the entry, allows adding functions to parented loot entries such as alternatives
+   */
+  private final LootItemFunction[] functions;
+  /**
+   * Functions merged into a single function for ease of use
+   */
+  private final BiFunction<ItemStack, LootContext, ItemStack> combinedFunctions;
 
-	protected AddEntryLootModifier(LootItemCondition[] conditionsIn, ILootModifierCondition[] modifierConditions, LootPoolEntryContainer entry, LootItemFunction[] functions) {
-		super(conditionsIn);
+  protected AddEntryLootModifier(LootItemCondition[] conditionsIn, ILootModifierCondition[] modifierConditions, LootPoolEntryContainer entry, LootItemFunction[] functions) {
+    super(conditionsIn);
     this.modifierConditions = modifierConditions;
     this.entry = entry;
-		this.functions = functions;
-		this.combinedFunctions = LootItemFunctions.compose(functions);
-	}
+    this.functions = functions;
+    this.combinedFunctions = LootItemFunctions.compose(functions);
+  }
 
-  /** Creates a builder for this loot modifier */
+  /**
+   * Creates a builder for this loot modifier
+   */
   public static Builder builder(LootPoolEntryContainer entry) {
     return new Builder(entry);
   }
 
-  /** Creates a builder for this loot modifier */
+  /**
+   * Creates a builder for this loot modifier
+   */
   public static Builder builder(LootPoolEntryContainer.Builder<?> builder) {
     return builder(builder.build());
   }
 
   @Nonnull
-	@Override
-	protected ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
+  @Override
+  protected ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
     // if any condition fails, exit immediately
-    for (ILootModifierCondition modifierCondition : modifierConditions) {
+    for (ILootModifierCondition modifierCondition : this.modifierConditions) {
       if (!modifierCondition.test(generatedLoot, context)) {
         return generatedLoot;
       }
     }
     // generate the actual entry
     Consumer<ItemStack> consumer = LootItemFunction.decorate(this.combinedFunctions, generatedLoot::add, context);
-    entry.expand(context, generator -> generator.createItemStack(consumer, context));
-		return generatedLoot;
-	}
+    this.entry.expand(context, generator -> generator.createItemStack(consumer, context));
+    return generatedLoot;
+  }
 
   @Override
   public Codec<AddEntryLootModifier> codec() {
     return CODEC;
   }
 
-  /** Builder for a conditional loot entry */
+  /**
+   * Builder for a conditional loot entry
+   */
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
   public static class Builder extends AbstractLootModifierBuilder<Builder> {
 
@@ -113,7 +130,7 @@ public class AddEntryLootModifier extends LootModifier {
      * Adds a loot entry condition to the builder
      */
     public Builder addCondition(ILootModifierCondition condition) {
-      modifierConditions.add(condition);
+      this.modifierConditions.add(condition);
       return this;
     }
 
@@ -121,13 +138,13 @@ public class AddEntryLootModifier extends LootModifier {
      * Adds a loot function to the builder
      */
     public Builder addFunction(LootItemFunction function) {
-      functions.add(function);
+      this.functions.add(function);
       return this;
     }
 
     @Override
     public void build(String name, GlobalLootModifierProvider provider) {
-      provider.add(name, MantleLoot.ADD_ENTRY, new AddEntryLootModifier(getConditions(), modifierConditions.toArray(new ILootModifierCondition[0]), entry, functions.toArray(new LootItemFunction[0])));
+      provider.add(name, MantleLoot.ADD_ENTRY, new AddEntryLootModifier(this.getConditions(), this.modifierConditions.toArray(new ILootModifierCondition[0]), this.entry, this.functions.toArray(new LootItemFunction[0])));
     }
   }
 }

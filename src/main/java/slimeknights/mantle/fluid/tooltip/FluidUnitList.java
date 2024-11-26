@@ -15,6 +15,7 @@ import java.util.List;
 @SuppressWarnings("ClassCanBeRecord") // needed in GSON
 @RequiredArgsConstructor
 public class FluidUnitList {
+
   @Nullable
   private final TagKey<Fluid> tag;
   private final List<FluidUnit> units;
@@ -30,8 +31,8 @@ public class FluidUnitList {
    * Applies the text of all child units
    */
   public long getText(List<Component> tooltip, long amount) {
-    if (units != null) {
-      for (FluidUnit unit : units) {
+    if (this.units != null) {
+      for (FluidUnit unit : this.units) {
         amount = unit.getText(tooltip, amount);
       }
     }

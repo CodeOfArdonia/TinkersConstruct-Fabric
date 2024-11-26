@@ -12,6 +12,7 @@ import slimeknights.mantle.client.book.data.BookData;
 
 @AllArgsConstructor
 public class OpenNamedBookPacket implements IThreadsafePacket {
+
   private static final String BOOK_ERROR = "command.mantle.book_test.not_found";
   private final ResourceLocation book;
 
@@ -21,20 +22,21 @@ public class OpenNamedBookPacket implements IThreadsafePacket {
 
   @Override
   public void encode(FriendlyByteBuf buf) {
-    buf.writeResourceLocation(book);
+    buf.writeResourceLocation(this.book);
   }
 
   @Override
   public void handleThreadsafe(Context context) {
-    BookData bookData = BookLoader.getBook(book);
-    if(bookData != null) {
+    BookData bookData = BookLoader.getBook(this.book);
+    if (bookData != null) {
       bookData.openGui(Component.literal("Book"), "", null, null);
     } else {
-      ClientOnly.errorStatus(book);
+      ClientOnly.errorStatus(this.book);
     }
   }
 
   static class ClientOnly {
+
     static void errorStatus(ResourceLocation book) {
       Player player = Minecraft.getInstance().player;
       if (player != null) {

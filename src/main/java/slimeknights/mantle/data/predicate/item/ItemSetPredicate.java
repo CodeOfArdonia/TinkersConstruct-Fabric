@@ -8,8 +8,11 @@ import slimeknights.mantle.data.predicate.IJsonPredicate;
 
 import java.util.Set;
 
-/** Predicate matching an item from a set */
+/**
+ * Predicate matching an item from a set
+ */
 public record ItemSetPredicate(Set<Item> items) implements ItemPredicate {
+
   public static final IGenericLoader<ItemSetPredicate> LOADER = new RegistrySetLoader<>("items", BuiltInRegistries.ITEM, ItemSetPredicate::new, predicate -> predicate.items);
 
   public ItemSetPredicate(Item item) {
@@ -18,7 +21,7 @@ public record ItemSetPredicate(Set<Item> items) implements ItemPredicate {
 
   @Override
   public boolean matches(Item item) {
-    return items.contains(item);
+    return this.items.contains(item);
   }
 
   @Override

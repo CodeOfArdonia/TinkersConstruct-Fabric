@@ -8,9 +8,12 @@ import net.minecraft.world.entity.MobType;
 import slimeknights.mantle.data.GenericLoaderRegistry.IGenericLoader;
 import slimeknights.mantle.data.NamedComponentRegistry;
 
-/** Predicate matching a specific mob type */
+/**
+ * Predicate matching a specific mob type
+ */
 @RequiredArgsConstructor
 public class MobTypePredicate implements LivingEntityPredicate {
+
   /**
    * Registry of mob types, to allow addons to register types
    * TODO: support registering via IMC
@@ -21,7 +24,7 @@ public class MobTypePredicate implements LivingEntityPredicate {
 
   @Override
   public boolean matches(LivingEntity input) {
-    return input.getMobType() == type;
+    return input.getMobType() == this.type;
   }
 
   @Override
@@ -29,7 +32,9 @@ public class MobTypePredicate implements LivingEntityPredicate {
     return LOADER;
   }
 
-  /** Loader for a mob type predicate */
+  /**
+   * Loader for a mob type predicate
+   */
   public static final IGenericLoader<MobTypePredicate> LOADER = new IGenericLoader<>() {
     @Override
     public MobTypePredicate deserialize(JsonObject json) {

@@ -18,13 +18,14 @@ public class FluidUnit {
 
   /**
    * Gets the display text for this fluid entry
+   *
    * @return Display text
    */
   public long getText(List<Component> tooltip, long amount) {
-    long full = amount / needed;
+    long full = amount / this.needed;
     if (full > 0) {
-      tooltip.add(Component.translatable(key, full).withStyle(ChatFormatting.GRAY));
+      tooltip.add(Component.translatable(this.key, full).withStyle(ChatFormatting.GRAY));
     }
-    return amount % needed;
+    return amount % this.needed;
   }
 }

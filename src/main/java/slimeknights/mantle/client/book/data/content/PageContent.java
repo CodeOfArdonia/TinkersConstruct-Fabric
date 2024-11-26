@@ -13,23 +13,35 @@ import slimeknights.mantle.client.screen.book.element.TextElement;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 
-/** Base for all page content */
+/**
+ * Base for all page content
+ */
 public abstract class PageContent {
 
-  public static final transient int TITLE_HEIGHT = 16;
-  public static final transient int LARGE_TITLE_HEIGHT = 20;
+  public static final int TITLE_HEIGHT = 16;
+  public static final int LARGE_TITLE_HEIGHT = 20;
 
   public transient PageData parent;
   public transient BookRepository source;
 
-  /** If true, the title will be centered */
-  @Setter @Getter @Nullable
+  /**
+   * If true, the title will be centered
+   */
+  @Setter
+  @Getter
+  @Nullable
   private Boolean centerTitle;
-  /** If true, the title will be large */
-  @Setter @Getter @Nullable
+  /**
+   * If true, the title will be large
+   */
+  @Setter
+  @Getter
+  @Nullable
   private Boolean largeTitle;
 
-  /** Returns the title for this page content, for the sake of indexes */
+  /**
+   * Returns the title for this page content, for the sake of indexes
+   */
   @Nullable
   public String getTitle() {
     return "";
@@ -45,24 +57,26 @@ public abstract class PageContent {
    */
   public abstract void build(BookData book, ArrayList<BookElement> list, boolean rightSide);
 
-  /** Returns true if the title should be large */
+  /**
+   * Returns true if the title should be large
+   */
   private boolean isLarge() {
-    if (largeTitle != null) {
-      return largeTitle;
-    }
-    else if (parent != null && parent.parent != null && parent.parent.parent != null) {
-      return parent.parent.parent.appearance.largePageTitles;
+    if (this.largeTitle != null) {
+      return this.largeTitle;
+    } else if (this.parent != null && this.parent.parent != null && this.parent.parent.parent != null) {
+      return this.parent.parent.parent.appearance.largePageTitles;
     }
     return false;
   }
 
-  /** Returns true if the title should be centered */
+  /**
+   * Returns true if the title should be centered
+   */
   private boolean isCentered() {
-    if (centerTitle != null) {
-      return centerTitle;
-    }
-    else if (parent != null && parent.parent != null && parent.parent.parent != null) {
-      return parent.parent.parent.appearance.centerPageTitles;
+    if (this.centerTitle != null) {
+      return this.centerTitle;
+    } else if (this.parent != null && this.parent.parent != null && this.parent.parent.parent != null) {
+      return this.parent.parent.parent.appearance.centerPageTitles;
     }
     return false;
   }
@@ -71,13 +85,14 @@ public abstract class PageContent {
    * Gets the title height for the given page
    */
   protected int getTitleHeight() {
-    return isLarge() ? LARGE_TITLE_HEIGHT : TITLE_HEIGHT;
+    return this.isLarge() ? LARGE_TITLE_HEIGHT : TITLE_HEIGHT;
   }
 
   /**
    * Adds a title to the book with default properties
-   * @param list       List of book elements
-   * @param titleText  Title text
+   *
+   * @param list      List of book elements
+   * @param titleText Title text
    */
   public void addTitle(ArrayList<BookElement> list, String titleText) {
     this.addTitle(list, titleText, false);
@@ -85,6 +100,7 @@ public abstract class PageContent {
 
   /**
    * Adds a title to the book with an optional shadow
+   *
    * @param list       List of book elements
    * @param titleText  Title text
    * @param dropShadow If true, adds a shadow
@@ -95,6 +111,7 @@ public abstract class PageContent {
 
   /**
    * Adds a title to the book with the given color and shadow
+   *
    * @param list       List of book elements
    * @param titleText  Title text
    * @param dropShadow If true, adds a shadow
@@ -106,6 +123,7 @@ public abstract class PageContent {
 
   /**
    * Adds a title to the book with full options
+   *
    * @param list       List of book elements
    * @param titleText  Title text
    * @param dropShadow If true, adds a shadow
@@ -115,7 +133,7 @@ public abstract class PageContent {
   public void addTitle(ArrayList<BookElement> list, String titleText, boolean dropShadow, int color, int y) {
     TextData title = new TextData(titleText);
 
-    boolean isLarge = isLarge();
+    boolean isLarge = this.isLarge();
     title.scale = isLarge ? 1.2f : 1.0f;
     title.underlined = true;
     title.dropshadow = dropShadow;
@@ -127,25 +145,30 @@ public abstract class PageContent {
 
     int x = 0;
     int w = BookScreen.PAGE_WIDTH;
-    if (isCentered()) {
-      w = (int)Math.ceil(this.parent.parent.parent.fontRenderer.width(titleText) * title.scale) + 1;
+    if (this.isCentered()) {
+      w = (int) Math.ceil(this.parent.parent.parent.fontRenderer.width(titleText) * title.scale) + 1;
       x = (BookScreen.PAGE_WIDTH - w) / 2;
     }
     list.add(new TextElement(x, y, w, isLarge ? 11 : 9, title));
   }
 
-  /** Adds text to the book at the top */
+  /**
+   * Adds text to the book at the top
+   */
   public void addText(ArrayList<BookElement> list, String subText, boolean dropShadow) {
     this.addText(list, subText, dropShadow, 0, 0);
   }
 
-  /** Adds text to the book at the top with the given color */
+  /**
+   * Adds text to the book at the top with the given color
+   */
   public void addText(ArrayList<BookElement> list, String subText, boolean dropShadow, int color) {
     this.addText(list, subText, dropShadow, color, 0);
   }
 
   /**
    * Adds a text to the book at the given locaiton
+   *
    * @param list       List of book elements
    * @param text       Text
    * @param dropShadow If true, adds a shadow

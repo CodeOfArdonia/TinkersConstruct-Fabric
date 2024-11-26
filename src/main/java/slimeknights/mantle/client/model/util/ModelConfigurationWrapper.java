@@ -25,11 +25,13 @@ import java.util.function.Function;
  */
 @SuppressWarnings("WeakerAccess")
 public class ModelConfigurationWrapper extends BlockModel {
+
   private final BlockModel base;
 
   /**
    * Creates a new configuration wrapper
-   * @param base  Base model configuration
+   *
+   * @param base Base model configuration
    */
   public ModelConfigurationWrapper(BlockModel base) {
     super(base.parentLocation, base.getElements(), base.textureMap, base.hasAmbientOcclusion(), base.getGuiLight(), base.getTransforms(), base.getOverrides());
@@ -38,101 +40,101 @@ public class ModelConfigurationWrapper extends BlockModel {
 
   @Override
   public boolean hasTexture(String name) {
-    return base.hasTexture(name);
+    return this.base.hasTexture(name);
   }
 
   @Override
   public Material getMaterial(String name) {
-    return base.getMaterial(name);
+    return this.base.getMaterial(name);
   }
 
   @Override
   public GuiLight getGuiLight() {
-    return base.getGuiLight();
+    return this.base.getGuiLight();
   }
 
   @Override
   public boolean hasAmbientOcclusion() {
-    return base.hasAmbientOcclusion();
+    return this.base.hasAmbientOcclusion();
   }
 
   @Override
   public ItemTransforms getTransforms() {
-    return base.getTransforms();
+    return this.base.getTransforms();
   }
 
   @Override
   public Transformation getRootTransform() {
-    return base.getRootTransform();
+    return this.base.getRootTransform();
   }
 
   @Override
   public boolean isComponentVisible(String part, boolean fallback) {
-    return base.isComponentVisible(part, fallback);
+    return this.base.isComponentVisible(part, fallback);
   }
 
   @Override
   public List<BlockElement> getElements() {
-    return base.getElements();
+    return this.base.getElements();
   }
 
   @Override
   public boolean isResolved() {
-    return base.isResolved();
+    return this.base.isResolved();
   }
 
   @Override
   public List<ItemOverride> getOverrides() {
-    return base.getOverrides();
+    return this.base.getOverrides();
   }
 
   @Override
   public Collection<ResourceLocation> getDependencies() {
-    return base.getDependencies();
+    return this.base.getDependencies();
   }
 
   @Override
   public void resolveParents(Function<ResourceLocation, UnbakedModel> function) {
-    base.resolveParents(function);
+    this.base.resolveParents(function);
   }
 
   @Override
   public BakedModel bake(ModelBaker modelBaker, Function<Material, TextureAtlasSprite> function, ModelState modelState, ResourceLocation resourceLocation) {
-    return base.bake(modelBaker, function, modelState, resourceLocation);
+    return this.base.bake(modelBaker, function, modelState, resourceLocation);
   }
 
   @Override
   public BakedModel bake(ModelBaker modelBaker, BlockModel blockModel, Function<Material, TextureAtlasSprite> function, ModelState modelState, ResourceLocation resourceLocation, boolean bl) {
-    return base.bake(modelBaker, blockModel, function, modelState, resourceLocation, bl);
+    return this.base.bake(modelBaker, blockModel, function, modelState, resourceLocation, bl);
   }
 
   @Override
   public BlockModel getRootModel() {
-    return base.getRootModel();
+    return this.base.getRootModel();
   }
 
   @Override
   public ItemOverrides getOverrides(ModelBaker pModelBakery, BlockModel pModel, Function<Material, TextureAtlasSprite> textureGetter) {
-    return base.getOverrides(pModelBakery, pModel, textureGetter);
+    return this.base.getOverrides(pModelBakery, pModel, textureGetter);
   }
 
   @Override
   public void setCustomGeometry(IUnbakedGeometry<?> geometry) {
-    base.setCustomGeometry(geometry);
+    this.base.setCustomGeometry(geometry);
   }
 
   @Override
   public IUnbakedGeometry<?> getCustomGeometry() {
-    return base.getCustomGeometry();
+    return this.base.getCustomGeometry();
   }
 
   @Override
   public VisibilityData getVisibilityData() {
-    return base.getVisibilityData();
+    return this.base.getVisibilityData();
   }
 
   @Override
   public void setRootTransform(Transformation rootTransform) {
-    base.setRootTransform(rootTransform);
+    this.base.setRootTransform(rootTransform);
   }
 }

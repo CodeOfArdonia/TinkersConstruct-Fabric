@@ -90,7 +90,7 @@ public class TemplateLevel extends Level {
 
   @Override
   public String gatherChunkSourceStats() {
-    return chunkSource.gatherStats();
+    return this.chunkSource.gatherStats();
   }
 
   @Nullable
@@ -188,6 +188,6 @@ public class TemplateLevel extends Level {
   @Nonnull
   @Override
   public Holder<Biome> getUncachedNoiseBiome(int x, int y, int z) {
-    return registries.registryOrThrow(Registries.BIOME).getHolderOrThrow(Biomes.PLAINS);
+    return this.registries.registryOrThrow(Registries.BIOME).getHolderOrThrow(Biomes.PLAINS);
   }
 }

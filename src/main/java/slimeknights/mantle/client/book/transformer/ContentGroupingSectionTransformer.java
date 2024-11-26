@@ -20,10 +20,12 @@ import java.util.List;
  * Extended version of {@link ContentListingSectionTransformer} which supports putting entries in subgroups
  */
 public class ContentGroupingSectionTransformer extends SectionTransformer {
+
   private static final ResourceLocation INDEX_EXTRA_DATA = Mantle.getResource("index");
 
   private final Boolean largeTitle;
   private final Boolean centerTitle;
+
   public ContentGroupingSectionTransformer(String sectionName, @Nullable Boolean largeTitle, @Nullable Boolean centerTitle) {
     super(sectionName);
     this.largeTitle = largeTitle;
@@ -36,16 +38,16 @@ public class ContentGroupingSectionTransformer extends SectionTransformer {
 
   @Override
   public void transform(BookData book, SectionData data) {
-    String title = book.translate(sectionName);
-    String subtextKey = sectionName + ".subtext";
+    String title = book.translate(this.sectionName);
+    String subtextKey = this.sectionName + ".subtext";
     String subText = null;
     if (book.strings.containsKey(subtextKey)) {
       subText = book.translate(subtextKey);
     }
 
     // start building the listing
-    GroupingBuilder builder = new GroupingBuilder(data, title, subText, largeTitle, centerTitle);
-    data.pages.removeIf(sectionPage -> !processPage(book, builder, sectionPage));
+    GroupingBuilder builder = new GroupingBuilder(data, title, subText, this.largeTitle, this.centerTitle);
+    data.pages.removeIf(sectionPage -> !this.processPage(book, builder, sectionPage));
 
     // create pages for each listing if any exist
     if (builder.hasEntries()) {
@@ -71,7 +73,7 @@ public class ContentGroupingSectionTransformer extends SectionTransformer {
       // add a page for each finished listing
       for (ContentListing listing : finishedListings) {
         PageData listingPage = new PageData(true);
-        listingPage.name = sectionName;
+        listingPage.name = this.sectionName;
         listingPage.source = data.source;
         listingPage.parent = data;
         listingPage.content = listing;
@@ -82,7 +84,9 @@ public class ContentGroupingSectionTransformer extends SectionTransformer {
     }
   }
 
-  /** Overridable method to process a single page */
+  /**
+   * Overridable method to process a single page
+   */
   protected boolean processPage(BookData book, GroupingBuilder builder, PageData page) {
     if (!IndexTransformer.isPageHidden(page) && !page.name.equals("hidden")) {
       builder.addPage(page.getTitle(), page);
@@ -90,89 +94,114 @@ public class ContentGroupingSectionTransformer extends SectionTransformer {
     return true;
   }
 
-  /** Builder to create a all content listing pages */
+  /**
+   * Builder to create a all content listing pages
+   */
   public static class GroupingBuilder {
+
     private static final int COLUMN_WIDTH = BookScreen.PAGE_WIDTH / 3;
 
-    /** Section containing this grouping */
+    /**
+     * Section containing this grouping
+     */
     private final SectionData section;
-    /** Number of columns on the page, makes a new page if its 3 */
+    /**
+     * Number of columns on the page, makes a new page if its 3
+     */
     private int columns = 1;
-    /** Number of entries in the current column, when too big a new column starts */
+    /**
+     * Number of entries in the current column, when too big a new column starts
+     */
     private int entriesInColumn = 0;
-    /** Max number of entries in a column */
+    /**
+     * Max number of entries in a column
+     */
     private int maxInColumn;
-    /** Listing that is currently being built */
+    /**
+     * Listing that is currently being built
+     */
     private ContentListing currentListing = new ContentListing();
-    /** All listings to include in the book */
+    /**
+     * All listings to include in the book
+     */
     @Getter
-    private final List<ContentListing> finishedListings = Lists.newArrayList(currentListing);
+    private final List<ContentListing> finishedListings = Lists.newArrayList(this.currentListing);
 
     public GroupingBuilder(SectionData section, @Nullable String title, @Nullable String subText, @Nullable Boolean largeTitle, @Nullable Boolean centerTitle) {
       this.section = section;
-      currentListing.title = title;
-      currentListing.subText = subText;
-      currentListing.setLargeTitle(largeTitle);
-      currentListing.setCenterTitle(centerTitle);
-      maxInColumn = currentListing.getEntriesInColumn(section);
+      this.currentListing.title = title;
+      this.currentListing.subText = subText;
+      this.currentListing.setLargeTitle(largeTitle);
+      this.currentListing.setCenterTitle(centerTitle);
+      this.maxInColumn = this.currentListing.getEntriesInColumn(section);
     }
 
-    /** If true, entries were added */
+    /**
+     * If true, entries were added
+     */
     public boolean hasEntries() {
-      return entriesInColumn > 0; // should be sufficient, only 0 when nothing is added
+      return this.entriesInColumn > 0; // should be sufficient, only 0 when nothing is added
     }
 
-    /** Increases the number of entries in the column */
+    /**
+     * Increases the number of entries in the column
+     */
     private void incrementColumns(String text, boolean bold) {
       // entriesInColumn += section.parent.fontRenderer.wordWrapHeight(text, COLUMN_WIDTH) / 9;
       if (bold) {
-        entriesInColumn += TextDataRenderer.getLinesForString(text, ChatFormatting.BOLD.toString(), COLUMN_WIDTH, "", section.parent.fontRenderer);
+        this.entriesInColumn += TextDataRenderer.getLinesForString(text, ChatFormatting.BOLD.toString(), COLUMN_WIDTH, "", this.section.parent.fontRenderer);
       } else {
-        entriesInColumn += TextDataRenderer.getLinesForString(text, "", COLUMN_WIDTH, "- ", section.parent.fontRenderer);
+        this.entriesInColumn += TextDataRenderer.getLinesForString(text, "", COLUMN_WIDTH, "- ", this.section.parent.fontRenderer);
       }
     }
 
-    /** Starts a new column */
+    /**
+     * Starts a new column
+     */
     private void startNewColumn(boolean forceBreak) {
       // already have 3 columns? start a new one
-      if (columns == 3) {
-        currentListing = new ContentListing();
-        ContentListing firstListing = finishedListings.get(0);
-        currentListing.title = firstListing.title;
-        currentListing.setLargeTitle(firstListing.getLargeTitle());
-        currentListing.setCenterTitle(firstListing.getCenterTitle());
-        maxInColumn = currentListing.getEntriesInColumn(section);
-        finishedListings.add(currentListing);
-        columns = 1;
+      if (this.columns == 3) {
+        this.currentListing = new ContentListing();
+        ContentListing firstListing = this.finishedListings.get(0);
+        this.currentListing.title = firstListing.title;
+        this.currentListing.setLargeTitle(firstListing.getLargeTitle());
+        this.currentListing.setCenterTitle(firstListing.getCenterTitle());
+        this.maxInColumn = this.currentListing.getEntriesInColumn(this.section);
+        this.finishedListings.add(this.currentListing);
+        this.columns = 1;
       } else {
         // 1 or 2 columns? force break
-        columns++;
+        this.columns++;
         if (forceBreak) {
-          currentListing.addColumnBreak();
+          this.currentListing.addColumnBreak();
         }
       }
-      entriesInColumn = 0;
+      this.entriesInColumn = 0;
     }
 
-    /** Adds a group to this listing */
+    /**
+     * Adds a group to this listing
+     */
     public void addGroup(String name, @Nullable PageData data) {
       // if a group already exists, start a new column
-      if (entriesInColumn != 0) {
-        startNewColumn(true);
+      if (this.entriesInColumn != 0) {
+        this.startNewColumn(true);
       }
 
       // add the title entry to the column
-      incrementColumns(name, true);
-      currentListing.addEntry(name, data, true);
+      this.incrementColumns(name, true);
+      this.currentListing.addEntry(name, data, true);
     }
 
-    /** Adds a page to the current group in the listing */
+    /**
+     * Adds a page to the current group in the listing
+     */
     public void addPage(String name, PageData data) {
-      if (entriesInColumn == maxInColumn) {
-        startNewColumn(false);
+      if (this.entriesInColumn == this.maxInColumn) {
+        this.startNewColumn(false);
       }
-      incrementColumns(name, false);
-      currentListing.addEntry(name, data, false);
+      this.incrementColumns(name, false);
+      this.currentListing.addEntry(name, data, false);
     }
   }
 }

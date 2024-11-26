@@ -21,40 +21,45 @@ import java.util.function.Supplier;
  * Packet interface to add common methods for registration
  */
 public interface ISimplePacket extends S2CPacket, C2SPacket {
+
   /**
    * Encodes a packet for the buffer
-   * @param buf  Buffer instance
+   *
+   * @param buf Buffer instance
    */
   void encode(FriendlyByteBuf buf);
 
   /**
    * Handles receiving the packet
-   * @param context  Packet context
+   *
+   * @param context Packet context
    */
   void handle(Supplier<Context> context);
 
   @Override
   default void handle(MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl handler, PacketSender responseSender, SimpleChannel channel) {
-    handle(new Context(server, handler, player, channel));
+    this.handle(new Context(server, handler, player, channel));
   }
 
   @Override
   default void handle(Minecraft client, ClientPacketListener listener, PacketSender responseSender, SimpleChannel channel) {
-    handle(new Context(client, listener, null, channel));
+    this.handle(new Context(client, listener, null, channel));
   }
 
-  public record Context(Executor exec, PacketListener handler, @Nullable ServerPlayer sender, SimpleChannel channel) implements Supplier<Context> {
+  record Context(Executor exec, PacketListener handler, @Nullable ServerPlayer sender,
+                        SimpleChannel channel) implements Supplier<Context> {
+
     public void enqueueWork(Runnable runnable) {
-      exec().execute(runnable);
+      this.exec().execute(runnable);
     }
 
     @Nullable
     public ServerPlayer getSender() {
-      return sender();
+      return this.sender();
     }
 
     public NetworkDirection getDirection() {
-      return sender() == null ? NetworkDirection.PLAY_TO_SERVER : NetworkDirection.PLAY_TO_CLIENT;
+      return this.sender() == null ? NetworkDirection.PLAY_TO_SERVER : NetworkDirection.PLAY_TO_CLIENT;
     }
 
     public void setPacketHandled(boolean value) {

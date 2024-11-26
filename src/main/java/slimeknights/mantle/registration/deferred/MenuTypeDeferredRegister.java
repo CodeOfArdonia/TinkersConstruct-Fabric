@@ -18,12 +18,13 @@ public class MenuTypeDeferredRegister extends DeferredRegisterWrapper<MenuType<?
 
   /**
    * Registers a container type
-   * @param name     Container name
-   * @param factory  Container factory
-   * @param <C>      Container type
-   * @return  Registry object containing the container type
+   *
+   * @param name    Container name
+   * @param factory Container factory
+   * @param <C>     Container type
+   * @return Registry object containing the container type
    */
   public <C extends AbstractContainerMenu> RegistryObject<MenuType<C>> register(String name, ExtendedScreenHandlerType.ExtendedFactory<C> factory) {
-    return register.register(name, () -> new ExtendedScreenHandlerType(factory));
+    return this.register.register(name, () -> new ExtendedScreenHandlerType(factory));
   }
 }

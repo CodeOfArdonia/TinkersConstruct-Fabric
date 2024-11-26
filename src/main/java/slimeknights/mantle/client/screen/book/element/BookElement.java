@@ -47,7 +47,7 @@ public abstract class BookElement {
     List<Component> list = stack.getTooltipLines(this.mc.player, this.mc.options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
 
 
-    Font font = mc.gui.getFont();
+    Font font = this.mc.gui.getFont();
     if (font == null) {
       font = fontRenderer;
     }
@@ -58,12 +58,12 @@ public abstract class BookElement {
   public void drawTooltip(GuiGraphics guiGraphics, List<Component> textLines, int x, int y, Font font) {
     // GuiUtils.drawHoveringText(matrixStack, textLines, x, y, this.parent.width, this.parent.height, -1, font);
     // GuiUtils.drawHoveringText(matrixStack, textLines, x, y, BookScreen.PAGE_WIDTH, BookScreen.PAGE_HEIGHT, BookScreen.PAGE_WIDTH, font);
-    int oldWidth = parent.width;
-    int oldHeight = parent.height;
-    parent.width = BookScreen.PAGE_WIDTH;
-    parent.height = BookScreen.PAGE_HEIGHT;
+    int oldWidth = this.parent.width;
+    int oldHeight = this.parent.height;
+    this.parent.width = BookScreen.PAGE_WIDTH;
+    this.parent.height = BookScreen.PAGE_HEIGHT;
     guiGraphics.renderTooltip(font, textLines, Optional.empty(), x, y);
-    parent.width = oldWidth;
-    parent.height = oldHeight;
+    this.parent.width = oldWidth;
+    this.parent.height = oldHeight;
   }
 }

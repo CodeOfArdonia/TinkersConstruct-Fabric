@@ -28,7 +28,9 @@ public class PageData implements IDataItem, IConditional {
   public float scale = 1.0F;
   public JsonCondition condition = new JsonCondition(TrueCondition.ID, new JsonObject());
 
-  /** Contains arbitrary data to be used by custom transformers and other things */
+  /**
+   * Contains arbitrary data to be used by custom transformers and other things
+   */
   public Map<ResourceLocation, JsonElement> extraData = Collections.emptyMap();
 
   public transient SectionData parent;
@@ -59,7 +61,7 @@ public class PageData implements IDataItem, IConditional {
 
     this.name = this.name.toLowerCase();
 
-    Class<? extends PageContent> ctype = BookLoader.getPageType(type);
+    Class<? extends PageContent> ctype = BookLoader.getPageType(this.type);
 
     if (!this.data.isEmpty() && !this.data.equals("no-load")) {
       Resource pageInfo = this.source.getResource(this.source.getResourceLocation(this.data));
@@ -70,10 +72,10 @@ public class PageData implements IDataItem, IConditional {
           PageTypeOverrider overrider = BookLoader.getGson().fromJson(data, PageTypeOverrider.class);
           if (overrider.type != null) {
             Class<? extends PageContent> overriddenType = BookLoader.getPageType(overrider.type);
-            if(overriddenType != null) {
+            if (overriddenType != null) {
               ctype = BookLoader.getPageType(overrider.type);
               // Also override the type on the page so that we can read it out in transformers
-              type = overrider.type;
+              this.type = overrider.type;
             }
           }
 
@@ -95,7 +97,8 @@ public class PageData implements IDataItem, IConditional {
       if (ctype != null) {
         try {
           this.content = ctype.getDeclaredConstructor().newInstance();
-        } catch (InstantiationException | IllegalAccessException | NullPointerException | NoSuchMethodException | InvocationTargetException e) {
+        } catch (InstantiationException | IllegalAccessException | NullPointerException | NoSuchMethodException |
+                 InvocationTargetException e) {
           this.content = new ContentError("Failed to create a page of type \"" + this.type + "\".", e);
           e.printStackTrace();
         }
@@ -156,13 +159,15 @@ public class PageData implements IDataItem, IConditional {
     }
   }
 
-  /** Gets the title for the page data, which can be overridden by translation */
+  /**
+   * Gets the title for the page data, which can be overridden by translation
+   */
   public String getTitle() {
     String title = this.parent.parent.strings.get(this.parent.name + "." + this.name);
     if (title != null) {
       return title;
     }
-    title = content.getTitle();
+    title = this.content.getTitle();
     if (title != null && !title.isEmpty()) {
       return title;
     }
@@ -171,10 +176,11 @@ public class PageData implements IDataItem, IConditional {
 
   @Override
   public boolean isConditionMet() {
-    return condition.test();
+    return this.condition.test();
   }
 
   private static class PageTypeOverrider {
+
     public ResourceLocation type;
   }
 }

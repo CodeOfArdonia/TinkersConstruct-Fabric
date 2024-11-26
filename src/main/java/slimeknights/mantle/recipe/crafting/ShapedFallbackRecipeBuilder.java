@@ -15,17 +15,21 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
-/** Builder for a shaped recipe with fallbacks */
+/**
+ * Builder for a shaped recipe with fallbacks
+ */
 @SuppressWarnings("unused")
 @RequiredArgsConstructor(staticName = "fallback")
 public class ShapedFallbackRecipeBuilder {
+
   private final ShapedRecipeBuilder base;
   private final List<ResourceLocation> alternatives = new ArrayList<>();
 
   /**
    * Adds a single alternative to this recipe. Any matching alternative causes this recipe to fail
-   * @param location  Alternative
-   * @return  Builder instance
+   *
+   * @param location Alternative
+   * @return Builder instance
    */
   public ShapedFallbackRecipeBuilder addAlternative(ResourceLocation location) {
     this.alternatives.add(location);
@@ -34,8 +38,9 @@ public class ShapedFallbackRecipeBuilder {
 
   /**
    * Adds a list of alternatives to this recipe. Any matching alternative causes this recipe to fail
-   * @param locations  Alternative list
-   * @return  Builder instance
+   *
+   * @param locations Alternative list
+   * @return Builder instance
    */
   public ShapedFallbackRecipeBuilder addAlternatives(Collection<ResourceLocation> locations) {
     this.alternatives.addAll(locations);
@@ -44,28 +49,31 @@ public class ShapedFallbackRecipeBuilder {
 
   /**
    * Builds the recipe using the output as the name
-   * @param consumer  Recipe consumer
+   *
+   * @param consumer Recipe consumer
    */
   public void build(Consumer<FinishedRecipe> consumer) {
-    base.save(base -> consumer.accept(new Result(base, alternatives)));
+    this.base.save(base -> consumer.accept(new Result(base, this.alternatives)));
   }
 
   /**
    * Builds the recipe using the given ID
-   * @param consumer  Recipe consumer
-   * @param id        Recipe ID
+   *
+   * @param consumer Recipe consumer
+   * @param id       Recipe ID
    */
   public void build(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
-    base.save(base -> consumer.accept(new Result(base, alternatives)), id);
+    this.base.save(base -> consumer.accept(new Result(base, this.alternatives)), id);
   }
 
   private record Result(FinishedRecipe base, List<ResourceLocation> alternatives) implements FinishedRecipe {
+
     @Override
     public void serializeRecipeData(JsonObject json) {
-      base.serializeRecipeData(json);
-      json.add("alternatives", alternatives.stream()
-                                           .map(ResourceLocation::toString)
-                                           .collect(JsonArray::new, JsonArray::add, JsonArray::addAll));
+      this.base.serializeRecipeData(json);
+      json.add("alternatives", this.alternatives.stream()
+        .map(ResourceLocation::toString)
+        .collect(JsonArray::new, JsonArray::add, JsonArray::addAll));
     }
 
     @Override
@@ -75,19 +83,19 @@ public class ShapedFallbackRecipeBuilder {
 
     @Override
     public ResourceLocation getId() {
-      return base.getId();
+      return this.base.getId();
     }
 
     @Nullable
     @Override
     public JsonObject serializeAdvancement() {
-      return base.serializeAdvancement();
+      return this.base.serializeAdvancement();
     }
 
     @Nullable
     @Override
     public ResourceLocation getAdvancementId() {
-      return base.getAdvancementId();
+      return this.base.getAdvancementId();
     }
   }
 }

@@ -20,7 +20,9 @@ import java.util.Map.Entry;
 
 @SuppressWarnings("WeakerAccess")
 public class FluidCuboid {
+
   protected static final Map<Direction, FluidFace> DEFAULT_FACES;
+
   static {
     DEFAULT_FACES = new EnumMap<>(Direction.class);
     for (Direction direction : Direction.values()) {
@@ -28,24 +30,34 @@ public class FluidCuboid {
     }
   }
 
-  /** Fluid start, scaled for block models */
+  /**
+   * Fluid start, scaled for block models
+   */
   @Getter
   private final Vector3f from;
-  /** Fluid end, scaled for block models */
+  /**
+   * Fluid end, scaled for block models
+   */
   @Getter
   private final Vector3f to;
-  /** Block faces for the fluid */
+  /**
+   * Block faces for the fluid
+   */
   @Getter(value = AccessLevel.PUBLIC)
   private final Map<Direction, FluidFace> faces;
 
-  /** Cache for scaled from */
+  /**
+   * Cache for scaled from
+   */
   @Nullable
   private Vector3f fromScaled;
-  /** Cache for scaled to */
+  /**
+   * Cache for scaled to
+   */
   @Nullable
   private Vector3f toScaled;
 
-  public FluidCuboid(Vector3f from, Vector3f to, Map<Direction,FluidFace> faces) {
+  public FluidCuboid(Vector3f from, Vector3f to, Map<Direction, FluidFace> faces) {
     this.from = from;
     this.to = to;
     this.faces = faces;
@@ -53,56 +65,61 @@ public class FluidCuboid {
 
   /**
    * Checks if the fluid has the given face
-   * @param face  Face to check
-   * @return  True if the face is present
+   *
+   * @param face Face to check
+   * @return True if the face is present
    */
   @Nullable
   public FluidFace getFace(Direction face) {
-    return faces.get(face);
+    return this.faces.get(face);
   }
 
   /**
    * Gets fluid from, scaled for renderer
+   *
    * @return Scaled from
    */
   public Vector3f getFromScaled() {
-    if (fromScaled == null) {
-      fromScaled = new Vector3f(from);
-      fromScaled.mul(1 / 16f);
+    if (this.fromScaled == null) {
+      this.fromScaled = new Vector3f(this.from);
+      this.fromScaled.mul(1 / 16f);
     }
-    return fromScaled;
+    return this.fromScaled;
   }
 
   /**
    * Gets fluid to, scaled for renderer
+   *
    * @return Scaled from
    */
   public Vector3f getToScaled() {
-    if (toScaled == null) {
-      toScaled = new Vector3f(to);
-      toScaled.mul(1 / 16f);
+    if (this.toScaled == null) {
+      this.toScaled = new Vector3f(this.to);
+      this.toScaled.mul(1 / 16f);
     }
-    return toScaled;
+    return this.toScaled;
   }
 
   /**
    * Creates a new fluid cuboid from JSON
-   * @param json  JSON object
-   * @return  Fluid cuboid
+   *
+   * @param json JSON object
+   * @return Fluid cuboid
    */
   public static FluidCuboid fromJson(JsonObject json) {
     Vector3f from = ModelHelper.arrayToVector(json, "from");
     Vector3f to = ModelHelper.arrayToVector(json, "to");
     // if faces is defined, fill with specified faces
-    Map<Direction,FluidFace> faces = getFaces(json);
+    Map<Direction, FluidFace> faces = getFaces(json);
     return new FluidCuboid(from, to, faces);
   }
 
   /**
    * Gets a list of fluid cuboids from the given parent
-   * @param parent  Parent JSON
-   * @param key     List key
-   * @return  List of cuboids
+   *
+   * @param parent Parent JSON
+   * @param key    List key
+   * @return List of cuboids
    */
   public static List<FluidCuboid> listFromJson(JsonObject parent, String key) {
     JsonElement json = parent.get(key);
@@ -122,8 +139,9 @@ public class FluidCuboid {
 
   /**
    * Gets a face set from the given json element
-   * @param json  JSON parent
-   * @return  Set of faces
+   *
+   * @param json JSON parent
+   * @return Set of faces
    */
   protected static Map<Direction, FluidFace> getFaces(JsonObject json) {
     if (!json.has("faces")) {
@@ -148,8 +166,11 @@ public class FluidCuboid {
     return faces;
   }
 
-  /** Represents a single fluid face in the model */
+  /**
+   * Represents a single fluid face in the model
+   */
   public record FluidFace(boolean isFlowing, int rotation) {
+
     public static final FluidFace NORMAL = new FluidFace(false, 0);
   }
 }

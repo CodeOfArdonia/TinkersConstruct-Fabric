@@ -22,8 +22,11 @@ import java.util.function.Supplier;
 
 import static slimeknights.mantle.registration.RegistrationHelper.castDelegate;
 
-/** Extension of the fence object with all other wood blocks */
+/**
+ * Extension of the fence object with all other wood blocks
+ */
 public class WoodBlockObject extends FenceBuildingBlockObject {
+
   @Getter
   private final WoodType woodType;
   // basic
@@ -92,76 +95,96 @@ public class WoodBlockObject extends FenceBuildingBlockObject {
     this.logItemTag = TagKey.create(Registries.ITEM, tagName);
   }
 
-  /** Gets the log for this wood type */
+  /**
+   * Gets the log for this wood type
+   */
   public Block getLog() {
-    return log.get();
+    return this.log.get();
   }
 
-  /** Gets the stripped log for this wood type */
+  /**
+   * Gets the stripped log for this wood type
+   */
   public Block getStrippedLog() {
-    return strippedLog.get();
+    return this.strippedLog.get();
   }
 
-  /** Gets the wood for this wood type */
+  /**
+   * Gets the wood for this wood type
+   */
   public Block getWood() {
-    return wood.get();
+    return this.wood.get();
   }
 
-  /** Gets the stripped wood for this wood type */
+  /**
+   * Gets the stripped wood for this wood type
+   */
   public Block getStrippedWood() {
-    return strippedWood.get();
+    return this.strippedWood.get();
   }
 
   /* Doors */
 
-  /** Gets the fence gate for this wood type */
+  /**
+   * Gets the fence gate for this wood type
+   */
   public FenceGateBlock getFenceGate() {
-    return fenceGate.get();
+    return this.fenceGate.get();
   }
 
-  /** Gets the door for this wood type */
+  /**
+   * Gets the door for this wood type
+   */
   public DoorBlock getDoor() {
-    return door.get();
+    return this.door.get();
   }
 
-  /** Gets the trapdoor for this wood type */
+  /**
+   * Gets the trapdoor for this wood type
+   */
   public TrapDoorBlock getTrapdoor() {
-    return trapdoor.get();
+    return this.trapdoor.get();
   }
 
   /* Redstone */
 
-  /** Gets the pressure plate for this wood type */
+  /**
+   * Gets the pressure plate for this wood type
+   */
   public PressurePlateBlock getPressurePlate() {
-    return pressurePlate.get();
+    return this.pressurePlate.get();
   }
 
-  /** Gets the button for this wood type */
+  /**
+   * Gets the button for this wood type
+   */
   public ButtonBlock getButton() {
-    return button.get();
+    return this.button.get();
   }
 
   /* Signs */
 
   /* Gets the sign for this wood type, can also be used to get the item */
   public StandingSignBlock getSign() {
-    return sign.get();
+    return this.sign.get();
   }
 
   /* Gets the wall sign for this wood type */
   public WallSignBlock getWallSign() {
-    return wallSign.get();
+    return this.wallSign.get();
   }
 
   @Override
   public List<Block> values() {
     return Arrays.asList(
-      get(), getSlab(), getStairs(), getFence(),
-      getLog(), getStrippedLog(), getWood(), getStrippedWood(),
-      getFenceGate(), getDoor(), getTrapdoor(),
-      getPressurePlate(), getButton(), getSign(), getWallSign());
+      this.get(), this.getSlab(), this.getStairs(), this.getFence(),
+      this.getLog(), this.getStrippedLog(), this.getWood(), this.getStrippedWood(),
+      this.getFenceGate(), this.getDoor(), this.getTrapdoor(),
+      this.getPressurePlate(), this.getButton(), this.getSign(), this.getWallSign());
   }
 
-  /** Variants of wood for the register function */
-	public enum WoodVariant { LOG, WOOD, PLANKS }
+  /**
+   * Variants of wood for the register function
+   */
+  public enum WoodVariant {LOG, WOOD, PLANKS}
 }

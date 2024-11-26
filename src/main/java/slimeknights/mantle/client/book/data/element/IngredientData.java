@@ -25,6 +25,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 public class IngredientData implements IDataElement {
+
   public SizedIngredient[] ingredients = new SizedIngredient[0];
   public String action;
 
@@ -59,24 +60,24 @@ public class IngredientData implements IDataElement {
     }
 
     ArrayList<ItemStack> stacks = new ArrayList<>();
-    for(SizedIngredient ingredient : ingredients) {
-      if(ingredient == null) {
+    for (SizedIngredient ingredient : this.ingredients) {
+      if (ingredient == null) {
         continue;
       }
 
       stacks.addAll(ingredient.getMatchingStacks());
     }
 
-    if(ingredients == null || stacks.isEmpty() || !StringUtil.isNullOrEmpty(error)) {
-      items = NonNullList.withSize(1, getMissingItem());
+    if (this.ingredients == null || stacks.isEmpty() || !StringUtil.isNullOrEmpty(this.error)) {
+      this.items = NonNullList.withSize(1, this.getMissingItem());
       return;
     }
 
-    items = NonNullList.of(getMissingItem(), stacks.toArray(new ItemStack[0]));
+    this.items = NonNullList.of(this.getMissingItem(), stacks.toArray(new ItemStack[0]));
   }
 
   private ItemStack getMissingItem() {
-    return getMissingItem(this.error);
+    return this.getMissingItem(this.error);
   }
 
   private ItemStack getMissingItem(String error) {
@@ -85,7 +86,7 @@ public class IngredientData implements IDataElement {
     CompoundTag display = missingItem.getOrCreateTagElement("display");
     display.putString("Name", "\u00A7rError Loading Item");
     ListTag lore = new ListTag();
-    if(!StringUtil.isNullOrEmpty(error)) {
+    if (!StringUtil.isNullOrEmpty(error)) {
       lore.add(StringTag.valueOf("\u00A7r\u00A7eError:"));
       lore.add(StringTag.valueOf("\u00A7r\u00A7e" + error));
     }
@@ -95,17 +96,18 @@ public class IngredientData implements IDataElement {
   }
 
   public static class Deserializer implements JsonDeserializer<IngredientData> {
+
     @Override
     public IngredientData deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
       IngredientData data = new IngredientData();
 
-      if(json.isJsonArray()) {
+      if (json.isJsonArray()) {
         JsonArray array = json.getAsJsonArray();
         data.ingredients = new SizedIngredient[array.size()];
 
-        for(int i = 0; i < array.size(); i++) {
+        for (int i = 0; i < array.size(); i++) {
           try {
-            data.ingredients[i] = readIngredient(array.get(i));
+            data.ingredients[i] = this.readIngredient(array.get(i));
           } catch (Exception e) {
             data.ingredients[i] = SizedIngredient.of(Ingredient.of(data.getMissingItem(e.getMessage())));
           }
@@ -115,13 +117,13 @@ public class IngredientData implements IDataElement {
       }
 
       try {
-        data.ingredients = new SizedIngredient[]{ readIngredient(json) };
+        data.ingredients = new SizedIngredient[]{this.readIngredient(json)};
       } catch (Exception e) {
         data.error = e.getMessage();
         return data;
       }
 
-      if(json.isJsonObject()) {
+      if (json.isJsonObject()) {
         JsonObject object = json.getAsJsonObject();
         if (object.has("action")) {
           JsonElement action = object.get("action");
@@ -138,16 +140,16 @@ public class IngredientData implements IDataElement {
     }
 
     private SizedIngredient readIngredient(JsonElement json) {
-      if(json.isJsonPrimitive()) {
+      if (json.isJsonPrimitive()) {
         JsonPrimitive primitive = json.getAsJsonPrimitive();
 
-        if(primitive.isString()) {
+        if (primitive.isString()) {
           Item item = BuiltInRegistries.ITEM.get(new ResourceLocation(primitive.getAsString()));
           return SizedIngredient.fromItems(item);
         }
       }
 
-      if(!json.isJsonObject()) {
+      if (!json.isJsonObject()) {
         throw new JsonParseException("Must be an array, string or JSON object");
       }
 

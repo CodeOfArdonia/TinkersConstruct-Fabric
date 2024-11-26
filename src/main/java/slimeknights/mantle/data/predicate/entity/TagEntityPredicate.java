@@ -13,13 +13,14 @@ import slimeknights.mantle.data.predicate.TagPredicateLoader;
  */
 @RequiredArgsConstructor
 public class TagEntityPredicate implements LivingEntityPredicate {
-  public static final TagPredicateLoader<EntityType<?>,TagEntityPredicate> LOADER = new TagPredicateLoader<>(Registries.ENTITY_TYPE, TagEntityPredicate::new, c -> c.tag);
+
+  public static final TagPredicateLoader<EntityType<?>, TagEntityPredicate> LOADER = new TagPredicateLoader<>(Registries.ENTITY_TYPE, TagEntityPredicate::new, c -> c.tag);
 
   private final TagKey<EntityType<?>> tag;
 
   @Override
   public boolean matches(LivingEntity entity) {
-    return entity.getType().is(tag);
+    return entity.getType().is(this.tag);
   }
 
   @Override

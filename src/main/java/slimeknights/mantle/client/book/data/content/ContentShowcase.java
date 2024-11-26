@@ -13,21 +13,30 @@ import slimeknights.mantle.client.screen.book.element.TextElement;
 
 import java.util.ArrayList;
 
-/** Page that showcases an item with text below */
+/**
+ * Page that showcases an item with text below
+ */
 public class ContentShowcase extends PageContent {
-  public static final transient ResourceLocation ID = Mantle.getResource("showcase");
 
-  /** Title of the page */
+  public static final ResourceLocation ID = Mantle.getResource("showcase");
+
+  /**
+   * Title of the page
+   */
   @Getter
   public String title = null;
-  /** Text to display below the item */
+  /**
+   * Text to display below the item
+   */
   public TextData[] text;
-  /** Item to display */
+  /**
+   * Item to display
+   */
   public IngredientData item;
 
   @Override
   public void build(BookData book, ArrayList<BookElement> list, boolean rightSide) {
-    int y = getTitleHeight();
+    int y = this.getTitleHeight();
 
     if (this.title == null || this.title.isEmpty()) {
       y = 0;

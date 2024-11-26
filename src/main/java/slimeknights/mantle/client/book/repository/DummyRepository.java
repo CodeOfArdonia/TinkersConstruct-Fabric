@@ -1,7 +1,7 @@
 package slimeknights.mantle.client.book.repository;
 
-import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
 import slimeknights.mantle.client.book.data.SectionData;
 
 import javax.annotation.Nullable;

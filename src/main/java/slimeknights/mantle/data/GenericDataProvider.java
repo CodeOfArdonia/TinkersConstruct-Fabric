@@ -29,6 +29,7 @@ import java.util.concurrent.CompletableFuture;
 @RequiredArgsConstructor
 @Log4j2
 public abstract class GenericDataProvider implements DataProvider {
+
   private static final Gson GSON = (new GsonBuilder())
     .registerTypeAdapter(ResourceLocation.class, new ResourceLocation.Serializer())
     .setPrettyPrinting()
@@ -55,8 +56,8 @@ public abstract class GenericDataProvider implements DataProvider {
   protected CompletableFuture<?> saveThing(CachedOutput cache, ResourceLocation location, Object materialJson) {
     return CompletableFuture.runAsync(() -> {
       try {
-        String json = gson.toJson(materialJson);
-        Path path = this.generator.getOutputFolder().resolve(Paths.get(type.getDirectory(), location.getNamespace(), folder, location.getPath() + ".json"));
+        String json = this.gson.toJson(materialJson);
+        Path path = this.generator.getOutputFolder().resolve(Paths.get(this.type.getDirectory(), location.getNamespace(), this.folder, location.getPath() + ".json"));
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         HashingOutputStream hashingOutputStream = new HashingOutputStream(Hashing.sha1(), byteArrayOutputStream);
         Writer writer = new OutputStreamWriter(hashingOutputStream, StandardCharsets.UTF_8);

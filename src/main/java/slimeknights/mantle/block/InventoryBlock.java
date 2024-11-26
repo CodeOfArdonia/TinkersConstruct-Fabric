@@ -37,6 +37,7 @@ public abstract class InventoryBlock extends Block implements EntityBlock {
 
   /**
    * Called when the block is activated to open the UI. Override to return false for blocks with no inventory
+   *
    * @param player Player instance
    * @param world  World instance
    * @param pos    Block position
@@ -104,7 +105,7 @@ public abstract class InventoryBlock extends Block implements EntityBlock {
     if (state.getBlock() != newState.getBlock()) {
       Storage<ItemVariant> inventory = ItemStorage.SIDED.find(worldIn, pos, null);
       if (inventory != null)
-        dropInventoryItems(state, worldIn, pos, inventory);
+        this.dropInventoryItems(state, worldIn, pos, inventory);
       if (worldIn.getBlockEntity(pos) != null)
         worldIn.updateNeighbourForOutputSignal(pos, this);
     }
@@ -114,10 +115,11 @@ public abstract class InventoryBlock extends Block implements EntityBlock {
 
   /**
    * Called when the block is replaced to drop contained items.
-   * @param state       Block state
-   * @param worldIn     Tile world
-   * @param pos         Tile position
-   * @param inventory   Item handler
+   *
+   * @param state     Block state
+   * @param worldIn   Tile world
+   * @param pos       Tile position
+   * @param inventory Item handler
    */
   protected void dropInventoryItems(BlockState state, Level worldIn, BlockPos pos, Storage<ItemVariant> inventory) {
     dropInventoryItems(worldIn, pos, inventory);
@@ -125,15 +127,16 @@ public abstract class InventoryBlock extends Block implements EntityBlock {
 
   /**
    * Drops all items from the given inventory in world
-   * @param world      World instance
-   * @param pos        Position to drop
-   * @param inventory  Inventory instance
+   *
+   * @param world     World instance
+   * @param pos       Position to drop
+   * @param inventory Inventory instance
    */
   public static void dropInventoryItems(Level world, BlockPos pos, Storage<ItemVariant> inventory) {
     double x = pos.getX();
     double y = pos.getY();
     double z = pos.getZ();
-    for(StorageView<ItemVariant> view : inventory) {
+    for (StorageView<ItemVariant> view : inventory) {
       Containers.dropItemStack(world, x, y, z, view.getResource().toStack((int) Math.max(view.getResource().getItem().getMaxStackSize(), view.getAmount())));
     }
   }

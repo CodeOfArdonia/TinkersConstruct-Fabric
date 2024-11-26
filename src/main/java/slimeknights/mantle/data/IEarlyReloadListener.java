@@ -16,6 +16,7 @@ import java.util.concurrent.Executor;
  * TODO 1.19: is there any reason to keep this alongside {@link IEarlySafeManagerReloadListener}?
  */
 public interface IEarlyReloadListener extends PreparableReloadListener {
+
   @Override
   default CompletableFuture<Void> reload(PreparationBarrier stage, ResourceManager resourceManager, ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler, Executor backgroundExecutor, Executor gameExecutor) {
     return CompletableFuture.runAsync(() -> {
@@ -23,6 +24,8 @@ public interface IEarlyReloadListener extends PreparableReloadListener {
     }, backgroundExecutor).thenCompose(stage::wait);
   }
 
-  /** @param resourceManager the resource manager being reloaded */
+  /**
+   * @param resourceManager the resource manager being reloaded
+   */
   void onResourceManagerReload(ResourceManager resourceManager);
 }

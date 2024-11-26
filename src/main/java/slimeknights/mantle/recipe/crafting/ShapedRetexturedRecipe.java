@@ -3,16 +3,16 @@ package slimeknights.mantle.recipe.crafting;
 import com.google.gson.JsonObject;
 import lombok.Getter;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import slimeknights.mantle.item.RetexturedBlockItem;
 import slimeknights.mantle.recipe.MantleRecipeSerializers;
 import slimeknights.mantle.util.JsonHelper;
@@ -21,16 +21,20 @@ import javax.annotation.Nullable;
 
 @SuppressWarnings("WeakerAccess")
 public class ShapedRetexturedRecipe extends ShapedRecipe {
-  /** Ingredient used to determine the texture on the output */
+
+  /**
+   * Ingredient used to determine the texture on the output
+   */
   @Getter
   private final Ingredient texture;
   private final boolean matchAll;
 
   /**
    * Creates a new recipe using an existing shaped recipe
-   * @param orig       Shaped recipe to copy
-   * @param texture    Ingredient to use for the texture
-   * @param matchAll   If true, all inputs must match for the recipe to match
+   *
+   * @param orig     Shaped recipe to copy
+   * @param texture  Ingredient to use for the texture
+   * @param matchAll If true, all inputs must match for the recipe to match
    */
   protected ShapedRetexturedRecipe(ShapedRecipe orig, Ingredient texture, boolean matchAll) {
     super(orig.getId(), orig.getGroup(), orig.category(), orig.getWidth(), orig.getHeight(), orig.getIngredients(), orig.getResultItem(RegistryAccess.EMPTY));
@@ -40,11 +44,12 @@ public class ShapedRetexturedRecipe extends ShapedRecipe {
 
   /**
    * Gets the output using the given texture
-   * @param texture  Texture to use
-   * @return  Output with texture. Will be blank if the input is not a block
+   *
+   * @param texture Texture to use
+   * @return Output with texture. Will be blank if the input is not a block
    */
   public ItemStack getRecipeOutput(Item texture) {
-    return RetexturedBlockItem.setTexture(getResultItem(RegistryAccess.EMPTY).copy(), Block.byItem(texture));
+    return RetexturedBlockItem.setTexture(this.getResultItem(RegistryAccess.EMPTY).copy(), Block.byItem(texture));
   }
 
   @Override
@@ -53,7 +58,7 @@ public class ShapedRetexturedRecipe extends ShapedRecipe {
     Block currentTexture = null;
     for (int i = 0; i < craftMatrix.getContainerSize(); i++) {
       ItemStack stack = craftMatrix.getItem(i);
-      if (!stack.isEmpty() && texture.test(stack)) {
+      if (!stack.isEmpty() && this.texture.test(stack)) {
         // if the item is the same as the result, copy the texture over
         Block block;
         if (stack.getItem() == result.getItem()) {
@@ -70,7 +75,7 @@ public class ShapedRetexturedRecipe extends ShapedRecipe {
         if (currentTexture == null) {
           currentTexture = block;
           // match all means we must check the rest. If not match all, we can be done
-          if (!matchAll) {
+          if (!this.matchAll) {
             break;
           }
 
@@ -95,6 +100,7 @@ public class ShapedRetexturedRecipe extends ShapedRecipe {
   }
 
   public static class Serializer implements RecipeSerializer<ShapedRetexturedRecipe> {
+
     @Override
     public ShapedRetexturedRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
       ShapedRecipe recipe = SHAPED_RECIPE.fromJson(recipeId, json);

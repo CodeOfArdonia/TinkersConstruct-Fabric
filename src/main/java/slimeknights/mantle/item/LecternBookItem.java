@@ -12,14 +12,15 @@ import net.minecraft.world.level.block.LecternBlock;
 import net.minecraft.world.level.block.entity.LecternBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-
 import slimeknights.mantle.util.BlockEntityHelper;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Book item that can be placed on lecterns
  */
 public abstract class LecternBookItem extends TooltipItem implements ILecternBookItem {
+
   public LecternBookItem(Properties properties) {
     super(properties);
   }
@@ -51,13 +52,13 @@ public abstract class LecternBookItem extends TooltipItem implements ILecternBoo
     BlockState state = world.getBlockState(pos);
     if (state.is(Blocks.LECTERN)) {
       BlockEntityHelper.get(LecternBlockEntity.class, world, pos)
-											 .ifPresent(te -> {
-                        ItemStack book = te.getBook();
-                        if (!book.isEmpty() && book.getItem() instanceof ILecternBookItem
-                            && ((ILecternBookItem) book.getItem()).openLecternScreen(world, pos, player, book)) {
-                          isCancelled.set(true);
-                        }
-                      });
+        .ifPresent(te -> {
+          ItemStack book = te.getBook();
+          if (!book.isEmpty() && book.getItem() instanceof ILecternBookItem
+            && ((ILecternBookItem) book.getItem()).openLecternScreen(world, pos, player, book)) {
+            isCancelled.set(true);
+          }
+        });
     }
     return isCancelled.get() ? InteractionResult.FAIL : InteractionResult.PASS;
   }

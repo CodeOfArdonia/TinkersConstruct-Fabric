@@ -11,11 +11,12 @@ import slimeknights.mantle.data.predicate.entity.LivingEntityPredicate;
  * Predicate that checks for properties of the attacker in a damage source
  */
 public record SourceAttackerPredicate(IJsonPredicate<LivingEntity> attacker) implements DamageSourcePredicate {
+
   public static final IGenericLoader<SourceAttackerPredicate> LOADER = new NestedLoader<>("entity_type", LivingEntityPredicate.LOADER, SourceAttackerPredicate::new, SourceAttackerPredicate::attacker);
 
   @Override
   public boolean matches(DamageSource source) {
-    return source.getEntity() instanceof LivingEntity living && attacker.matches(living);
+    return source.getEntity() instanceof LivingEntity living && this.attacker.matches(living);
   }
 
   @Override

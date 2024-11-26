@@ -18,8 +18,8 @@ public class SelectionElement extends SizedBookElement {
   public static final int WIDTH = 42;
   public static final int HEIGHT = 42;
 
-  private SectionData section;
-  private ImageElement iconRenderer;
+  private final SectionData section;
+  private final ImageElement iconRenderer;
 
   private final int iconX;
   private final int iconY;

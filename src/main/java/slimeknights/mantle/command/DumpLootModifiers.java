@@ -25,11 +25,18 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Command to dump global loot modifiers */
+/**
+ * Command to dump global loot modifiers
+ */
 public class DumpLootModifiers {
-  /** Resource location of the global loot manager "tag" */
+
+  /**
+   * Resource location of the global loot manager "tag"
+   */
   protected static final ResourceLocation GLOBAL_LOOT_MODIFIERS = new ResourceLocation("mantle", "loot_modifiers/global_loot_modifiers.json");
-  /** Path for saving the loot modifiers */
+  /**
+   * Path for saving the loot modifiers
+   */
   private static final String LOOT_MODIFIER_PATH = GLOBAL_LOOT_MODIFIERS.getNamespace() + "/" + GLOBAL_LOOT_MODIFIERS.getPath();
 
   // loot modifiers
@@ -38,16 +45,19 @@ public class DumpLootModifiers {
 
   /**
    * Registers this sub command with the root command
-   * @param subCommand  Command builder
+   *
+   * @param subCommand Command builder
    */
   public static void register(LiteralArgumentBuilder<CommandSourceStack> subCommand) {
     subCommand.requires(sender -> sender.hasPermission(MantleCommand.PERMISSION_EDIT_SPAWN))
-              .then(Commands.literal("save").executes(source -> run(source, true)))
-              .then(Commands.literal("log").executes(source -> run(source, false)));
+      .then(Commands.literal("save").executes(source -> run(source, true)))
+      .then(Commands.literal("log").executes(source -> run(source, false)));
   }
 
 
-  /** Runs the command, dumping the tag */
+  /**
+   * Runs the command, dumping the tag
+   */
   private static int run(CommandContext<CommandSourceStack> context, boolean saveFile) throws CommandSyntaxException {
     List<ResourceLocation> finalLocations = new ArrayList<>();
     ResourceManager manager = context.getSource().getServer().getResourceManager();
@@ -72,11 +82,8 @@ public class DumpLootModifiers {
             }
           }
         }
-      }
-      catch (RuntimeException | IOException ex) {
+      } catch (RuntimeException | IOException ex) {
         Mantle.logger.error("Couldn't read global loot modifier list {} in data pack {}", GLOBAL_LOOT_MODIFIERS, resource.sourcePackId(), ex);
-      } finally {
-//          IOUtils.closeQuietly(resource);
       }
     }
 

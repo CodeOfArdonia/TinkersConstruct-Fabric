@@ -9,6 +9,7 @@ import net.minecraft.world.entity.player.Player;
 
 @Environment(EnvType.CLIENT)
 public interface ClientRightClickAir {
+
   Event<ClientRightClickAir> EVENT = EventFactory.createArrayBacked(ClientRightClickAir.class, clientRightClickAirs -> (player, hand) -> {
     for (ClientRightClickAir event : clientRightClickAirs)
       event.click(player, hand);

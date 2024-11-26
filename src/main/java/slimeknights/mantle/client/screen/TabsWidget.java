@@ -152,7 +152,9 @@ public class TabsWidget extends Widget {
     }
   }
 
-  /** Based on {@link net.minecraft.client.gui.screens.inventory.AbstractContainerScreen#renderFloatingItem(GuiGraphics, ItemStack, int, int, String)} */
+  /**
+   * Based on {@link net.minecraft.client.gui.screens.inventory.AbstractContainerScreen#renderFloatingItem(GuiGraphics, ItemStack, int, int, String)}
+   */
   private void drawItemStack(GuiGraphics guiGraphics, ItemStack stack, int x, int y) {
     guiGraphics.pose().pushPose();
     guiGraphics.pose().translate(0, 0, 232f);

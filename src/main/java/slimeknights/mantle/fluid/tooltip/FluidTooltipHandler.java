@@ -40,15 +40,24 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 
-/** Handles fluid units displaying in tooltips */
+/**
+ * Handles fluid units displaying in tooltips
+ */
 @SuppressWarnings("unused")
 @Log4j2
 public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implements IdentifiableResourceReloadListener {
-  /** Tooltip when not holding shift mentioning that is possible */
+
+  /**
+   * Tooltip when not holding shift mentioning that is possible
+   */
   public static final Component HOLD_SHIFT = Mantle.makeComponent("gui", "fluid.hold_shift").withStyle(ChatFormatting.GRAY);
-  /** Folder for saving the logic */
+  /**
+   * Folder for saving the logic
+   */
   public static final String FOLDER = "mantle/fluid_tooltips";
-  /** GSON instance */
+  /**
+   * GSON instance
+   */
   public static final Gson GSON = (new GsonBuilder())
     .registerTypeAdapter(ResourceLocation.class, new ResourceLocation.Serializer())
     .registerTypeAdapter(FluidIngredient.class, FluidIngredient.SERIALIZER)
@@ -57,28 +66,40 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
     .disableHtmlEscaping()
     .create();
 
-  /** ID of the default fallback */
+  /**
+   * ID of the default fallback
+   */
   public static final ResourceLocation DEFAULT_ID = Mantle.getResource("fallback");
 
   /* Base units */
   private static final FluidUnit BUCKET = new FluidUnit(Mantle.makeDescriptionId("gui", "fluid.bucket"), 10000);
   private static final FluidUnit MILLIBUCKET = new FluidUnit(Mantle.makeDescriptionId("gui", "fluid.millibucket"), 81);
   private static final FluidUnit DROPLET = new FluidUnit(Mantle.makeDescriptionId("gui", "fluid.droplet"), 1);
-  /** Default fallback in case resource pack has none */
+  /**
+   * Default fallback in case resource pack has none
+   */
   private static final FluidUnitList DEFAULT_LIST = new FluidUnitList(null, List.of(BUCKET, DROPLET));
 
-  /** Formatter as a biconsumer, shows up in a few places */
-  public static final BiConsumer<Long,List<Component>> BUCKET_FORMATTER = FluidTooltipHandler::appendBuckets;
+  /**
+   * Formatter as a biconsumer, shows up in a few places
+   */
+  public static final BiConsumer<Long, List<Component>> BUCKET_FORMATTER = FluidTooltipHandler::appendBuckets;
 
   /* Instance data */
   public static final FluidTooltipHandler INSTANCE = new FluidTooltipHandler();
 
-  /** Fallback to use when no list matches */
+  /**
+   * Fallback to use when no list matches
+   */
   private FluidUnitList fallback = DEFAULT_LIST;
-  /** List of tooltip options */
-  private Map<ResourceLocation,FluidUnitList> unitLists = Collections.emptyMap();
-  /** Cache of fluid to entry */
-  private final Map<Fluid,FluidUnitList> listCache = new HashMap<>();
+  /**
+   * List of tooltip options
+   */
+  private Map<ResourceLocation, FluidUnitList> unitLists = Collections.emptyMap();
+  /**
+   * Cache of fluid to entry
+   */
+  private final Map<Fluid, FluidUnitList> listCache = new HashMap<>();
 
   /**
    * Initializes this manager, registering it with the resource manager
@@ -93,7 +114,9 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
     super(GSON, FOLDER);
   }
 
-  /** Loads from JSON */
+  /**
+   * Loads from JSON
+   */
   @Nullable
   private static FluidUnitList loadList(ResourceLocation key, JsonElement json) {
     try {
@@ -105,11 +128,11 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
   }
 
   @Override
-  protected void apply(Map<ResourceLocation,JsonElement> splashList, ResourceManager manager, ProfilerFiller profiler) {
+  protected void apply(Map<ResourceLocation, JsonElement> splashList, ResourceManager manager, ProfilerFiller profiler) {
     long time = System.nanoTime();
-    ImmutableMap.Builder<ResourceLocation,FluidUnitList> builder = ImmutableMap.builder();
-    Map<ResourceLocation,ResourceLocation> redirects = new HashMap<>();
-    for (Entry<ResourceLocation,JsonElement> entry : splashList.entrySet()) {
+    ImmutableMap.Builder<ResourceLocation, FluidUnitList> builder = ImmutableMap.builder();
+    Map<ResourceLocation, ResourceLocation> redirects = new HashMap<>();
+    for (Entry<ResourceLocation, JsonElement> entry : splashList.entrySet()) {
       ResourceLocation key = entry.getKey();
       JsonElement element = entry.getValue();
 
@@ -129,10 +152,10 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
       }
     }
     // process redirects
-    Map<ResourceLocation,FluidUnitList> mapBeforeRedirects = builder.build();
+    Map<ResourceLocation, FluidUnitList> mapBeforeRedirects = builder.build();
     builder = ImmutableMap.builder();
     builder.putAll(mapBeforeRedirects);
-    for (Entry<ResourceLocation,ResourceLocation> entry : redirects.entrySet()) {
+    for (Entry<ResourceLocation, ResourceLocation> entry : redirects.entrySet()) {
       ResourceLocation from = entry.getKey();
       ResourceLocation to = entry.getValue();
       FluidUnitList list = mapBeforeRedirects.get(to);
@@ -143,31 +166,35 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
       }
     }
     // find the fallback
-    unitLists = builder.build();
-    fallback = this.unitLists.getOrDefault(DEFAULT_ID, DEFAULT_LIST);
-    listCache.clear();
-    log.info("Loaded {} fluid unit lists in {} ms", listCache.size(), (System.nanoTime() - time) / 1000000f);
+    this.unitLists = builder.build();
+    this.fallback = this.unitLists.getOrDefault(DEFAULT_ID, DEFAULT_LIST);
+    this.listCache.clear();
+    log.info("Loaded {} fluid unit lists in {} ms", this.listCache.size(), (System.nanoTime() - time) / 1000000f);
   }
 
-  /** Gets the unit list for the given fluid */
+  /**
+   * Gets the unit list for the given fluid
+   */
   private FluidUnitList getUnitList(Fluid fluid) {
-    FluidUnitList cached = listCache.get(fluid);
+    FluidUnitList cached = this.listCache.get(fluid);
     if (cached != null) {
       return cached;
     }
-    for (FluidUnitList list : unitLists.values()) {
+    for (FluidUnitList list : this.unitLists.values()) {
       if (list.matches(fluid)) {
-        listCache.put(fluid, list);
+        this.listCache.put(fluid, list);
         return list;
       }
     }
-    listCache.put(fluid, fallback);
-    return fallback;
+    this.listCache.put(fluid, this.fallback);
+    return this.fallback;
   }
 
-  /** Gets the unit list for the given ID */
+  /**
+   * Gets the unit list for the given ID
+   */
   private FluidUnitList getUnitList(ResourceLocation id) {
-    return unitLists.getOrDefault(id, fallback);
+    return this.unitLists.getOrDefault(id, this.fallback);
   }
 
 
@@ -175,8 +202,9 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
 
   /**
    * Gets the tooltip for a fluid stack
-   * @param fluid  Fluid stack instance
-   * @return  Fluid tooltip
+   *
+   * @param fluid Fluid stack instance
+   * @return Fluid tooltip
    */
   public static List<Component> getFluidTooltip(FluidStack fluid) {
     return getFluidTooltip(fluid, fluid.getAmount());
@@ -184,9 +212,10 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
 
   /**
    * Gets the tooltip for a fluid stack
+   *
    * @param fluid  Fluid stack instance
    * @param amount Amount override
-   * @return  Fluid tooltip
+   * @return Fluid tooltip
    */
   public static List<Component> getFluidTooltip(FluidStack fluid, long amount) {
     List<Component> tooltip = new ArrayList<>();
@@ -196,15 +225,16 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
     appendMaterial(fluid.getFluid(), amount, tooltip);
     // add mod display name
     FabricLoader.getInstance().getModContainer(Objects.requireNonNull(BuiltInRegistries.FLUID.getKey(fluid.getFluid())).getNamespace())
-           .map(container -> container.getMetadata().getName())
-           .ifPresent(name -> tooltip.add(Component.literal(name).withStyle(ChatFormatting.BLUE, ChatFormatting.ITALIC)));
+      .map(container -> container.getMetadata().getName())
+      .ifPresent(name -> tooltip.add(Component.literal(name).withStyle(ChatFormatting.BLUE, ChatFormatting.ITALIC)));
     return tooltip;
   }
 
   /**
    * Adds information for the tooltip based on material units
-   * @param fluid    Input fluid stack
-   * @param tooltip  Tooltip to append information
+   *
+   * @param fluid   Input fluid stack
+   * @param tooltip Tooltip to append information
    */
   public static void appendMaterial(FluidStack fluid, List<Component> tooltip) {
     appendMaterial(fluid.getFluid(), fluid.getAmount(), tooltip);
@@ -212,9 +242,10 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
 
   /**
    * Adds information for the tooltip based on material units
-   * @param fluid      Input fluid
-   * @param amount     Input amount
-   * @param tooltip    Tooltip to append information
+   *
+   * @param fluid   Input fluid
+   * @param amount  Input amount
+   * @param tooltip Tooltip to append information
    */
   public static void appendMaterial(Fluid fluid, long amount, List<Component> tooltip) {
     if (appendMaterialNoShift(fluid, amount, tooltip)) {
@@ -224,10 +255,11 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
 
   /**
    * Adds information for the tooltip based on material units, does not show "hold shift for buckets"
-   * @param fluid      Input fluid
-   * @param original   Input amount
-   * @param tooltip    Tooltip to append information
-   * @return  True if the amount is not in buckets
+   *
+   * @param fluid    Input fluid
+   * @param original Input amount
+   * @param tooltip  Tooltip to append information
+   * @return True if the amount is not in buckets
    */
   public static boolean appendMaterialNoShift(Fluid fluid, long original, List<Component> tooltip) {
     // if holding shift, skip specific units
@@ -245,10 +277,11 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
 
   /**
    * Appends the hold shift message to the tooltip
-   * @param tooltip  Tooltip to append information
+   *
+   * @param tooltip Tooltip to append information
    */
   public static void appendShift(List<Component> tooltip) {
-    if(!SafeClientAccess.getTooltipKey().isShiftOrUnknown()) {
+    if (!SafeClientAccess.getTooltipKey().isShiftOrUnknown()) {
       tooltip.add(Component.empty());
       tooltip.add(HOLD_SHIFT);
     }
@@ -256,9 +289,10 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
 
   /**
    * Adds information to the tooltip based on a named list, allows customizing display for a specific location
-   * @param id       ID of the list to append
-   * @param amount   Fluid amount
-   * @param tooltip  Tooltip to append information
+   *
+   * @param id      ID of the list to append
+   * @param amount  Fluid amount
+   * @param tooltip Tooltip to append information
    */
   public static void appendNamedList(ResourceLocation id, long amount, List<Component> tooltip) {
     amount = INSTANCE.getUnitList(id).getText(tooltip, amount);
@@ -267,8 +301,9 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
 
   /**
    * Adds information to the tooltip based on the fluid using bucket units
-   * @param amount     Fluid amount
-   * @param tooltip  Tooltip to append information
+   *
+   * @param amount  Fluid amount
+   * @param tooltip Tooltip to append information
    */
   public static void appendBuckets(long amount, List<Component> tooltip) {
     amount = INSTANCE.fallback.getText(tooltip, amount);

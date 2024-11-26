@@ -10,9 +10,12 @@ import slimeknights.mantle.recipe.ingredient.FluidIngredient;
 
 import java.util.List;
 
-/** Datagen fluid ingredient to create an ingredient matching a fluid from another mod, should not be used outside datagen */
+/**
+ * Datagen fluid ingredient to create an ingredient matching a fluid from another mod, should not be used outside datagen
+ */
 @RequiredArgsConstructor(staticName = "of")
 public class FluidNameIngredient extends FluidIngredient {
+
   private final ResourceLocation fluidName;
   private final long amount;
 
@@ -23,7 +26,7 @@ public class FluidNameIngredient extends FluidIngredient {
 
   @Override
   public long getAmount(Fluid fluid) {
-    return amount;
+    return this.amount;
   }
 
   @Override

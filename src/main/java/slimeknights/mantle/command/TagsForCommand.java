@@ -54,7 +54,10 @@ import java.util.Objects;
  * Command to list all tags for an entry
  */
 public class TagsForCommand {
-  /** Tag type cannot be found */
+
+  /**
+   * Tag type cannot be found
+   */
   protected static final Dynamic2CommandExceptionType VALUE_NOT_FOUND = new Dynamic2CommandExceptionType((type, name) -> Component.translatable("command.mantle.tags_for.not_found", type, name));
 
   /* Missing target errors */
@@ -65,41 +68,45 @@ public class TagsForCommand {
   private static final Component NO_HELD_ENCHANTMENT = Component.translatable("command.mantle.tags_for.no_held_enchantment");
   private static final Component NO_TARGETED_ENTITY = Component.translatable("command.mantle.tags_for.no_targeted_entity");
   private static final Component NO_TARGETED_BLOCK_ENTITY = Component.translatable("command.mantle.tags_for.no_targeted_block_entity");
-  /** Value has no tags */
+  /**
+   * Value has no tags
+   */
   private static final Component NO_TAGS = Component.translatable("command.mantle.tags_for.no_tags");
 
   /**
    * Registers this sub command with the root command
-   * @param subCommand  Command builder
+   *
+   * @param subCommand Command builder
    */
   public static void register(LiteralArgumentBuilder<CommandSourceStack> subCommand) {
     subCommand.requires(source -> MantleCommand.requiresDebugInfoOrOp(source, MantleCommand.PERMISSION_GAME_COMMANDS))
-              // by registry ID
-              .then(Commands.literal("id")
-                            .then(Commands.argument("type", RegistryArgument.registry()).suggests(MantleCommand.REGISTRY)
-                                          .then(Commands.argument("name", ResourceLocationArgument.id()).suggests(MantleCommand.REGISTRY_VALUES)
-                                                        .executes(TagsForCommand::runForId))))
-              // held item
-              .then(Commands.literal("held")
-                            .then(Commands.literal("item").executes(TagsForCommand::heldItem))
-                            .then(Commands.literal("block").executes(TagsForCommand::heldBlock))
-                            .then(Commands.literal("enchantment").executes(TagsForCommand::heldEnchantments))
-                            .then(Commands.literal("fluid").executes(TagsForCommand::heldFluid))
-                            .then(Commands.literal("entity").executes(TagsForCommand::heldEntity))
-                            .then(Commands.literal("potion").executes(TagsForCommand::heldPotion)))
-              // targeted
-              .then(Commands.literal("targeted")
-                            .then(Commands.literal("block_entity").executes(TagsForCommand::targetedTileEntity))
-                            .then(Commands.literal("entity").executes(TagsForCommand::targetedEntity)));
+      // by registry ID
+      .then(Commands.literal("id")
+        .then(Commands.argument("type", RegistryArgument.registry()).suggests(MantleCommand.REGISTRY)
+          .then(Commands.argument("name", ResourceLocationArgument.id()).suggests(MantleCommand.REGISTRY_VALUES)
+            .executes(TagsForCommand::runForId))))
+      // held item
+      .then(Commands.literal("held")
+        .then(Commands.literal("item").executes(TagsForCommand::heldItem))
+        .then(Commands.literal("block").executes(TagsForCommand::heldBlock))
+        .then(Commands.literal("enchantment").executes(TagsForCommand::heldEnchantments))
+        .then(Commands.literal("fluid").executes(TagsForCommand::heldFluid))
+        .then(Commands.literal("entity").executes(TagsForCommand::heldEntity))
+        .then(Commands.literal("potion").executes(TagsForCommand::heldPotion)))
+      // targeted
+      .then(Commands.literal("targeted")
+        .then(Commands.literal("block_entity").executes(TagsForCommand::targetedTileEntity))
+        .then(Commands.literal("entity").executes(TagsForCommand::targetedEntity)));
   }
 
   /**
    * Prints the final list of owning tags
-   * @param context     Command context
-   * @param registry    Registry to output
-   * @param value       Value to print
-   * @param <T>         Collection type
-   * @return  Number of tags printed
+   *
+   * @param context  Command context
+   * @param registry Registry to output
+   * @param value    Value to print
+   * @param <T>      Collection type
+   * @return Number of tags printed
    */
   private static <T> int printOwningTags(CommandContext<CommandSourceStack> context, Registry<T> registry, T value) {
     MutableComponent output = Component.translatable("command.mantle.tags_for.success", registry.key().location(), registry.getKey(value));
@@ -108,8 +115,8 @@ public class TagsForCommand {
       output.append("\n* ").append(NO_TAGS);
     } else {
       tags.stream()
-          .sorted(ResourceLocation::compareNamespaced)
-          .forEach(tag -> output.append("\n* " + tag));
+        .sorted(ResourceLocation::compareNamespaced)
+        .forEach(tag -> output.append("\n* " + tag));
     }
     context.getSource().sendSuccess(() -> output, true);
     return tags.size();
@@ -118,7 +125,9 @@ public class TagsForCommand {
 
   /* Standard way: by ID */
 
-  /** Runs the registry ID subcommand making generics happy */
+  /**
+   * Runs the registry ID subcommand making generics happy
+   */
   private static <T> int runForResult(CommandContext<CommandSourceStack> context, Registry<T> registry) throws CommandSyntaxException {
     ResourceLocation name = context.getArgument("name", ResourceLocation.class);
     // first, fetch value
@@ -129,7 +138,9 @@ public class TagsForCommand {
     return printOwningTags(context, registry, value);
   }
 
-  /** Run the registry ID subcommand */
+  /**
+   * Run the registry ID subcommand
+   */
   private static int runForId(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
     Registry<?> result = RegistryArgument.getResult(context, "type");
     return runForResult(context, result);
@@ -138,13 +149,17 @@ public class TagsForCommand {
 
   /* Held item, can extract some data from the stack */
 
-  /** Item tags for held item */
+  /**
+   * Item tags for held item
+   */
   private static int heldItem(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
     Item item = context.getSource().getPlayerOrException().getMainHandItem().getItem();
     return printOwningTags(context, BuiltInRegistries.ITEM, item);
   }
 
-  /** Block tags for held item */
+  /**
+   * Block tags for held item
+   */
   private static int heldBlock(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
     CommandSourceStack source = context.getSource();
     Item item = source.getPlayerOrException().getMainHandItem().getItem();
@@ -156,7 +171,9 @@ public class TagsForCommand {
     return 0;
   }
 
-  /** Fluid tags for held item */
+  /**
+   * Fluid tags for held item
+   */
   private static int heldFluid(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
     CommandSourceStack source = context.getSource();
     Player player = source.getPlayerOrException();
@@ -173,7 +190,9 @@ public class TagsForCommand {
     return 0;
   }
 
-  /** Potion tags for held item */
+  /**
+   * Potion tags for held item
+   */
   private static int heldPotion(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
     CommandSourceStack source = context.getSource();
     ItemStack stack = source.getPlayerOrException().getMainHandItem();
@@ -185,7 +204,9 @@ public class TagsForCommand {
     return 0;
   }
 
-  /** Block tags for held item */
+  /**
+   * Block tags for held item
+   */
   private static int heldEnchantments(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
     CommandSourceStack source = context.getSource();
     ItemStack stack = source.getPlayerOrException().getMainHandItem();
@@ -202,7 +223,9 @@ public class TagsForCommand {
     return 0;
   }
 
-  /** Entity tags for held item */
+  /**
+   * Entity tags for held item
+   */
   private static int heldEntity(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
     CommandSourceStack source = context.getSource();
     ItemStack stack = source.getPlayerOrException().getMainHandItem();
@@ -219,9 +242,10 @@ public class TagsForCommand {
 
   /**
    * Gets the tags for the fluid being looked at
-   * @param context  Context
-   * @return  Tags for the looked at block or entity
-   * @throws CommandSyntaxException  For command errors
+   *
+   * @param context Context
+   * @return Tags for the looked at block or entity
+   * @throws CommandSyntaxException For command errors
    */
   private static int targetedTileEntity(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
     CommandSourceStack source = context.getSource();
@@ -242,9 +266,10 @@ public class TagsForCommand {
 
   /**
    * Gets the tags for the entity being looked at
-   * @param context  Context
-   * @return  Tags for the looked at block or entity
-   * @throws CommandSyntaxException  For command errors
+   *
+   * @param context Context
+   * @return Tags for the looked at block or entity
+   * @throws CommandSyntaxException For command errors
    */
   private static int targetedEntity(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
     CommandSourceStack source = context.getSource();
