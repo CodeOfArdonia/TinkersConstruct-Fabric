@@ -84,7 +84,7 @@ public enum SlimeType implements StringRepresentable {
     String name = this.getSerializedName();
     this.grassBlockTag = TinkerTags.Blocks.tag((nether ? "slimy_nylium/" : "slimy_grass/") + name);
     this.dirtBlockTag = TinkerTags.Blocks.tag("slimy_soil/" + ("blood".equals(name) ? "vanilla" : name));
-    this.slimeballTag = TinkerTags.Items.forgeTag("slimeball/" + name);
+    this.slimeballTag = TinkerTags.Items.commonTag("slimeball/" + name);
   }
 
   SlimeType(int color, int defaultFoliageColor, Tiers harvestTier, MapColor mapColor, boolean nether) {

@@ -267,40 +267,40 @@ public class TinkerTags {
 
     private static void init() {}
 
-    public static final TagKey<Item> WORKBENCHES = forgeTag("workbenches");
+    public static final TagKey<Item> WORKBENCHES = commonTag("workbenches");
     public static final TagKey<Item> TABLES = tag("tables");
-    public static final TagKey<Item> GLASS_PANES_SILICA = forgeTag("silica_glass_panes");
+    public static final TagKey<Item> GLASS_PANES_SILICA = commonTag("silica_glass_panes");
 
     /**
      * Compat: allows other mods to add normal stone variants which can be used to create stone tools.
      * Note this tag includes both stone and cobblestone, unlike the default forge/vanilla tags that include one or the other
      * Also does not include other items that can be used as stone in crafting
      */
-    public static final TagKey<Item> STONE = forgeTag("normal_stone");
+    public static final TagKey<Item> STONE = commonTag("normal_stone");
     /**
      * Compat: allows other mods to add granite variants which can be used to create granite tools
      */
-    public static final TagKey<Item> GRANITE = forgeTag("granite");
+    public static final TagKey<Item> GRANITE = commonTag("granite");
     /**
      * Compat: allows other mods to add diorite variants which can be used to create diorite tools
      */
-    public static final TagKey<Item> DIORITE = forgeTag("diorite");
+    public static final TagKey<Item> DIORITE = commonTag("diorite");
     /**
      * Compat: allows other mods to add andesite variants which can be used to create andesite tools
      */
-    public static final TagKey<Item> ANDESITE = forgeTag("andesite");
+    public static final TagKey<Item> ANDESITE = commonTag("andesite");
     /**
      * Compat: allows other mods to add blackstone variants which can be used to create blackstone tools
      */
-    public static final TagKey<Item> BLACKSTONE = forgeTag("blackstone");
+    public static final TagKey<Item> BLACKSTONE = commonTag("blackstone");
     /**
      * Compat: allows other mods to add deepslate variants which can be used to create deepslate tools
      */
-    public static final TagKey<Item> DEEPSLATE = forgeTag("deepslate");
+    public static final TagKey<Item> DEEPSLATE = commonTag("deepslate");
     /**
      * Compat: allows other mods to add basalt variants which can be used to create basalt tools
      */
-    public static final TagKey<Item> BASALT = forgeTag("basalt");
+    public static final TagKey<Item> BASALT = commonTag("basalt");
 
     /**
      * Materials that can be used to craft wooden tool tables
@@ -349,14 +349,14 @@ public class TinkerTags {
     public static final TagKey<Item> SMELTERY = tag("smeltery");
     public static final TagKey<Item> FOUNDRY = tag("foundry");
 
-    public static final TagKey<Item> ORES_COBALT = forgeTag("cobalt_ores");
-    public static final TagKey<Item> RAW_BLOCK_COBALT = forgeTag("raw_cobalt_blocks");
-    public static final TagKey<Item> RAW_COBALT = forgeTag("raw_materials/cobalt");
+    public static final TagKey<Item> ORES_COBALT = commonTag("cobalt_ores");
+    public static final TagKey<Item> RAW_BLOCK_COBALT = commonTag("raw_cobalt_blocks");
+    public static final TagKey<Item> RAW_COBALT = commonTag("raw_cobalt_ores");
 
-    public static final TagKey<Item> NUGGETS_NETHERITE = forgeTag("netherite_nuggets");
-    public static final TagKey<Item> INGOTS_NETHERITE_SCRAP = forgeTag("netherite_scrap_ingots");
-    public static final TagKey<Item> NUGGETS_NETHERITE_SCRAP = forgeTag("netherite_scrap_nuggets");
-    public static final TagKey<Item> NUGGETS_COPPER = forgeTag("copper_nuggets");
+    public static final TagKey<Item> NUGGETS_NETHERITE = commonTag("netherite_nuggets");
+    public static final TagKey<Item> INGOTS_NETHERITE_SCRAP = commonTag("netherite_scrap_ingots");
+    public static final TagKey<Item> NUGGETS_NETHERITE_SCRAP = commonTag("netherite_scrap_nuggets");
+    public static final TagKey<Item> NUGGETS_COPPER = commonTag("copper_nuggets");
 
     public static final TagKey<Item> CASTS = tag("casts");
     public static final TagKey<Item> GOLD_CASTS = tag("casts/gold");
@@ -394,9 +394,9 @@ public class TinkerTags {
     public static final TagKey<Item> SCORCHED_TANKS = tag("scorched_tanks");
     public static final TagKey<Item> TANKS = tag("tanks");
 
-    public static final TagKey<Item> WITHER_BONES = forgeTag("wither_bones");
-    public static final TagKey<Item> BOOKS = forgeTag("books");
-    public static final TagKey<Item> GUIDEBOOKS = forgeTag("books/guide");
+    public static final TagKey<Item> WITHER_BONES = commonTag("wither_bones");
+    public static final TagKey<Item> BOOKS = commonTag("books");
+    public static final TagKey<Item> GUIDEBOOKS = commonTag("books/guide");
     public static final TagKey<Item> TINKERS_GUIDES = tag("guides");
 
     /**
@@ -634,13 +634,13 @@ public class TinkerTags {
     /**
      * Tag so mods like thermal know our scyhtes can harvest
      */
-    public static final TagKey<Item> SCYTHES = forgeTag("tools/scythe");
+    public static final TagKey<Item> SCYTHES = commonTag("tools/scythe");
 
     /**
      * Tag for others adding empty potion bottles
      */
-    public static final TagKey<Item> SPLASH_BOTTLE = forgeTag("bottles/splash");
-    public static final TagKey<Item> LINGERING_BOTTLE = forgeTag("bottles/lingering");
+    public static final TagKey<Item> SPLASH_BOTTLE = commonTag("bottles/splash");
+    public static final TagKey<Item> LINGERING_BOTTLE = commonTag("bottles/lingering");
 
     /**
      * Makes a tag in the tinkers domain
@@ -652,7 +652,7 @@ public class TinkerTags {
     /**
      * Makes a tag in the forge domain
      */
-    public static TagKey<Item> forgeTag(String name) {
+    public static TagKey<Item> commonTag(String name) {
       return TagKey.create(Registries.ITEM, new ResourceLocation("c", name));
     }
   }

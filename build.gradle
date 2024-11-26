@@ -47,33 +47,8 @@ repositories {
 }
 
 group = 'slimeknights.tconstruct'
-
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-
-// sets version to the slimeKnights version format
-task buildInfo {
-    try {
-        def cmd = "git rev-parse --short HEAD"
-        def proc = cmd.execute()
-        proc.waitFor()
-        if (proc.exitValue() == 0) {
-            ext.revision = proc.text.trim()
-        } else {
-            ext.revision = "GITBORK"
-        }
-    } catch (ignored) {
-        ext.revision = "gitgud"
-    }
-}
-ext.artifact_version = 'NFG'
-if (System.getenv().ARTIFACT_VERSION == null) {
-    artifact_version = "${mod_version}"
-}
-if (System.getenv().ARTIFACT_VERSION != null) {
-    artifact_version = "${system.getenv().ARTIFACT_VERSION}"
-}
-
-version = "${minecraft_version}-${artifact_version}"
+version = "${minecraft_version}-${mod_version}"
 
 sourceSets {
     main {
@@ -87,7 +62,6 @@ sourceSets {
 
 loom {
     accessWidenerPath = file("src/main/resources/tinkers.accesswidener")
-
     runs {
         datagen {
             client()
@@ -126,18 +100,14 @@ dependencies {
     implementation(include("com.google.code.findbugs:jsr305:3.0.2"))
 
     // dependencies
-    modImplementation(include(project.dependencies.project(path: ":Mantle", configuration: 'namedElements'))) { transitive false }
-
     modImplementation("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
     include(implementation(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-fabric:0.1.1")))
     for (String module in port_lib_modules.split(",")) {
         modImplementation(include("io.github.fabricators_of_create.Porting-Lib:$module:$port_lib_version+$minecraft_base_version"))
     }
 
-    modApi "dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cca_version}"
-    modApi "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:${project.cca_version}"
-    include "dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cca_version}"
-    include "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:${project.cca_version}"
+    modApi(include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cca_version}"))
+    modApi(include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:${project.cca_version}"))
 
     api(include('com.electronwill.night-config:core:3.6.6'))
     api(include('com.electronwill.night-config:toml:3.6.6'))
@@ -151,7 +121,7 @@ dependencies {
         exclude(group: "net.fabricmc.fabric-api")
     }
 
-    modImplementation "me.alphamode:Star:1.5+${minecraft_version}"
+    modImplementation(include("me.alphamode:Star:1.5+${minecraft_version}"))
 
     // REI
     modCompileOnlyApi("me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}") {

@@ -1,8 +1,10 @@
 {
   "schemaVersion": 1,
   "id": "tconstruct",
+  "provides": [
+    "mantle"
+  ],
   "version": "${version}",
-
   "name": "Supporoform",
   "description": "A little of this, a little of that, a lot of tinkering, and a lot of tools.",
   "authors": [
@@ -13,36 +15,38 @@
   "contact": {
     "sources": "https://github.com/CodeOfArdonia/TinkersConstruct-Fabric"
   },
-
   "license": "MIT",
   "icon": "logo.png",
-  "mixins": [
-    "supporoform.mixins.json"
-  ],
   "environment": "*",
   "entrypoints": {
     "main": [
+      "slimeknights.mantle.Mantle",
       "slimeknights.tconstruct.TConstruct"
     ],
     "client": [
+      "slimeknights.mantle.client.ClientEvents",
       "slimeknights.tconstruct.shared.TinkerClient"
     ],
     "fabric-datagen": [
+      "slimeknights.mantle.MantleData",
       "slimeknights.tconstruct.TConstructData"
     ],
     "rei_client": [
+      "slimeknights.mantle.plugin.rei.REIPlugin",
       "slimeknights.tconstruct.plugin.rei.REIPlugin"
     ],
     "rei_common": [
       "slimeknights.tconstruct.plugin.rei.REIPluginServer"
     ],
     "jei_mod_plugin": [
+      "slimeknights.mantle.plugin.jei.JEIPlugin",
       "slimeknights.tconstruct.plugin.jei.JEIPlugin"
     ],
     "mixinsquared": [
       "slimeknights.tconstruct.StarSodiumFixer"
     ],
     "cardinal-components": [
+      "slimeknights.mantle.util.OffhandCooldownTracker",
       "slimeknights.tconstruct.gadgets.capability.PiggybackCapability",
       "slimeknights.tconstruct.tools.logic.EquipmentChangeWatcher",
       "slimeknights.tconstruct.library.tools.capability.TinkerDataCapability",
@@ -53,6 +57,7 @@
   "accessWidener": "tinkers.accesswidener",
   "custom": {
     "cardinal-components": [
+      "mantle:offhand_cooldown",
       "tconstruct:piggyback",
       "tconstruct:equipment_watcher",
       "tconstruct:persistent_data",
@@ -60,11 +65,14 @@
       "tconstruct:modifiers"
     ]
   },
+  "mixins": [
+    "mantle.mixins.json",
+    "supporoform.mixins.json"
+  ],
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric": ">=${fabric_version}",
     "minecraft": ">=${minecraft_version}",
-    "mantle": ">=${mantle_version}",
     "porting_lib_accessors": ">=${port_lib_accessors_version}",
     "porting_lib_attributes": ">=${port_lib_attributes_version}",
     "porting_lib_base": ">=${port_lib_base_version}",
