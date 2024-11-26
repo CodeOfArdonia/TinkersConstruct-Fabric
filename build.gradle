@@ -123,6 +123,8 @@ dependencies {
 
     modImplementation(include("me.alphamode:Star:1.5+${minecraft_version}"))
 
+    modApi "com.terraformersmc:modmenu:7.2.2"
+
     // REI
     modCompileOnlyApi("me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}") {
         exclude(group: "net.fabricmc.fabric-api")
@@ -150,7 +152,6 @@ dependencies {
             exclude(group: "net.fabricmc.fabric-api")
         }
     } else if (project.recipe_viewer == 'emi') {
-        modRuntimeOnly "mezz.jei:jei-${minecraft_version}-fabric:${jei_version}"
         modRuntimeOnly "dev.emi:emi-fabric:${project.emi_version}"
     } else {
         println("unknown recipe viewer: $recipe_viewer")

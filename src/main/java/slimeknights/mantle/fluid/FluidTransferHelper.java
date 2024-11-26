@@ -81,9 +81,9 @@ public class FluidTransferHelper {
         // extract it, or rollback if the amounts don't match
         long drained = view.extract(resource, accepted, transferTransaction);
         if (drained != accepted) {
-          Mantle.logger.error("Lost {} fluid during transfer", drained - accepted);
-        }
-        transferTransaction.commit();
+          transferTransaction.abort();
+          Mantle.logger.debug("Lost {} fluid during transfer, cancelled transfer", drained - accepted);
+        } else transferTransaction.commit();
         return new FluidStack(resource, drained);
       }
     }
