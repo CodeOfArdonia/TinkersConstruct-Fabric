@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
@@ -40,7 +41,15 @@ public class SmelteryTank<T extends MantleBlockEntity & ISmelteryTankHandler> ex
   private List<FluidStack> fluids;
   /**
    * Maximum capacity of the smeltery
+   * -- SETTER --
+   * Updates the maximum tank capacity
+   * <p>
+   * <p>
+   * -- GETTER --
+   * Gets the maximum amount of space in the smeltery tank
    */
+  @Getter
+  @Setter
   private long capacity;
   /**
    * Current amount of fluid in the tank
@@ -68,24 +77,6 @@ public class SmelteryTank<T extends MantleBlockEntity & ISmelteryTankHandler> ex
 
 
   /* Capacity and space */
-
-  /**
-   * Updates the maximum tank capacity
-   *
-   * @param maxCapacity New max capacity
-   */
-  public void setCapacity(long maxCapacity) {
-    this.capacity = maxCapacity;
-  }
-
-  /**
-   * Gets the maximum amount of space in the smeltery tank
-   *
-   * @return Tank capacity
-   */
-  public long getCapacity() {
-    return this.capacity;
-  }
 
   /**
    * Gets the amount of empty space in the tank
@@ -361,25 +352,19 @@ public class SmelteryTank<T extends MantleBlockEntity & ISmelteryTankHandler> ex
       if (this.fluid.isFluidEqual(resource)) {
         // if found, determine how much we can drain
         long drainable = Math.min(maxAmount, this.fluid.getAmount());
-
-        // copy contained fluid to return for accuracy
-        FluidStack ret = this.fluid.copy();
-        ret.setAmount(drainable);
-
         // update tank if executing
         this.updateSnapshots(transaction);
-        this.fluid.shrink(drainable);
-        SmelteryTank.this.contained -= drainable;
         // if now empty, remove from the list
-        transaction.addOuterCloseCallback((result) -> {
-          if (result.wasCommitted()) {
-            if (this.fluid.getAmount() <= 0) {
-              SmelteryTank.this.fluids.remove(this.slot);
-              SmelteryTank.this.parent.notifyFluidsChanged(FluidChange.REMOVED, this.fluid);
-            } else {
-              SmelteryTank.this.parent.notifyFluidsChanged(FluidChange.CHANGED, this.fluid);
-            }
-          }
+        transaction.addOuterCloseCallback(result -> {
+          if (result.wasAborted()) return;
+          this.fluid.shrink(drainable);
+          SmelteryTank.this.getFluidInTank(this.slot).shrink(drainable);
+          SmelteryTank.this.contained -= drainable;
+          if (this.fluid.getAmount() <= 0) {
+            SmelteryTank.this.fluids.remove(this.slot);
+            SmelteryTank.this.parent.notifyFluidsChanged(FluidChange.REMOVED, this.fluid);
+          } else
+            SmelteryTank.this.parent.notifyFluidsChanged(FluidChange.CHANGED, this.fluid);
         });
 
 

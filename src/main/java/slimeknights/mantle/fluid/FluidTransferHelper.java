@@ -60,9 +60,10 @@ public class FluidTransferHelper {
    * @param input   Fluid source
    * @param output  Fluid destination
    * @param maxFill Maximum to transfer
+   * @param force   should force fill. MAY CAUSE FLUID COPY!!!
    * @return True if transfer succeeded
    */
-  public static FluidStack tryTransfer(Storage<FluidVariant> input, Storage<FluidVariant> output, long maxFill) {
+  public static FluidStack tryTransfer(Storage<FluidVariant> input, Storage<FluidVariant> output, long maxFill, boolean force) {
     for (StorageView<FluidVariant> view : input) {
       if (view.isResourceBlank()) continue;
       FluidVariant resource = view.getResource();
@@ -80,10 +81,12 @@ public class FluidTransferHelper {
 
         // extract it, or rollback if the amounts don't match
         long drained = view.extract(resource, accepted, transferTransaction);
-        if (drained != accepted) {
+        if (accepted == 0 || drained == 0 || drained != accepted && !force) {
           transferTransaction.abort();
           Mantle.logger.debug("Lost {} fluid during transfer, cancelled transfer", drained - accepted);
-        } else transferTransaction.commit();
+          return FluidStack.EMPTY;
+        }
+        transferTransaction.commit();
         return new FluidStack(resource, drained);
       }
     }
@@ -197,12 +200,12 @@ public class FluidTransferHelper {
           if (!world.isClientSide) {
             Storage<FluidVariant> itemHandler = ContainerItemContext.forPlayerInteraction(player, hand).find(FluidStorage.ITEM);
             // first, try filling the TE from the item
-            FluidStack transferred = tryTransfer(itemHandler, teHandler, Long.MAX_VALUE);
+            FluidStack transferred = tryTransfer(itemHandler, teHandler, Long.MAX_VALUE, player.isCreative());
             if (!transferred.isEmpty()) {
               playEmptySound(world, pos, player, transferred);
             } else {
               // if that failed, try filling the item handler from the TE
-              transferred = tryTransfer(teHandler, itemHandler, Integer.MAX_VALUE);
+              transferred = tryTransfer(teHandler, itemHandler, Integer.MAX_VALUE, player.isCreative());
               if (!transferred.isEmpty()) {
                 playFillSound(world, pos, player, transferred);
               }

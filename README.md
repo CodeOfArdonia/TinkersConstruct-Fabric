@@ -16,6 +16,7 @@ Also, this is an LTS version only for 1.20.1 fabric. So don't ask me for porting
 - Piggy backpack will make your chestplate disappear.
 - When trying to fill a container without enough space, it will cause fluid copy. (Now it will deny fluid transfer)
 - When putting a single fuel in heater it will disappear without adding furnace burn time.
+- Fix fluids in smeltery disappear when try to insert/extract fluids to drain in certain conditions.
 
 ## Modifications
 
