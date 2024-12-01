@@ -16,7 +16,7 @@
     "sources": "https://github.com/CodeOfArdonia/TinkersConstruct-Fabric"
   },
   "license": "MIT",
-  "icon": "logo.png",
+  "icon": "logo.jpg",
   "environment": "*",
   "entrypoints": {
     "main": [
