@@ -8,7 +8,7 @@ Also, this is an LTS version only for 1.20.1 fabric. So don't ask me for porting
 
 ## Fixes
 
-- Casting Table&Basin will not drop casts and items correctly.
+- Inventory blocks will not drop items correctly.
 - Crash client when you open the gui provide by a broken smeltery.
 - Some recipes cannot be used due to wrong tags.
 - When throwing items directly in to smeltery it will wrongly stack.

@@ -15,16 +15,19 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.Nameable;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import slimeknights.mantle.fabric.transfer.InventoryStorage;
 import slimeknights.mantle.util.ItemStackList;
 
 import javax.annotation.Nonnull;
+import java.util.Collections;
 
 // Updated version of InventoryLogic in Mantle. Also contains a few bugfixes DOES NOT OVERRIDE createMenu
 public abstract class InventoryBlockEntity extends NameableBlockEntity implements Container, MenuProvider, Nameable, SidedStorageBlockEntity {
@@ -177,9 +180,7 @@ public abstract class InventoryBlockEntity extends NameableBlockEntity implement
 
   @Override
   public void clearContent() {
-    for (int i = 0; i < this.inventory.size(); i++) {
-      this.inventory.set(i, ItemStack.EMPTY);
-    }
+    Collections.fill(this.inventory, ItemStack.EMPTY);
   }
 
   /* Supporting methods */
@@ -257,9 +258,8 @@ public abstract class InventoryBlockEntity extends NameableBlockEntity implement
       int slot = itemTag.getByte(TAG_SLOT) & 255;
       if (slot < this.inventory.size()) {
         stack = ItemStack.of(itemTag);
-        if (!stack.isEmpty() && stack.getCount() > limit) {
+        if (!stack.isEmpty() && stack.getCount() > limit)
           stack.setCount(limit);
-        }
         this.inventory.set(slot, stack);
       }
     }
@@ -267,12 +267,16 @@ public abstract class InventoryBlockEntity extends NameableBlockEntity implement
 
   @Override
   public boolean isEmpty() {
-    for (ItemStack itemstack : this.inventory) {
-      if (!itemstack.isEmpty()) {
+    for (ItemStack itemstack : this.inventory)
+      if (!itemstack.isEmpty())
         return false;
-      }
-    }
-
     return true;
+  }
+
+  public void dropStacks() {
+    if (this.level == null) return;
+    Vec3 pos = Vec3.atCenterOf(this.getBlockPos());
+    for (ItemStack stack : this.inventory)
+      this.level.addFreshEntity(new ItemEntity(this.level, pos.x, pos.y, pos.z, stack));
   }
 }

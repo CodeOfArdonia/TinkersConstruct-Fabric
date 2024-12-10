@@ -19,7 +19,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.WorldlyContainer;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -163,13 +162,6 @@ public abstract class CastingBlockEntity extends TableBlockEntity implements Wor
   @Override
   public Storage<FluidVariant> getFluidStorage(@org.jetbrains.annotations.Nullable Direction direction) {
     return this.tank;
-  }
-
-  public void dropStacks() {
-    if (this.level == null) return;
-    BlockPos pos = this.getBlockPos();
-    this.level.addFreshEntity(new ItemEntity(this.level, pos.getX(), pos.getY(), pos.getZ(), this.getItem(INPUT)));
-    this.level.addFreshEntity(new ItemEntity(this.level, pos.getX(), pos.getY(), pos.getZ(), this.getItem(OUTPUT)));
   }
 
   /**
