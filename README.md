@@ -1,5 +1,8 @@
 # Supporoform
 
+**Special Version Notice: This mod is for my modpack, so do not ask for following stuffs: support other MC version,
+integrations with other mods except mods in modpack.**
+
 This is a fork of `Tinker's Construct`/`Hephaestus`, contains bug fixes and some slight modifications designed for my
 modpack.
 
