@@ -24,6 +24,7 @@ Also, this is an LTS version only for 1.20.1 fabric. So don't ask me for porting
 ## Modifications
 
 - Remove skeletons smelt to milk recipes.
+- Updated Star to solve conflict with `Thin Air`
 
 ## Capability
 
