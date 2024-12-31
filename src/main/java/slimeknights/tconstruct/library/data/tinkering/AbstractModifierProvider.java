@@ -139,7 +139,7 @@ public abstract class AbstractModifierProvider extends GenericDataProvider {
     this.addModifiers();
     List<CompletableFuture<?>> futures = new ArrayList<>();
     this.allModifiers.forEach((id, data) -> futures.add(this.saveThing(cache, id, data.serialize())));
-    this.composableModifiers.forEach((id, data) -> this.saveThing(cache, id, data.serialize()));
+    this.composableModifiers.forEach((id, data) -> futures.add(this.saveThing(cache, id, data.serialize())));
     return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
   }
 
