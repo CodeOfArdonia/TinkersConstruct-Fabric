@@ -1,6 +1,7 @@
 package slimeknights.tconstruct.library.tools.nbt;
 
 import com.google.common.collect.ImmutableSet;
+import com.iafenvoy.tconstruct.extra.ModifierCache;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.nbt.CompoundTag;
@@ -17,6 +18,7 @@ import slimeknights.tconstruct.library.materials.MaterialRegistry;
 import slimeknights.tconstruct.library.materials.definition.MaterialVariantId;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.library.modifiers.ModifierId;
+import slimeknights.tconstruct.library.modifiers.ModifierManager;
 import slimeknights.tconstruct.library.modifiers.TinkerHooks;
 import slimeknights.tconstruct.library.recipe.tinkerstation.ValidatedResult;
 import slimeknights.tconstruct.library.tools.SlotType;
@@ -895,7 +897,8 @@ public class ToolStack implements IToolStackView {
     ToolStack tool = ToolStack.from(item, definition, tag);
     tool.ensureSlotsBuilt();
     if (hasMaterials || !definition.isMultipart()) {
-      tool.rebuildStats();
+      if (ModifierManager.INSTANCE.isDynamicModifiersLoaded()) tool.rebuildStats();
+      else ModifierCache.RUN_AFTER_LOAD_MODIFIERS.add(tool::rebuildStats);
     }
   }
 }
